@@ -1,0 +1,237 @@
+.crud_btn {
+    background: #0d6efd;
+    border-radius: 5px;
+    height: 35px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+
+
+}
+
+.table_tag {
+    width: 100%;
+    /* border: 1px solid #a9a9a957; */
+    background-color: white;
+    
+}
+
+.table_head_tag {
+    border-bottom: 1px solid #a9a9a957;
+    height: 35px;
+    background: #0a5881;
+    color: white;
+    font-size: 14px;
+    font-weight: 700px;
+}
+.action_icon{
+    font-size: 16px !important;
+    color: #0a5881;
+}
+
+
+
+.table_tag {
+    border-collapse: collapse;
+    /* width:200%; */
+  }
+  
+  .table_head_tag  tr > th {
+    background:#0a5881;
+    position: sticky;
+    padding:.5rem;
+    z-index:2;
+    top: 0;
+  }
+  
+  .table_head_tag tr > :first-child {
+    z-index:3;
+    left:0;
+    top:0;
+  }
+  
+
+  .table_tr > :first-child {
+    background:#d5e1e7;
+    position: sticky;
+    z-index:1;
+    left:0;
+  }
+
+  .table_head_tag tr > :nth-child(2) {
+    z-index:3;
+    left:28px;
+    top:0;
+  }
+  
+
+  .table_tr > :nth-child(2) {
+    background:#d5e1e7;
+    position: sticky;
+    z-index:1;
+    left:28px;
+  }
+ 
+.table_th_tag {
+    border-right: 1px dotted #c5d5ec;
+        /* min-width: 50px; */
+    white-space: nowrap;
+    /* overflow: hidden;
+    max-width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis; */
+}
+.table_th_icon{
+    font-size: 15px !important;
+}
+.table_th_icon_menu{
+    position: absolute;
+    width: 210px;
+    background: white;
+    right: -162px;
+    z-index: 111;
+    opacity: 1;
+    box-shadow: 0px 0px 11px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    cursor: pointer;
+    display: block;
+    top: 192.391px;
+    /* left: 43.015px; mobile */
+   left: 192.015px; 
+}
+
+.table_div {
+    /* background-color: #bdbdbd40; */
+    background-color: white;
+
+    border-radius: 10px;
+    box-shadow: 0 1px 15px 1px rgba(62, 57, 107, .07);
+}
+.table_td{
+    background: #d5e1e7;
+}
+.table_tr {
+    /* border-bottom: 1px solid #a9a9a957; */
+    border-bottom: 2px solid #eff7ff;
+    font-size: 14px;
+    color: gray;
+
+}
+
+.no_data_found {
+    color: gray;
+}
+
+.action_column {
+    width: 80px;
+}
+.check_box_column {
+    width: 40px;
+}
+.table_div2 {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid #a9a9a938;
+    height: 389px;
+}
+
+.text_area_field {
+    min-width: 462px !important;
+}
+
+.single_select_field {
+    min-width: 210px !important;
+}
+
+.selected_row_text {
+    font-size: 14px;
+    color: gray;
+
+}
+
+.pagination_btn {
+    border: none !important;
+}
+
+.search_container {
+    width: 400px;
+    height: 50px;
+    position: absolute;
+    /* top: calc(50% - 25px); */
+    /* left: calc(50% - 200px); */
+    left: calc(73% - 200px);
+    display: flex;
+    justify-content: end;
+
+}
+/* tr:nth-child(even) {
+    background-color: #f2f2f2;
+  } */
+
+.search_container .search {
+    position: relative;
+    height: 100%;
+}
+
+.search_container .search input {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    right: calc(50% - 25px);
+    top: 0;
+    padding: 0 25px;
+    border: 0;
+    border-radius: 25px;
+    color: #4e4e4e;
+    font-size: 18px;
+    font-weight: 300;
+    box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.1),
+        0 1px 28px 0 rgba(0, 0, 0, 0.2),
+        0 0 40px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.6s cubic-bezier(0, 2, 1, -1);
+}
+
+.search_container .search button {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    right: calc(50% - 25px);
+    top: 0;
+    margin: auto;
+    background: #2d2926;
+    color: #fff;
+    font-size: 15px;
+    border: 0;
+    border-radius: 50%;
+    box-shadow: 0 6px 28px 0 rgba(0, 0, 0, 0.0), 0 5px 55px 0 rgba(0, 0, 0, 0.0);
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0, 2, 1, -1);
+    justify-content: center;
+    display: flex;
+}
+
+.search_container .search input:focus,
+.search_container .search input:active,
+.search_container .search:hover input {
+    width: 300px;
+    right: 0;
+}
+
+.search_container .search input:focus+button,
+.search_container .search input:active+button,
+.search_container .search:hover button {
+    right: 0;
+    box-shadow: 0 6px 28px 0 rgba(0, 0, 0, 0.3), 0 5px 55px 0 rgba(0, 0, 0, 0.2);
+}
+
+
+@media screen and (max-width: 480px) {
+    .text_area_field {
+        min-width: 269px !important;
+    }
+
+    .single_select_field {
+        min-width: 269px !important;
+    }
+}

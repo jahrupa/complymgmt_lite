@@ -1,0 +1,44 @@
+.white-card {
+    background-color: white;
+    width: auto;
+    min-height: 100px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.dashboard-heading {
+    font-weight: 600;
+    font-size: 23px;
+}
+
+.dashboard-card-header-text {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.dashboard-card-sub-header-text {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.progress-text {
+    color: #0D6EFD;
+    font-weight: bolder;
+    font-size: 14px;
+}
+
+.progress-text1 {
+    color: gray;
+    font-size: 14px;
+}
+
+
+.v-line {
+    border-left: 5px solid #00008B;
+    height: 25px;
+}
+
+.v-line-d {
+    display: flex;
+    gap: 2px
+}
