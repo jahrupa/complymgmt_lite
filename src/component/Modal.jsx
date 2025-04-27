@@ -1,5 +1,5 @@
 // Modal Component
-const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen }) => {
+const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,isEditing }) => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -10,8 +10,8 @@ const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen }) => {
         <div className="modal fade show modal-lg" id="exampleModalCenter" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" style={{ display: 'block' }}>
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
-              <div className="d-flex justify-content-between modal-header">
-                <h5 className="modal-title" id="exampleModalLongTitle">{crudTitle}</h5>
+              <div className="d-flex justify-content-between modal-header pt-1 pb-0">
+                <h5 className="modal-title" id="exampleModalLongTitle">{isEditing?editCrudTitle:crudTitle}</h5>
                 <button type="button" className="close btn w-auto" onClick={closeModal} aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>

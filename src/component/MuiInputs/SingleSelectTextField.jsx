@@ -17,7 +17,7 @@ export default function SingleSelectTextField({value, onChange,names,label}) {
   };
 
   return (
-      <FormControl sx={{width:'-webkit-fill-available'}}>
+      <FormControl sx={{width:'-webkit-fill-available'}} className='mb-3' >
         <InputLabel id="demo-controlled-open-select-label">{label}</InputLabel>
         <Select
           labelId="demo-controlled-open-select-label"
@@ -29,6 +29,8 @@ export default function SingleSelectTextField({value, onChange,names,label}) {
           label={label}
           onChange={onChange}
           name={names}
+        
+          
         >
           <MenuItem value="">
             <em>None</em>

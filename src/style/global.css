@@ -1,5 +1,10 @@
 body {
     margin: 0;
-    font-family: 'roboto',  sans-serif !important;
-    background: #F4F5FA;
+    font-family: 'Inter', 'Poppins', sans-serif !important;
+    background: white;
+  }
+
+  .button-style{
+    font-size: 16px;
+    font-weight: 600;
   }

@@ -34,7 +34,7 @@ export default function MultipleSelectTextFields({ value, onChange,names,label }
   };
 
   return (
-    <FormControl className='text_area_field'>
+    <FormControl className='text_area_field w-100 mb-3'>
       <InputLabel id="demo-multiple-chip-label">{label}</InputLabel>
       <Select
         labelId="demo-multiple-chip-label"

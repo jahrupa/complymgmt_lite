@@ -10,137 +10,90 @@ import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
+import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
+import PasswordInput from '../component/MuiInputs/PasswordInput';
 
 
 const dummuJsonData = [
   {
     "id": 1744096161424,
-    "name": "rupa",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
+    "user_name": "rupa",
+    "email_id": "jha@gmail.com",
+    "role": "Admin",
+    "status": "Active",
+    "temporary_password": "password12",
+    "access_modules": [
       "Admin",
       "Editor"
     ]
   },
   {
-    "id": 1744096172140,
-    "name": "RUAP JHA",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
+    "id": 1744096161425,
+    "user_name": "rupa",
+    "email_id": "jha@gmail.com",
+    "role": "Admin",
+    "status": "Inactive",
+    "temporary_password": "password12",
+    "access_modules": [
+      "Admin",
       "Editor"
     ]
   },
   {
-    "id": 1744096188895,
-    "name": "SHIVAM",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Viewer",
-      "Manager"
+    "id": 1744096161426,
+    "user_name": "rupa",
+    "email_id": "jha@gmail.com",
+    "role": "Admin",
+    "status": "Active",
+    "temporary_password": "password12",
+    "access_modules": [
+      "Admin",
+      "Editor"
     ]
   },
   {
-    "id": 1744096201341,
-    "name": "YASH",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Admin"
+    "id": 1744096161427,
+    "user_name": "rupa",
+    "email_id": "jha@gmail.com",
+    "role": "Admin",
+    "status": "Inactive",
+    "temporary_password": "password12",
+    "access_modules": [
+      "Admin",
+      "Editor"
     ]
   },
   {
-    "id": 1744096214025,
-    "name": "NEHA",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Editor",
-      "Viewer"
+    "id": 1744096161428,
+    "user_name": "rupa",
+    "email_id": "jha@gmail.com",
+    "role": "Admin",
+    "status": "Active",
+    "temporary_password": "password12",
+    "access_modules": [
+      "Admin",
+      "Editor"
     ]
   },
   {
-    "id": 1744096228460,
-    "name": "CHARCOL",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Viewer"
+    "id": 1744096161429,
+    "user_name": "rupa",
+    "email_id": "jha@gmail.com",
+    "role": "Admin",
+    "status": "Inactive",
+    "temporary_password": "password12",
+    "access_modules": [
+      "Admin",
+      "Editor"
     ]
   },
-  {
-    "id": 1744096251027,
-    "name": "MINAL",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Manager"
-    ]
-  },
-  {
-    "id": 1744096267626,
-    "name": "RATHI",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Developer"
-    ]
-  },
-  {
-    "id": 1744096267626,
-    "name": "RATHI",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Developer"
-    ]
-  },
-  {
-    "id": 1744096267626,
-    "name": "RATHI",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Developer"
-    ]
-  },
-  {
-    "id": 1744096267626,
-    "name": "RATHI",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Developer"
-    ]
-  },
-  {
-    "id": 1744096267626,
-    "name": "RATHI",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Developer"
-    ]
-  },
-  {
-    "id": 1744096267626,
-    "name": "RATHI",
-    "age": "",
-    "desc": "NA",
-    "roleAccess": [
-      "Developer"
-    ]
-  }
-
 ]
 
 const UserRolesPage = () => {
   // const [data, setData] = useState([]);
   // if you want to show dummy jason data 
   const [data, setData] = useState(dummuJsonData);
-  const [current, setCurrent] = useState({ id: null, name: '', age: '', desc: '', roleAccess: [] });
+  const [current, setCurrent] = useState({ id: null, user_name: '', email_id: '', role: '', temporary_password: "", status: '', desc: '', access_modules: [] });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -155,7 +108,7 @@ const UserRolesPage = () => {
     'Manager',
     'Developer',
   ];
-  
+
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -163,21 +116,21 @@ const UserRolesPage = () => {
   };
   // Handle role access change
   const handleRoleAccessChange = (newValue) => {
-    setCurrent((prev) => ({ ...prev, roleAccess: newValue }));
+    setCurrent((prev) => ({ ...prev, access_modules: newValue }));
   };
   // Handle Add or Edit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isEditing) {
       const updatedData = data.map((item) =>
-        item.id === current.id ? { ...item, name: current.name, age: current.age, desc: current.desc, roleAccess: current.roleAccess } : item
+        item.id === current.id ? { ...item, user_name: current.user_name, email_id: current.email_id, role: current.role, temporary_password: current.temporary_password, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
       );
       setData(updatedData);
     } else {
-      const newData = { id: Date.now(), name: current.name, age: current.age, desc: current.desc, roleAccess: current.roleAccess };
+      const newData = { id: Date.now(), user_name: current.user_name, email_id: current.email_id, role: current.role, temporary_password: current.temporary_password, status: current.status, desc: current.desc, access_modules: current.access_modules };
       setData((prev) => [...prev, newData]);
     }
-    setCurrent({ id: null, name: '', age: '', desc: '', roleAccess: [] });
+    setCurrent({ id: null, user_name: '', email_id: '', role: '', temporary_password: '', status: '', desc: '', access_modules: [] });
     setIsEditing(false);
     setIsModalOpen(false);
 
@@ -244,35 +197,35 @@ const UserRolesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
+  const userStatus = ['Active', 'Inactive'];
+
+
   const crudForm = () => {
     return (
       <div>
         {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-            <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='name' handleChange={handleChange} value={current.name} />
-            <MuiTextField label='email' type='email' isRequired={true} fieldName='name' handleChange={handleChange} value={current.name} />
+          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} />
+          <MuiTextField label='email' type='email' isRequired={true} fieldName='email_id' handleChange={handleChange} value={current.email_id} />
         </div>
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-            <MuiTextField label='Contact No' type='number' isRequired={true} fieldName='name' handleChange={handleChange} value={current.name} />
-            <MuiTextField label='Designation' type='text' isRequired={true} fieldName='name' handleChange={handleChange} value={current.name} />
+          <PasswordInput name='temporary_password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.temporary_password} />
+          <SingleSelectTextField name="role" label="role" value={current.role} onChange={(e) => setCurrent((prev) => ({ ...prev, role: e.target.value }))} names={roleName} />
+
         </div>
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-            <MuiTextField label='User Type' type='text' isRequired={true} fieldName='name' handleChange={handleChange} value={current.name} />
-            <MuiTextField label='Status' type='text' isRequired={true} fieldName='name' handleChange={handleChange} value={current.name} />
+          <MuiTextField label='User Type' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} />
+          <SingleSelectTextField name="status" label="status" value={current.status} onChange={(e) => setCurrent((prev) => ({ ...prev, status: e.target.value }))} names={userStatus} />
         </div>
-        <div className='mb-3'>
-          <MultipleSelectTextFields label='Role Access' value={current.roleAccess} onChange={handleRoleAccessChange} names={names} />
-        </div>
-        <div className='d-flex justify-content-between mt-2 mb-3'>
-          <MuiTextAreaField value={current.desc} handleChange={handleChange} name='desc' label='Description' />
-        </div>
+        <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} />
 
         <div className="row row-gap-2">
           <div className='col col-12 col-md-6'>
-            <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
+            <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancle</span></button>
           </div>
-          <div className='col col-12 col-md-6'>
-            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? 'Update' : 'Add'}</button>
+          <div className='col col-12 col-md-6 d-flex justify-content-end'>
+            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create User</span>}</button>
           </div>
         </div>
         {/* </form> */}
@@ -281,7 +234,9 @@ const UserRolesPage = () => {
     )
 
   }
-  const crudTitle = "Create User & Add Role"
+  const crudTitle = "Add New User Form"
+  const editCrudTitle = "Edit User"
+
   return (
     <div>
       {/* Form for Create or Edit */}
@@ -296,8 +251,8 @@ const UserRolesPage = () => {
         />
         <input
           type="number"
-          name="age"
-          value={current.age}
+          name="email_id"
+          value={current.email_id}
           onChange={handleChange}
           placeholder="Age"
           required
@@ -310,27 +265,28 @@ const UserRolesPage = () => {
 
       {/* Table to display data */}
       <div className='table_div p-3'>
-        <div className='d-flex justify-content-end mb-3'>
-          {/* <div class="search_container">
-            <div class="search">
-              <input type="text" placeholder="Search..." />
-              <button type="submit"><SearchIcon /></button>
+        <div className='d-lg-flex d-md-flex  justify-content-between'>
+          <div class="search-bar-container h-25">
+            <input type="text" placeholder="Search.." name="search" className='search-bar-input p-1 w-100'/>
+            <button className='search-icon'><SearchIcon /></button>
+          </div>
+
+          <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+            <div className='pe-2'>
+              <button className='crud_btn' onClick={openModal}>
+                <span><AddIcon /></span> <span className='button-style'>Add New User</span>
+              </button>
             </div>
-          </div> */}
+            <div>
+              <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
+                <span className='button-style'> Delete All</span>
+              </button>
+            </div>
 
-          <div className='pe-2'>
-            <button className='crud_btn' onClick={openModal}>
-              <span><AddIcon /></span> <span>Add Record</span>
-            </button>
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
-          <div>
-            <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
-              Delete All
-            </button>
-          </div>
-
-          <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
         </div>
+
         <div className='table_div2'>
           <table className='table_tag'>
             <thead className='table_head_tag'>
@@ -345,19 +301,42 @@ const UserRolesPage = () => {
                 </th>
                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
 
-                <th className='table_th_tag  ps-2 pe-2'><span>Name</span>
+                <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
                   <span className='ms-4'>
                     <ExpandCircleDownIcon className='table_th_icon' />
 
                   </span>
+
                   {/* <div class="dropdown-menu table_th_icon_menu" aria-labelledby="dropdownMenu2">
     <button class="dropdown-item" type="button">Action</button>
     <button class="dropdown-item" type="button">Another action</button>
     <button class="dropdown-item" type="button">Something else here</button>
   </div> */}
                 </th>
-                <th className="table_th_tag ps-2 pe-2"><span>Role Access</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Description</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
+
+                <th className='table_th_tag  ps-2 pe-2'><span>Email Id</span>
+                  <span className='ms-4'>
+                    <ExpandCircleDownIcon className='table_th_icon' />
+
+                  </span>
+                </th>
+                <th className='table_th_tag  ps-2 pe-2'><span>Role</span>
+                  <span className='ms-4'>
+                    <ExpandCircleDownIcon className='table_th_icon' />
+                  </span>
+                </th>
+                <th className='table_th_tag  ps-2 pe-2'><span>Status</span>
+                  <span className='ms-4'>
+                    <ExpandCircleDownIcon className='table_th_icon' />
+                  </span>
+                </th>
+                <th className='table_th_tag  ps-2 pe-2'><span>Password</span>
+                  <span className='ms-4'>
+                    <ExpandCircleDownIcon className='table_th_icon' />
+                  </span>
+                </th>
+                <th className="table_th_tag ps-2 pe-2"><span>Access Modules</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
+                {/* <th className='table_th_tag  ps-2 pe-2'><span>Description</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th> */}
               </tr>
             </thead>
             <tbody>
@@ -384,9 +363,13 @@ const UserRolesPage = () => {
                         <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
                       </div>
                     </td>
-                    <td className='  ps-2 pe-2'>{item.name}</td>
-                    <td className=" ps-2 pe-2">{item.roleAccess.join(', ')}</td>
-                    <td className='  ps-2 pe-2'>{item.desc}</td>
+                    <td className='  ps-2 pe-2'>{item.user_name}</td>
+                    <td className='  ps-2 pe-2'>{item.email_id}</td>
+                    <td className='  ps-2 pe-2'>{item.role}</td>
+                    <td className='  ps-2 pe-2'><span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span></td>
+                    <td className='  ps-2 pe-2'>{item.temporary_password}</td>
+                    <td className=" ps-2 pe-2">{item.access_modules.join(', ')}</td>
+                    {/* <td className='  ps-2 pe-2'>{item.desc}</td> */}
                   </tr>
                 ))
               )}
