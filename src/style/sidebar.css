@@ -51,11 +51,11 @@ width: 250px;
 }
 
 .openbtn {
-  font-size: 20px;
+  /* font-size: 20px; */
   cursor: pointer;
   background-color: white;
   color: gray;
-  padding: 10px 15px;
+  /* padding: 10px 15px; */
   border: none;
 }
 
@@ -91,14 +91,19 @@ width: 250px;
 }
 
 .sidebar-close-icon-span {
-  background: #80808021;
+  background: #F7F7F7;
   width: 35px;
   height: 35px;
   border-radius: 2px;
   cursor: pointer;
   display: flex;
-}
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
 
+}
+.side-bar-active-tab{
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  border: 1px solid powderblue;
+}
 .sidebar-close-icon-active {
   color: darkblue;
   /* margin: 6px; */

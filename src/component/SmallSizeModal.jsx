@@ -1,5 +1,5 @@
 // Modal Component
-const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,isEditing }) => {
+const SmallSizeModal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,isEditing }) => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -7,7 +7,7 @@ const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,
   return (
     <div>
       {isModalOpen && (
-        <div className="modal fade show modal-lg" id="exampleModalCenter" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" style={{ display: 'block' }}>
+        <div className="modal fade show" id="exampleModalCenter" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" style={{ display: 'block' }}>
           <div className="modal-dialog modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="d-flex justify-content-between modal-header pt-1 pb-0">
@@ -27,4 +27,4 @@ const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,
   );
 };
 
-export default Modal;
+export default SmallSizeModal;

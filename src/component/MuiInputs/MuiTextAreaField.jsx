@@ -28,7 +28,6 @@ export default function MuiTextAreaField({value,handleChange,name,label}) {
 
     return (
         <form className={classes.root} noValidate autoComplete="off">
-            <div className="">
                 <TextField
                     id="outlined-textarea"
                     label={label}
@@ -39,9 +38,8 @@ export default function MuiTextAreaField({value,handleChange,name,label}) {
                     variant="outlined"
                     inputProps={{ className: classes.textarea }}
                     onChange={handleChange}
-                    className="text_area_field"
+                    className="text_area_field mb-3 w-100"
                 />
-            </div>
         </form>
     );
 }

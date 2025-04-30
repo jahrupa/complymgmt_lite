@@ -14,7 +14,6 @@ import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
-import Toggle from '../component/Toggle';
 
 
 const dummuJsonData = [
@@ -110,7 +109,7 @@ const dummuJsonData = [
   },
 ]
 
-const UserRolesPage = () => {
+const AddUser = () => {
   // const [data, setData] = useState([]);
   // if you want to show dummy jason data 
   const [data, setData] = useState(dummuJsonData);
@@ -406,9 +405,7 @@ const UserRolesPage = () => {
                     <td className='  ps-2 pe-2'>{item.user_name}</td>
                     <td className='  ps-2 pe-2'>{item.email_id}</td>
                     <td className='  ps-2 pe-2'>{item.role}</td>
-                    <td className='  ps-2 pe-2'><Toggle/>
-                    {/* <span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span> */}
-                    </td>
+                    <td className='  ps-2 pe-2'><span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span></td>
                     <td className='  ps-2 pe-2'>{item.temporary_password}</td>
                     {/* <td className=" ps-2 pe-2">{item.access_modules.join(', ')}</td> */}
                     <td className=" ps-2 pe-2">{item.group_holding}</td>
@@ -440,4 +437,4 @@ const UserRolesPage = () => {
   );
 };
 
-export default UserRolesPage;
+export default AddUser;

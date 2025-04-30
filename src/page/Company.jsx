@@ -1,157 +1,109 @@
+
 import React, { useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
-import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
 import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
-import Toggle from '../component/Toggle';
+import SmallSizeModal from '../component/SmallSizeModal';
+import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 
 
 const dummuJsonData = [
   {
-    "id": 1744096161424,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
-    "status": "Active",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "temporary_password": "password12",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
+    id: 1744096161424,
+    company_name: "Tata",
+    group_holding: "XYZ",
+    role: new Date().toISOString(),
+    status: new Date().toISOString(),
+    temporary_password: "password12",
+    access_modules: ["Admin", "Editor"]
   },
   {
-    "id": 1744096161425,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
-    "status": "Inactive",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
+    id: 1744096161425,
+    company_name: "Tata",
+    group_holding: "XYZ",
+    role: new Date().toISOString(),
+    status: new Date().toISOString(),
+    temporary_password: "password12",
+    access_modules: ["Admin", "Editor"]
   },
   {
-    "id": 1744096161426,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
-    "status": "Active",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
+    id: 1744096161426,
+    company_name: "Tata",
+    group_holding: "XYZ",
+    role: new Date().toISOString(),
+    status: new Date().toISOString(),
+    temporary_password: "password12",
+    access_modules: ["Admin", "Editor"]
   },
   {
-    "id": 1744096161427,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
-    "status": "Inactive",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
+    id: 1744096161427,
+    company_name: "Tata",
+    group_holding: "XYZ",
+    role: new Date().toISOString(),
+    status: new Date().toISOString(),
+    temporary_password: "password12",
+    access_modules: ["Admin", "Editor"]
   },
   {
-    "id": 1744096161428,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
-    "status": "Active",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
+    id: 1744096161428,
+    company_name: "Tata",
+    group_holding: "XYZ",
+    role: new Date().toISOString(),
+    status:new Date().toISOString(),
+    temporary_password: "password12",
+    access_modules: ["Admin", "Editor"]
   },
   {
-    "id": 1744096161429,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
-    "status": "Inactive",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
+    id: 1744096161429,
+    company_name: "Tata",
+    group_holding: "XYZ",
+    role: new Date().toISOString(),
+    status: new Date().toISOString(),
+    temporary_password: "password12",
+    access_modules: ["Admin", "Editor"]
   },
-]
+];
 
-const UserRolesPage = () => {
+const Company = () => {
   // const [data, setData] = useState([]);
   // if you want to show dummy jason data 
   const [data, setData] = useState(dummuJsonData);
-  const [current, setCurrent] = useState({ id: null, user_name: '', email_id: '', role: '', temporary_password: "", status: '', desc: '', access_modules: [],group_holding:"" ,company:"",location:""});
+  const [current, setCurrent] = useState({ id: null, company_name: '', group_holding: '', role: '', temporary_password: "", status: '', desc: '', access_modules: [] });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // You can adjust the number of items per page
-  // Role wise access
-  const names = [
-    'Create',
-    'Editor',
-    'Viewer',
-    'Delete',
-    'All'
-  ];
+ 
 
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
-  // Handle role access change
-  const handleRoleAccessChange = (newValue) => {
-    setCurrent((prev) => ({ ...prev, access_modules: newValue }));
-  };
+
   // Handle Add or Edit
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isEditing) {
       const updatedData = data.map((item) =>
-        item.id === current.id ? { ...item, user_name: current.user_name, email_id: current.email_id, role: current.role, temporary_password: current.temporary_password,group_holding:current.group_holding,company:current.company,location:current.location, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
+        item.id === current.id ? { ...item, company_name: current.company_name, group_holding: current.group_holding, role: current.role, temporary_password: current.temporary_password, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
       );
       setData(updatedData);
     } else {
-      const newData = { id: Date.now(), user_name: current.user_name, email_id: current.email_id, role: current.role, temporary_password: current.temporary_password,group_holding:current.group_holding,company:current.company ,location:current.location,status: current.status, desc: current.desc, access_modules: current.access_modules };
+      const newData = { id: Date.now(), company_name: current.company_name, group_holding: current.group_holding, role: current.role, temporary_password: current.temporary_password, status: current.status, desc: current.desc, access_modules: current.access_modules };
       setData((prev) => [...prev, newData]);
     }
-    setCurrent({ id: null, user_name: '', email_id: '', role: '', temporary_password: '', group_holding:'',company:'',location:'',status: '', desc: '', access_modules: [] });
+    setCurrent({ id: null, company_name: '', group_holding: '', role: '', temporary_password: '', status: '', desc: '', access_modules: [] });
     setIsEditing(false);
     setIsModalOpen(false);
 
@@ -218,8 +170,17 @@ const UserRolesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
-  const userStatus = ['Active', 'Inactive'];
+  const groupHolding = [
+    "Tata",
+    "Groupon",
+    "Influitive",
+    "Spinfluence",
+    "Intellivision",
+    "Omnilert",
+    "Technologent",
+    "Securiteam"
+  ];
+  
 
 
   const crudForm = () => {
@@ -227,27 +188,8 @@ const UserRolesPage = () => {
       <div>
         {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} />
-          <MuiTextField label='email' type='email' isRequired={true} fieldName='email_id' handleChange={handleChange} value={current.email_id} />
-        </div>
-        <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          <SingleSelectTextField name="status" label="status" value={current.status} onChange={(e) => setCurrent((prev) => ({ ...prev, status: e.target.value }))} names={userStatus} />
-          <PasswordInput name='temporary_password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.temporary_password} />
-          <SingleSelectTextField name="role" label="role" value={current.role} onChange={(e) => setCurrent((prev) => ({ ...prev, role: e.target.value }))} names={roleName} />
-
-        </div>
-        <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          {/* <SingleSelectTextField name="User" label="User" value={current.user_name} onChange={(e) => setCurrent((prev) => ({ ...prev, user_name: e.target.value }))} names={userStatus} /> */}
-
-          {/* <MuiTextField label='User Type' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} /> */}
-          {/* <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} /> */}
-
-        </div>
-
-        <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          <SingleSelectTextField name="Group Holding" label="Group Holding" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={userStatus} />
-          <SingleSelectTextField name="Company" label="Company" value={current.company} onChange={(e) => setCurrent((prev) => ({ ...prev, company: e.target.value }))} names={userStatus} />
-          <SingleSelectTextField name="Location" label="Location" value={current.location} onChange={(e) => setCurrent((prev) => ({ ...prev, location: e.target.value }))} names={roleName} />
+          <MuiTextField label='Company Name' type='text' isRequired={true} fieldName='company_name' handleChange={handleChange} value={current.company_name} />
+          <SingleSelectTextField name="group_holding" label="Group Holding" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
 
         </div>
 
@@ -256,7 +198,7 @@ const UserRolesPage = () => {
             <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
           </div>
           <div className='col col-12 col-md-6 d-flex justify-content-end'>
-            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create User</span>}</button>
+            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create company</span>}</button>
           </div>
         </div>
         {/* </form> */}
@@ -265,8 +207,8 @@ const UserRolesPage = () => {
     )
 
   }
-  const crudTitle = "Add New User Form"
-  const editCrudTitle = "Edit User"
+  const crudTitle = "Add New company"
+  const editCrudTitle = "Edit company"
 
   return (
     <div>
@@ -282,8 +224,8 @@ const UserRolesPage = () => {
         />
         <input
           type="number"
-          name="email_id"
-          value={current.email_id}
+          name="group_holding"
+          value={current.group_holding}
           onChange={handleChange}
           placeholder="Age"
           required
@@ -300,17 +242,17 @@ const UserRolesPage = () => {
           <div className='d-flex h-100'>
             <div class="search-bar-container h-25">
               {/* <input type="text" placeholder="Search..." name="search" className='search-bar-input p-1 w-100' /> */}
-              <MuiSearchBar label='Search...' type='text' />
+              <MuiSearchBar label='Search...' type='text'/>
               <button className='search-icon'><SearchIcon /></button>
             </div>
-            <MultipleSelectFields placeholder='Filter By Role' roleName={roleName} />
+              <MultipleSelectFields placeholder='Filter By Group Holding'roleName={groupHolding} />
           </div>
 
 
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div className='pe-2'>
               <button className='crud_btn' onClick={openModal}>
-                <span><AddIcon /></span> <span className='button-style'>Add New User</span>
+                <span><AddIcon /></span> <span className='button-style'>Add New company</span>
               </button>
             </div>
             <div>
@@ -319,7 +261,7 @@ const UserRolesPage = () => {
               </button>
             </div>
 
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
 
@@ -337,7 +279,7 @@ const UserRolesPage = () => {
                 </th>
                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
 
-                <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
+                <th className='table_th_tag  ps-2 pe-2'><span>company Name</span>
                   <span className='ms-4'>
                     <ExpandCircleDownIcon className='table_th_icon' />
 
@@ -350,33 +292,22 @@ const UserRolesPage = () => {
   </div> */}
                 </th>
 
-                <th className='table_th_tag  ps-2 pe-2'><span>Email Id</span>
+                <th className='table_th_tag  ps-2 pe-2'><span>Group Holding</span>
                   <span className='ms-4'>
                     <ExpandCircleDownIcon className='table_th_icon' />
 
                   </span>
                 </th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Role</span>
+                <th className='table_th_tag  ps-2 pe-2'><span>Created At</span>
                   <span className='ms-4'>
                     <ExpandCircleDownIcon className='table_th_icon' />
                   </span>
                 </th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Status</span>
+                <th className='table_th_tag  ps-2 pe-2'><span>Updated At</span>
                   <span className='ms-4'>
                     <ExpandCircleDownIcon className='table_th_icon' />
                   </span>
                 </th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Password</span>
-                  <span className='ms-4'>
-                    <ExpandCircleDownIcon className='table_th_icon' />
-                  </span>
-                </th>
-                {/* <th className="table_th_tag ps-2 pe-2"><span>Access Modules</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th> */}
-                {/* <th className='table_th_tag  ps-2 pe-2'><span>Description</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th> */}
-                <th className="table_th_tag  ps-2 pe-2"><span>Group Holding</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-                <th className="table_th_tag  ps-2 pe-2"><span>Company</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-                <th className="table_th_tag  ps-2 pe-2"><span>Location</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-
               </tr>
             </thead>
             <tbody>
@@ -403,18 +334,10 @@ const UserRolesPage = () => {
                         <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
                       </div>
                     </td>
-                    <td className='  ps-2 pe-2'>{item.user_name}</td>
-                    <td className='  ps-2 pe-2'>{item.email_id}</td>
+                    <td className='  ps-2 pe-2'>{item.company_name}</td>
+                    <td className='  ps-2 pe-2'>{item.group_holding}</td>
                     <td className='  ps-2 pe-2'>{item.role}</td>
-                    <td className='  ps-2 pe-2'><Toggle/>
-                    {/* <span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span> */}
-                    </td>
-                    <td className='  ps-2 pe-2'>{item.temporary_password}</td>
-                    {/* <td className=" ps-2 pe-2">{item.access_modules.join(', ')}</td> */}
-                    <td className=" ps-2 pe-2">{item.group_holding}</td>
-                    <td className=" ps-2 pe-2">{item.company}</td>
-                    <td className=" ps-2 pe-2">{item.location}</td>
-                    {/* <td className='  ps-2 pe-2'>{item.desc}</td> */}
+                    <td className='  ps-2 pe-2'>{item.status}</td>
                   </tr>
                 ))
               )}
@@ -440,4 +363,4 @@ const UserRolesPage = () => {
   );
 };
 
-export default UserRolesPage;
+export default Company;

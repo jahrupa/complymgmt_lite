@@ -4,11 +4,15 @@ import PageLayout from '../layout/pageLayout';
 import DashboardPage from '../page/DashboardPage';
 import UserRolesPage from '../page/UserRolesPage';
 import Login from '../page/Login';
-import GroupOnboardingPage from '../page/GroupOnboardingPage';
-import { GroupCompaniesPage } from '../page/GroupCompaniesPage';
+import Company from '../page/Company';
+import  GroupCompaniesPage from '../page/GroupCompaniesPage';
 import UserManagementPage from '../page/UserManagementPage';
 import NotFoundPage from '../page/NotFoundPage';
 import ProtectedRoute from './ProtectedRoute';
+import Location from '../page/Location';
+import Module from '../page/Module';
+import SubModule from '../page/SubModule';
+import AddUser from '../page/AddUser';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   // const isAuthenticated = Boolean(localStorage.getItem('authToken')); // Example of checking authentication status
@@ -25,7 +29,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
     //     <Route index element={<Navigate to="/dashboard" />} />
     //     <Route path="dashboard" element={<DashboardPage />} />
     //     <Route path="userroles" element={<UserRolesPage />} />
-    //     <Route path="grouponboarding" element={<GroupOnboardingPage />} />
+    //     <Route path="grouponboarding" element={<Company />} />
     //     <Route path="groupofcompanies" element={<GroupCompaniesPage />} />
     //     <Route path="usermanagement" element={<UserManagementPage />} />
     //   </Route>
@@ -40,10 +44,16 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
       <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
         <Route path="/" element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}>
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="userroles" element={<UserRolesPage />} />
-          <Route path="grouponboarding" element={<GroupOnboardingPage />} />
-          <Route path="groupofcompanies" element={<GroupCompaniesPage />} />
+          <Route path="createuserrole" element={<UserRolesPage />} />
+          <Route path="adduser" element={<AddUser />} />
+          <Route path="company" element={<Company />} />
+          <Route path="groupofholding" element={<GroupCompaniesPage />} />
           <Route path="usermanagement" element={<UserManagementPage />} />
+          <Route path="location" element={<Location />} />
+          <Route path="module" element={<Module />} />
+          <Route path="submodule" element={<SubModule />} />
+
+
         </Route>
       </Route>
       {/* Catch-all Route for 404 */}
