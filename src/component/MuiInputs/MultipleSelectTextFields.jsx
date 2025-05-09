@@ -27,7 +27,7 @@ export default function MultipleSelectTextFields({ value, onChange,names,label }
 
   const getStyles = (name, personName, theme) => {
     return {
-      fontWeight: personName.includes(name)
+      fontWeight: personName?.includes(name)
         ? theme.typography.fontWeightMedium
         : theme.typography.fontWeightRegular,
     };

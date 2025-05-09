@@ -239,7 +239,8 @@ const AddUser = () => {
           {/* <SingleSelectTextField name="User" label="User" value={current.user_name} onChange={(e) => setCurrent((prev) => ({ ...prev, user_name: e.target.value }))} names={userStatus} /> */}
 
           {/* <MuiTextField label='User Type' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} /> */}
-          {/* <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} /> */}
+          <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} />
+
 
         </div>
 

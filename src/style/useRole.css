@@ -60,20 +60,24 @@
     z-index:1;
     left:0;
   }
-
-  .table_head_tag tr > :nth-child(2) {
+.delete_message{
+    font-size: 12px;
+    color: gray;
+    text-align: center;
+}
+  /* .table_head_tag tr > :nth-child(2) {
     z-index:3;
     left:28px;
     top:0;
-  }
+  } */
   
 
-  .table_tr > :nth-child(2) {
+  /* .table_tr > :nth-child(2) {
     background:#d5e1e7;
     position: sticky;
     z-index:1;
     left:28px;
-  }
+  } */
  
 .table_th_tag {
     border-right: 1px dotted #c5d5ec;
@@ -274,7 +278,10 @@
     box-shadow: 0 6px 28px 0 rgba(0, 0, 0, 0.3), 0 5px 55px 0 rgba(0, 0, 0, 0.2);
 }
 
-
+.table_td_font{
+    font-size: 11px;
+    white-space: nowrap;
+}
 @media screen and (max-width: 480px) {
     .text_area_field {
         min-width: 269px !important;

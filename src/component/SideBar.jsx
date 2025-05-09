@@ -10,15 +10,12 @@ import location from '../assets/location.png'
 import module_icon from '../assets/module.png'
 import sub_module from '../assets/sub-module.png'
 import user_role from '../assets/user-role.png'
-import dashboard from '../assets/dashboard-3.png'
-import add_user from '../assets/add-user.png'
+import dashboard from '../assets/dashboard-4.png'
+import add_user from '../assets/add-user-1.png'
 import company from '../assets/company-1.png'
 import group_of_company from '../assets/group_of_company-1.png'
 import user_managnment from '../assets/user_managnment.png'
-
-
-
-
+import access_control from '../assets/access_control.png'
 
 
 function SideBar({ sidebarOpen }) {
@@ -40,6 +37,8 @@ function SideBar({ sidebarOpen }) {
         { icon: <img src={location} alt="Location" className="side-bar-icon" />, label: 'Location' },
         { icon: <img src={module_icon} alt="Module" className="side-bar-icon" />, label: 'Module' },
         { icon: <img src={sub_module} alt="SubModule" className="side-bar-icon" />, label: 'SubModule' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Access Control' },
+
 
     ];
     return (

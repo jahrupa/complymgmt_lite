@@ -24,35 +24,38 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelectFields({placeholder,roleName}) {
+export default function MultipleSelectFields({ placeholder, roleName, onChange }) {
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
+  const [selectedIds, setSelectedIds] = React.useState([]);
 
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    const newValue = typeof value === 'string' ? value.split(',') : value;
+    setSelectedIds(newValue);
+    onChange?.(newValue); // Optional callback to send selected IDs to parent
   };
 
   return (
     <div>
-      <FormControl sx={{width: 170 }}>
+      <FormControl sx={{ width: 250 }}>
         <Select
           multiple
           displayEmpty
-          value={personName}
+          value={selectedIds}
           onChange={handleChange}
           input={<OutlinedInput />}
           renderValue={(selected) => {
             if (selected.length === 0) {
-              return <div style={{color:'darkslategray',fontSize:'14px'}}>{placeholder}</div>;
+              return <div style={{ color: 'darkslategray', fontSize: '14px' }}>{placeholder}</div>;
             }
 
-            return selected.join(', ');
+            // Display names instead of IDs
+            const selectedNames = roleName
+              .filter((item) => selected.includes(item.groups_holdings_id))
+              .map((item) => item.group_holding_name);
+            return selectedNames.join(', ');
           }}
           MenuProps={MenuProps}
           inputProps={{ 'aria-label': 'Without label' }}
@@ -65,13 +68,13 @@ export default function MultipleSelectFields({placeholder,roleName}) {
           <MenuItem disabled value="">
             <em>{placeholder}</em>
           </MenuItem>
-          {roleName.map((name) => (
+          {roleName.map((item) => (
             <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
+              key={item.groups_holdings_id}
+              value={item.groups_holdings_id}
+              style={getStyles(item.groups_holdings_id, selectedIds, theme)}
             >
-              {name}
+              {item.group_holding_name}
             </MenuItem>
           ))}
         </Select>
@@ -79,3 +82,4 @@ export default function MultipleSelectFields({placeholder,roleName}) {
     </div>
   );
 }
+
