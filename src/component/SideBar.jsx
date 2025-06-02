@@ -38,6 +38,19 @@ function SideBar({ sidebarOpen }) {
         { icon: <img src={module_icon} alt="Module" className="side-bar-icon" />, label: 'Module' },
         { icon: <img src={sub_module} alt="SubModule" className="side-bar-icon" />, label: 'SubModule' },
         { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Access Control' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Onboarding' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Onbarding Compliance Scope' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Onbarding Payroll Compliance' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Outsourcing Scope' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Reimbursements' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Payroll Management' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Service Trackers' },
+        { icon: <img src={access_control} alt="Access Control" className="side-bar-icon" />, label: 'Role Manager' },
+
+
+
+
+        
 
 
     ];

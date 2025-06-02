@@ -84,7 +84,7 @@ export default function UserProfile() {
                     <ListItemIcon>
                         <Settings fontSize="small" />
                     </ListItemIcon>
-                    Settings
+                    Profile Settings
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
                     <ListItemIcon>

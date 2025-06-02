@@ -6,7 +6,7 @@
 //   )
 // }
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,60 +23,63 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
+import { createGroup, deleteGroupById, fetchAllGroup, updateGroupById } from '../api/Service';
+import Snackbars from '../component/Snackbars';
+import DeleteModal from '../component/DeleteModal';
 
 
 const dummuJsonData = [
   {
     id: 1744096161424,
-    enterprise_name: "Tata",
-    Created_by: "Rupa",
-    role: new Date().toISOString(),
-    status: new Date().toISOString(),
+    group_holding_name: "Tata",
+    group_holding_account_owner: "Rupa",
+    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     temporary_password: "password12",
     access_modules: ["Admin", "Editor"]
   },
   {
     id: 1744096161425,
-    enterprise_name: "Tata",
-    Created_by: "Rupa",
-    role: new Date().toISOString(),
-    status: new Date().toISOString(),
+    group_holding_name: "Tata",
+    group_holding_account_owner: "Rupa",
+    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     temporary_password: "password12",
     access_modules: ["Admin", "Editor"]
   },
   {
     id: 1744096161426,
-    enterprise_name: "Tata",
-    Created_by: "Rupa",
-    role: new Date().toISOString(),
-    status: new Date().toISOString(),
+    group_holding_name: "Tata",
+    group_holding_account_owner: "Rupa",
+    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     temporary_password: "password12",
     access_modules: ["Admin", "Editor"]
   },
   {
     id: 1744096161427,
-    enterprise_name: "Tata",
-    Created_by: "Rupa",
-    role: new Date().toISOString(),
-    status: new Date().toISOString(),
+    group_holding_name: "Tata",
+    group_holding_account_owner: "Rupa",
+    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     temporary_password: "password12",
     access_modules: ["Admin", "Editor"]
   },
   {
     id: 1744096161428,
-    enterprise_name: "Tata",
-    Created_by: "Rupa",
-    role: new Date().toISOString(),
-    status:new Date().toISOString(),
+    group_holding_name: "Tata",
+    group_holding_account_owner: "Rupa",
+    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     temporary_password: "password12",
     access_modules: ["Admin", "Editor"]
   },
   {
     id: 1744096161429,
-    enterprise_name: "Tata",
-    Created_by: "Rupa",
-    role: new Date().toISOString(),
-    status: new Date().toISOString(),
+    group_holding_name: "Tata",
+    group_holding_account_owner: "Rupa",
+    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
     temporary_password: "password12",
     access_modules: ["Admin", "Editor"]
   },
@@ -86,10 +89,20 @@ const GroupCompaniesPage = () => {
   // const [data, setData] = useState([]);
   // if you want to show dummy jason data 
   const [data, setData] = useState(dummuJsonData);
-  const [current, setCurrent] = useState({ id: null, enterprise_name: '', Created_by: 'Rupa', role: '', temporary_password: "", status: '', desc: '', access_modules: [] });
+  const [current, setCurrent] = useState({ id: null, group_holding_name: '', groups_holdings_id: null, group_holding_account_owner: 'Rupa', created_at: '', temporary_password: "", created_at: '', desc: '', access_modules: [] });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: 'top',
+    horizontal: 'center',
+    message: '',
+    severityType: '',
+  });
+  const [groupId, setgroupId] = useState(null)
+  console.log(current, 'current')
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // You can adjust the number of items per page
@@ -107,31 +120,84 @@ const GroupCompaniesPage = () => {
     const { name, value } = e.target;
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
-  // Handle role access change
+  // Handle created_at access change
   const handleRoleAccessChange = (newValue) => {
     setCurrent((prev) => ({ ...prev, access_modules: newValue }));
   };
   // Handle Add or Edit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      const updatedData = data.map((item) =>
-        item.id === current.id ? { ...item, enterprise_name: current.enterprise_name, Created_by: current.Created_by, role: current.role, temporary_password: current.temporary_password, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
-      );
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (isEditing) {
+  //     const updatedData = data.map((item) =>
+  //       item.id === current.id ? { ...item, group_holding_name: current.group_holding_name, group_holding_account_owner: current.group_holding_account_owner, created_at: current.created_at, temporary_password: current.temporary_password, created_at: current.created_at, desc: current.desc, access_modules: current.access_modules } : item
+  //     );
+  //     setData(updatedData);
+  //   } else {
+  //     const newData = { id: Date.now(), group_holding_name: current.group_holding_name, group_holding_account_owner: current.group_holding_account_owner, created_at: current.created_at, temporary_password: current.temporary_password, created_at: current.created_at, desc: current.desc, access_modules: current.access_modules };
+  //     setData((prev) => [...prev, newData]);
+  //   }
+  //   setCurrent({ id: null, group_holding_name: '', group_holding_account_owner: '', created_at: '', temporary_password: '', created_at: '', desc: '', access_modules: [] });
+  //   setIsEditing(false);
+  //   setIsModalOpen(false);
+
+  // };
+
+
+  const handleSubmit = async (e) => {
+    // e?.preventDefault();
+
+    const payload = {
+      "group_holding_name": current?.group_holding_name,
+      "group_holding_description": "Cloudnine Healthcare Group Holdings",
+      "group_holding_type": "Healthcare",
+      "group_holding_account_owner": "Cloudnine Admin",
+      "group_holding_spoc": "Dr. R Kishore Kumar",
+      "group_holding_email": "group.spoc@cloudninecare.com",
+      "group_holding_phone": "+918012345678",
+      "isActive": true,
+      "group_holding_code": "CLOUD9",
+      "approved_by": 2,
+      "created_by": 1
+    };
+
+    try {
+      let response;
+      if (isEditing) {
+        // Update existing company
+        response = await updateGroupById(current?.groups_holdings_id, payload);
+      } else {
+        // Create new company
+        response = await createGroup(payload);
+      }
+
+      // ✅ Get the message from response
+      const message = response?.message;
+      // Set snackbar with message
+      // setSnackbarMessage(message); // You'll need this state
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
+
+      // Refresh data
+      const updatedData = await fetchAllGroup();
       setData(updatedData);
-    } else {
-      const newData = { id: Date.now(), enterprise_name: current.enterprise_name, Created_by: current.Created_by, role: current.role, temporary_password: current.temporary_password, status: current.status, desc: current.desc, access_modules: current.access_modules };
-      setData((prev) => [...prev, newData]);
+    } catch (error) {
+      console.error("Error saving company:", error);
+      // setSnackbarMessage("Failed to save company");
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
     }
-    setCurrent({ id: null, enterprise_name: '', Created_by: '', role: '', temporary_password: '', status: '', desc: '', access_modules: [] });
+
+    // Reset form state
+    setCurrent({ id: null, group_holding_name: '', group_holding_account_owner: '', created_at: '', temporary_password: '', created_at: '', desc: '', access_modules: [] });
+
     setIsEditing(false);
     setIsModalOpen(false);
-
   };
+
+
 
   // Handle Edit
   const handleEdit = (id) => {
-    const item = data.find((item) => item.id === id);
+    const item = data.find((item) => item.groups_holdings_id === id);
     setCurrent(item);
     setIsEditing(true);
     setIsModalOpen(true);
@@ -139,11 +205,46 @@ const GroupCompaniesPage = () => {
   };
 
   // Handle Delete
-  const handleDelete = (id) => {
-    const filteredData = data.filter((item) => item.id !== id);
-    setData(filteredData);
-    setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
+  const handleDelete = async (groupId) => {
+    try {
+      const response = await deleteGroupById(groupId);
+      const message = response?.message || "Company deleted successfully";
+
+      // Refresh data
+      const updatedData = await fetchAllGroup();
+      setData(updatedData);
+      setIsDeleteModalOpen(false);
+
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      console.error("Error deleting company:", error);
+
+      // Extract error message safely
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete company";
+
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
   };
+  // const handleDelete = (id) => {
+  // const filteredData = data.filter((item) => item.id !== id);
+  // setData(filteredData);
+  //   setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
+  // };
 
   // Handle Delete All Selected
   const handleDeleteAll = () => {
@@ -200,17 +301,34 @@ const GroupCompaniesPage = () => {
     "Technologent",
     "Securiteam"
   ];
-  
+
   const userStatus = ['Active', 'Inactive'];
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [GroupData] = await Promise.all([
+          fetchAllGroup(),
+          // fetchAllGroupHolding(),
+          // fetchAllCompaniesName(),
+        ]);
+        setData(GroupData);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const crudForm = () => {
     return (
       <div>
         {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-          <MuiTextField label='Group Holding Name' type='text' isRequired={true} fieldName='enterprise_name' handleChange={handleChange} value={current.enterprise_name} />
-          {/* <MuiTextField label='Create By' type='text' isRequired={true} fieldName='Created_by' handleChange={handleChange} value={current.Created_by} isdisabled={true}/> */}
+          <MuiTextField label='Group Holding Name' type='text' isRequired={true} fieldName='group_holding_name' handleChange={handleChange} value={current?.group_holding_name} />
+          {/* <MuiTextField label='Create By' type='text' isRequired={true} fieldName='group_holding_account_owner' handleChange={handleChange} value={current.group_holding_account_owner} isdisabled={true}/> */}
 
         </div>
 
@@ -230,30 +348,32 @@ const GroupCompaniesPage = () => {
   }
   const crudTitle = "Add New Group Holding"
   const editCrudTitle = "Edit Group Holding"
+  const deleteModal = () => {
+    return (
+      <div>
+        <div className='delete_message p-4'>
+          Are you sure you want to delete <DeleteIcon className='action_icon' /> this Company Holding?
+        </div>
 
+        <div className="row row-gap-2 mt-4">
+          <div className='col col-12 col-md-6'>
+            <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
+          </div>
+          <div className='col col-12 col-md-6 d-flex justify-content-end'>
+            <button type="submit"
+              className="btn-sm btn btn-primary"
+              onClick={() => handleDelete(groupId)}>Yes, I'm sure</button>
+          </div>
+        </div>
+      </div>
+
+
+    )
+
+  }
   return (
     <div>
-      {/* Form for Create or Edit */}
-      {/* <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          value={current.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-        />
-        <input
-          type="number"
-          name="Created_by"
-          value={current.Created_by}
-          onChange={handleChange}
-          placeholder="Age"
-          required
-        />
-        <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
-      </form> */}
-
+      <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       {/* Button to Delete All Selected Rows */}
 
 
@@ -261,12 +381,12 @@ const GroupCompaniesPage = () => {
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
           <div className='d-flex h-100'>
-            <div class="search-bar-container h-25">
+            <div className="search-bar-container h-25">
               {/* <input type="text" placeholder="Search..." name="search" className='search-bar-input p-1 w-100' /> */}
-              <MuiSearchBar label='Search...' type='text'/>
+              <MuiSearchBar label='Search...' type='text' />
               <button className='search-icon'><SearchIcon /></button>
             </div>
-              <MultipleSelectFields placeholder='Filter By Group Holding'roleName={roleName} />
+            <MultipleSelectFields placeholder='Filter By Group Holding' roleName={roleName} />
           </div>
 
 
@@ -276,11 +396,12 @@ const GroupCompaniesPage = () => {
                 <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
               </button>
             </div>
-            <div>
+            {/* <div>
               <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
                 <span className='button-style'> Delete All</span>
               </button>
-            </div>
+            </div> */}
+            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
             <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
@@ -290,14 +411,13 @@ const GroupCompaniesPage = () => {
           <table className='table_tag'>
             <thead className='table_head_tag'>
               <tr >
-                <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                  {/* Select All checkbox */}
+                {/* <th className='table_th_tag ps-2 pe-2 check_box_column'>
                   <input
                     type="checkbox"
                     checked={selectedRows.length === data.length && data.length > 0}
                     onChange={handleSelectAll}
                   />
-                </th>
+                </th> */}
                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
 
                 <th className='table_th_tag  ps-2 pe-2'><span>Group Holding Name</span>
@@ -306,14 +426,14 @@ const GroupCompaniesPage = () => {
 
                   </span>
 
-                  {/* <div class="dropdown-menu table_th_icon_menu" aria-labelledby="dropdownMenu2">
-    <button class="dropdown-item" type="button">Action</button>
-    <button class="dropdown-item" type="button">Another action</button>
-    <button class="dropdown-item" type="button">Something else here</button>
+                  {/* <div className="dropdown-menu table_th_icon_menu" aria-labelledby="dropdownMenu2">
+    <button className="dropdown-item" type="button">Action</button>
+    <button className="dropdown-item" type="button">Another action</button>
+    <button className="dropdown-item" type="button">Something else here</button>
   </div> */}
                 </th>
 
-                <th className='table_th_tag  ps-2 pe-2'><span>Created By</span>
+                <th className='table_th_tag  ps-2 pe-2'><span>Group Holding Account Owner</span>
                   <span className='ms-4'>
                     <ExpandCircleDownIcon className='table_th_icon' />
 
@@ -339,26 +459,28 @@ const GroupCompaniesPage = () => {
               ) : (
                 currentData.map((item) => (
                   <tr key={item.id} className='table_tr'>
-                    <td className='  ps-2 pe-2 table_td sticky_col'>
-                      {/* Individual row checkbox */}
+                    {/* <td className='  ps-2 pe-2 table_td sticky_col'>
                       <input
                         type="checkbox"
                         checked={selectedRows.includes(item.id)}
                         onChange={(e) => handleCheckboxChange(e, item.id)}
                       />
-                    </td>
+                    </td> */}
                     <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                       <div>
-                        <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
+                        <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.groups_holdings_id)}><EditIcon className='action_icon' /></button>
                       </div>
                       <div>
-                        <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
+                        <button className='btn  mt-1 btn-sm' onClick={() => {
+                            setgroupId(item.groups_holdings_id);
+                            setIsDeleteModalOpen(true);
+                          }}><DeleteIcon className='action_icon' /></button>
                       </div>
                     </td>
-                    <td className='  ps-2 pe-2'>{item.enterprise_name}</td>
-                    <td className='  ps-2 pe-2'>{item.Created_by}</td>
-                    <td className='  ps-2 pe-2'>{item.role}</td>
-                    <td className='  ps-2 pe-2'>{item.status}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.group_holding_name ? item.group_holding_name : '-'}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.group_holding_account_owner ? item.group_holding_account_owner : '-'}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.created_at ? item.created_at : '-'}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.updated_at ? item.updated_at : '-'}</td>
                   </tr>
                 ))
               )}

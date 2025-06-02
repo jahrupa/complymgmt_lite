@@ -42,3 +42,72 @@
     display: flex;
     gap: 2px
 }
+
+.upload_file_input_container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.upload_file_input {
+    position: absolute;
+    z-index: -1;
+    top: 10px;
+    left: 8px;
+    font-size: 17px;
+    color: #b8b8b8;
+}
+
+.button-wrap {
+    position: relative;
+}
+
+/* .upload_button {
+    display: inline-block;
+    align-items: center;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: orange;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+} */
+
+.upload_button {
+    display: inline-block;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #8080804a;
+    padding: 40px;
+}
+
+.uploaded_file_name {
+    background: gainsboro;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.not_uploaded_file_text {
+    text-align: center;
+    font-size: 14px;
+    color: gray;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.upload_file_icon {
+    align-items: center;
+    display: flex;
+}

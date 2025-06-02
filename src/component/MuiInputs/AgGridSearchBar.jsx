@@ -1,11 +1,12 @@
 import { TextField } from '@mui/material'
 import React from 'react'
 
-const MuiSearchBar = ({ handleChange, isRequired, fieldName, value, label, type}) => {
+const AgGridSearchBar = ({ handleChange, isRequired, fieldName, value, label, type ,id,onInput}) => {
     return (
-        <TextField id="outlined-basic" label={label} variant="outlined" type={type} name={fieldName}
+        <TextField id={id} label={label} variant="outlined" type={type} name={fieldName}
             value={value}
             required={isRequired}
+            onInput={onInput}
             onChange={handleChange} className='w-100 mb-3'
             sx={{
                 '& .MuiOutlinedInput-input': {
@@ -31,4 +32,4 @@ const MuiSearchBar = ({ handleChange, isRequired, fieldName, value, label, type}
     )
 }
 
-export default MuiSearchBar
+export default AgGridSearchBar

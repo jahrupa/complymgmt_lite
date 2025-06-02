@@ -14,9 +14,17 @@ import Module from '../page/Module';
 import SubModule from '../page/SubModule';
 import AddUser from '../page/AddUser';
 import AccessControl from '../page/AccessControl';
+import Onbarding from '../component/Onbarding';
+import OnbardingComplianceScope from '../component/OnbardingComplianceScope.jsx';
+import OnbardingPayrollCompliance from '../component/OnbardingPayrollCompliance.jsx';
+import ServiceTrackers from '../component/ServiceTrackers.jsx';
+import RoleManager from '../component/RoleManager.jsx';
+import OutsourcingScope from '../component/OutsourcingScope.jsx';
+import Reimbursements from '../component/Reimbursements.jsx';
+import PayrollManagement from '../component/PayrollManagement.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
-  const[isAuthenticated,setIsAuthenticated]=useState(false)
+  const[isAuthenticated,setIsAuthenticated]=useState(true)
    let tokenId = localStorage.getItem('token');
     useEffect(()=>{
       if(tokenId){
@@ -41,6 +49,21 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
           <Route path="/module" element={<Module />} />
           <Route path="/submodule" element={<SubModule />} />
           <Route path="/accesscontrol" element={<AccessControl />} />
+          <Route path="/onboarding" element={<Onbarding />} />
+          <Route path="/onboarding" element={<Onbarding />} />
+          <Route path="/onbardingcompliancescope" element={<OnbardingComplianceScope />} />
+          <Route path="/onbardingpayrollcompliance" element={<OnbardingPayrollCompliance />} />
+          <Route path="/outsourcingScope" element={<OutsourcingScope />} />
+          <Route path="/reimbursements" element={<Reimbursements />} />
+          <Route path="/payrollmanagement" element={<PayrollManagement />} />
+          <Route path="/servicetrackers" element={<ServiceTrackers />} />
+          <Route path="/rolemanager" element={<RoleManager />} />
+
+          
+
+
+          
+
 
         </Route>
       </Route>

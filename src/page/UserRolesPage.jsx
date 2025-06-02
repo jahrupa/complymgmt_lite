@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,18 +16,21 @@ import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
 
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName } from '../api/Service';
+import DeleteModal from '../component/DeleteModal';
+import Snackbars from '../component/Snackbars';
 
 const dummuJsonData = [
   {
     "id": 1744096161424,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
+    "username": "rupa",
+    "email": "jha@gmail.com",
+    "role_name": "Admin",
     "status": "Active",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
-    "temporary_password": "password12",
+    "group_holding": "Tata",
+    "company_name": 'xyz',
+    "location": "Mumbai",
+    "password": "password12",
     "access_modules": [
       "Admin",
       "Editor"
@@ -35,14 +38,14 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161425,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
+    "username": "rupa",
+    "email": "jha@gmail.com",
+    "role_name": "Admin",
     "status": "Inactive",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
+    "password": "password12",
+    "group_holding": "Tata",
+    "company_name": 'xyz',
+    "location": "Mumbai",
     "access_modules": [
       "Admin",
       "Editor"
@@ -50,14 +53,14 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161426,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
+    "username": "rupa",
+    "email": "jha@gmail.com",
+    "role_name": "Admin",
     "status": "Active",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
+    "password": "password12",
+    "group_holding": "Tata",
+    "company_name": 'xyz',
+    "location": "Mumbai",
     "access_modules": [
       "Admin",
       "Editor"
@@ -65,14 +68,14 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161427,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
+    "username": "rupa",
+    "email": "jha@gmail.com",
+    "role_name": "Admin",
     "status": "Inactive",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
+    "password": "password12",
+    "group_holding": "Tata",
+    "company_name": 'xyz',
+    "location": "Mumbai",
     "access_modules": [
       "Admin",
       "Editor"
@@ -80,14 +83,14 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161428,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
+    "username": "rupa",
+    "email": "jha@gmail.com",
+    "role_name": "Admin",
     "status": "Active",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
+    "password": "password12",
+    "group_holding": "Tata",
+    "company_name": 'xyz',
+    "location": "Mumbai",
     "access_modules": [
       "Admin",
       "Editor"
@@ -95,14 +98,14 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161429,
-    "user_name": "rupa",
-    "email_id": "jha@gmail.com",
-    "role": "Admin",
+    "username": "rupa",
+    "email": "jha@gmail.com",
+    "role_name": "Admin",
     "status": "Inactive",
-    "temporary_password": "password12",
-    "group_holding":"Tata",
-    "company":'xyz',
-    "location":"Mumbai",
+    "password": "password12",
+    "group_holding": "Tata",
+    "company_name": 'xyz',
+    "location": "Mumbai",
     "access_modules": [
       "Admin",
       "Editor"
@@ -114,10 +117,23 @@ const UserRolesPage = () => {
   // const [data, setData] = useState([]);
   // if you want to show dummy jason data 
   const [data, setData] = useState(dummuJsonData);
-  const [current, setCurrent] = useState({ id: null, user_name: '', email_id: '', role: '', temporary_password: "", status: '', desc: '', access_modules: [],group_holding:"" ,company:"",location:""});
+  const [current, setCurrent] = useState({ user_id: null, username: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', desc: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [groupHoldingName, setGroupHoldingName] = useState([])
+  const [companyName, setCompanyName] = useState([])
+  const [locationName, setLocationName] = useState([])
+  const [rolesName, setRolesName] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userId, setUserId] = useState(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: 'top',
+    horizontal: 'center',
+    message: '',
+    severityType: '',
+  });
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // You can adjust the number of items per page
@@ -135,42 +151,133 @@ const UserRolesPage = () => {
     const { name, value } = e.target;
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
-  // Handle role access change
+  // Handle role_name access change
   const handleRoleAccessChange = (newValue) => {
     setCurrent((prev) => ({ ...prev, access_modules: newValue }));
   };
   // Handle Add or Edit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      const updatedData = data.map((item) =>
-        item.id === current.id ? { ...item, user_name: current.user_name, email_id: current.email_id, role: current.role, temporary_password: current.temporary_password,group_holding:current.group_holding,company:current.company,location:current.location, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
-      );
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (isEditing) {
+  //     const updatedData = data.map((item) =>
+  //       item.id === current.id ? { ...item, username: current.username, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
+  //     );
+  //     setData(updatedData);
+  //   } else {
+  //     const newData = { id: Date.now(), username: current.username, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules };
+  //     setData((prev) => [...prev, newData]);
+  //   }
+  //   setCurrent({ id: null, username: '', email: '', role_name: '', password: '', group_holding: '', company_name: '', location: '', status: '', desc: '', access_modules: [] });
+  //   setIsEditing(false);
+  //   setIsModalOpen(false);
+
+  // };
+
+  const handleSubmit = async (e) => {
+    // e?.preventDefault();
+
+    const payload = {
+      "Name": "Rupa Jha",
+      "Email": current?.email,
+      "MobileNumber": "2345876543",
+      "IsKarma": false,
+      "Username": current?.username,
+      "Password": current?.password,
+      "IsActive": true,
+      "CreatedBy": 1
+    };
+
+    try {
+      let response;
+      if (isEditing) {
+        // Update existing company
+        response = await updateUserById(userId, payload);
+      } else {
+        // Create new company
+        response = await createUser(payload);
+      }
+
+      // ✅ Get the message from response
+      const message = response?.message;
+      console.log(message,'message')
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
+
+      // Refresh data
+      const updatedData = await fetchAllUser();
       setData(updatedData);
-    } else {
-      const newData = { id: Date.now(), user_name: current.user_name, email_id: current.email_id, role: current.role, temporary_password: current.temporary_password,group_holding:current.group_holding,company:current.company ,location:current.location,status: current.status, desc: current.desc, access_modules: current.access_modules };
-      setData((prev) => [...prev, newData]);
+    } catch (error) {
+      console.error("Error saving user:", error);
+    
+      // Extract message from error response if available
+      const errorMessage =
+        error?.response?.data?.message || // for Axios
+        error?.message ||                 // native JS error
+        "Failed to save user";            // fallback message
+    
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error'
+      });
     }
-    setCurrent({ id: null, user_name: '', email_id: '', role: '', temporary_password: '', group_holding:'',company:'',location:'',status: '', desc: '', access_modules: [] });
+    
     setIsEditing(false);
     setIsModalOpen(false);
-
   };
 
   // Handle Edit
-  const handleEdit = (id) => {
-    const item = data.find((item) => item.id === id);
+  const handleEdit = (user_id) => {
+    const item = data.find((item) => item.user_id === user_id);
     setCurrent(item);
     setIsEditing(true);
     setIsModalOpen(true);
+    setUserId(user_id)
 
   };
 
   // Handle Delete
-  const handleDelete = (id) => {
-    const filteredData = data.filter((item) => item.id !== id);
-    setData(filteredData);
-    setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
+  // const handleDelete = (id) => {
+  //   const filteredData = data.filter((item) => item.id !== id);
+  //   setData(filteredData);
+  //   setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
+  // };
+
+  // Handle Delete
+  const handleDelete = async (userId) => {
+    try {
+      const response = await deleteUserById(userId);
+      const message = response?.message || "User deleted successfully";
+
+      // Refresh data
+      const updatedData = await fetchAllUser();
+      setData(updatedData);
+      setIsDeleteModalOpen(false);
+
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+
+      // Extract error message safely
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete user";
+
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
   };
 
   // Handle Delete All Selected
@@ -219,7 +326,30 @@ const UserRolesPage = () => {
     setIsModalOpen(false);
   };
   const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
-  const userStatus = ['Active', 'Inactive'];
+  const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [userData, groupHolding, roleName, companyName, getLocationName] = await Promise.all([
+          fetchAllUser(),
+          fetchAllGroupHolding(),
+          fetchAllUserName(),
+          fetchAllCompaniesName(),
+          fetchAllLocationName(),
+        ]);
+        setData(userData);
+        setGroupHoldingName(groupHolding);
+        setRolesName(roleName)
+        setCompanyName(companyName)
+        setLocationName(getLocationName)
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
 
   const crudForm = () => {
@@ -227,27 +357,92 @@ const UserRolesPage = () => {
       <div>
         {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} />
-          <MuiTextField label='email' type='email' isRequired={true} fieldName='email_id' handleChange={handleChange} value={current.email_id} />
+          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} />
+          <MuiTextField label='email' type='email' isRequired={true} fieldName='email' handleChange={handleChange} value={current.email} />
         </div>
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
           <SingleSelectTextField name="status" label="status" value={current.status} onChange={(e) => setCurrent((prev) => ({ ...prev, status: e.target.value }))} names={userStatus} />
-          <PasswordInput name='temporary_password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.temporary_password} />
-          <SingleSelectTextField name="role" label="role" value={current.role} onChange={(e) => setCurrent((prev) => ({ ...prev, role: e.target.value }))} names={roleName} />
-
+          <PasswordInput name='password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.password} />
+          {/* <SingleSelectTextField name="role_name" label="role_name" value={current.role_name} onChange={(e) => setCurrent((prev) => ({ ...prev, role_name: e.target.value }))} names={roleName} /> */}
+          <SingleSelectTextField
+            name="role_name"
+            label="Role"
+            value={current.role_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedRole = rolesName.find(
+                (g) => g.name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                role_name: selectedName,
+                groups_holdings_id: matchedRole?.id || null,
+              }));
+            }}
+            names={rolesName}
+          />
         </div>
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          {/* <SingleSelectTextField name="User" label="User" value={current.user_name} onChange={(e) => setCurrent((prev) => ({ ...prev, user_name: e.target.value }))} names={userStatus} /> */}
+          {/* <SingleSelectTextField name="User" label="User" value={current.username} onChange={(e) => setCurrent((prev) => ({ ...prev, username: e.target.value }))} names={userStatus} /> */}
 
-          {/* <MuiTextField label='User Type' type='text' isRequired={true} fieldName='user_name' handleChange={handleChange} value={current.user_name} /> */}
+          {/* <MuiTextField label='User Type' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} /> */}
           {/* <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} /> */}
 
         </div>
 
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          <SingleSelectTextField name="Group Holding" label="Group Holding" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={userStatus} />
-          <SingleSelectTextField name="Company" label="Company" value={current.company} onChange={(e) => setCurrent((prev) => ({ ...prev, company: e.target.value }))} names={userStatus} />
-          <SingleSelectTextField name="Location" label="Location" value={current.location} onChange={(e) => setCurrent((prev) => ({ ...prev, location: e.target.value }))} names={roleName} />
+          {/* <SingleSelectTextField name="Group Holding" label="Group Holding" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={userStatus} /> */}
+          <SingleSelectTextField
+            name="group_holding_name"
+            label="Group Holding"
+            value={current.group_holding_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedGroup = groupHoldingName.find(
+                (g) => g.name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                group_holding_name: selectedName,
+                groups_holdings_id: matchedGroup?.id || null,
+              }));
+            }}
+            names={groupHoldingName}
+          />
+          {/* <SingleSelectTextField name="Company" label="Company" value={current.company_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_name: e.target.value }))} names={userStatus} /> */}
+          <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedCompany = companyName.find(
+                (g) => g.name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                company_name: selectedName,
+                company_id: matchedCompany?.id || null,
+              }));
+            }}
+            names={companyName}
+            isdisable={isEditing ? true : false}
+
+          />
+           <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = locationName.find(
+                (g) => g.name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                location_name: selectedName,
+                location_id: matchedLocation?.id || null,
+              }));
+            }}
+            names={locationName}
+            isdisable={isEditing ? true : false}
+
+          />
+          {/* <SingleSelectTextField name="Location" label="Location" value={current.location} onChange={(e) => setCurrent((prev) => ({ ...prev, location: e.target.value }))} names={roleName} /> */}
 
         </div>
 
@@ -268,8 +463,33 @@ const UserRolesPage = () => {
   const crudTitle = "Add New User Form"
   const editCrudTitle = "Edit User"
 
+  const deleteModal = () => {
+    return (
+      <div>
+        <div className='delete_message p-4'>
+          Are you sure you want to delete <DeleteIcon className='action_icon' /> this user?
+        </div>
+
+        <div className="row row-gap-2 mt-4">
+          <div className='col col-12 col-md-6'>
+            <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
+          </div>
+          <div className='col col-12 col-md-6 d-flex justify-content-end'>
+            <button type="submit"
+              className="btn-sm btn btn-primary"
+              onClick={() => handleDelete(userId)}>Yes, I'm sure</button>
+          </div>
+        </div>
+      </div>
+
+
+    )
+
+  }
   return (
     <div>
+      <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+
       {/* Form for Create or Edit */}
       {/* <form onSubmit={handleSubmit}>
         <input
@@ -282,8 +502,8 @@ const UserRolesPage = () => {
         />
         <input
           type="number"
-          name="email_id"
-          value={current.email_id}
+          name="email"
+          value={current.email}
           onChange={handleChange}
           placeholder="Age"
           required
@@ -313,12 +533,12 @@ const UserRolesPage = () => {
                 <span><AddIcon /></span> <span className='button-style'>Add New User</span>
               </button>
             </div>
-            <div>
+            {/* <div>
               <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
                 <span className='button-style'> Delete All</span>
               </button>
-            </div>
-
+            </div> */}
+            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
             <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
@@ -327,14 +547,13 @@ const UserRolesPage = () => {
           <table className='table_tag'>
             <thead className='table_head_tag'>
               <tr >
-                <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                  {/* Select All checkbox */}
+                {/* <th className='table_th_tag ps-2 pe-2 check_box_column'>
                   <input
                     type="checkbox"
                     checked={selectedRows.length === data.length && data.length > 0}
                     onChange={handleSelectAll}
                   />
-                </th>
+                </th> */}
                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
 
                 <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
@@ -387,33 +606,35 @@ const UserRolesPage = () => {
               ) : (
                 currentData.map((item) => (
                   <tr key={item.id} className='table_tr'>
-                    <td className='  ps-2 pe-2 table_td sticky_col'>
-                      {/* Individual row checkbox */}
+                    {/* <td className='  ps-2 pe-2 table_td sticky_col'>
                       <input
                         type="checkbox"
                         checked={selectedRows.includes(item.id)}
                         onChange={(e) => handleCheckboxChange(e, item.id)}
                       />
-                    </td>
+                    </td> */}
                     <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                       <div>
-                        <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
+                        <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.user_id)}><EditIcon className='action_icon' /></button>
                       </div>
                       <div>
-                        <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
+                        <button className='btn  mt-1 btn-sm' onClick={() => {
+                          setUserId(item.user_id);
+                          setIsDeleteModalOpen(true);
+                        }}><DeleteIcon className='action_icon' /></button>
                       </div>
                     </td>
-                    <td className='  ps-2 pe-2'>{item.user_name}</td>
-                    <td className='  ps-2 pe-2'>{item.email_id}</td>
-                    <td className='  ps-2 pe-2'>{item.role}</td>
-                    <td className='  ps-2 pe-2'><Toggle/>
-                    {/* <span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span> */}
+                    <td className=' table_td_font ps-2 pe-2'>{item.username}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.email}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.role_name ? item.role_name : '-'}</td>
+                    <td className=' table_td_font ps-2 pe-2'><Toggle />
+                      {/* <span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span> */}
                     </td>
-                    <td className='  ps-2 pe-2'>{item.temporary_password}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.password}</td>
                     {/* <td className=" ps-2 pe-2">{item.access_modules.join(', ')}</td> */}
-                    <td className=" ps-2 pe-2">{item.group_holding}</td>
-                    <td className=" ps-2 pe-2">{item.company}</td>
-                    <td className=" ps-2 pe-2">{item.location}</td>
+                    <td className="table_td_font ps-2 pe-2">{item.group_holding ? item.group_holding : "-"}</td>
+                    <td className="table_td_font ps-2 pe-2">{item.company_name ? item.company_name : '-'}</td>
+                    <td className="table_td_font ps-2 pe-2">{item.location ? item.location_name : "-"}</td>
                     {/* <td className='  ps-2 pe-2'>{item.desc}</td> */}
                   </tr>
                 ))

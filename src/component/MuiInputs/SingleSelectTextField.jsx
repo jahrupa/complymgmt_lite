@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function SingleSelectTextField({ value, onChange, names, label,isdisable }) {
+export default function SingleSelectTextField({ value, onChange, names = [], label,isdisable }) {
   const [open, setOpen] = React.useState(false);
 
   const handleClose = () => setOpen(false);

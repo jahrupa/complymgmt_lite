@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,13 +14,14 @@ import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
+import { fetchAllModule } from '../api/Service';
 
 
 const dummuJsonData = [
     {
         id: 1744096161424,
         module_name: "Tata",
-        module_desc: "XYZ",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
@@ -29,7 +30,7 @@ const dummuJsonData = [
     {
         id: 1744096161425,
         module_name: "Tata",
-        module_desc: "XYZ",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
@@ -38,7 +39,7 @@ const dummuJsonData = [
     {
         id: 1744096161426,
         module_name: "Tata",
-        module_desc: "XYZ",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
@@ -47,7 +48,7 @@ const dummuJsonData = [
     {
         id: 1744096161427,
         module_name: "Tata",
-        module_desc: "XYZ",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
@@ -56,7 +57,7 @@ const dummuJsonData = [
     {
         id: 1744096161428,
         module_name: "Tata",
-        module_desc: "XYZ",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
@@ -65,7 +66,7 @@ const dummuJsonData = [
     {
         id: 1744096161429,
         module_name: "Tata",
-        module_desc: "XYZ",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
@@ -77,7 +78,7 @@ const Module = () => {
     // const [data, setData] = useState([]);
     // if you want to show dummy jason data 
     const [data, setData] = useState(dummuJsonData);
-    const [current, setCurrent] = useState({ id: null, module_name: '', module_desc: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: [] });
+    const [current, setCurrent] = useState({ id: null, module_name: '', module_description: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: [] });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,14 +98,14 @@ const Module = () => {
         e.preventDefault();
         if (isEditing) {
             const updatedData = data.map((item) =>
-                item.id === current.id ? { ...item, module_name: current.module_name, module_desc: current.module_desc, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by } : item
+                item.id === current.id ? { ...item, module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by } : item
             );
             setData(updatedData);
         } else {
-            const newData = { id: Date.now(), module_name: current.module_name, module_desc: current.module_desc, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by };
+            const newData = { id: Date.now(), module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by };
             setData((prev) => [...prev, newData]);
         }
-        setCurrent({ id: null, module_name: '', module_desc: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: [] });
+        setCurrent({ id: null, module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: [] });
         setIsEditing(false);
         setIsModalOpen(false);
 
@@ -182,7 +183,25 @@ const Module = () => {
         "Securiteam"
     ];
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [locationData, groupHolding, companyName] = await Promise.all([
+                    fetchAllModule(),
+                    // fetchAllGroupHolding(),
+                    // fetchAllCompaniesName(),
+                ]);
+                setData(locationData);
+                // setGroupHoldinData(groupHolding);
+                // setCompanyNameData(companyName);
 
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const crudForm = () => {
         return (
@@ -195,7 +214,7 @@ const Module = () => {
 
                 </div>
                 <div className=''>
-                <MuiTextAreaField value={current.module_desc} handleChange={handleChange} name='module_desc' label='Module Description' />
+                <MuiTextAreaField value={current.module_description} handleChange={handleChange} name='module_description' label='Module Description' />
 
                     {/* <SingleSelectTextField name="module_name" label="module_name" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value }))} names={groupHolding} /> */}
                     
@@ -236,8 +255,8 @@ const Module = () => {
         />
         <input
           type="number"
-          name="module_desc"
-          value={current.module_desc}
+          name="module_description"
+          value={current.module_description}
           onChange={handleChange}
           placeholder="Age"
           required
@@ -267,11 +286,11 @@ const Module = () => {
                                 <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
                             </button>
                         </div>
-                        <div>
+                        {/* <div>
                             <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
                                 <span className='button-style'> Delete All</span>
                             </button>
-                        </div>
+                        </div> */}
 
                         <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
@@ -281,14 +300,13 @@ const Module = () => {
                     <table className='table_tag'>
                         <thead className='table_head_tag'>
                             <tr >
-                                <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                                    {/* Select All checkbox */}
+                                {/* <th className='table_th_tag ps-2 pe-2 check_box_column'>
                                     <input
                                         type="checkbox"
                                         checked={selectedRows.length === data.length && data.length > 0}
                                         onChange={handleSelectAll}
                                     />
-                                </th>
+                                </th> */}
                                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
                                 {/* <th className='table_th_tag  ps-2 pe-2'><span>Location</span>
                                     <span className='ms-4'>
@@ -335,14 +353,13 @@ const Module = () => {
                             ) : (
                                 currentData.map((item) => (
                                     <tr key={item.id} className='table_tr'>
-                                        <td className='  ps-2 pe-2 table_td sticky_col'>
-                                            {/* Individual row checkbox */}
+                                        {/* <td className='  ps-2 pe-2 table_td sticky_col'>
                                             <input
                                                 type="checkbox"
                                                 checked={selectedRows.includes(item.id)}
                                                 onChange={(e) => handleCheckboxChange(e, item.id)}
                                             />
-                                        </td>
+                                        </td> */}
                                         <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                                             <div>
                                                 <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
@@ -353,12 +370,11 @@ const Module = () => {
                                         </td>
                                         {/* <td className='  ps-2 pe-2'>{item.location}</td> */}
 
-                                        <td className='  ps-2 pe-2'>{item.module_name}</td>
-                                        <td className='  ps-2 pe-2'>{item.module_desc}</td>
-                                        <td className='  ps-2 pe-2'>{item.approved_by}</td>
-
-                                        <td className='  ps-2 pe-2'>{item.created_at}</td>
-                                        <td className='  ps-2 pe-2'>{item.updated_at}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.module_name}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.module_description}</td>
+                                        <td className='table_td_font ps-2 pe-2'>{item.approved_by}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.created_at}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.updated_at}</td>
                                     </tr>
                                 ))
                             )}

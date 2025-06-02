@@ -16,17 +16,6 @@ function NavBar({ setSidebarOpen, sidebarOpen }) {
                         {sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
                     </button>
                     <img src={complyn_mgmt_logo} alt='logo' width={115} className='mt-1'/>
-                    <div className='d-flex'>
-                        {/* <div className="nav-bar-logo-name" style={{
-                            background: 'linear-gradient(to right, blue, orange)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            fontWeight: 'bold'
-                        }}>
-                            Complymgmt
-                        </div> */}
-
-                    </div>
                 </div>
                 <div className='pe-4 ps-4'>
                     <UserProfile />

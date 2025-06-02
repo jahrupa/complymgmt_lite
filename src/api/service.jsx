@@ -9,7 +9,18 @@ import {
   CREATE_LOCATION,
   UPDATE_LOCATION_BY_ID,
   DELETE_LOCATION_BY_ID,
-  GET_ALL_COMPANY_NAME
+  GET_ALL_COMPANY_NAME,
+  GET_ALL_GROUP,
+  CREATE_GROUP,
+  UPDATE_GROUP,
+  DELETE_GROUP,
+  GET_ALL_USER,
+  DELETE_USER_BY_ID,
+  GET_ALL_Roles_NAME,
+  CREATE_USER,
+  GET_LOCATION_NAME,
+  GET_COMPANY_BY_GROUP_HOLDING_ID,
+  GET_ALL_MODULE
 
 } from "./Endpoint";
 
@@ -64,6 +75,15 @@ export const deleteCompanyById = async (id) => {
     throw error;
   }
 };
+export const getCompanyByGroupId = async (id) => {
+  try {
+    const response = await API.get(`${GET_COMPANY_BY_GROUP_HOLDING_ID}${id}`); 
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching company by group ID:", error);
+    throw error
+  }
+};
 
 
 
@@ -73,7 +93,7 @@ export const fetchAllGroupHolding = async () => {
     const response = await API.get(GET_GROUP_HOLDING_BY_NAME);
     return response.data;
   } catch (error) {
-    console.error("Error fetching companies:", error);
+    console.error("Error fetching group holdin:", error);
     throw error;
   }
 };
@@ -85,11 +105,20 @@ export const fetchAllLocation = async () => {
     const response = await API.get(GET_ALL_LOCATION);
     return response.data;
   } catch (error) {
-    console.error("Error fetching companies:", error);
+    console.error("Error fetching location:", error);
     throw error;
   }
 };
 
+export const fetchAllLocationName = async () => {
+  try {
+    const response = await API.get(GET_LOCATION_NAME);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching location name:", error);
+    throw error;
+  }
+};
 
 export const createLocation = async (locationData) => {
   try {
@@ -118,6 +147,109 @@ export const deleteLocationById = async (id) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting location:", error);
+    throw error;
+  }
+};
+
+
+// Group Holding
+export const fetchAllGroup = async () => {
+  try {
+    const response = await API.get(GET_ALL_GROUP);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching group:", error);
+    throw error;
+  }
+};
+
+export const createGroup = async (groupData) => {
+  try {
+    const response = await API.post(CREATE_GROUP, groupData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating Group:", error);
+    throw error;
+  }
+}
+
+export const updateGroupById = async (id, groupData) => {
+  try {
+    const response = await API.put(`${UPDATE_GROUP}${id}`, groupData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating location:", error);
+    throw error;
+  }
+};
+
+export const deleteGroupById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_GROUP}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting company:", error);
+    throw error;
+  }
+};
+
+
+// Group Holding
+export const fetchAllUser = async () => {
+  try {
+    const response = await API.get(GET_ALL_USER);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+};
+export const fetchAllUserName = async () => {
+  try {
+    const response = await API.get(GET_ALL_Roles_NAME);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user Name:", error);
+    throw error;
+  }
+};
+export const deleteUserById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_USER_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+};
+
+export const createUser = async (userData) => {
+  try {
+    const response = await API.post(CREATE_USER, userData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
+}
+
+export const updateUserById = async (id, userData) => {
+  try {
+    const response = await API.put(`${UPDATE_GROUP}${id}`, userData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+
+// Group Holding
+export const fetchAllModule = async () => {
+  try {
+    const response = await API.get(GET_ALL_MODULE);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Module:", error);
     throw error;
   }
 };

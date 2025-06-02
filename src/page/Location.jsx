@@ -13,7 +13,7 @@ import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { createLocation, deleteLocationById, fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, updateLocationById } from '../api/Service';
+import { createLocation, deleteLocationById, fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, getCompanyByGroupId, updateLocationById } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 
@@ -32,7 +32,6 @@ const Location = () => {
             // location_id: null,
             updated_at: '',
         });
-    console.log(current, 'current')
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +45,7 @@ const Location = () => {
         horizontal: 'center',
     });
     const [locationId, setLocationId] = useState(null);
-
+    const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
@@ -106,7 +105,6 @@ const Location = () => {
     // Handle Edit
     const handleEdit = (location_id) => {
         // setCurrent({ company_id: company_id })
-
         const item = data.find((item) => item.location_id === location_id);
         setCurrent(item);
         setIsEditing(true);
@@ -217,28 +215,19 @@ const Location = () => {
     const closeModal = () => {
         setIsModalOpen(false);
     };
-    const groupHoldings = [
-        "Tata",
-        "Groupon",
-        "Influitive",
-        "Spinfluence",
-        "Intellivision",
-        "Omnilert",
-        "Technologent",
-        "Securiteam"
-    ];
-
+  
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [locationData, groupHolding, companyName] = await Promise.all([
                     fetchAllLocation(),
                     fetchAllGroupHolding(),
-                    fetchAllCompaniesName(),
+                    // fetchAllCompaniesName(),
                 ]);
                 setData(locationData);
                 setGroupHoldinData(groupHolding);
                 setCompanyNameData(companyName);
+
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -247,6 +236,34 @@ const Location = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const fetchCompany = async () => {
+            try {
+                const data = await getCompanyByGroupId(current?.groups_holdings_id);
+                const company = data?.companies?.[0];
+
+                if (company) {
+                    // Set company name list for dropdown (even though it's disabled)
+                    setCompanyNameByGroupHoldingId([{ id: company.id, name: company.name }]);
+
+                    // Set selected company name in state
+                    setCurrent((prev) => ({
+                        ...prev,
+                        company_name: company.name,
+                        company_id: company.id,
+
+                    }));
+                }
+            } catch (error) {
+                console.error("Failed to fetch company:", error);
+            }
+        };
+
+        if (current?.groups_holdings_id) {
+            fetchCompany();
+        }
+    }, [current?.groups_holdings_id]);
+
 
     const crudForm = () => {
         return (
@@ -254,7 +271,7 @@ const Location = () => {
                 {/* <form onSubmit={handleSubmit}> */}
 
                 <div>
-                    <SingleSelectTextField
+                    {/* <SingleSelectTextField
                         name="group_holding_name"
                         label="Group Holding"
                         value={current?.group_holding_name}
@@ -271,27 +288,37 @@ const Location = () => {
                         }}
                         names={groupHoldingData}
                         isdisable={isEditing ? true : false}
-                    />
+                    /> */}
 
-                </div>
-                <div className=''>
-                    <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
+                    <SingleSelectTextField
+                        name="group_holding_name"
+                        label="Group Holding"
+                        value={current?.group_holding_name}
                         onChange={(e) => {
                             const selectedName = e.target.value;
-                            const matchedGroup = companyNameData.find(
+                            const matchedGroup = groupHoldingData.find(
                                 (g) => g.name === selectedName
                             );
                             setCurrent((prev) => ({
                                 ...prev,
-                                company_name: selectedName,
-                                company_id: matchedGroup?.id || null,
+                                group_holding_name: selectedName,
+                                groups_holdings_id: matchedGroup?.id || null,
+                                company_name: '', // reset when group changes
                             }));
                         }}
-                        names={companyNameData}
-                        isdisable={isEditing ? true : false}
-
+                        names={groupHoldingData}
+                        isdisable={isEditing}
                     />
 
+                </div>
+                <div className=''>
+                    <SingleSelectTextField
+                        name="company_name"
+                        label="Company Name"
+                        value={current?.company_name}
+                        names={companyNameByGroupHoldingId}
+                        isdisable={true}
+                    />
                 </div>
                 <div>
                     <MuiTextField label='Location' type='text' isRequired={true} fieldName='location_name' handleChange={handleChange} value={current?.location_name} />
