@@ -6,11 +6,15 @@ import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Optional theme CSS
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import SearchIcon from '@mui/icons-material/Search';
-import AgGridSearchBar from './MuiInputs/AgGridSearchBar';
-import Modal from '../component/Modal'
+// import AgGridSearchBar from './MuiInputs/AgGridSearchBar';
+// import Modal from '../component/Modal'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import * as XLSX from 'xlsx';
+// import MonthYearCalander from './MonthYearCalander';
+import AgGridSearchBar from '../component/MuiInputs/AgGridSearchBar';
+import Modal from '../component/Modal';
+import MonthYearCalander from '../component/MonthYearCalander';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Onbarding = () => {
@@ -160,6 +164,13 @@ const Onbarding = () => {
                 <div className=' d-flex justify-content-end'>
                   <button className='crud_btn' onClick={openModal}>Upload File</button>
                 </div>
+              </div>
+              <div>
+                <MonthYearCalander/>
+                {/* <div class="month-picker-wrapper">
+                  <input type="month" id="bdaymonth" name="bdaymonth" />
+                </div> */}
+
               </div>
             </div>
           </div>

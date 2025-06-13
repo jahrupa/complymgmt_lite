@@ -6,6 +6,7 @@ import Modal from './Modal'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import exportCsvIcon from '../assets/Arrow-Line.png'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import * as XLSX from 'xlsx';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -146,7 +147,7 @@ const OnbardingPayrollCompliance = () => {
 
             <div className='d-lg-flex d-md-flex gap-2'>
               <div>
-                <button onClick={onBtnExport} className='crud_btn'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
+                <button onClick={onBtnExport} className='crud_btn'><ExitToAppIcon style={{width:18}}/>Export</button>
               </div>
               <div>
                 <div className=' d-flex justify-content-end'>

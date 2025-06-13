@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,6 +19,16 @@ import Toggle from '../component/Toggle';
 import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+// Register module
+ModuleRegistry.registerModules([AllCommunityModule]);
+
 
 const dummuJsonData = [
   {
@@ -199,7 +209,7 @@ const UserRolesPage = () => {
 
       // ✅ Get the message from response
       const message = response?.message;
-      console.log(message,'message')
+      console.log(message, 'message')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
@@ -207,13 +217,13 @@ const UserRolesPage = () => {
       setData(updatedData);
     } catch (error) {
       console.error("Error saving user:", error);
-    
+
       // Extract message from error response if available
       const errorMessage =
         error?.response?.data?.message || // for Axios
         error?.message ||                 // native JS error
         "Failed to save user";            // fallback message
-    
+
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
@@ -221,7 +231,7 @@ const UserRolesPage = () => {
         severityType: 'error'
       });
     }
-    
+
     setIsEditing(false);
     setIsModalOpen(false);
   };
@@ -426,7 +436,7 @@ const UserRolesPage = () => {
             isdisable={isEditing ? true : false}
 
           />
-           <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
+          <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = locationName.find(
@@ -486,6 +496,163 @@ const UserRolesPage = () => {
     )
 
   }
+
+
+  // "id": 1744096161424,
+  //     "username": "rupa",
+  //     "email": "jha@gmail.com",
+  //     "role_name": "Admin",
+  //     "status": "Active",
+  //     "group_holding": "Tata",
+  //     "company_name": 'xyz',
+  //     "location": "Mumbai",
+  //     "password": "password12",
+  //     "access_modules": [
+  //       "Admin",
+  //       "Editor"
+  //     ]
+  const getRoleColor = (role) => {
+    switch (role) {
+      case 'Admin':
+        return { background: '#d1e7dd', color: '#0f5132' }; // green
+      case 'Manager':
+        return { background: '#cff4fc', color: '#055160' }; // blue
+      case 'Client':
+        return { background: '#fce5cd', color: '#7f4f24' }; // brown
+      case 'Super Admin':
+        return { background: '#f8d7da', color: '#842029' }; // red
+      default:
+        return { background: '#e2e3e5', color: '#41464b' }; // gray
+    }
+  };
+  const colDefs = [
+    {
+      headerName: 'Actions',
+      field: 'actions',
+      filter: false,
+      editable: false,
+      width: 130,
+      pinned: "left",
+      cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+      cellRenderer: (params) => {
+        return (
+          <div className="d-flex justify-content-around align-items-center">
+
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                setCurrent(params.data);
+                setIsEditing(true);
+                setIsModalOpen(true);
+                setUserId(params.data.id); // OR .user_id based on your data
+              }}
+            >
+              <EditIcon fontSize="small" className="action_icon" />
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                setUserId(params.data.id);
+                setIsDeleteModalOpen(true);
+              }}
+            >
+              <DeleteIcon fontSize="small" className="action_icon" />
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                setUserId(params.data.id);
+                setIsDeleteModalOpen(true);
+              }}
+            >
+              <VisibilityIcon fontSize="small" className="action_icon" />
+            </button>
+            {/* <VisibilityIcon/> */}
+          </div>
+        );
+      }
+    }
+    ,
+
+    { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    {
+      field: 'role_name', headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+      cellRenderer: (params) => {
+        const { background, color } = getRoleColor(params.value);
+        return (
+          <span
+            style={{
+              //   padding: '4px 12px',
+              padding: '5px 12px',
+              backgroundColor: background,
+              color: color,
+              borderRadius: '20px',
+              fontSize: '0.8rem',
+              fontWeight: 500,
+              //   display: 'inline-block',
+              textAlign: 'center',
+              minWidth: '60px'
+            }}
+          >
+            <span> <PermIdentityIcon style={{ width: '15', height: '15' }} className='mb-1 me-1' /></span>{params.value}<span></span>
+          </span>
+        );
+      }
+    },
+    { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    {
+            field: 'status',
+            headerName: 'Status',
+            editable: false,
+            filter: true,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+            cellRenderer: (params) => {
+              const value = params.value;
+              const iconUrl = value === 'Active'
+                ? "https://www.ag-grid.com/example-assets/icons/tick-in-circle.png"
+                : "https://www.ag-grid.com/example-assets/icons/cross-in-circle.png";
+          
+              return (
+                <div >
+                  <img src={iconUrl} alt={value} />
+                </div>
+              );
+            }
+          },
+           {
+      field: 'email',
+      headerName: 'Email',
+      editable: false,
+      filter: true,
+      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    },
+    {
+      field: 'password',
+      headerName: 'Password',
+      editable: false,
+      filter: true,
+      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    },
+
+
+    { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'group_holding', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
+
+  ];
+  const gridRef = useRef();
+  const defaultColDef = {
+    sortable: true,
+    filter: true,
+    editable: true,
+    headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+  };
+  const onRowValueChanged = (event) => {
+    console.log('Row updated:', event.data);
+  };
+
+
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
@@ -533,27 +700,30 @@ const UserRolesPage = () => {
                 <span><AddIcon /></span> <span className='button-style'>Add New User</span>
               </button>
             </div>
-            {/* <div>
-              <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
-                <span className='button-style'> Delete All</span>
-              </button>
-            </div> */}
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
             <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
 
-        <div className='table_div2'>
-          <table className='table_tag'>
+        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+          <AgGridReact
+            theme="legacy"
+            ref={gridRef}
+            rowData={data}
+            columnDefs={colDefs}
+            defaultColDef={defaultColDef}
+            editType="fullRow"
+            rowSelection="single"
+            pagination={true}
+            // rowBuffer={rowBuffer}
+            onRowValueChanged={onRowValueChanged}
+
+          />
+        </div>
+
+        {/* <table className='table_tag'>
             <thead className='table_head_tag'>
               <tr >
-                {/* <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                  <input
-                    type="checkbox"
-                    checked={selectedRows.length === data.length && data.length > 0}
-                    onChange={handleSelectAll}
-                  />
-                </th> */}
                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
 
                 <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
@@ -561,12 +731,6 @@ const UserRolesPage = () => {
                     <ExpandCircleDownIcon className='table_th_icon' />
 
                   </span>
-
-                  {/* <div class="dropdown-menu table_th_icon_menu" aria-labelledby="dropdownMenu2">
-    <button class="dropdown-item" type="button">Action</button>
-    <button class="dropdown-item" type="button">Another action</button>
-    <button class="dropdown-item" type="button">Something else here</button>
-  </div> */}
                 </th>
 
                 <th className='table_th_tag  ps-2 pe-2'><span>Email Id</span>
@@ -590,8 +754,6 @@ const UserRolesPage = () => {
                     <ExpandCircleDownIcon className='table_th_icon' />
                   </span>
                 </th>
-                {/* <th className="table_th_tag ps-2 pe-2"><span>Access Modules</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th> */}
-                {/* <th className='table_th_tag  ps-2 pe-2'><span>Description</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th> */}
                 <th className="table_th_tag  ps-2 pe-2"><span>Group Holding</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
                 <th className="table_th_tag  ps-2 pe-2"><span>Company</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
                 <th className="table_th_tag  ps-2 pe-2"><span>Location</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
@@ -606,13 +768,6 @@ const UserRolesPage = () => {
               ) : (
                 currentData.map((item) => (
                   <tr key={item.id} className='table_tr'>
-                    {/* <td className='  ps-2 pe-2 table_td sticky_col'>
-                      <input
-                        type="checkbox"
-                        checked={selectedRows.includes(item.id)}
-                        onChange={(e) => handleCheckboxChange(e, item.id)}
-                      />
-                    </td> */}
                     <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                       <div>
                         <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.user_id)}><EditIcon className='action_icon' /></button>
@@ -628,23 +783,18 @@ const UserRolesPage = () => {
                     <td className=' table_td_font ps-2 pe-2'>{item.email}</td>
                     <td className=' table_td_font ps-2 pe-2'>{item.role_name ? item.role_name : '-'}</td>
                     <td className=' table_td_font ps-2 pe-2'><Toggle />
-                      {/* <span className={`${item.status === 'Active' ? 'active_status_badge' : 'inactive_status_badge'}`}>{item.status}</span> */}
                     </td>
                     <td className=' table_td_font ps-2 pe-2'>{item.password}</td>
-                    {/* <td className=" ps-2 pe-2">{item.access_modules.join(', ')}</td> */}
                     <td className="table_td_font ps-2 pe-2">{item.group_holding ? item.group_holding : "-"}</td>
                     <td className="table_td_font ps-2 pe-2">{item.company_name ? item.company_name : '-'}</td>
                     <td className="table_td_font ps-2 pe-2">{item.location ? item.location_name : "-"}</td>
-                    {/* <td className='  ps-2 pe-2'>{item.desc}</td> */}
                   </tr>
                 ))
               )}
             </tbody>
-          </table>
-        </div>
+          </table> */}
 
-        {/* Pagination Controls */}
-        <div className="justify-content-between pagination mt-3">
+        {/* <div className="justify-content-between pagination mt-3">
           <div className='selected_row_text'>
             Selected Rows: {selectedRows.length}
           </div>
@@ -655,7 +805,7 @@ const UserRolesPage = () => {
             ))}
             <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

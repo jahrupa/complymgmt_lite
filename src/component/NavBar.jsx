@@ -11,10 +11,10 @@ function NavBar({ setSidebarOpen, sidebarOpen }) {
     return (
         <div>
             <div className="navbar">
-                <div className='d-flex' style={{ alignItems: 'center' }}>
-                    <button className="openbtn btn btn-sm w-auto" onClick={() => setSidebarOpen(prev => !prev)}>
+                <div className='d-flex' style={{ alignItems: 'center',marginLeft:95 }}>
+                    {/* <button className="openbtn btn btn-sm w-auto" onClick={() => setSidebarOpen(prev => !prev)}>
                         {sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
-                    </button>
+                    </button> */}
                     <img src={complyn_mgmt_logo} alt='logo' width={115} className='mt-1'/>
                 </div>
                 <div className='pe-4 ps-4'>

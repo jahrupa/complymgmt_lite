@@ -89,6 +89,8 @@
     justify-content: center;
     border: 1px dashed #8080804a;
     padding: 40px;
+    background: #F0F2F7;
+
 }
 
 .uploaded_file_name {

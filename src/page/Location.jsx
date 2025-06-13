@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,6 +17,14 @@ import { createLocation, deleteLocationById, fetchAllCompaniesName, fetchAllGrou
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 
+
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 const Location = () => {
     // const [data, setData] = useState([]);
@@ -215,7 +223,7 @@ const Location = () => {
     const closeModal = () => {
         setIsModalOpen(false);
     };
-  
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -363,6 +371,87 @@ const Location = () => {
         )
 
     }
+
+
+
+    //  id: null, company_name: '',
+    //         company_id: null,
+    //         group_holding_name: '',
+    //         created_at: '',
+    //         location_name: "",
+    //         // location_id: null,
+    //         updated_at: '',
+
+
+    const colDefs = [
+        {
+            headerName: 'Actions',
+            field: 'actions',
+            filter: false,
+            editable: false,
+            width: 130,
+            pinned: "left",
+            cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+            cellRenderer: (params) => {
+                return (
+                    <div className="d-flex justify-content-around align-items-center">
+
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setCurrent(params.data);
+                                setIsEditing(true);
+                                setIsModalOpen(true);
+                                setUserId(params.data.id); // OR .user_id based on your data
+                            }}
+                        >
+                            <EditIcon fontSize="small" className="action_icon" />
+                        </button>
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setUserId(params.data.id);
+                                setIsDeleteModalOpen(true);
+                            }}
+                        >
+                            <DeleteIcon fontSize="small" className="action_icon" />
+                        </button>
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setUserId(params.data.id);
+                                setIsDeleteModalOpen(true);
+                            }}
+                        >
+                            <VisibilityIcon fontSize="small" className="action_icon" />
+                        </button>
+                        {/* <VisibilityIcon/> */}
+                    </div>
+                );
+            }
+        }
+        ,
+
+        { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'created_at', headerName: 'Created At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'updated_at', headerName: 'Updated At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
+
+
+    ];
+    const gridRef = useRef();
+    const defaultColDef = {
+        sortable: true,
+        filter: true,
+        editable: true,
+        headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    };
+    const onRowValueChanged = (event) => {
+        console.log('Row updated:', event.data);
+    };
     return (
         <div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
@@ -375,13 +464,13 @@ const Location = () => {
                             <MuiSearchBar label='Search...' type='text' />
                             <button className='search-icon'><SearchIcon /></button>
                         </div>
-                        <MultipleSelectFields
+                        {/* <MultipleSelectFields
                             placeholder="Filter By Group Holding"
                             roleName={groupHoldingData}
                             onChange={(selectedIds) => {
                                 // use selectedIds in your filters or elsewhere
                             }}
-                        />
+                        /> */}
                     </div>
 
 
@@ -403,17 +492,10 @@ const Location = () => {
                     </div>
                 </div>
 
-                <div className='table_div2'>
+                {/* <div className='table_div2'>
                     <table className='table_tag'>
                         <thead className='table_head_tag'>
                             <tr >
-                                {/* <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRows.length === data.length && data.length > 0}
-                                        onChange={handleSelectAll}
-                                    />
-                                </th> */}
                                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
                                 <th className='table_th_tag  ps-2 pe-2'><span>Location</span>
                                     <span className='ms-4'>
@@ -454,13 +536,6 @@ const Location = () => {
                             ) : (
                                 currentData.map((item) => (
                                     <tr key={item.id} className='table_tr'>
-                                        {/* <td className='  ps-2 pe-2 table_td sticky_col'>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedRows.includes(item.id)}
-                                                onChange={(e) => handleCheckboxChange(e, item.id)}
-                                            />
-                                        </td> */}
                                         <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                                             <div>
                                                 <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.location_id)}><EditIcon className='action_icon' /></button>
@@ -483,10 +558,10 @@ const Location = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
+                </div> */}
 
                 {/* Pagination Controls */}
-                <div className="justify-content-between pagination mt-3">
+                {/* <div className="justify-content-between pagination mt-3">
                     <div className='selected_row_text'>
                         Selected Rows: {selectedRows.length}
                     </div>
@@ -497,6 +572,21 @@ const Location = () => {
                         ))}
                         <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
                     </div>
+                </div> */}
+                <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+                    <AgGridReact
+                        theme="legacy"
+                        ref={gridRef}
+                        rowData={data}
+                        columnDefs={colDefs}
+                        defaultColDef={defaultColDef}
+                        editType="fullRow"
+                        rowSelection="single"
+                        pagination={true}
+                        // rowBuffer={rowBuffer}
+                        onRowValueChanged={onRowValueChanged}
+
+                    />
                 </div>
             </div>
         </div>

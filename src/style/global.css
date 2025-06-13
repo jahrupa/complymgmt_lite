@@ -9,6 +9,52 @@ body {
   font-weight: 600;
 }
 
+.fs-12 {
+  font-size: 12px;
+}
+
+.fs-14 {
+  font-size: 14px;
+}
+
+.fs-16 {
+  font-size: 16px;
+}
+
+.fw-600 {
+  font-weight: 600;
+}
+
+.active-color {
+  color: #4AAC4E;
+}
+
+.inactive-color {
+  color: #FC4040;
+}
+
+.icon-color {
+  color: #397492;
+}
+
+.card-border-blue {
+  border: 1px solid #3974925c;
+}
+
+.card-border-red {
+  border: 1px solid #fc40403b;
+}
+
+.card-border-green {
+  border: 1px solid #4aac4e4a;
+}
+
+.card_div {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
 /* header */
 .css-s09cke-MuiTablePagination-selectLabel {
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -117,12 +163,187 @@ body {
 
 }
 
-.grid-table-filter{
+.grid-table-filter {
   height: 25px;
   border-radius: 5px;
   border: 1px solid #80808082;
   font-size: 12px;
 }
-.grid-table-filter:focus-visible{
+
+.grid-table-filter:focus-visible {
   outline: none;
 }
+
+.display-none {
+  display: none;
+}
+
+
+
+/* calander */
+
+.month-picker-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 195px;
+  border: 1px solid #8fbc8f2e;
+}
+
+.month-picker-wrapper label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #121212;
+}
+
+.month-picker-wrapper input[type="month"] {
+  padding: 7px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  color: #121212;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.month-picker-wrapper input[type="month"]:hover,
+.month-picker-wrapper input[type="month"]:focus {
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Approve && Reject btn */
+
+
+ .btn-wrap-div {
+      /* background-color: #f0f2f5;
+      font-family: 'Segoe UI', sans-serif; */
+      display: flex;
+      /* justify-content: center;
+      align-items: center; */
+      /* height: 100vh; */
+      gap: 10px;
+    }
+
+    .button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: background 0.3s ease, transform 0.2s ease;
+      height: 35px;
+    }
+
+    .button svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+      transition: transform 0.3s ease;
+    }
+
+    .approve {
+      background: #28a745;
+      box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .reject {
+      background: #dc3545;
+      box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    .button::before {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      transform: scale(0);
+      width: 100px;
+      height: 100px;
+      z-index: 0;
+      transition: transform 0.5s ease-out;
+    }
+
+    .button:active::before {
+      transform: scale(4);
+      opacity: 0;
+    }
+
+    .text {
+      position: relative;
+      z-index: 1;
+    }
+
+    .icon {
+      position: relative;
+      z-index: 1;
+    }
+
+    .button:hover .icon {
+      transform: rotate(20deg) scale(1.2);
+    }
+
+     .upload-wrapper {
+      position: relative;
+    }
+
+    .upload-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+      height: 35px;
+      border: none;
+      gap: 10px;
+
+    }
+
+    .upload-label:hover {
+      background: #0069d9;
+      transform: scale(1.05);
+    }
+
+    .upload-label:active {
+      transform: scale(0.97);
+    }
+
+    .upload-label svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    .upload-input {
+      display: none;
+    }
+
+    #multi-fileUpload{
+      display: none;
+    }

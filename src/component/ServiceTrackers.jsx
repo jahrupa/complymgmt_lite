@@ -183,10 +183,13 @@ function ServiceTrackers() {
             headerName: 'Actions',
             headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
             cellRenderer: (params) => {
-                const btn = document.createElement('button');
-                btn.innerText = 'Delete';
-                btn.onclick = () => deleteRow(params.data.id);
-                return btn;
+                <button onClick={() => deleteRow(params.data.id)} className="btn btn-danger btn-sm">
+                  Delete
+                </button>
+                // const btn = document.createElement('button');
+                // btn.innerText = 'Delete';
+                // btn.onclick = () => deleteRow(params.data.id);
+                // return btn;
             }
         }
     ];
@@ -395,7 +398,7 @@ function ServiceTrackers() {
                             </div>
                             <div>
                                 <div className=' d-flex justify-content-end'>
-                                    <button className='crud_btn' onClick={openModal}>Upload File</button>
+                                    <button className='crud_btn' onClick={openModal}>Add Service Tracker</button>
                                 </div>
                             </div>
                         </div>

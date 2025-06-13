@@ -6,49 +6,49 @@ import API from '../api/axios'; // your axios instance
 import { LOGIN_API } from '../api/Endpoint';
 
 
-const Login = ({setIsAuthenticated}) => {
+const Login = ({ setIsAuthenticated }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
 
-// Login handler in your component
-const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    console.log('Login submitted:', { username, password });
-  
-    try {
-      const response = await API.post(LOGIN_API, {
-        username,
-        password,
-      });
-      const token = response.data?.data?.token;
-      console.log(token,'token')
-      if (token) {
-        localStorage.setItem('token', token);
-        setIsAuthenticated(true)
-        navigate('/dashboard');
-      } else {
-        // console.error('Token not found in response:', response.data);
-      }
-  
-    } catch (error) {
-      const errMsg = error.response?.data?.message || error.message || "Login failed";
-      console.error('Login failed:', errMsg);
-      alert(errMsg);
-    }
-  };
-//   let tokenId = localStorage.getItem('token');
-//   console.log(tokenId,'tokenId')
-//   useEffect(()=>{
-//     if(tokenId){
-//         setIsAuthenticated(true)
-//     }
-//   },[tokenId])
+    // Login handler in your component
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        console.log('Login submitted:', { username, password });
+
+        try {
+            const response = await API.post(LOGIN_API, {
+                username,
+                password,
+            });
+            const token = response.data?.data?.token;
+            console.log(token, 'token')
+            if (token) {
+                localStorage.setItem('token', token);
+                setIsAuthenticated(true)
+                navigate('/dashboard');
+            } else {
+                // console.error('Token not found in response:', response.data);
+            }
+
+        } catch (error) {
+            const errMsg = error.response?.data?.message || error.message || "Login failed";
+            console.error('Login failed:', errMsg);
+            alert(errMsg);
+        }
+    };
+    //   let tokenId = localStorage.getItem('token');
+    //   console.log(tokenId,'tokenId')
+    //   useEffect(()=>{
+    //     if(tokenId){
+    //         setIsAuthenticated(true)
+    //     }
+    //   },[tokenId])
     return (
         <div className='centered-container ps-3 pe-3 page_bg'>
-            <div className=' mobil_view_login_form_col1_v2 pe-5 ps-5'>
+            <div className=' mobil_view_login_form_col1_v2 pe-5'>
                 <img src={complyn_mgmt_logo} alt="Avatar" className="avatar_v2" />
                 <div className='ps-2 pe-2 mt-2'>Command the chaos. Lead with intelligence. Govern with integrity.
                 </div>
@@ -65,7 +65,9 @@ const handleSubmit = async (e) => {
 
 
                             <div className="container login_form_container">
-
+                                <div className='d-flex justify-content-center mb-3 mt-4'>
+                                <img src={complyn_mgmt_logo} alt="Avatar" style={{width:'50%'}} />
+                                </div>
                                 <div className='mb-3 login_heading_text'>Log in</div>
                                 <label htmlFor="uname">Email address</label>
                                 <input
@@ -95,7 +97,7 @@ const handleSubmit = async (e) => {
                                 <button type="submit" className='login_btn_style_v2  mt-2 mb-2'><span className='login_btn'>Log in</span></button>
                                 {/* <div className="container" style={{ backgroundColor: '#f1f1f1' }}> */}
                                 {/* </div> */}
-                                <div className='karma-logon-text_v2'>New to complymgmt?<span className='karma_logo_text_span_v2'> Create account</span></div>
+                                {/* <div className='karma-logon-text_v2'>New to complymgmt?<span className='karma_logo_text_span_v2'> Create account</span></div> */}
 
                             </div>
 

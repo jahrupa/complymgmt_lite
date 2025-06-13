@@ -14,7 +14,7 @@ import Module from '../page/Module';
 import SubModule from '../page/SubModule';
 import AddUser from '../page/AddUser';
 import AccessControl from '../page/AccessControl';
-import Onbarding from '../component/Onbarding';
+import Onbarding from '../page/Onbarding';
 import OnbardingComplianceScope from '../component/OnbardingComplianceScope.jsx';
 import OnbardingPayrollCompliance from '../component/OnbardingPayrollCompliance.jsx';
 import ServiceTrackers from '../component/ServiceTrackers.jsx';
@@ -22,6 +22,7 @@ import RoleManager from '../component/RoleManager.jsx';
 import OutsourcingScope from '../component/OutsourcingScope.jsx';
 import Reimbursements from '../component/Reimbursements.jsx';
 import PayrollManagement from '../component/PayrollManagement.jsx';
+import DocumentUpload from '../page/DocumentUpload.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const[isAuthenticated,setIsAuthenticated]=useState(true)
@@ -50,7 +51,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
           <Route path="/submodule" element={<SubModule />} />
           <Route path="/accesscontrol" element={<AccessControl />} />
           <Route path="/onboarding" element={<Onbarding />} />
-          <Route path="/onboarding" element={<Onbarding />} />
+          {/* <Route path="/onboarding" element={<Onbarding />} /> */}
           <Route path="/onbardingcompliancescope" element={<OnbardingComplianceScope />} />
           <Route path="/onbardingpayrollcompliance" element={<OnbardingPayrollCompliance />} />
           <Route path="/outsourcingScope" element={<OutsourcingScope />} />
@@ -58,6 +59,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
           <Route path="/payrollmanagement" element={<PayrollManagement />} />
           <Route path="/servicetrackers" element={<ServiceTrackers />} />
           <Route path="/rolemanager" element={<RoleManager />} />
+          <Route path="/uploadDocument" element={<DocumentUpload />} />
+
 
           
 

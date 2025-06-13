@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,6 +16,13 @@ import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
 import { fetchAllModule } from '../api/Service';
 
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import DeleteModal from '../component/DeleteModal';
 
 const dummuJsonData = [
     {
@@ -25,7 +32,7 @@ const dummuJsonData = [
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: ["Admin"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161425,
@@ -34,7 +41,7 @@ const dummuJsonData = [
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: ["Admin"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161426,
@@ -43,7 +50,7 @@ const dummuJsonData = [
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: ["Admin"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161427,
@@ -52,7 +59,7 @@ const dummuJsonData = [
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: ["Admin"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161428,
@@ -61,7 +68,7 @@ const dummuJsonData = [
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: ["Admin"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161429,
@@ -70,7 +77,7 @@ const dummuJsonData = [
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: ["Admin"]
+        approved_by: "Admin"
     },
 ];
 
@@ -78,10 +85,13 @@ const Module = () => {
     // const [data, setData] = useState([]);
     // if you want to show dummy jason data 
     const [data, setData] = useState(dummuJsonData);
-    const [current, setCurrent] = useState({ id: null, module_name: '', module_description: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: [] });
+    const [current, setCurrent] = useState({ id: null, module_name: '', module_description: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: '' });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [userId, setUserId] = useState(null)
+    
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
@@ -105,7 +115,7 @@ const Module = () => {
             const newData = { id: Date.now(), module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by };
             setData((prev) => [...prev, newData]);
         }
-        setCurrent({ id: null, module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: [] });
+        setCurrent({ id: null, module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: '' });
         setIsEditing(false);
         setIsModalOpen(false);
 
@@ -240,6 +250,146 @@ const Module = () => {
     }
     const crudTitle = "Add New Module"
     const editCrudTitle = "Edit Module"
+ const deleteModal = () => {
+        return (
+            <div>
+                <div className='delete_message p-4'>
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user role?
+                </div>
+
+                <div className="row row-gap-2 mt-4">
+                    <div className='col col-12 col-md-6'>
+                        <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
+                    </div>
+                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                        <button type="submit"
+                            className="btn-sm btn btn-primary"
+                            onClick={() => handleDelete(userId)}>Yes, I'm sure</button>
+                    </div>
+                </div>
+            </div>
+
+
+        )
+
+    }
+
+        const getRoleColor = (role) => {
+        switch (role) {
+            case 'Admin':
+                return { background: '#d1e7dd', color: '#0f5132' }; // green
+            case 'Manager':
+                return { background: '#cff4fc', color: '#055160' }; // blue
+            case 'Client':
+                return { background: '#fce5cd', color: '#7f4f24' }; // brown
+            case 'Super Admin':
+                return { background: '#f8d7da', color: '#842029' }; // red
+            default:
+                return { background: '#e2e3e5', color: '#41464b' }; // gray
+        }
+    };
+
+    const colDefs = [
+        {
+            headerName: 'Actions',
+            field: 'actions',
+            filter: false,
+            editable: false,
+            width: 130,
+            flex: 1,
+            pinned: "left",
+            cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+            cellRenderer: (params) => {
+                return (
+                    <div className="d-flex justify-content-around align-items-center">
+
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setCurrent(params.data);
+                                setIsEditing(true);
+                                setIsModalOpen(true);
+                                setUserId(params.data.id); // OR .user_id based on your data
+                            }}
+                        >
+                            <EditIcon fontSize="small" className="action_icon" />
+                        </button>
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setUserId(params.data.id);
+                                setIsDeleteModalOpen(true);
+                            }}
+                        >
+                            <DeleteIcon fontSize="small" className="action_icon" />
+                        </button>
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setUserId(params.data.id);
+                                setIsDeleteModalOpen(true);
+                            }}
+                        >
+                            <VisibilityIcon fontSize="small" className="action_icon" />
+                        </button>
+                        {/* <VisibilityIcon/> */}
+                    </div>
+                );
+            }
+        }
+        ,
+
+        { field: 'id', headerName: 'ID',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            field: 'approved_by', headerName: 'approved by',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+            cellRenderer: (params) => {
+                const { background, color } = getRoleColor(params.value);
+                return (
+                    <span
+                        style={{
+                            //   padding: '4px 12px',
+                            padding: '5px 12px',
+                            backgroundColor: background,
+                            color: color,
+                            borderRadius: '20px',
+                            fontSize: '0.8rem',
+                            fontWeight: 500,
+                            //   display: 'inline-block',
+                            textAlign: 'center',
+                            minWidth: '60px'
+                        }}
+                    >
+                       <span> <PermIdentityIcon style={{width:'15',height:'15'}} className='mb-1 me-1'/></span>{params.value}<span></span> 
+                    </span>
+                );
+            }
+        },
+        { field: 'module_name', headerName: 'Module Name',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            field: 'module_description',
+            headerName: 'Module Description',
+            editable: true,
+            filter: true,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+          },
+          
+
+        { field: 'location', headerName: 'Location',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'created_at', headerName: 'Created At',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'updated_at', headerName: 'Updated At',flex: 1, editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
+
+    ];
+    const gridRef = useRef();
+    const defaultColDef = {
+        sortable: true,
+        filter: true,
+        editable: true,
+        headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    };
+    const onRowValueChanged = (event) => {
+        console.log('Row updated:', event.data);
+    };
 
     return (
         <div>
@@ -276,7 +426,7 @@ const Module = () => {
                             <MuiSearchBar label='Search...' type='text' />
                             <button className='search-icon'><SearchIcon /></button>
                         </div>
-                        <MultipleSelectFields placeholder='Filter By Module' roleName={groupHolding} />
+                        {/* <MultipleSelectFields placeholder='Filter By Module' roleName={groupHolding} /> */}
                     </div>
 
 
@@ -293,27 +443,16 @@ const Module = () => {
                         </div> */}
 
                         <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+                                                <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+
                     </div>
                 </div>
 
-                <div className='table_div2'>
+                {/* <div className='table_div2'>
                     <table className='table_tag'>
                         <thead className='table_head_tag'>
                             <tr >
-                                {/* <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRows.length === data.length && data.length > 0}
-                                        onChange={handleSelectAll}
-                                    />
-                                </th> */}
                                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
-                                {/* <th className='table_th_tag  ps-2 pe-2'><span>Location</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th> */}
                                 <th className='table_th_tag  ps-2 pe-2'><span>Module Name</span>
                                     <span className='ms-4'>
                                         <ExpandCircleDownIcon className='table_th_icon' />
@@ -353,13 +492,6 @@ const Module = () => {
                             ) : (
                                 currentData.map((item) => (
                                     <tr key={item.id} className='table_tr'>
-                                        {/* <td className='  ps-2 pe-2 table_td sticky_col'>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedRows.includes(item.id)}
-                                                onChange={(e) => handleCheckboxChange(e, item.id)}
-                                            />
-                                        </td> */}
                                         <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                                             <div>
                                                 <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
@@ -368,7 +500,6 @@ const Module = () => {
                                                 <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
                                             </div>
                                         </td>
-                                        {/* <td className='  ps-2 pe-2'>{item.location}</td> */}
 
                                         <td className='table_td_font  ps-2 pe-2'>{item.module_name}</td>
                                         <td className='table_td_font  ps-2 pe-2'>{item.module_description}</td>
@@ -380,10 +511,10 @@ const Module = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
+                </div> */}
 
                 {/* Pagination Controls */}
-                <div className="justify-content-between pagination mt-3">
+                {/* <div className="justify-content-between pagination mt-3">
                     <div className='selected_row_text'>
                         Selected Rows: {selectedRows.length}
                     </div>
@@ -394,7 +525,23 @@ const Module = () => {
                         ))}
                         <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
                     </div>
-                </div>
+                </div> */}
+
+                <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+                                    <AgGridReact
+                                        theme="legacy"
+                                        ref={gridRef}
+                                        rowData={data}
+                                        columnDefs={colDefs}
+                                        defaultColDef={defaultColDef}
+                                        editType="fullRow"
+                                        rowSelection="single"
+                                        pagination={true}
+                                        // rowBuffer={rowBuffer}
+                                        onRowValueChanged={onRowValueChanged}
+                
+                                    />
+                                </div>
             </div>
         </div>
     );

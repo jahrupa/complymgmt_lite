@@ -35,7 +35,7 @@ export default function UserProfile() {
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
                     >
-                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" sx={{ bgcolor: deepOrange[500] ,width:'35px',height:'35px'}} />
+                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" sx={{ bgcolor: deepOrange[500] ,width:'30px',height:'30px',fontSize:'12px'}} />
                     </IconButton>
                 </Tooltip>
             </Box>

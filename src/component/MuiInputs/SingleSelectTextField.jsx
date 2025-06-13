@@ -11,7 +11,7 @@ export default function SingleSelectTextField({ value, onChange, names = [], lab
   const handleOpen = () => setOpen(true);
 
   return (
-    <FormControl sx={{ width: '100%' }} className="mb-3">
+    <FormControl sx={{ width: '100%' }} className="mb-3 ">
       <InputLabel id="group-holding-label">{label}</InputLabel>
       <Select
         labelId="group-holding-label"
