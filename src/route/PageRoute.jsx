@@ -41,33 +41,25 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
       <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
         <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/createuserrole" element={<UserRolesPage />} />
-          <Route path="/adduser" element={<AddUser />} />
+          <Route path="/create_user_role" element={<UserRolesPage />} />
+          <Route path="/add_user" element={<AddUser />} />
           <Route path="/company" element={<Company />} />
-          <Route path="/groupofholding" element={<GroupCompaniesPage />} />
-          <Route path="/usermanagement" element={<UserManagementPage />} />
+          <Route path="/group_holding" element={<GroupCompaniesPage />} />
+          <Route path="/user_management" element={<UserManagementPage />} />
           <Route path="/location" element={<Location />} />
           <Route path="/module" element={<Module />} />
-          <Route path="/submodule" element={<SubModule />} />
-          <Route path="/accesscontrol" element={<AccessControl />} />
+          <Route path="/sub_module" element={<SubModule />} />
+          <Route path="/access_control" element={<AccessControl />} />
           <Route path="/onboarding" element={<Onbarding />} />
           {/* <Route path="/onboarding" element={<Onbarding />} /> */}
-          <Route path="/onbardingcompliancescope" element={<OnbardingComplianceScope />} />
-          <Route path="/onbardingpayrollcompliance" element={<OnbardingPayrollCompliance />} />
-          <Route path="/outsourcingScope" element={<OutsourcingScope />} />
+          <Route path="/onbarding_compliance_scope" element={<OnbardingComplianceScope />} />
+          <Route path="/onbarding_payroll_compliance" element={<OnbardingPayrollCompliance />} />
+          <Route path="/outsourcing_scope" element={<OutsourcingScope />} />
           <Route path="/reimbursements" element={<Reimbursements />} />
-          <Route path="/payrollmanagement" element={<PayrollManagement />} />
-          <Route path="/servicetrackers" element={<ServiceTrackers />} />
-          <Route path="/rolemanager" element={<RoleManager />} />
-          <Route path="/uploadDocument" element={<DocumentUpload />} />
-
-
-          
-
-
-          
-
-
+          <Route path="/payroll_management" element={<PayrollManagement />} />
+          <Route path="/service_trackers" element={<ServiceTrackers />} />
+          <Route path="/role_manager" element={<RoleManager />} />
+          <Route path="/upload_documents" element={<DocumentUpload />} />
         </Route>
       </Route>
 

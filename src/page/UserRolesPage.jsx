@@ -15,7 +15,6 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-
 import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
@@ -690,7 +689,7 @@ const UserRolesPage = () => {
               <MuiSearchBar label='Search...' type='text' />
               <button className='search-icon'><SearchIcon /></button>
             </div>
-            <MultipleSelectFields placeholder='Filter By Role' roleName={roleName} />
+            {/* <MultipleSelectFields placeholder='Filter By Role' roleName={roleName} /> */}
           </div>
 
 

@@ -42,3 +42,82 @@
   text-align: center;
   display: flex;
 }
+
+.nav-logo {
+  width: 115px;
+}
+
+.nav-desk-mobile-view {
+  align-items: center;
+  margin-left: 95px;
+  display: flex;
+}
+
+  .nav-openbtn {
+    /* font-size: 20px; */
+    cursor: pointer;
+    background-color: white;
+    color: gray;
+    /* padding: 10px 15px; */
+    border: none;
+    display: none;
+}
+@media screen and (max-height: 580px) {
+    .nav-openbtn {
+    /* font-size: 20px; */
+    cursor: pointer;
+    background-color: white;
+    color: gray;
+    /* padding: 10px 15px; */
+    border: none;
+    display: block;
+}
+  .nav-desk-mobile-view {
+    align-items: center;
+    margin-left: 10px;
+    display: flex;
+  }
+
+  .nav-logo {
+    width: 90px;
+    margin-top: 9px !important;
+  }
+
+  .css-1gsv0ye-MuiAvatar-root {
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 1.25rem;
+    line-height: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: #fff;
+    background-color: #bdbdbd;
+    background-color: #ff5722;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 12px;
+  }
+}
+
+

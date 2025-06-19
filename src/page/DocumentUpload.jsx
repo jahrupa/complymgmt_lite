@@ -10,6 +10,7 @@ import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
@@ -35,7 +36,7 @@ import MenuPopup from '../component/MenuPopup';
 import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
 import ResponsiveDatePickers from '../component/DatePicker';
-import ReactPDFViewer from '../component/ReactPDFViewer';
+import { ReactPDFViewer } from '../component/ReactPDFViewer';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 const dummuJsonData = [
@@ -242,6 +243,8 @@ const DocumentUpload = () => {
   const [locationName, setLocationName] = useState([])
   const [rolesName, setRolesName] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
+
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -391,11 +394,11 @@ const DocumentUpload = () => {
 
   // Function to open the modal
   const openModal = () => {
-    setIsModalOpen(true);
+    setIsFileUploadModalModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
+    setIsFileUploadModalModalOpen(false);
   };
   const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
   const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
@@ -489,8 +492,8 @@ const DocumentUpload = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setCurrent(params.data);
-                setIsEditing(true);
+                // setCurrent(params.data);
+                setIsEditing(false);
                 setIsModalOpen(true);
                 setUserId(params.data.id); // OR .user_id based on your data
               }}
@@ -509,11 +512,13 @@ const DocumentUpload = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setUserId(params.data.id);
-                setIsDeleteModalOpen(true);
+                setCurrent(params.data);
+                setIsEditing(true);
+                setIsModalOpen(true);
+                setUserId(params.data.id); // OR .user_id based on your data
               }}
             >
-              <VisibilityIcon fontSize="small" className="action_icon" />
+              <EditIcon fontSize="small" className="action_icon" />
             </button>
             {/* <VisibilityIcon/> */}
           </div>
@@ -595,13 +600,12 @@ const DocumentUpload = () => {
   const onRowValueChanged = (event) => {
     console.log('Row updated:', event.data);
   };
-  const crudForm = () => {
+  const fileUploadForm = () => {
     return (
       <div>
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
             <MultiFileUpload />
-
             {/* <label className="upload_button" htmlFor="upload">
             <span className="me-2 upload_file_icon"><CloudUploadIcon /></span>Upload File
           </label>
@@ -639,8 +643,8 @@ const DocumentUpload = () => {
     )
 
   }
-  const crudTitle = "Add New User Role Form"
-  const editCrudTitle = "Edit User Role"
+  const crudTitle = "Upload Your File"
+  const editCrudTitle = "Edit Your Uploaded File"
   const deleteModal = () => {
     return (
       <div>
@@ -681,7 +685,6 @@ const DocumentUpload = () => {
         <div className='d-lg-flex d-md-flex gap-3 mb-3'>
           <SingleSelectTextField name="company_common_name" label="Company Common Name" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
           <MuiTextField label='Company Name' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} />
-
         </div>
         <div className='d-lg-flex d-md-flex gap-3 mb-3'>
           <SingleSelectTextField name="company_common_name" label="Module" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
@@ -696,19 +699,133 @@ const DocumentUpload = () => {
           {/* <SingleSelectTextField name="company_common_name" label="Upload Date" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} /> */}
           <ResponsiveDatePickers />
         </div>
+        <div className='d-lg-flex d-md-flex d-flex justify-content-between'>
+
+          <div>
+            <button type='submit' className='btn-sm btn btn-primary'>Cancle</button>
+          </div>
+          <div>
+            <button type='submit' className='btn-sm btn btn-primary'>{isEditing ? 'Save Changes' : 'Save'}</button>
+          </div>
+        </div>
+
       </div>
     )
   }
   const drawerFilePreviewBody = () => {
     return (
       <div className='p-3'>
+        <div className='row mb-4'>
+          <div className='col col-4'>
+            <div className='pdf-tab'>
+              <div className='fs-12'>
+                Document2
+              </div>
+              <div className='fs-12'>
+                <span style={{ color: 'gray' }}>Uploaded By :</span> Rupa
+              </div>
+            </div>
+          </div>
+          <div className='col col-4'>
+            <div className='pdf-tab'>
+              <div className='fs-12'>
+                Document2
+              </div>
+              <div className='fs-12'>
+                <span style={{ color: 'gray' }}>Uploaded By :</span> Rupa
+              </div>
+            </div>
+
+          </div>
+          <div className='col col-4'>
+            <div className='pdf-tab'>
+              <div className='fs-12'>
+                Document2
+              </div>
+              <div className='fs-12'>
+                <span style={{ color: 'gray' }}>Uploaded By :</span> Rupa
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* history */}
+        <div className='mb-2 card_div p-3 w-auto card-border-blue'>
+          <div className="row align-items-center">
+            <div className="col-3 col-md-2">
+              <div className="p-2 rounded" style={{ background: '#FEEED2', color: '#F68E3F', textAlign: 'center' }}>
+                v1
+              </div>
+            </div>
+
+            <div className="col-9 col-md-10">
+              <div className="mb-1">
+                <span className="fs-14" style={{ color: 'gray' }}>Tagged by - </span>
+                <span className="fs-14 fw-semibold">Mayank</span>
+              </div>
+
+              <div className="d-flex align-items-center gap-1 fs-14 text-muted">
+                <CalendarMonthIcon fontSize="small" />
+                <span>12/06/2025</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div className='mb-2 card_div p-3 w-auto card-border-blue'>
+          <div className="row align-items-center">
+            <div className="col-3 col-md-2">
+              <div className="p-2 rounded" style={{ background: '#FEEED2', color: '#F68E3F', textAlign: 'center' }}>
+                v2
+              </div>
+            </div>
+
+            <div className="col-9 col-md-10">
+              <div className="mb-1">
+                <span className="fs-14" style={{ color: 'gray' }}>Re-Uploaded by - </span>
+                <span className="fs-14 fw-semibold">Harsh Rana</span>
+              </div>
+
+              <div className="d-flex align-items-center gap-1 fs-14 text-muted">
+                <CalendarMonthIcon fontSize="small" />
+                <span>12/06/2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className='mb-2 card_div p-3 w-auto card-border-blue'>
+          <div className="row align-items-center">
+            <div className="col-3 col-md-2">
+              <div className="p-2 rounded" style={{ background: '#FEEED2', color: '#F68E3F', textAlign: 'center' }}>
+                v3
+              </div>
+            </div>
+
+            <div className="col-9 col-md-10">
+              <div className="mb-1">
+                <span className="fs-14" style={{ color: 'gray' }}>Uploaded by - </span>
+                <span className="fs-14 fw-semibold">Rahul Singh</span>
+              </div>
+
+              <div className="d-flex align-items-center gap-1 fs-14 text-muted">
+                <CalendarMonthIcon fontSize="small" />
+                <span>12/06/2025</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        {/* <div>
           <ReactPDFViewer />
+        </div> */}
+
       </div>
     )
   }
   return (
     <div>
-      <RightDrawer drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} />
+      <RightDrawer drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <h5>Document Repository</h5>
       <div className='row  mb-4 mt-4'>
         <div className='col col-12 col-lg-4 mb-3 col-md-4'>
@@ -765,7 +882,7 @@ const DocumentUpload = () => {
               </div>
             </div>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <Modal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} />
           </div>
         </div>
 

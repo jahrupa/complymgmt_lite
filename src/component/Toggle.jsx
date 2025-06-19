@@ -1,14 +1,16 @@
-import React from 'react'
-import '../style/toggle.css'
-const Toggle = () => {
+import React from 'react';
+import '../style/toggle.css';
+
+const Toggle = ({ checked, onChange }) => {
     return (
-        <div>
-            <label class="switch">
-                <input type="checkbox" checked disabled />
-                <span class="slider round"></span>
+        <div style={{marginTop:12}}>
+            <label className="switch">
+                <input type="checkbox" checked={checked} onChange={onChange} />
+                <span className={`${checked?'slider  round':'slider-in-active round'}`}></span>
             </label>
         </div>
-    )
-}
 
-export default Toggle
+    );
+};
+
+export default Toggle;

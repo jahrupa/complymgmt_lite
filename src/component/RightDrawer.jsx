@@ -5,15 +5,15 @@ import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 
-export default function RightDrawer({ drawerHeader, drawerBody, drawerFilePreviewHeader ,drawerFilePreviewBody}) {
+export default function RightDrawer({ drawerHeader, drawerBody, drawerFilePreviewHeader ,drawerFilePreviewBody,isModalOpen,setIsModalOpen}) {
     const [open, setOpen] = React.useState(false);
 
     const toggleDrawer = (newOpen) => () => {
-        setOpen(newOpen);
+        setIsModalOpen(newOpen);
     };
 
     const DrawerList = (
-        <Box sx={{ width: 650 }} role="presentation">
+        <Box sx={{ width: 'auto' }} role="presentation">
             {drawerHeader()}
             <Divider />
             <List>
@@ -29,8 +29,7 @@ export default function RightDrawer({ drawerHeader, drawerBody, drawerFilePrevie
 
     return (
         <div>
-            <Button onClick={toggleDrawer(true)}>Open drawer</Button>
-            <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+            <Drawer anchor="right" open={isModalOpen} onClose={toggleDrawer(false)}>
                 {DrawerList}
             </Drawer>
         </div>

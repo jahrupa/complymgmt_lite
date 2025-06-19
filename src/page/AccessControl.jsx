@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,6 +16,21 @@ import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
 import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
 
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import MenuPopup from '../component/MenuPopup';
+import MultiFileUpload from '../component/MultiFileUpload';
+import RightDrawer from '../component/RightDrawer';
+import ResponsiveDatePickers from '../component/DatePicker';
+import { ReactPDFViewer } from '../component/ReactPDFViewer';
+// Register module
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const dummuJsonData = [
     {
@@ -194,7 +209,7 @@ const AccessControl = () => {
         "Tracker",
         "Own/Self",
         "All",
-        
+
     ];
     const accessControl = [
         "Upload/Add New",
@@ -202,10 +217,10 @@ const AccessControl = () => {
         "Delete",
         "Can Approve",
     ];
-    
+
     const handleRoleAccessChange = (newValue) => {
         setCurrent((prev) => ({ ...prev, approved_by: newValue }));
-      };
+    };
 
     const crudForm = () => {
         return (
@@ -240,7 +255,7 @@ const AccessControl = () => {
                     {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
 
                 </div>
-               
+
                 <div>
                     {/* <SingleSelectTextField name="sub_module_id" label="sub Module" value={current.sub_module_id} onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_id: e.target.value }))} names={groupHolding} /> */}
                     <MultipleSelectTextFields label='Access Control' value={current.approved_by} onChange={handleRoleAccessChange} names={accessControl} />
@@ -263,42 +278,82 @@ const AccessControl = () => {
     const crudTitle = "Add New Access Control"
     const editCrudTitle = "Edit Access Control"
 
+
+    // id: 1744096161424,
+    // sub_module_name: "Tata",
+    // module_desc: "XYZ",
+    // created_at: "Tata",
+    // updated_at: "Tata",
+    // location: "Mumbai",
+    // approved_by: ["Admin"]
+
+    const colDefs = [
+        {
+            headerName: 'Actions',
+            field: 'actions',
+            filter: false,
+            editable: false,
+            width: 130,
+            pinned: "left",
+            cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+            cellRenderer: (params) => {
+                return (
+                    <div className="d-flex justify-content-around align-items-center">
+                        <button className="btn btn-sm" onClick={() => {
+                            //   setCurrent(params.data);
+                            //   setIsEditing(true);
+                            //   setIsModalOpen(true);
+                            //   setUserId(params.data._id);
+                        }}>
+                            <EditIcon fontSize="small" className="action_icon" />
+                        </button>
+                        <button className="btn btn-sm" onClick={() => {
+                            //   setgroupId(params.data._id);
+                            //   setIsDeleteModalOpen(true);
+                        }}>
+                            <DeleteIcon fontSize="small" className="action_icon" />
+                        </button>
+                        {/* <button className="btn btn-sm" onClick={() => {
+              setUserId(params.data._id);
+              setIsDeleteModalOpen(true);
+            }}>
+              <VisibilityIcon fontSize="small" className="action_icon" />
+            </button> */}
+                    </div>
+                );
+            }
+        },
+        { field: '_id', headerName: 'ID', filter: true, editable: false, },
+        { field: 'group_name', headerName: 'Group Name', filter: true, editable: false, },
+        { field: 'group_description', headerName: 'Group Description', filter: true, editable: false, },
+        { field: 'common_attributes.created_at', headerName: 'Created At', filter: true, editable: false, },
+        { field: 'updated_at', headerName: 'Updated At', filter: true, editable: false, },
+
+    ];
+
+
+      const gridRef = useRef();
+      const defaultColDef = {
+        sortable: true,
+        filter: true,
+        editable: true,
+        headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+      };
+      const onRowValueChanged = (event) => {
+        console.log('Row updated:', event.data);
+      };
+
+
     return (
         <div>
-            {/* Form for Create or Edit */}
-            {/* <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          value={current.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-        />
-        <input
-          type="number"
-          name="module_desc"
-          value={current.module_desc}
-          onChange={handleChange}
-          placeholder="Age"
-          required
-        />
-        <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
-      </form> */}
-
-            {/* Button to Delete All Selected Rows */}
-
-
             {/* Table to display data */}
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
                     <div className='d-flex h-100'>
                         <div class="search-bar-container h-25">
-                            {/* <input type="text" placeholder="Search..." name="search" className='search-bar-input p-1 w-100' /> */}
                             <MuiSearchBar label='Search...' type='text' />
                             <button className='search-icon'><SearchIcon /></button>
                         </div>
-                        {/* <MultipleSelectFields placeholder='Filter By Access Control' roleName={groupHolding} /> */}
                     </div>
 
 
@@ -308,36 +363,17 @@ const AccessControl = () => {
                                 <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
                             </button>
                         </div>
-                        <div>
-                            <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
-                                <span className='button-style'> Delete All</span>
-                            </button>
-                        </div>
 
                         <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>
 
-                <div className='table_div2'>
+                {/* <div className='table_div2'>
                     <table className='table_tag'>
                         <thead className='table_head_tag'>
                             <tr >
-                                <th className='table_th_tag ps-2 pe-2 check_box_column'>
-                                    {/* Select All checkbox */}
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRows.length === data.length && data.length > 0}
-                                        onChange={handleSelectAll}
-                                    />
-                                </th>
                                 <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
-                                {/* <th className='table_th_tag  ps-2 pe-2'><span>Location</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th> */}
-                                 <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
+                                <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
                                     <span className='ms-4'>
                                         <ExpandCircleDownIcon className='table_th_icon' />
 
@@ -373,7 +409,7 @@ const AccessControl = () => {
                                     </span>
                                 </th>
 
-                               
+
                                 <th className='table_th_tag  ps-2 pe-2'><span>Service Trackers</span>
                                     <span className='ms-4'>
                                         <ExpandCircleDownIcon className='table_th_icon' />
@@ -392,9 +428,9 @@ const AccessControl = () => {
 
                                     </span>
                                 </th>
-                                
-                              
-                                
+
+
+
                             </tr>
                         </thead>
                         <tbody>
@@ -405,14 +441,6 @@ const AccessControl = () => {
                             ) : (
                                 currentData.map((item) => (
                                     <tr key={item.id} className='table_tr'>
-                                        <td className='  ps-2 pe-2 table_td sticky_col'>
-                                            {/* Individual row checkbox */}
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedRows.includes(item.id)}
-                                                onChange={(e) => handleCheckboxChange(e, item.id)}
-                                            />
-                                        </td>
                                         <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
                                             <div>
                                                 <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
@@ -421,7 +449,6 @@ const AccessControl = () => {
                                                 <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
                                             </div>
                                         </td>
-                                        {/* <td className='  ps-2 pe-2'>{item.location}</td> */}
                                         <td className='  ps-2 pe-2 table_td_tag_space'>{item.module_desc}</td>
                                         <td className='  ps-2 pe-2 table_td_tag_space'>{item.created_at}</td>
                                         <td className='  ps-2 pe-2 table_td_tag_space'>{item.updated_at}</td>
@@ -432,15 +459,13 @@ const AccessControl = () => {
                                         <td className='  ps-2 pe-2 table_td_tag_space'>{item.approved_by}</td>
                                         <td className='  ps-2 pe-2 table_td_tag_space'>{item.sub_module_name}</td>
 
-                                       
+
                                     </tr>
                                 ))
                             )}
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination Controls */}
                 <div className="justify-content-between pagination mt-3">
                     <div className='selected_row_text'>
                         Selected Rows: {selectedRows.length}
@@ -452,7 +477,26 @@ const AccessControl = () => {
                         ))}
                         <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
                     </div>
-                </div>
+                </div> */}
+
+                <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+                          <AgGridReact
+                            theme="legacy"
+                            ref={gridRef}
+                            rowData={data}
+                            columnDefs={colDefs}
+                            defaultColDef={defaultColDef}
+                            editType="fullRow"
+                            rowSelection="single"
+                            pagination={true}
+                            // rowBuffer={rowBuffer}
+                            onRowValueChanged={onRowValueChanged}
+                
+                          />
+                        </div>
+
+
+
             </div>
         </div>
     );

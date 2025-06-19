@@ -30,7 +30,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const Company = () => {
   // if you want to show dummy jason data 
   const [data, setData] = useState([]);
-  const [current, setCurrent] = useState({ company_id: null, company_name: '', group_holding_name: '', groups_holdings_id: null, created_at: '', updated_at: '', });
+  const [current, setCurrent] = useState({ _id: null, company_name: '', group_holding_name: '', groups_holdings_id: null, created_at: '', updated_at: '', });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -92,7 +92,7 @@ const Company = () => {
 
     // Reset form state
     setCurrent({
-      company_id: null,
+      _id: null,
       company_name: '',
       group_holding_name: '',
       groups_holdings_id: null,
@@ -156,15 +156,15 @@ const Company = () => {
 
 
   // Pagination Logic: Slicing the data to display on the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentData = data?.slice(indexOfFirstItem, indexOfLastItem);
 
   // Pagination Button Handler
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Total number of pages
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  // const totalPages = Math.ceil(data.length / itemsPerPage);
 
   // Function to open the modal
   const openModal = () => {
@@ -313,7 +313,7 @@ const Company = () => {
     }
     ,
 
-    { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'created_at', headerName: 'Created At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },

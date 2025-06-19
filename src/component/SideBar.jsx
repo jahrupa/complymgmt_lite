@@ -49,30 +49,30 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
 
     const menuItems = [
         // { icon: <DashboardCustomizeIcon className="side-bar-icon sidebar-close-icon-active" />, label: 'Dashboard' },
-        { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Dashboard' },
+        { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Dashboard' ,link:'dashboard'},
 
-        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Create User Role' },
+        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Create User Role',link:'create_user_role' },
         // { icon: <GroupAddIcon className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'Add User' },
-        // { icon: <img src={add_user} alt="Add User" className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'Add User' },
+        // { icon: <img src={add_user} alt="Add User" className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'Add User',link:'add_user' },
         // { icon: <BusinessIcon className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'Group Of Holding' },
-        { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Group Of Holding' },
+        { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Group/Holding',link:'group_holding' },
         // { icon: <GroupIcon className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'Companies' },
-        { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'company' },
+        { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'company' ,link:'company'},
         // { icon: <ManageAccountsIcon className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'User Management' },
-        // { icon: <img src={user_managnment} alt="User Management" className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'User Management' },
-        { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module' },
-        { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'SubModule' },
-        { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Access Control' },
-        { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onboarding' },
-        { icon: (active) => <ReceiptLongOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onbarding Compliance Scope' },
-        { icon: (active) => <CurrencyRupeeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onbarding Payroll Compliance' },
-        { icon: (active) => <NextWeekOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Outsourcing Scope' },
-        { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Reimbursements' },
-        { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Payroll Management' },
-        { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Service Trackers' },
-        { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Role Manager' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Upload Document' },
+        // { icon: <img src={user_managnment} alt="User Management" className={`${activeItem?'side-bar-icon-active ':'side-bar-icon'}`} />, label: 'User Management',link:'user_management' },
+        { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location',link:'location' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module',link:'module' },
+        { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'SubModule' ,link:'sub_module'},
+        { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Access Control',link:'access_control' },
+        { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onboarding',link:'onboarding' },
+        { icon: (active) => <ReceiptLongOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onbarding Compliance Scope',link:'onbarding_compliance_scope' },
+        { icon: (active) => <CurrencyRupeeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onbarding Payroll Compliance',link:'onbarding_payroll_compliance' },
+        { icon: (active) => <NextWeekOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Outsourcing Scope',link:'outsourcing_scope' },
+        { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Reimbursements',link:'reimbursements' },
+        { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Payroll Management',link:'payroll_management' },
+        { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Service Trackers',link:'service_trackers' },
+        { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Role Manager',link:'role_manager' },
+        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Upload Document',link:'upload_documents' },
 
     ];
     return (
@@ -86,15 +86,15 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                         >
                             {sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
                         </button>
-                        <img src={complyn_mgmt_logo} alt='logo' width={115} className={`${sidebarOpen ? 'mt-1 ' : 'mt-1 display-none'}`} />
+                        <img src={complyn_mgmt_logo} alt='logo' width={115} className={`${sidebarOpen ? 'mt-1 nav-open-logo' : 'mt-1 display-none'}`} />
                     </div>
                     <div style={{ paddingTop: 75 }}>
-                        {menuItems.map(({ icon, label }, i) => {
+                        {menuItems.map(({ icon, label,link }, i) => {
                             const isActive = activeItem === label;
                             return (
                                 <div key={i}>
                                     <Link
-                                        to={`/${label.toLowerCase().replace(/\s+/g, '')}`}
+                                        to={`/${link}`}
                                         onClick={() => setActiveItem(label)}
                                     >
                                         <div
@@ -122,7 +122,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
 
 
             </div>
-            <div id="main" style={{ marginLeft: sidebarOpen ? '250px' : '90px' }}>
+            <div id="main" style={{ marginLeft: sidebarOpen ? '250px' : '90px' }} className='mobile-page-layout'>
                 <Outlet />
             </div>
         </div>

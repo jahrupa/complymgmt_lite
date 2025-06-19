@@ -20,7 +20,8 @@ import {
   CREATE_USER,
   GET_LOCATION_NAME,
   GET_COMPANY_BY_GROUP_HOLDING_ID,
-  GET_ALL_MODULE
+  GET_ALL_MODULE,
+  UPDATE_GROUP_STATUS
 
 } from "./Endpoint";
 
@@ -97,6 +98,16 @@ export const fetchAllGroupHolding = async () => {
     throw error;
   }
 };
+export const updateGroupStatusById = async (id, groupData) => {
+  try {
+    const response = await API.put(`${UPDATE_GROUP_STATUS}${id}`, groupData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating gropu/holding:", error);
+    throw error;
+  }
+};
+
 
 // lOCATION API
 
