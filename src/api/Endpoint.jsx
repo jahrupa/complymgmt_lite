@@ -12,6 +12,7 @@ export const UPDATE_USER_BY_ID ='update_user_by_id/';
 // Company
 export const CREATE_COMPANY ='/create_company';
 export const UPDATE_COMPANY_BY_ID ='/update_company_by_id/';
+export const UPDATE_COMPANY_STATUS_BY_ID ='/update_companyStatus_by_id/';
 export const GET_ALL_COMPANY ='/view_all_companies';
 export const DELETE_COMPANY_BY_ID ='/delete_company_by_id/';
 export const GET_ALL_COMPANY_NAME ='/view_company_names';
