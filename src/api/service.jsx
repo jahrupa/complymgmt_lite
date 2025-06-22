@@ -21,7 +21,8 @@ import {
   GET_LOCATION_NAME,
   GET_COMPANY_BY_GROUP_HOLDING_ID,
   GET_ALL_MODULE,
-  UPDATE_GROUP_STATUS
+  UPDATE_GROUP_STATUS,
+  UPDATE_COMPANY_STATUS_BY_ID
 
 } from "./Endpoint";
 
@@ -66,6 +67,15 @@ export const updateCompanyById = async (id, companyData) => {
   }
 };
 
+export const updateCompanyStatusById = async (id, companyData) => {
+  try {
+    const response = await API.put(`${UPDATE_COMPANY_STATUS_BY_ID}${id}`, companyData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating company status:", error);
+    throw error;
+  }
+};
 
 export const deleteCompanyById = async (id) => {
   try {
@@ -94,7 +104,7 @@ export const fetchAllGroupHolding = async () => {
     const response = await API.get(GET_GROUP_HOLDING_BY_NAME);
     return response.data;
   } catch (error) {
-    console.error("Error fetching group holdin:", error);
+    console.error("Error fetching group holding name:", error);
     throw error;
   }
 };

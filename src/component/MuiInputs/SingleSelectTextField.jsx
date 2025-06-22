@@ -27,7 +27,7 @@ export default function SingleSelectTextField({ value, onChange, names = [], lab
           <em>None</em>
         </MenuItem>
         {names.map((item) => (
-          <MenuItem key={item.id} value={item.name}>
+          <MenuItem key={item._id} value={item.name}>
             {item.name}
           </MenuItem>
         ))}

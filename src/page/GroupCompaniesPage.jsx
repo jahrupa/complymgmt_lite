@@ -24,7 +24,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const GroupCompaniesPage = () => {
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState({});
-  const [current, setCurrent] = useState({ _id: null, group_name: '', groups_holdings_id: null, group_holding_account_owner: 'Rupa', created_at: '', group_description: '', });
+  const [current, setCurrent] = useState({ _id: null, group_name: '', groups_holdings_id: null, group_holding_account_owner: '', created_at: '', group_description: '', });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -399,6 +399,9 @@ const GroupCompaniesPage = () => {
   };
   return (
     <div>
+        <div className='mb-4'>
+      <h5>Group/Holding</h5>
+      </div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
@@ -413,7 +416,16 @@ const GroupCompaniesPage = () => {
               <button className='crud_btn' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
               </button>
+              
             </div>
+            <button className="button approve">
+                  <span className="icon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                    </svg>
+                  </span>
+                  <span className="text">Approve All</span>
+                </button>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
             <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />

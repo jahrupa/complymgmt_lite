@@ -13,7 +13,7 @@ import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { createCompany, deleteCompanyById, fetchAllCompanies, fetchAllGroupHolding, updateCompanyById } from '../api/Service';
+import { createCompany, deleteCompanyById, fetchAllCompanies, fetchAllGroupHolding, updateCompanyById, updateCompanyStatusById } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 
@@ -24,19 +24,22 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import Toggle from '../component/Toggle';
+import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Company = () => {
   // if you want to show dummy jason data 
   const [data, setData] = useState([]);
-  const [current, setCurrent] = useState({ _id: null, company_name: '', group_holding_name: '', groups_holdings_id: null, created_at: '', updated_at: '', });
+  const [current, setCurrent] = useState({ _id: null, company_name: '', company_description: '', group_name: '', groups_holdings_id: null, created_at: '', updated_at: '', });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [groupHoldingName, setGroupHoldingName] = useState([])
   const [companyId, setCompanyId] = useState(null)
+  const [userId, setUserId] = useState(null)
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -47,7 +50,7 @@ const Company = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // You can adjust the number of items per page
-
+console.log(current,'current')
 
   // Handle input change
   const handleChange = (e) => {
@@ -60,9 +63,12 @@ const Company = () => {
     // e?.preventDefault();
 
     const payload = {
-      company_name: current?.company_name || '',
-      group_holding_name: current?.group_holding_name || '',
-      groups_holdings_id: current?.groups_holdings_id || null
+      "CompanyName": current?.company_name || '',
+      "CompanyDescription": current?.company_description || '',
+      "GroupHoldingsID": current?.groups_holdings_id || null,
+      "CommonAttributes": {
+        "Created_By": "507f1f77bcf86cd799439012",
+      }
     };
 
     try {
@@ -94,7 +100,8 @@ const Company = () => {
     setCurrent({
       _id: null,
       company_name: '',
-      group_holding_name: '',
+      group_name: '',
+      company_description: '',
       groups_holdings_id: null,
       created_at: '',
       updated_at: '',
@@ -201,18 +208,19 @@ const Company = () => {
         {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
           <SingleSelectTextField
-            name="group_holding_name"
+            name="group_name"
             label="Group Holding"
-            value={current.group_holding_name}
+            value={current.group_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedGroup = groupHoldingName.find(
                 (g) => g.name === selectedName
               );
+              console.log(matchedGroup,'matchedGroup')
               setCurrent((prev) => ({
                 ...prev,
-                group_holding_name: selectedName,
-                groups_holdings_id: matchedGroup?.id || null,
+                group_name: selectedName,
+                groups_holdings_id: matchedGroup?._id || null,
               }));
             }}
             names={groupHoldingName}
@@ -221,7 +229,9 @@ const Company = () => {
 
 
         </div>
-
+        <div>
+          <MuiTextAreaField value={current.company_description} handleChange={handleChange} name='company_description' label='Company Description' />
+        </div>
         <div className="row row-gap-2">
           <div className='col col-12 col-md-6'>
             <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -263,7 +273,49 @@ const Company = () => {
   }
 
 
+  const getRoleColorForFileStatus = (status) => {
+    switch (status) {
+      case 1:
+        return { color: '#4CAF50' }; // green
+      case 0:
+        return { color: '#F44336' }; // brown
+      default:
+        return { color: '#41464b' }; // gray
+    }
+  };
 
+  const handleToggleChange = async (e, params) => {
+    const newIsActive = {
+      "IsActive": e.target.checked
+    };
+    try {
+      const response = await updateCompanyStatusById(params.data._id, newIsActive);
+      const message = response?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete company";
+
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
+    const updatedData = await fetchAllCompanies();
+    setData(updatedData);
+  };
   const colDefs = [
     {
       headerName: 'Actions',
@@ -283,7 +335,9 @@ const Company = () => {
                 setCurrent(params.data);
                 setIsEditing(true);
                 setIsModalOpen(true);
-                setUserId(params.data.id); // OR .user_id based on your data
+                setUserId(params.data._id); // OR .user_id based on your data
+                setCompanyId(params.data._id)
+
               }}
             >
               <EditIcon fontSize="small" className="action_icon" />
@@ -291,22 +345,22 @@ const Company = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setUserId(params.data.id);
+                setUserId(params.data._id);
+                setCompanyId(params.data._id)
                 setIsDeleteModalOpen(true);
               }}
             >
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
-            <button
+            {/* <button
               className="btn btn-sm"
               onClick={() => {
-                setUserId(params.data.id);
+                setUserId(params.data._id);
                 setIsDeleteModalOpen(true);
               }}
             >
               <VisibilityIcon fontSize="small" className="action_icon" />
-            </button>
-            {/* <VisibilityIcon/> */}
+            </button> */}
           </div>
         );
       }
@@ -314,11 +368,67 @@ const Company = () => {
     ,
 
     { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'created_at', headerName: 'Created At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'updated_at', headerName: 'Updated At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'company_description', headerName: 'Company Desc', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    {
+      field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
+      headerName: 'Approval Status',
+      editable: false,
+      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+      filter: true,
 
+      valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
+
+      cellRenderer: (params) => {
+        const getApprovalStatusText = (status) => {
+          switch (status) {
+            case 0: return 'Pending';
+            case 1: return 'Approved';
+            default: return '-'; // fallback
+          }
+        };
+
+        const status = params.value;
+        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input
+              type="checkbox"
+              checked={true}
+              readOnly // ✅ prevent manual toggle unless you implement onChange
+              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+            />
+            <span
+              style={{
+                color,
+                fontSize: '0.8rem',
+                fontWeight: 500,
+              }}
+            >
+              {getApprovalStatusText(status)}
+            </span>
+          </div>
+        );
+      }
+    }, { field: 'common_attributes.approval_time', headerName: 'Status Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    {
+      headerName: 'Status',
+      field: 'common_attributes.is_active',
+      editable: false,
+      pinned: "right",
+      valueGetter: (params) => params.data?.common_attributes?.is_active,
+      cellRenderer: (params) => (
+        <Toggle
+          checked={!!params.value}
+          onChange={(e) => handleToggleChange(e, params)}
+        />
+      )
+    }
   ];
   const gridRef = useRef();
   const defaultColDef = {
@@ -332,6 +442,9 @@ const Company = () => {
   };
   return (
     <div>
+      <div className='mb-4'>
+        <h5>Company</h5>
+      </div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
 
       {/* Table to display data */}
@@ -355,9 +468,17 @@ const Company = () => {
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div className='pe-2'>
               <button className='crud_btn' onClick={openModal}>
-                <span><AddIcon /></span> <span className='button-style'>Add New company</span>
+                <span><AddIcon /></span> <span className='button-style'>Add New Company</span>
               </button>
             </div>
+            <button className="button approve">
+                  <span className="icon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                    </svg>
+                  </span>
+                  <span className="text">Approve All</span>
+                </button>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
             <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
@@ -417,7 +538,7 @@ const Company = () => {
                       </div>
                     </td>
                     <td className='table_td_font  ps-2 pe-2'>{item.company_name ? item.company_name : '-'}</td>
-                    <td className=' table_td_font ps-2 pe-2'>{item.group_holding_name ? item.group_holding_name : '-'}</td>
+                    <td className=' table_td_font ps-2 pe-2'>{item.group_name ? item.group_name : '-'}</td>
                     <td className=' table_td_font ps-2 pe-2'>{item.created_at ? item.created_at : '-'}</td>
                     <td className=' table_td_font ps-2 pe-2'>{item.updated_at ? item.updated_at : '-'}</td>
                   </tr>
