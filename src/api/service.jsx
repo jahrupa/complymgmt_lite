@@ -22,9 +22,21 @@ import {
   GET_COMPANY_BY_GROUP_HOLDING_ID,
   GET_ALL_MODULE,
   UPDATE_GROUP_STATUS,
-  UPDATE_COMPANY_STATUS_BY_ID
+  UPDATE_COMPANY_STATUS_BY_ID,
+  UPDATE_LOCATION_STATUS_BY_ID,
+  LOGIN_API
 
 } from "./Endpoint";
+// Login Api
+export const loginApi = async (loginPayload) => {
+  try {
+    const response = await API.post(LOGIN_API, loginPayload);
+    return response.data;
+  } catch (error) {
+    console.error("Login Error :", error);
+    throw error;
+  }
+}
 
 // Company Api
 export const fetchAllCompanies = async () => {
@@ -161,6 +173,15 @@ export const updateLocationById = async (id, locationData) => {
   }
 };
 
+export const updateLocationStatusById = async (id, locationData) => {
+  try {
+    const response = await API.put(`${UPDATE_LOCATION_STATUS_BY_ID}${id}`, locationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating location status:", error);
+    throw error;
+  }
+};
 
 export const deleteLocationById = async (id) => {
   try {

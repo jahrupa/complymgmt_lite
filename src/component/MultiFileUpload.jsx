@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 const MAX_COUNT = 5;
 
 function MultiFileUpload() {
@@ -35,12 +35,12 @@ function MultiFileUpload() {
 
     return (
         <div className="">
-            <div style={{fontSize:14,marginBottom:7,color:'gray'}}>
+            <div style={{ fontSize: 14, marginBottom: 7, color: 'gray' }}>
                 <span>Note: </span>
                 <span>You can upload a maximum of 5 files at a time.</span>
             </div>
             <input id='multi-fileUpload' type='file' multiple
-                accept='application/pdf, image/png'
+                accept='.xlsx, .xls'
                 onChange={handleFileEvent}
                 disabled={fileLimit}
                 className="upload_file_input"
@@ -53,8 +53,14 @@ function MultiFileUpload() {
 
             <div className="uploaded-files-list">
                 {uploadedFiles.map(file => (
-                    <div >
-                        {file.name}
+                    <div className="mt-2 uploaded_file_name d-flex">
+                        <span><TextSnippetIcon /></span>
+                        <snap className='w-100'>{file.name}</snap>
+
+                        <div className='d-flex justify-content-end'>
+                            <button style={{display:'contents'}}>x</button>
+                        </div>
+
                     </div>
                 ))}
             </div>

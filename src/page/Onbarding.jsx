@@ -167,10 +167,6 @@ const Onbarding = () => {
               </div>
               <div>
                 <MonthYearCalander/>
-                {/* <div class="month-picker-wrapper">
-                  <input type="month" id="bdaymonth" name="bdaymonth" />
-                </div> */}
-
               </div>
             </div>
           </div>

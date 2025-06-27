@@ -37,6 +37,8 @@ import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
 import ResponsiveDatePickers from '../component/DatePicker';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
+import SmallSizeModal from '../component/SmallSizeModal';
+import MonthYearCalander from '../component/MonthYearCalander';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 const dummuJsonData = [
@@ -235,6 +237,8 @@ const dummuJsonData = [
 ]
 const DocumentUpload = () => {
   const [data, setData] = useState(dummuJsonData);
+  const [columnDefs, setColumnDefs] = useState([]);
+
   const [current, setCurrent] = useState({ user_id: null, role_name: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', desc: '', uploaded_file: [], group_holding_name: "", group_holding_id: null, company_common_name: "", company_id: null, location_name: "", location_id: "" });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -244,6 +248,7 @@ const DocumentUpload = () => {
   const [rolesName, setRolesName] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
+  const [fileName, setFileName] = useState(''); // State to store the file name
 
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -400,6 +405,34 @@ const DocumentUpload = () => {
   const closeModal = () => {
     setIsFileUploadModalModalOpen(false);
   };
+  const uploadFile = () => {
+    const reader = new FileReader();
+
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+
+      // Read second sheet (index 1)
+      const sheetName = workbook.SheetNames[0];
+      console.log('Sheet Name:', sheetName);
+      if (!sheetName) {
+        alert('The workbook does not have a second sheet.');
+        return;
+      }
+
+      const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+      const headers = sheet[0] || [];
+      const rows = sheet.slice(1).map(row =>
+        Object.fromEntries(headers.map((h, i) => [h, row?.[i] ?? '']))
+      );
+
+      setColumnDefs(headers.map(h => ({ field: h, editable: true })));
+      setData(rows);
+    };
+    setIsModalOpen(false);
+
+    reader.readAsArrayBuffer(fileName);
+  }
   const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
   const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
 
@@ -526,10 +559,7 @@ const DocumentUpload = () => {
       }
     }
     ,
-
-    { field: 'id', headerName: 'ID', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'name', headerName: 'Name', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
+    { field: 'name', headerName: 'Uploaded By', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       field: 'role_name', headerName: 'Role Name', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
 
@@ -561,30 +591,6 @@ const DocumentUpload = () => {
       //   <span style={{color:'gray'}}>{params?.value}</span>
       //  )}
     },
-
-    {
-      field: 'status', headerName: 'File Status', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
-
-      cellRenderer: (params) => {
-        const { color } = getRoleColorForFileStatus(params.value);
-        return (
-          <span
-            style={{
-              color: color,
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              textAlign: 'center',
-            }}
-          >
-            <span>{params.value}</span>
-          </span>
-
-
-        );
-      }
-    },
-
-
     { field: 'uploaded_at', headerName: 'Uploaded At', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'updated_at', headerName: 'Updated At', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
 
@@ -635,7 +641,7 @@ const DocumentUpload = () => {
             <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
           </div>
           <div className="col-12 col-md-6">
-            {/* <button type="submit" className="btn btn-primary w-100" onClick={uploadFile}>Upload</button> */}
+            <button type="submit" className="btn btn-primary w-100" onClick={uploadFile}>Upload</button>
           </div>
         </div>
       </div>
@@ -826,7 +832,7 @@ const DocumentUpload = () => {
   return (
     <div>
       <RightDrawer drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      <h5>Document Repository</h5>
+      <h5>Upload Document</h5>
       <div className='row  mb-4 mt-4'>
         <div className='col col-12 col-lg-4 mb-3 col-md-4'>
           <div className='card_div p-3 w-auto card-border-blue'>
@@ -870,6 +876,7 @@ const DocumentUpload = () => {
               {/* <button className='crud_btn' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New User Role</span>
                             </button> */}
+             
               <div>
                 <button className="reject upload-wrapper upload-label" onClick={openModal}>
                   <span className="icon">
@@ -880,9 +887,11 @@ const DocumentUpload = () => {
                   <span className="text">Upload File</span>
                 </button>
               </div>
+              <MonthYearCalander />
+
             </div>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <Modal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} />
+            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} />
           </div>
         </div>
 
@@ -892,6 +901,7 @@ const DocumentUpload = () => {
             ref={gridRef}
             rowData={data}
             columnDefs={colDefs}
+            // columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
             rowSelection="single"

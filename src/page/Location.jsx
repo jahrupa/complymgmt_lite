@@ -13,7 +13,7 @@ import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { createLocation, deleteLocationById, fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, getCompanyByGroupId, updateLocationById } from '../api/Service';
+import { createLocation, deleteLocationById, fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, getCompanyByGroupId, updateLocationById, updateLocationStatusById } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 
@@ -25,6 +25,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import Toggle from '../component/Toggle';
 
 const Location = () => {
     // const [data, setData] = useState([]);
@@ -32,7 +33,7 @@ const Location = () => {
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState(
         {
-            id: null, company_name: '',
+            _id: null, company_name: '',
             company_id: null,
             group_holding_name: '',
             created_at: '',
@@ -273,6 +274,38 @@ const Location = () => {
     }, [current?.groups_holdings_id]);
 
 
+    const handleToggleChange = async (e, params) => {
+        const newIsActive = {
+            "IsActive": e.target.checked
+        };
+        try {
+            const response = await updateLocationStatusById(params.data._id, newIsActive);
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to delete company";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllLocation();
+        setData(updatedData);
+    };
     const crudForm = () => {
         return (
             <div>
@@ -366,22 +399,8 @@ const Location = () => {
                     </div>
                 </div>
             </div>
-
-
         )
-
     }
-
-
-
-    //  id: null, company_name: '',
-    //         company_id: null,
-    //         group_holding_name: '',
-    //         created_at: '',
-    //         location_name: "",
-    //         // location_id: null,
-    //         updated_at: '',
-
 
     const colDefs = [
         {
@@ -402,7 +421,7 @@ const Location = () => {
                                 setCurrent(params.data);
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setUserId(params.data.id); // OR .user_id based on your data
+                                setUserId(params.data._id); // OR .user_id based on your data
                             }}
                         >
                             <EditIcon fontSize="small" className="action_icon" />
@@ -410,7 +429,7 @@ const Location = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data.id);
+                                setUserId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
@@ -419,25 +438,43 @@ const Location = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data.id);
+                                setUserId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
                             <VisibilityIcon fontSize="small" className="action_icon" />
                         </button>
-                        {/* <VisibilityIcon/> */}
                     </div>
                 );
             }
         }
         ,
 
-        { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'city', headerName: 'City', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
         { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'created_at', headerName: 'Created At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'updated_at', headerName: 'Updated At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            headerName: 'Status',
+            field: 'common_attributes.is_active',
+            editable: false,
+            pinned: "right",
+            valueGetter: (params) => params.data?.common_attributes?.is_active,
+            cellRenderer: (params) => (
+                <Toggle
+                    checked={!!params.value}
+                    onChange={(e) => handleToggleChange(e, params)}
+                />
+            )
+        }, { field: 'common_attributes.approval_time', headerName: 'Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
 
 
 
@@ -460,20 +497,10 @@ const Location = () => {
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
                     <div className='d-flex h-100'>
                         <div className="search-bar-container h-25">
-                            {/* <input type="text" placeholder="Search..." name="search" className='search-bar-input p-1 w-100' /> */}
                             <MuiSearchBar label='Search...' type='text' />
                             <button className='search-icon'><SearchIcon /></button>
                         </div>
-                        {/* <MultipleSelectFields
-                            placeholder="Filter By Group Holding"
-                            roleName={groupHoldingData}
-                            onChange={(selectedIds) => {
-                                // use selectedIds in your filters or elsewhere
-                            }}
-                        /> */}
                     </div>
-
-
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div className='pe-2'>
                             <button className='crud_btn' onClick={openModal}>
@@ -481,98 +508,9 @@ const Location = () => {
                             </button>
                         </div>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Location' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-
-                        {/* <div>
-                            <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
-                                <span className='button-style'> Delete All</span>
-                            </button>
-                        </div> */}
-
                         <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>
-
-                {/* <div className='table_div2'>
-                    <table className='table_tag'>
-                        <thead className='table_head_tag'>
-                            <tr >
-                                <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Location</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>company Name</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-
-                                <th className='table_th_tag  ps-2 pe-2'><span>Group Holding</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Created At</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Updated At</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-                                    </span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.length === 0 ? (
-                                <tr>
-                                    <td colSpan="10" style={{ textAlign: 'center', height: '300px' }}> <div className='no_data_found'><span><BackupTableIcon /></span><span>No data available</span></div></td>
-                                </tr>
-                            ) : (
-                                currentData.map((item) => (
-                                    <tr key={item.id} className='table_tr'>
-                                        <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
-                                            <div>
-                                                <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.location_id)}><EditIcon className='action_icon' /></button>
-                                            </div>
-                                            <div>
-                                                <button className='btn  mt-1 btn-sm' onClick={() => {
-                                                    setLocationId(item.location_id);
-                                                    setIsDeleteModalOpen(true);
-                                                }}><DeleteIcon className='action_icon' /></button>
-                                            </div>
-                                        </td>
-                                        <td className=' table_td_font ps-2 pe-2'>{item.location_name ? item.location_name : '-'}</td>
-
-                                        <td className=' table_td_font ps-2 pe-2'>{item.company_name ? item.company_name : '-'}</td>
-                                        <td className=' table_td_font ps-2 pe-2'>{item.group_holding_name ? item.group_holding_name : '-'}</td>
-                                        <td className=' table_td_font ps-2 pe-2'>{item.created_at ? item.created_at : '-'}</td>
-                                        <td className=' table_td_font ps-2 pe-2'>{item.updated_at ? item.updated_at : '-'}</td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div> */}
-
-                {/* Pagination Controls */}
-                {/* <div className="justify-content-between pagination mt-3">
-                    <div className='selected_row_text'>
-                        Selected Rows: {selectedRows.length}
-                    </div>
-                    <div className='d-flex'>
-                        <button className='btn btn-sm pagination_btn' onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <button className=' btn btn-sm h-75 pagination_btn' key={index + 1} onClick={() => paginate(index + 1)}>{index + 1}</button>
-                        ))}
-                        <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                    </div>
-                </div> */}
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact
                         theme="legacy"

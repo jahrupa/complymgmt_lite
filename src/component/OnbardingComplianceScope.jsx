@@ -11,6 +11,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import MonthYearCalander from './MonthYearCalander';
 
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -19,7 +20,7 @@ const OnbardingComplianceScope = () => {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [fileName, setFileName] = useState(''); // State to store the file name
+  const [fileName, setFileName] = useState(''); // State to store the file name
   const gridRef = useRef();
   const openModal = () => {
     setIsModalOpen(true);
@@ -37,7 +38,7 @@ const OnbardingComplianceScope = () => {
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-   
+
   };
 
   const addRow = () => {
@@ -57,33 +58,33 @@ const OnbardingComplianceScope = () => {
     }
 
   };
- const uploadFile = () => {
-  const reader = new FileReader();
+  const uploadFile = () => {
+    const reader = new FileReader();
 
-  reader.onload = (evt) => {
-    const data = new Uint8Array(evt.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
 
-    // Read second sheet (index 1)
-    const sheetName = workbook.SheetNames[0];
-    console.log('Sheet Name:', sheetName);
-    if (!sheetName) {
-      alert('The workbook does not have a second sheet.');
-      return;
-    }
+      // Read second sheet (index 1)
+      const sheetName = workbook.SheetNames[0];
+      console.log('Sheet Name:', sheetName);
+      if (!sheetName) {
+        alert('The workbook does not have a second sheet.');
+        return;
+      }
 
-    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
-    const headers = sheet[0] || [];
-    const rows = sheet.slice(1).map(row =>
-      Object.fromEntries(headers.map((h, i) => [h, row?.[i] ?? '']))
-    );
+      const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+      const headers = sheet[0] || [];
+      const rows = sheet.slice(1).map(row =>
+        Object.fromEntries(headers.map((h, i) => [h, row?.[i] ?? '']))
+      );
 
-    setColumnDefs(headers.map(h => ({ field: h, editable: true })));
-    setRowData(rows);
-  };
-  setIsModalOpen(false);
+      setColumnDefs(headers.map(h => ({ field: h, editable: true })));
+      setRowData(rows);
+    };
+    setIsModalOpen(false);
 
-  reader.readAsArrayBuffer(fileName);
+    reader.readAsArrayBuffer(fileName);
   }
   const crudForm = () => {
     return (
@@ -118,17 +119,17 @@ const OnbardingComplianceScope = () => {
   }
   const crudTitle = "Upload File"
 
-    const rowBuffer = 0;
-    const onBtnExport = useCallback(() => {
-      gridRef.current.api.exportDataAsCsv();
-    }, []);
-  
-    const onFilterTextBoxChanged = useCallback(() => {
-      gridRef.current.api.setGridOption(
-        "quickFilterText",
-        document.getElementById("filter-text-box").value,
-      );
-    }, []);
+  const rowBuffer = 0;
+  const onBtnExport = useCallback(() => {
+    gridRef.current.api.exportDataAsCsv();
+  }, []);
+
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      "quickFilterText",
+      document.getElementById("filter-text-box").value,
+    );
+  }, []);
   return (
     <div className="client-onboarding-2">
       {/* Add NavBar if you have it */}
@@ -152,6 +153,9 @@ const OnbardingComplianceScope = () => {
                 <div className=' d-flex justify-content-end'>
                   <button className='crud_btn' onClick={openModal}>Upload File</button>
                 </div>
+              </div>
+              <div>
+                <MonthYearCalander />
               </div>
             </div>
           </div>

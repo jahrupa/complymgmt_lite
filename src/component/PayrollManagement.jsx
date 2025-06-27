@@ -15,6 +15,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import exportCsvIcon from '../assets/Arrow-Line.png';
 import Modal from './Modal';
 import AgGridSearchBar from './MuiInputs/AgGridSearchBar';
+import MonthYearCalander from './MonthYearCalander';
 
 // Register modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -181,7 +182,7 @@ const PayrollManagement = () => {
                 <img src={exportCsvIcon} alt="csv export icon" width="12" className="mb-1 me-1" />Export
               </button> */}
 
-               <button className=" reject upload-wrapper upload-label" onClick={onBtnExport}>
+              <button className=" reject upload-wrapper upload-label" onClick={onBtnExport}>
                 <span className="icon">
                   <img src={exportCsvIcon} alt="csv export icon" width="12" className="mb-1 me-1" />
                 </span>
@@ -209,20 +210,20 @@ const PayrollManagement = () => {
 
               </div>
               {/* <button className="crud_btn" onClick={openModal}>Upload File</button> */}
-                <div>
-              <button className=" reject upload-wrapper upload-label" onClick={openModal}>
-                <span className="icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
-                  </svg>
-                </span>
-                <span className="text">Upload</span>
-              </button>
+              <div>
+                <button className=" reject upload-wrapper upload-label" onClick={openModal}>
+                  <span className="icon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
+                    </svg>
+                  </span>
+                  <span className="text">Upload</span>
+                </button>
+              </div>
+              <div>
+                <MonthYearCalander />
+              </div>
             </div>
-            </div>
-          
-
-
           </div>
         </div>
 

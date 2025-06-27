@@ -1,5 +1,5 @@
 // Login
-export const LOGIN_API ='/api/auth/login';
+export const LOGIN_API ='/api/v1/uam/login';
 
 // User
 export const GET_ALL_USER ='/view_all_user';
@@ -12,7 +12,7 @@ export const UPDATE_USER_BY_ID ='update_user_by_id/';
 // Company
 export const CREATE_COMPANY ='/create_company';
 export const UPDATE_COMPANY_BY_ID ='/update_company_by_id/';
-export const UPDATE_COMPANY_STATUS_BY_ID ='/update_companyStatus_by_id/';
+export const UPDATE_COMPANY_STATUS_BY_ID ='/update_company_status_by_id/';
 export const GET_ALL_COMPANY ='/view_all_companies';
 export const DELETE_COMPANY_BY_ID ='/delete_company_by_id/';
 export const GET_ALL_COMPANY_NAME ='/view_company_names';
@@ -27,14 +27,14 @@ export const GET_COMPANY_BY_ID ='/view_group_by_id/';
 export const GET_COMPANY_BY_GROUP_HOLDING_ID ='/get_company_by_group_id/';
 export const UPDATE_GROUP_STATUS ='/update_group_status_by_id/';
 
-
-
 // Location
-export const GET_ALL_LOCATION='/view_all_location';
+export const GET_ALL_LOCATION='/view_all_locations';
 export const CREATE_LOCATION='/create_location';
 export const UPDATE_LOCATION_BY_ID='/update_location_by_id/';
 export const DELETE_LOCATION_BY_ID='/delete_location_by_id/';
 export const GET_LOCATION_NAME='/view_location_by_name';
+export const UPDATE_LOCATION_STATUS_BY_ID='/update_location_status_by_id/';
+
 
 
 // Roles

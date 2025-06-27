@@ -166,15 +166,15 @@ const GroupCompaniesPage = () => {
   // Active/InActive status
   const handleToggleChange = async (e, params) => {
     const newIsActive = {
-        "IsActive": e.target.checked
+      "IsActive": e.target.checked
     };
-      
+
 
 
     try {
       const response = await updateGroupStatusById(params.data._id, newIsActive);
       const message = response?.message || "Status update successfully"
-       // Show success snackbar
+      // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
@@ -183,7 +183,7 @@ const GroupCompaniesPage = () => {
       });
     } catch (error) {
       console.error("Error:", error);
-        const errorMessage =
+      const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
         "Failed to delete company";
@@ -348,22 +348,22 @@ const GroupCompaniesPage = () => {
 
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <input
-          type="checkbox"
-          checked={true}
-          readOnly // ✅ prevent manual toggle unless you implement onChange
-          style={{ cursor: 'default',width:15,height:15 ,accentColor:'orange'}}
-        />
-        <span
-          style={{
-            color,
-            fontSize: '0.8rem',
-            fontWeight: 500,
-          }}
-        >
-          {getApprovalStatusText(status)}
-        </span>
-      </div>
+            <input
+              type="checkbox"
+              checked={true}
+              readOnly // ✅ prevent manual toggle unless you implement onChange
+              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+            />
+            <span
+              style={{
+                color,
+                fontSize: '0.8rem',
+                fontWeight: 500,
+              }}
+            >
+              {getApprovalStatusText(status)}
+            </span>
+          </div>
         );
       }
     },
@@ -399,8 +399,8 @@ const GroupCompaniesPage = () => {
   };
   return (
     <div>
-        <div className='mb-4'>
-      <h5>Group/Holding</h5>
+      <div className='mb-4'>
+        <h5>Group/Holding</h5>
       </div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       <div className='table_div p-3'>
@@ -416,16 +416,16 @@ const GroupCompaniesPage = () => {
               <button className='crud_btn' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
               </button>
-              
+
             </div>
             <button className="button approve">
-                  <span className="icon">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
-                    </svg>
-                  </span>
-                  <span className="text">Approve All</span>
-                </button>
+              <span className="icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                </svg>
+              </span>
+              <span className="text">Approve All</span>
+            </button>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
             <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />

@@ -32,7 +32,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const Company = () => {
   // if you want to show dummy jason data 
   const [data, setData] = useState([]);
-  const [current, setCurrent] = useState({ _id: null, company_name: '', company_description: '', group_name: '', groups_holdings_id: null, created_at: '', updated_at: '', });
+  const [current, setCurrent] = useState({ _id: null, company_name: '', company_description: '', group_name: '', group_holding_id: null, created_at: '', updated_at: '',company_common_name:'' });
+  // console.log(current,'current')
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,7 +66,7 @@ console.log(current,'current')
     const payload = {
       "CompanyName": current?.company_name || '',
       "CompanyDescription": current?.company_description || '',
-      "GroupHoldingsID": current?.groups_holdings_id || null,
+      "GroupHoldingsID": current?.group_holding_id || null,
       "CommonAttributes": {
         "Created_By": "507f1f77bcf86cd799439012",
       }
@@ -102,7 +103,7 @@ console.log(current,'current')
       company_name: '',
       group_name: '',
       company_description: '',
-      groups_holdings_id: null,
+      group_holding_id: null,
       created_at: '',
       updated_at: '',
     });
@@ -206,8 +207,7 @@ console.log(current,'current')
     return (
       <div>
         {/* <form onSubmit={handleSubmit}> */}
-        <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-          <SingleSelectTextField
+        <SingleSelectTextField
             name="group_name"
             label="Group Holding"
             value={current.group_name}
@@ -220,12 +220,15 @@ console.log(current,'current')
               setCurrent((prev) => ({
                 ...prev,
                 group_name: selectedName,
-                groups_holdings_id: matchedGroup?._id || null,
+                group_holding_id: matchedGroup?._id || null,
               }));
             }}
             names={groupHoldingName}
           />
+        <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
+          
           <MuiTextField label='Company Name' type='text' isRequired={true} fieldName='company_name' handleChange={handleChange} value={current.company_name} />
+          <MuiTextField label='Company Comman Name' type='text' isRequired={true} fieldName='company_common_name' handleChange={handleChange} value={current.company_common_name} />
 
 
         </div>
@@ -380,7 +383,6 @@ console.log(current,'current')
       editable: false,
       headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
       filter: true,
-
       valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
 
       cellRenderer: (params) => {

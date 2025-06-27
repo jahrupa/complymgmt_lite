@@ -23,9 +23,14 @@ import OutsourcingScope from '../component/OutsourcingScope.jsx';
 import Reimbursements from '../component/Reimbursements.jsx';
 import PayrollManagement from '../component/PayrollManagement.jsx';
 import DocumentUpload from '../page/DocumentUpload.jsx';
+import DocumentRepository from '../page/DocumentRepository.jsx';
+import ApprovedDocument from '../page/ApprovedDocument.jsx';
+import TaggedDocument from '../page/TaggedDocument.jsx';
+import UntaggedDocument from '../page/UntaggedDocument.jsx';
+import PendingDocument from '../page/PendingDocument.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
-  const[isAuthenticated,setIsAuthenticated]=useState(true)
+  const[isAuthenticated,setIsAuthenticated]=useState(false)
    let tokenId = localStorage.getItem('token');
     useEffect(()=>{
       if(tokenId){
@@ -60,6 +65,14 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
           <Route path="/service_trackers" element={<ServiceTrackers />} />
           <Route path="/role_manager" element={<RoleManager />} />
           <Route path="/upload_documents" element={<DocumentUpload />} />
+          <Route path="/document_repository" element={<DocumentRepository />} />
+          <Route path="/approved_documents" element={<ApprovedDocument />} />
+          <Route path="/tagged_documents" element={<TaggedDocument />} />
+          <Route path="/untagged_documents" element={<UntaggedDocument />} />
+          <Route path="/pending_documents" element={<PendingDocument />} />
+
+
+
         </Route>
       </Route>
 

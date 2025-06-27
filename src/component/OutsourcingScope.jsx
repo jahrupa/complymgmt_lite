@@ -11,6 +11,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import MonthYearCalander from './MonthYearCalander';
 
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -153,6 +154,9 @@ const OutsourcingScope = () => {
                   <button className='crud_btn' onClick={openModal}>Upload File</button>
                 </div>
               </div>
+              <div>
+                              <MonthYearCalander/>
+                            </div>
             </div>
           </div>
         </div>
