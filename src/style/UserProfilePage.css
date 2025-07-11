@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+/* 
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  margin: 0;
+  padding: 0;
+} */
+
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.profile-card {
+  width: 350px;
+  background-color: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+  text-align: center;
+}
+
+.profile-header {
+  height: 100px;
+  background: linear-gradient(to right, #43cea2, #185a9d);
+}
+
+.profile-image {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid #fff;
+  border-radius: 50%;
+}
+
+.profile-image img {
+  width: 100px;
+  border-radius: 50%;
+}
+
+.profile-content {
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.profile-content h2 {
+  margin: 10px 0 5px;
+  color: #333;
+}
+
+.location {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.bio {
+  font-size: 0.9rem;
+  color: #444;
+  margin: 15px 0;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+.stats span {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.follow-button {
+  padding: 10px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.follow-button:hover {
+  background: #5a67d8;
+}

@@ -306,7 +306,7 @@ const DocumentUpload = () => {
 
       // ✅ Get the message from response
       const message = response?.message;
-      console.log(message, 'message')
+      // console.log(message, 'message')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
@@ -825,7 +825,6 @@ const DocumentUpload = () => {
         {/* <div>
           <ReactPDFViewer />
         </div> */}
-
       </div>
     )
   }

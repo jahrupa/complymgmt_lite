@@ -1,53 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import '../style/login.css'
 import { useNavigate } from 'react-router-dom';
 import complyn_mgmt_logo from '../assets/complymgmt_logo.png'
 import API from '../api/axios'; // your axios instance
 import { LOGIN_API } from '../api/Endpoint';
+import Snackbars from '../component/Snackbars';
 
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    // Login handler
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await API.post(LOGIN_API, {
+            username,
+            password,
+        });
 
-    // Login handler in your component
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+        const token = response.data?.token;
+        const message = response?.data?.message;
 
-        console.log('Login submitted:', { username, password });
-
-        try {
-            const response = await API.post(LOGIN_API, {
-                username,
-                password,
-            });
-            const token = response.data?.data?.token;
-            console.log(token, 'token')
-            if (token) {
-                localStorage.setItem('token', token);
-                setIsAuthenticated(true)
-                navigate('/dashboard');
-            } else {
-                // console.error('Token not found in response:', response.data);
-            }
-
-        } catch (error) {
-            const errMsg = error.response?.data?.message || error.message || "Login failed";
-            console.error('Login failed:', errMsg);
-            alert(errMsg);
+        if (token) {
+            localStorage.setItem('token', token);
+            sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
+            setIsAuthenticated(true);
+            navigate('/dashboard');
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
+        } else {
+            alert('Login failed: Token missing');
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'error' });
         }
-    };
-    //   let tokenId = localStorage.getItem('token');
-    //   console.log(tokenId,'tokenId')
-    //   useEffect(()=>{
-    //     if(tokenId){
-    //         setIsAuthenticated(true)
-    //     }
-    //   },[tokenId])
+    } catch (error) {
+        setIsSnackbarsOpen({
+            ...issnackbarsOpen,
+            open: true,
+            message: error.response?.data?.error,
+            severityType: 'error'
+        });
+    }
+};
+
+
+
     return (
         <div className='centered-container ps-3 pe-3 page_bg'>
+            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+
             <div className=' mobil_view_login_form_col1_v2 pe-5'>
                 <img src={complyn_mgmt_logo} alt="Avatar" className="avatar_v2" />
                 <div className='ps-2 pe-2 mt-2'>Command the chaos. Lead with intelligence. Govern with integrity.
@@ -66,7 +68,7 @@ const Login = ({ setIsAuthenticated }) => {
 
                             <div className="container login_form_container">
                                 <div className='d-flex justify-content-center mb-3 mt-4'>
-                                <img src={complyn_mgmt_logo} alt="Avatar" style={{width:'50%'}} />
+                                    <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
                                 </div>
                                 <div className='mb-3 login_heading_text'>Log in</div>
                                 <label htmlFor="uname">Email address</label>

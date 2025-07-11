@@ -14,7 +14,7 @@ import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import { fetchAllModule } from '../api/Service';
+import { createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById } from '../api/Service';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
@@ -23,6 +23,9 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
+import Snackbars from '../component/Snackbars';
+import Toggle from '../component/Toggle';
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const dummuJsonData = [
     {
@@ -90,8 +93,15 @@ const Module = () => {
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [userId, setUserId] = useState(null)
-    
+    const [moduleId, setModuleId] = useState(null)
+    console.log(moduleId,'moduleId')
+    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+        open: false,
+        vertical: 'top',
+        horizontal: 'center',
+        message: '',
+        severityType: '',
+    });
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
@@ -104,21 +114,73 @@ const Module = () => {
     };
 
     // Handle Add or Edit
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (isEditing) {
-            const updatedData = data.map((item) =>
-                item.id === current.id ? { ...item, module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by } : item
-            );
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     if (isEditing) {
+    //         const updatedData = data.map((item) =>
+    //             item.id === current.id ? { ...item, module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by } : item
+    //         );
+    //         setData(updatedData);
+    //     } else {
+    //         const newData = { id: Date.now(), module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by };
+    //         setData((prev) => [...prev, newData]);
+    //     }
+    //     setCurrent({ id: null, module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: '' });
+    //     setIsEditing(false);
+    //     setIsModalOpen(false);
+
+    // };
+
+    const handleSubmit = async (e) => {
+        // e?.preventDefault();
+
+        const payload = {
+            "ModuleName": current.module_name,
+            "ModuleDescription": current.module_description,
+            "CommonAttributes": {
+                "Created_By": "68480959d7038d326905b02c"
+            }
+        };
+
+        try {
+            let response;
+            if (isEditing) {
+                // Update existing company
+                response = await updateModuleById(moduleId, {
+                    "ModuleName": current.module_name,
+                    "ModuleDescription": current.module_description,
+                    "CommonAttributes": {
+                        "Updated_By": "68480959d7038d326905b02c"
+                    }
+                });
+            } else {
+                // Create new company
+                response = await createModule(payload);
+            }
+
+            // ✅ Get the message from response
+            const message = response?.message;
+            // Set snackbar with message
+            // setSnackbarMessage(message); // You'll need this state
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
+
+            // Refresh data
+            const updatedData = await fetchAllModule();
             setData(updatedData);
-        } else {
-            const newData = { id: Date.now(), module_name: current.module_name, module_description: current.module_description, created_at: current.created_at, location: current.location, updated_at: current.updated_at, desc: current.desc, approved_by: current.approved_by };
-            setData((prev) => [...prev, newData]);
+        } catch (error) {
+            // console.error("Error saving company:", error);
+            // setSnackbarMessage("Failed to save company");
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
         }
-        setCurrent({ id: null, module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: '' });
+
+        // Reset form state
+        setCurrent({
+            _id: null,
+            module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: ''
+        });
+
         setIsEditing(false);
         setIsModalOpen(false);
-
     };
 
     // Handle Edit
@@ -131,12 +193,46 @@ const Module = () => {
     };
 
     // Handle Delete
-    const handleDelete = (id) => {
-        const filteredData = data.filter((item) => item.id !== id);
-        setData(filteredData);
-        setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
-    };
+    // const handleDelete = (id) => {
+    //     const filteredData = data.filter((item) => item.id !== id);
+    //     setData(filteredData);
+    //     setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
+    // };
+const handleDelete = async (moduleId) => {
+    try {
+      const response = await deleteModuleById(moduleId);
+      const message = response?.message || "Module deleted successfully";
 
+      // Refresh data
+      const updatedData = await fetchAllModule();
+      setData(updatedData);
+      setIsDeleteModalOpen(false);
+
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      // console.error("Error deleting company:", error);
+
+      // Extract error message safely
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to delete Module";
+
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
+  };
     // Handle Delete All Selected
     const handleDeleteAll = () => {
         const filteredData = data.filter((item) => !selectedRows.includes(item.id));
@@ -218,22 +314,22 @@ const Module = () => {
             <div>
                 {/* <form onSubmit={handleSubmit}> */}
                 <div>
-                <MuiTextField label='Module Name' type='text' isRequired={true} fieldName='module_name' handleChange={handleChange} value={current.module_name} />
+                    <MuiTextField label='Module Name' type='text' isRequired={true} fieldName='module_name' handleChange={handleChange} value={current.module_name} />
 
                     {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
 
                 </div>
                 <div className=''>
-                <MuiTextAreaField value={current.module_description} handleChange={handleChange} name='module_description' label='Module Description' />
+                    <MuiTextAreaField value={current.module_description} handleChange={handleChange} name='module_description' label='Module Description' />
 
                     {/* <SingleSelectTextField name="module_name" label="module_name" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value }))} names={groupHolding} /> */}
-                    
-                </div>
-                <div>
-                    <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
 
                 </div>
-               
+                {/* <div>
+                    <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
+
+                </div> */}
+
                 <div className="row row-gap-2">
                     <div className='col col-12 col-md-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -250,7 +346,7 @@ const Module = () => {
     }
     const crudTitle = "Add New Module"
     const editCrudTitle = "Edit Module"
- const deleteModal = () => {
+    const deleteModal = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
@@ -264,7 +360,7 @@ const Module = () => {
                     <div className='col col-12 col-md-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
-                            onClick={() => handleDelete(userId)}>Yes, I'm sure</button>
+                            onClick={() => handleDelete(moduleId)}>Yes, I'm sure</button>
                     </div>
                 </div>
             </div>
@@ -274,7 +370,7 @@ const Module = () => {
 
     }
 
-        const getRoleColor = (role) => {
+    const getRoleColor = (role) => {
         switch (role) {
             case 'Admin':
                 return { background: '#d1e7dd', color: '#0f5132' }; // green
@@ -288,6 +384,40 @@ const Module = () => {
                 return { background: '#e2e3e5', color: '#41464b' }; // gray
         }
     };
+
+    const handleToggleChange = async (e, params) => {
+        const newIsActive = {
+            "IsActive": e.target.checked
+        };
+        try {
+            const response = await updateModuleStatusById(params.data._id, newIsActive);
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            // console.error("Error:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to delete company";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllModule();
+        setData(updatedData);
+    };
+
 
     const colDefs = [
         {
@@ -309,7 +439,7 @@ const Module = () => {
                                 setCurrent(params.data);
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setUserId(params.data.id); // OR .user_id based on your data
+                                setModuleId(params.data._id); // OR .user_id based on your data
                             }}
                         >
                             <EditIcon fontSize="small" className="action_icon" />
@@ -317,21 +447,21 @@ const Module = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data.id);
+                                setModuleId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
-                        <button
+                        {/* <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data.id);
+                                setModuleId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
                             <VisibilityIcon fontSize="small" className="action_icon" />
-                        </button>
+                        </button> */}
                         {/* <VisibilityIcon/> */}
                     </div>
                 );
@@ -339,9 +469,9 @@ const Module = () => {
         }
         ,
 
-        { field: 'id', headerName: 'ID',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: '_id', headerName: 'ID', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
-            field: 'approved_by', headerName: 'approved by',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+            field: 'approved_by', headerName: 'approved by', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
             cellRenderer: (params) => {
                 const { background, color } = getRoleColor(params.value);
                 return (
@@ -359,25 +489,37 @@ const Module = () => {
                             minWidth: '60px'
                         }}
                     >
-                       <span> <PermIdentityIcon style={{width:'15',height:'15'}} className='mb-1 me-1'/></span>{params.value}<span></span> 
+                        <span> <PermIdentityIcon style={{ width: '15', height: '15' }} className='mb-1 me-1' /></span>{params.value}<span></span>
                     </span>
                 );
             }
         },
-        { field: 'module_name', headerName: 'Module Name',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'module_name', headerName: 'Module Name', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
             field: 'module_description',
             headerName: 'Module Description',
             editable: true,
             filter: true,
             headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-          },
-          
+        },
 
-        { field: 'location', headerName: 'Location',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'created_at', headerName: 'Created At',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'updated_at', headerName: 'Updated At',flex: 1, editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
 
+        { field: 'location', headerName: 'Location', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.created_at', headerName: 'Created At', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_at', headerName: 'Updated At', flex: 1, editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            headerName: 'Status',
+            field: 'common_attributes.is_active',
+            editable: false,
+            pinned: "right",
+            valueGetter: (params) => params.data?.common_attributes?.is_active,
+            cellRenderer: (params) => (
+                <Toggle
+                    checked={!!params.value}
+                    onChange={(e) => handleToggleChange(e, params)}
+                />
+            )
+        }
 
     ];
     const gridRef = useRef();
@@ -393,6 +535,10 @@ const Module = () => {
 
     return (
         <div>
+            <div className='mb-4'>
+                <h5>Module</h5>
+            </div>
+            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             {/* Form for Create or Edit */}
             {/* <form onSubmit={handleSubmit}>
         <input
@@ -443,7 +589,7 @@ const Module = () => {
                         </div> */}
 
                         <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-                                                <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+                        <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
                     </div>
                 </div>
@@ -528,20 +674,20 @@ const Module = () => {
                 </div> */}
 
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
-                                    <AgGridReact
-                                        theme="legacy"
-                                        ref={gridRef}
-                                        rowData={data}
-                                        columnDefs={colDefs}
-                                        defaultColDef={defaultColDef}
-                                        editType="fullRow"
-                                        rowSelection="single"
-                                        pagination={true}
-                                        // rowBuffer={rowBuffer}
-                                        onRowValueChanged={onRowValueChanged}
-                
-                                    />
-                                </div>
+                    <AgGridReact
+                        theme="legacy"
+                        ref={gridRef}
+                        rowData={data}
+                        columnDefs={colDefs}
+                        defaultColDef={defaultColDef}
+                        editType="fullRow"
+                        rowSelection="single"
+                        pagination={true}
+                        // rowBuffer={rowBuffer}
+                        onRowValueChanged={onRowValueChanged}
+
+                    />
+                </div>
             </div>
         </div>
     );

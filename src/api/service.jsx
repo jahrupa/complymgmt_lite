@@ -24,7 +24,19 @@ import {
   UPDATE_GROUP_STATUS,
   UPDATE_COMPANY_STATUS_BY_ID,
   UPDATE_LOCATION_STATUS_BY_ID,
-  LOGIN_API
+  LOGIN_API,
+  GET_COMPANY_NAME_BY_GROUP_ID,
+  CREATE_MODELE,
+  UPDATE_MODULE_STATUS_BY_ID,
+  UPDATE_MODULE_BY_ID,
+  DELETE_MODULE_BY_ID,
+  GET_ALL_SUB_MODULE,
+  CREATE_SUB_MODELE,
+  UPDATE_SUB_MODULE_STATUS_BY_ID,
+  VIEW_MODULE_NAME,
+  DELETE_SUB_MODULE_BY_ID,
+  UPDATE_SUB_MODULE_BY_ID,
+  GET_ALL_SERVICE_TRACKER
 
 } from "./Endpoint";
 // Login Api
@@ -55,6 +67,16 @@ export const fetchAllCompaniesName = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching companies name:", error);
+    throw error;
+  }
+};
+
+export const fetchCompaniesNameByGroupId = async (id) => {
+  try {
+    const response = await API.get(`${GET_COMPANY_NAME_BY_GROUP_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching companies name by group id:", error);
     throw error;
   }
 };
@@ -285,7 +307,7 @@ export const updateUserById = async (id, userData) => {
   }
 };
 
-// Group Holding
+// Modules
 export const fetchAllModule = async () => {
   try {
     const response = await API.get(GET_ALL_MODULE);
@@ -295,3 +317,111 @@ export const fetchAllModule = async () => {
     throw error;
   }
 };
+export const fetchAllModulesName = async () => {
+  try {
+    const response = await API.get(VIEW_MODULE_NAME);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Modules name:", error);
+    throw error;
+  }
+};
+export const createModule= async (modulePayload) => {
+  try {
+    const response = await API.post(CREATE_MODELE, modulePayload);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating module:", error);
+    throw error;
+  }
+}
+
+export const updateModuleStatusById = async (id, moduleStatus) => {
+  try {
+    const response = await API.put(`${UPDATE_MODULE_STATUS_BY_ID}${id}`, moduleStatus);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating module status:", error);
+    throw error;
+  }
+};
+export const updateModuleById = async (id, moduleData) => {
+  try {
+    const response = await API.put(`${UPDATE_MODULE_BY_ID}${id}`, moduleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating module by id:", error);
+    throw error;
+  }
+};
+export const deleteModuleById = async (id, moduleData) => {
+  try {
+    const response = await API.delete(`${DELETE_MODULE_BY_ID}${id}`, moduleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error delete module by id:", error);
+    throw error;
+  }
+};
+
+// Sub-Module
+
+export const fetchAllSubModule = async () => {
+  try {
+    const response = await API.get(GET_ALL_SUB_MODULE);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sub Module:", error);
+    throw error;
+  }
+};
+
+export const createsSubModule= async (subModulePayload) => {
+  try {
+    const response = await API.post(CREATE_SUB_MODELE, subModulePayload);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating SUB module:", error);
+    throw error;
+  }
+}
+export const updateSubModuleById = async (id, subModuleUpdate) => {
+  try {
+    const response = await API.put(`${UPDATE_SUB_MODULE_BY_ID}${id}`, subModuleUpdate);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating sub module:", error);
+    throw error;
+  }
+};
+export const updateSubModuleStatusById = async (id, subModuleStatus) => {
+  try {
+    const response = await API.put(`${UPDATE_SUB_MODULE_STATUS_BY_ID}${id}`, subModuleStatus);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating sub module status:", error);
+    throw error;
+  }
+};
+export const deleteSubModuleById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_SUB_MODULE_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting sub-module:", error);
+    throw error;
+  }
+};
+
+
+// Service Tracker
+export const fetchAllServiceTracker = async () => {
+  try {
+    const response = await API.get(GET_ALL_SERVICE_TRACKER);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching service tracker:", error);
+    throw error;
+  }
+};
+

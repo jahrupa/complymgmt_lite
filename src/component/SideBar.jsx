@@ -27,12 +27,14 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import TurnedInIcon from '@mui/icons-material/TurnedIn';
+import { Cable } from 'lucide-react';
 function SideBar({ sidebarOpen, setSidebarOpen }) {
     const [activeItem, setActiveItem] = useState('Dashboard');
+    const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
 
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
-        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Create User Role', link: 'create_user_role' },
+        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
         { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Group/Holding', link: 'group_holding' },
         { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
         { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
@@ -46,12 +48,13 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Reimbursements', link: 'reimbursements' },
         { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Payroll Management', link: 'payroll_management' },
         { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Service Trackers', link: 'service_trackers' },
-        { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Role Manager', link: 'role_manager' },
+        { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
         { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
+        { icon: (active) => <Cable  className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
+
 
     ];
-    const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
 
     const documentSubItems = [
         { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Approved Document', link: 'approved_documents' },

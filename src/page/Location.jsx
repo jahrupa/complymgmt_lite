@@ -3,29 +3,22 @@ import React, { useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Modal from '../component/Modal';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { createLocation, deleteLocationById, fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, getCompanyByGroupId, updateLocationById, updateLocationStatusById } from '../api/Service';
+import { createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
-
-
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import Toggle from '../component/Toggle';
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Location = () => {
     // const [data, setData] = useState([]);
@@ -33,21 +26,26 @@ const Location = () => {
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState(
         {
-            _id: null, company_name: '',
+            _id: null,
+            group_holdings_id: null,
+            company_name: '',
             company_id: null,
-            group_holding_name: '',
+            group_name: '',
             created_at: '',
             location_name: "",
-            // location_id: null,
+            location_id: null,
             updated_at: '',
+            city: '',
+            state: '',
+            location_description:''
         });
+    // console.log(current, 'company_name')
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
     const [companyNameData, setCompanyNameData] = useState([])
+    // console.log(companyNameData, 'companyNameData')
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    // const [issnackbarsOpen, setIsSnackbarsOpen] = useState(false);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -55,10 +53,7 @@ const Location = () => {
     });
     const [locationId, setLocationId] = useState(null);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // You can adjust the number of items per page
-
+    // console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
 
     // Handle input change
     const handleChange = (e) => {
@@ -67,25 +62,33 @@ const Location = () => {
     };
 
     const handleSubmit = async (e) => {
-        // e?.preventDefault();
-
         const payload = {
-            location_name: current?.location_name || '',
-            location_company_id: current?.company_id || '',
-            isActive: true,
-            approved_by: 3,
-            created_by: 2
+            "GroupHoldingsID": current?.group_holdings_id,
+            "CompanyID": current?.company_id,
+            "LocationName": current?.location_name,
+            "LocationDescription": current?.location_description,
+            "City": current?.city,
+            "State": current?.state,
+            "CommonAttributes": {
+                "Created_By": "68480959d7038d326905b02c"
+            }
         };
         const EditPayload = {
-            location_name: current?.location_name || '',
-            location_company_id: current?.location_company_id || '',
-            //   groups_holdings_id: current?.groups_holdings_id || null
+            "GroupHoldingsID": current?.group_holdings_id,
+            "CompanyID": current?.company_id,
+            "LocationName": current?.location_name,
+            "LocationDescription": current?.location_description,
+            "City": current?.city,
+            "State": current?.state,
+            "CommonAttributes": {
+                "Updated_By": "68480959d7038d326905b02c"
+            }
         };
 
         try {
             if (isEditing) {
                 // Update existing company
-                await updateLocationById(current.location_id, EditPayload);
+                await updateLocationById(current._id, EditPayload);
             } else {
                 // Create new company
                 await createLocation(payload);
@@ -101,10 +104,11 @@ const Location = () => {
         setCurrent({
             company_id: null,
             company_name: '',
-            group_holding_name: '',
-            groups_holdings_id: null,
+            group_name: '',
+            group_holdings_id: null,
             created_at: '',
             updated_at: '',
+            location_description:'',
         });
 
         setIsEditing(false);
@@ -120,26 +124,6 @@ const Location = () => {
         setIsModalOpen(true);
 
     };
-
-    // Handle Delete
-    // const handleDelete =async (location_id) => {
-    //     const item = data.find((item) => item.location_id === location_id);
-    //     setCurrent(item);
-    //      try {
-    //           await deleteLocationById(location_id); // wait for the delete to complete
-    //           // Optionally refresh data after delete
-    //           const updatedData = await fetchAllLocation();
-    //           setData(updatedData);
-    //           setIsDeleteModalOpen(false); // close modal after deletion
-    //           setIsSnackbarsOpen({ ...issnackbarsOpen, open: true });
-
-    //         //   setIsSnackbarsOpen(true)
-    //         } catch (error) {
-    //         //   setIsSnackbarsOpen(true)
-    //           setIsSnackbarsOpen({ ...issnackbarsOpen, open: true });
-    //         }
-    // };
-
 
     const handleDelete = async (locationId) => {
         try {
@@ -177,45 +161,6 @@ const Location = () => {
         }
     };
 
-
-
-    // Handle Delete All Selected
-    const handleDeleteAll = () => {
-        const filteredData = data.filter((item) => !selectedRows.includes(item.id));
-        setData(filteredData);
-        setSelectedRows([]); // Clear selected rows after deletion
-    };
-
-    // Handle Select All checkbox
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            const allIds = data.map((item) => item.id);
-            setSelectedRows(allIds);
-        } else {
-            setSelectedRows([]);
-        }
-    };
-
-    // Handle individual row checkbox
-    const handleCheckboxChange = (e, id) => {
-        if (e.target.checked) {
-            setSelectedRows([...selectedRows, id]);
-        } else {
-            setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
-        }
-    };
-
-    // Pagination Logic: Slicing the data to display on the current page
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Pagination Button Handler
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    // Total number of pages
-    const totalPages = Math.ceil(data.length / itemsPerPage);
-
     // Function to open the modal
     const openModal = () => {
         setIsModalOpen(true);
@@ -228,10 +173,9 @@ const Location = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [locationData, groupHolding, companyName] = await Promise.all([
+                const [locationData, groupHolding, companyName,] = await Promise.all([
                     fetchAllLocation(),
                     fetchAllGroupHolding(),
-                    // fetchAllCompaniesName(),
                 ]);
                 setData(locationData);
                 setGroupHoldinData(groupHolding);
@@ -248,30 +192,38 @@ const Location = () => {
     useEffect(() => {
         const fetchCompany = async () => {
             try {
-                const data = await getCompanyByGroupId(current?.groups_holdings_id);
-                const company = data?.companies?.[0];
-
-                if (company) {
-                    // Set company name list for dropdown (even though it's disabled)
-                    setCompanyNameByGroupHoldingId([{ id: company.id, name: company.name }]);
-
-                    // Set selected company name in state
-                    setCurrent((prev) => ({
-                        ...prev,
-                        company_name: company.name,
-                        company_id: company.id,
-
-                    }));
+                const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+                if (data) {
+                    setCompanyNameByGroupHoldingId(data);
                 }
             } catch (error) {
                 console.error("Failed to fetch company:", error);
             }
         };
 
-        if (current?.groups_holdings_id) {
+        if (current?.group_holdings_id) {
             fetchCompany();
         }
-    }, [current?.groups_holdings_id]);
+    }, [current?.group_holdings_id]);
+
+    // This effect sets company_name & company_id after company list is available
+    // useEffect(() => {
+    //     if (
+    //         companyNameByGroupHoldingId.length &&
+    //         current?.company_name === undefined && // prevent re-setting if already set
+    //         current?.group_holdings_id
+    //     ) {
+    //         const matchedCompany = companyNameByGroupHoldingId.find(
+    //             (c) => c._id === current.company_id
+    //         );
+
+    //         setCurrent((prev) => ({
+    //             ...prev,
+    //             company_name: matchedCompany?.name || '',
+    //             company_id: matchedCompany?._id || null,
+    //         }));
+    //     }
+    // }, [companyNameByGroupHoldingId, current?.group_holdings_id]);
 
 
     const handleToggleChange = async (e, params) => {
@@ -306,63 +258,94 @@ const Location = () => {
         const updatedData = await fetchAllLocation();
         setData(updatedData);
     };
+
     const crudForm = () => {
         return (
-            <div>
-                {/* <form onSubmit={handleSubmit}> */}
+            <>
 
                 <div>
-                    {/* <SingleSelectTextField
-                        name="group_holding_name"
-                        label="Group Holding"
-                        value={current?.group_holding_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedGroup = groupHoldingData.find(
-                                (g) => g.name === selectedName
-                            );
-                            setCurrent((prev) => ({
-                                ...prev,
-                                group_holding_name: selectedName,
-                                groups_holdings_id: matchedGroup?.id || null,
-                            }));
-                        }}
-                        names={groupHoldingData}
-                        isdisable={isEditing ? true : false}
-                    /> */}
-
                     <SingleSelectTextField
-                        name="group_holding_name"
+                        name="group_name"
                         label="Group Holding"
-                        value={current?.group_holding_name}
+                        value={current?.group_name || ''}
                         onChange={(e) => {
                             const selectedName = e.target.value;
-                            const matchedGroup = groupHoldingData.find(
-                                (g) => g.name === selectedName
-                            );
+                            const matchedGroup = groupHoldingData.find((g) => g.name === selectedName) || {};
                             setCurrent((prev) => ({
                                 ...prev,
-                                group_holding_name: selectedName,
-                                groups_holdings_id: matchedGroup?.id || null,
-                                company_name: '', // reset when group changes
+                                group_name: selectedName,
+                                group_holdings_id: matchedGroup._id || null,
+                                company_name: '',
                             }));
                         }}
                         names={groupHoldingData}
                         isdisable={isEditing}
                     />
-
                 </div>
-                <div className=''>
+
+                <div>
                     <SingleSelectTextField
                         name="company_name"
                         label="Company Name"
-                        value={current?.company_name}
+                        value={current?.company_name || ''}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = companyNameByGroupHoldingId.find((g) => g.name === selectedName) || {};
+                            setCurrent((prev) => ({
+                                ...prev,
+                                company_name: selectedName,
+                                company_id: matchedGroup._id || null,
+                            }));
+                        }}
                         names={companyNameByGroupHoldingId}
-                        isdisable={true}
+                        isdisable={isEditing}
+
+
+                    />
+
+                </div>
+
+                <div>
+                    <MuiTextField
+                        label="Location"
+                        type="text"
+                        isRequired={true}
+                        fieldName="location_name"
+                        handleChange={handleChange}
+                        value={current?.location_name || ''}
                     />
                 </div>
+
                 <div>
-                    <MuiTextField label='Location' type='text' isRequired={true} fieldName='location_name' handleChange={handleChange} value={current?.location_name} />
+                    <MuiTextField
+                        label="City"
+                        type="text"
+                        isRequired={true}
+                        fieldName="city"
+                        handleChange={handleChange}
+                        value={current?.city || ''}
+                    />
+                </div>
+
+                <div>
+                    <MuiTextField
+                        label="State"
+                        type="text"
+                        isRequired={true}
+                        fieldName="state"
+                        handleChange={handleChange}
+                        value={current?.state || ''}
+                    />
+                </div>
+                 <div>
+                    <MuiTextField
+                        label="Description"
+                        type="text"
+                        isRequired={true}
+                        fieldName="location_description"
+                        handleChange={handleChange}
+                        value={current?.location_description || ''}
+                    />
                 </div>
 
                 <div className="row row-gap-2">
@@ -370,15 +353,14 @@ const Location = () => {
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
                     <div className='col col-12 col-md-6 d-flex justify-content-end'>
-                        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create Location</span>}</button>
+                        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create Module</span>}</button>
                     </div>
                 </div>
-                {/* </form> */}
-            </div>
+            </>
 
-        )
+        );
+    };
 
-    }
     const crudTitle = "Add company Location"
     const editCrudTitle = "Edit Location"
     const deleteModal = () => {
@@ -421,7 +403,7 @@ const Location = () => {
                                 setCurrent(params.data);
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setUserId(params.data._id); // OR .user_id based on your data
+                                setLocationId(params.data._id)
                             }}
                         >
                             <EditIcon fontSize="small" className="action_icon" />
@@ -429,7 +411,7 @@ const Location = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data._id);
+                                setLocationId(params.data._id)
                                 setIsDeleteModalOpen(true);
                             }}
                         >
@@ -438,8 +420,9 @@ const Location = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data._id);
                                 setIsDeleteModalOpen(true);
+                                setLocationId(params.data._id)
+
                             }}
                         >
                             <VisibilityIcon fontSize="small" className="action_icon" />
@@ -452,9 +435,10 @@ const Location = () => {
 
         { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'city', headerName: 'City', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
+        { field: 'state', headerName: 'State', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'location_description', headerName: 'Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
@@ -474,9 +458,6 @@ const Location = () => {
             )
         }, { field: 'common_attributes.approval_time', headerName: 'Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
-
-
 
     ];
     const gridRef = useRef();

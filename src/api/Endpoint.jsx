@@ -16,6 +16,8 @@ export const UPDATE_COMPANY_STATUS_BY_ID ='/update_company_status_by_id/';
 export const GET_ALL_COMPANY ='/view_all_companies';
 export const DELETE_COMPANY_BY_ID ='/delete_company_by_id/';
 export const GET_ALL_COMPANY_NAME ='/view_company_names';
+export const GET_COMPANY_NAME_BY_GROUP_ID ='/get_companies_by_group_id/';
+
 
 // Group Holding
 export const GET_GROUP_HOLDING_BY_NAME ='/view_group_holdings_by_name';
@@ -34,7 +36,7 @@ export const UPDATE_LOCATION_BY_ID='/update_location_by_id/';
 export const DELETE_LOCATION_BY_ID='/delete_location_by_id/';
 export const GET_LOCATION_NAME='/view_location_by_name';
 export const UPDATE_LOCATION_STATUS_BY_ID='/update_location_status_by_id/';
-
+export const GET_LOCATION_BY_COMPANY_ID='/get_locations_by_company_id/';
 
 
 // Roles
@@ -44,6 +46,27 @@ export const GET_ALL_Roles_NAME='/view_role_names';
 
 // Module
 export const GET_ALL_MODULE='/view_all_modules';
+export const CREATE_MODELE='/create_module';
+export const UPDATE_MODULE_STATUS_BY_ID='/update_module_status_by_id/';
+export const UPDATE_MODULE_BY_ID='/update_module_by_id/';
+export const DELETE_MODULE_BY_ID='/delete_module_by_id/';
+export const VIEW_MODULE_NAME='/view_module_names';
+
+
+// sub-module
+export const GET_ALL_SUB_MODULE='/view_all_submodules';
+export const CREATE_SUB_MODELE='/create_submodule';
+export const UPDATE_SUB_MODULE_BY_ID='/update_submodule_by_id/';
+export const DELETE_SUB_MODULE_BY_ID='/delete_submodule_by_id/';
+export const UPDATE_SUB_MODULE_STATUS_BY_ID='/update_submodule_status_by_id/';
+
+// service tracker
+export const GET_ALL_SERVICE_TRACKER='/view_all_service_tracker';
+
+
+
+
+
 
 
 

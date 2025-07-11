@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function MuiTextAreaField({value,handleChange,name,label}) {
+export default function MuiTextAreaField({value,handleChange,name,label,error, helperText, isRequired }) {
     const classes = useStyles();
 
     return (
@@ -39,6 +39,9 @@ export default function MuiTextAreaField({value,handleChange,name,label}) {
                     inputProps={{ className: classes.textarea }}
                     onChange={handleChange}
                     className="text_area_field mb-3 w-100"
+                     required={isRequired}
+        error={error}
+        helperText={helperText}
                 />
         </form>
     );

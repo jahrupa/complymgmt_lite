@@ -13,6 +13,7 @@ import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import { deepOrange } from '@mui/material/colors'
+import { Link } from 'react-router-dom';
 export default function UserProfile() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -80,12 +81,15 @@ export default function UserProfile() {
                     <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg"/> jharupa@gmail.com
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleClose}>
+                <Link to={'/user_profile/1'}>
+                 <MenuItem onClick={handleClose}>
                     <ListItemIcon>
                         <Settings fontSize="small" />
                     </ListItemIcon>
                     Profile Settings
                 </MenuItem>
+                </Link>
+               
                 <MenuItem onClick={handleClose}>
                     <ListItemIcon>
                         <Logout fontSize="small" />

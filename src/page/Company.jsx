@@ -51,7 +51,7 @@ const Company = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // You can adjust the number of items per page
-console.log(current,'current')
+// console.log(current,'current')
 
   // Handle input change
   const handleChange = (e) => {
@@ -92,7 +92,7 @@ console.log(current,'current')
       const updatedData = await fetchAllCompanies();
       setData(updatedData);
     } catch (error) {
-      console.error("Error saving company:", error);
+      // console.error("Error saving company:", error);
       // setSnackbarMessage("Failed to save company");
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
     }
@@ -144,7 +144,7 @@ console.log(current,'current')
         severityType: 'success',
       });
     } catch (error) {
-      console.error("Error deleting company:", error);
+      // console.error("Error deleting company:", error);
 
       // Extract error message safely
       const errorMessage =
@@ -194,7 +194,7 @@ console.log(current,'current')
         setData(companiesData);
         setGroupHoldingName(groupHolding);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       }
     };
 
@@ -216,7 +216,7 @@ console.log(current,'current')
               const matchedGroup = groupHoldingName.find(
                 (g) => g.name === selectedName
               );
-              console.log(matchedGroup,'matchedGroup')
+              // console.log(matchedGroup,'matchedGroup')
               setCurrent((prev) => ({
                 ...prev,
                 group_name: selectedName,
@@ -302,7 +302,7 @@ console.log(current,'current')
         severityType: 'success',
       });
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
@@ -417,7 +417,8 @@ console.log(current,'current')
           </div>
         );
       }
-    }, { field: 'common_attributes.approval_time', headerName: 'Status Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    }, 
+    { field: 'common_attributes.approval_time', headerName: 'Status Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',
       field: 'common_attributes.is_active',
@@ -440,7 +441,7 @@ console.log(current,'current')
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    // console.log('Row updated:', event.data);
   };
   return (
     <div>
