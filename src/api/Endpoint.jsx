@@ -1,12 +1,20 @@
 // Login
 export const LOGIN_API ='/api/v1/uam/login';
 
-// User
-export const GET_ALL_USER ='/view_all_user';
+// Roles
+export const GET_ALL_ROLE ='/view_all_roles';
+export const DELETE_ROLE_BY_ID ='/delete_role_by_id/';
+export const CREATE_ROLE ='/create_role';
+export const UPDATE_ROLE_BY_ID ='update_role_by_id/';
+export const UPDATE_ROLE_STATUS_BY_ID='/update_role_status_by_id/';
+export const GET_ALL_ROLE_NAME='/view_role_names';
+
+// user
+export const GET_ALL_USER ='/view_all_users';
 export const DELETE_USER_BY_ID ='/delete_user_by_id/';
 export const CREATE_USER ='/create_user';
 export const UPDATE_USER_BY_ID ='update_user_by_id/';
-
+export const UPDATE_USER_STATUS_BY_ID='/update_user_status_by_id/';
 
 
 // Company
@@ -34,14 +42,9 @@ export const GET_ALL_LOCATION='/view_all_locations';
 export const CREATE_LOCATION='/create_location';
 export const UPDATE_LOCATION_BY_ID='/update_location_by_id/';
 export const DELETE_LOCATION_BY_ID='/delete_location_by_id/';
-export const GET_LOCATION_NAME='/view_location_by_name';
+export const GET_LOCATION_NAME='/view_location_names';
 export const UPDATE_LOCATION_STATUS_BY_ID='/update_location_status_by_id/';
 export const GET_LOCATION_BY_COMPANY_ID='/get_locations_by_company_id/';
-
-
-// Roles
-export const GET_ALL_Roles='/view_all_roles';
-export const GET_ALL_Roles_NAME='/view_role_names';
 
 
 // Module
@@ -51,6 +54,7 @@ export const UPDATE_MODULE_STATUS_BY_ID='/update_module_status_by_id/';
 export const UPDATE_MODULE_BY_ID='/update_module_by_id/';
 export const DELETE_MODULE_BY_ID='/delete_module_by_id/';
 export const VIEW_MODULE_NAME='/view_module_names';
+export const VIEW_MODULE_BY_LOCATION_ID='/view_modules_by_locationId/';
 
 
 // sub-module
@@ -62,6 +66,16 @@ export const UPDATE_SUB_MODULE_STATUS_BY_ID='/update_submodule_status_by_id/';
 
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/view_all_service_tracker';
+
+// Location To Module
+export const GET_ALL_LOCATION_TO_MODULE='/view_all_location_to_modules';
+export const CREATE_LOCATION_TO_MODULE='/create_location_to_modules';
+export const UPDATE_LOCATION_TO_MODULE_BY_ID='/update_location_to_module_by_id/';
+export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/update_location_to_module_status_by_id/';
+export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/';
+
+
+
 
 
 

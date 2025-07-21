@@ -381,7 +381,7 @@ function ServiceTrackers() {
     const crudTitle = "Add New Service Tracker"
     return (
         <div style={{ padding: '1rem' }}>
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}closeModal={closeModal} />
 
             <h5>Service Tracker Manager</h5>
 

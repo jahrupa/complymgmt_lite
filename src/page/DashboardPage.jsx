@@ -3,6 +3,7 @@ import '../style/dashboard.css'
 import Modal from '../component/Modal'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
+import StatsCards from '../component/StatsCards';
 
 const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,7 +59,7 @@ const DashboardPage = () => {
   const crudTitle = "Upload File"
   return (
     <div>
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
       <div className=' d-flex justify-content-end'>
         <button className='w-auto upload_btn' onClick={openModal}>Upload File</button>
       </div>
@@ -67,6 +68,9 @@ const DashboardPage = () => {
         <span className='v-line me-1 mt-1'></span>
         <span className='v-line me-1 mt-1'></span>
         <span className='dashboard-heading ms-2'>CEO Dashboard</span>
+      </div>
+      <div>
+      <StatsCards/>
       </div>
       <div className='row'>
         <div className='col-4 col-md-4'>

@@ -15,7 +15,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, updateUserStatusId } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 
@@ -32,7 +32,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const dummuJsonData = [
   {
     "id": 1744096161424,
-    "username": "rupa",
+    "full_name": "rupa",
     "email": "jha@gmail.com",
     "role_name": "Admin",
     "status": "Active",
@@ -47,7 +47,7 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161425,
-    "username": "rupa",
+    "full_name": "rupa",
     "email": "jha@gmail.com",
     "role_name": "Admin",
     "status": "Inactive",
@@ -62,7 +62,7 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161426,
-    "username": "rupa",
+    "full_name": "rupa",
     "email": "jha@gmail.com",
     "role_name": "Admin",
     "status": "Active",
@@ -77,7 +77,7 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161427,
-    "username": "rupa",
+    "full_name": "rupa",
     "email": "jha@gmail.com",
     "role_name": "Admin",
     "status": "Inactive",
@@ -92,7 +92,7 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161428,
-    "username": "rupa",
+    "full_name": "rupa",
     "email": "jha@gmail.com",
     "role_name": "Admin",
     "status": "Active",
@@ -107,7 +107,7 @@ const dummuJsonData = [
   },
   {
     "id": 1744096161429,
-    "username": "rupa",
+    "full_name": "rupa",
     "email": "jha@gmail.com",
     "role_name": "Admin",
     "status": "Inactive",
@@ -123,16 +123,17 @@ const dummuJsonData = [
 ]
 
 const UserRolesPage = () => {
-  // const [data, setData] = useState([]);
+  // const [data, setData] = useState(dummuJsonData);
   // if you want to show dummy jason data 
-  const [data, setData] = useState(dummuJsonData);
-  const [current, setCurrent] = useState({ user_id: null, username: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', desc: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
+  const [data, setData] = useState([]);
+  const [current, setCurrent] = useState({ user_id: null, full_name: '', username: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', user_description: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [groupHoldingName, setGroupHoldingName] = useState([])
   const [companyName, setCompanyName] = useState([])
   const [locationName, setLocationName] = useState([])
   const [rolesName, setRolesName] = useState([])
+  console.log(rolesName, groupHoldingName, 'rolesName')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -169,14 +170,14 @@ const UserRolesPage = () => {
   //   e.preventDefault();
   //   if (isEditing) {
   //     const updatedData = data.map((item) =>
-  //       item.id === current.id ? { ...item, username: current.username, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
+  //       item.id === current.id ? { ...item, full_name: current.full_name, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
   //     );
   //     setData(updatedData);
   //   } else {
-  //     const newData = { id: Date.now(), username: current.username, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules };
+  //     const newData = { id: Date.now(), full_name: current.full_name, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules };
   //     setData((prev) => [...prev, newData]);
   //   }
-  //   setCurrent({ id: null, username: '', email: '', role_name: '', password: '', group_holding: '', company_name: '', location: '', status: '', desc: '', access_modules: [] });
+  //   setCurrent({ id: null, full_name: '', email: '', role_name: '', password: '', group_holding: '', company_name: '', location: '', status: '', desc: '', access_modules: [] });
   //   setIsEditing(false);
   //   setIsModalOpen(false);
 
@@ -186,16 +187,17 @@ const UserRolesPage = () => {
     // e?.preventDefault();
 
     const payload = {
-      "Name": "Rupa Jha",
-      "Email": current?.email,
-      "MobileNumber": "2345876543",
-      "IsKarma": false,
+      "FullName": current?.full_name,
+      "Email": current.email,
+      UserDescription: current?.user_description,
       "Username": current?.username,
       "Password": current?.password,
-      "IsActive": true,
-      "CreatedBy": 1
-    };
-
+      "UserType": null,
+      "CommonAttributes": {
+        "Created_By": "68480959d7038d326905b02c"
+      },
+      "UserAccessLevel": null
+    }
     try {
       let response;
       if (isEditing) {
@@ -316,15 +318,15 @@ const UserRolesPage = () => {
   };
 
   // Pagination Logic: Slicing the data to display on the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
+  // const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
 
   // Pagination Button Handler
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Total number of pages
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  // const totalPages = Math.ceil(data.length / itemsPerPage);
 
   // Function to open the modal
   const openModal = () => {
@@ -336,7 +338,6 @@ const UserRolesPage = () => {
   };
   const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
   const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -348,6 +349,7 @@ const UserRolesPage = () => {
           fetchAllLocationName(),
         ]);
         setData(userData);
+        console.log(data, 'data')
         setGroupHoldingName(groupHolding);
         setRolesName(roleName)
         setCompanyName(companyName)
@@ -361,19 +363,18 @@ const UserRolesPage = () => {
   }, []);
 
 
+
   const crudForm = () => {
     return (
       <div>
         {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} />
+          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='full_name' handleChange={handleChange} value={current.full_name} />
           <MuiTextField label='email' type='email' isRequired={true} fieldName='email' handleChange={handleChange} value={current.email} />
         </div>
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          <SingleSelectTextField name="status" label="status" value={current.status} onChange={(e) => setCurrent((prev) => ({ ...prev, status: e.target.value }))} names={userStatus} />
           <PasswordInput name='password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.password} />
-          {/* <SingleSelectTextField name="role_name" label="role_name" value={current.role_name} onChange={(e) => setCurrent((prev) => ({ ...prev, role_name: e.target.value }))} names={roleName} /> */}
-          <SingleSelectTextField
+          {/* <SingleSelectTextField
             name="role_name"
             label="Role"
             value={current.role_name}
@@ -385,22 +386,15 @@ const UserRolesPage = () => {
               setCurrent((prev) => ({
                 ...prev,
                 role_name: selectedName,
-                groups_holdings_id: matchedRole?.id || null,
+
               }));
             }}
             names={rolesName}
-          />
-        </div>
-        <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          {/* <SingleSelectTextField name="User" label="User" value={current.username} onChange={(e) => setCurrent((prev) => ({ ...prev, username: e.target.value }))} names={userStatus} /> */}
-
-          {/* <MuiTextField label='User Type' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} /> */}
-          {/* <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} /> */}
+          /> */}
+          <MuiTextField label='UserName' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} />
 
         </div>
-
-        <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          {/* <SingleSelectTextField name="Group Holding" label="Group Holding" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={userStatus} /> */}
+        {/* <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
           <SingleSelectTextField
             name="group_holding_name"
             label="Group Holding"
@@ -410,15 +404,15 @@ const UserRolesPage = () => {
               const matchedGroup = groupHoldingName.find(
                 (g) => g.name === selectedName
               );
+              // console.log(matchedGroup,'matchedGroup')
               setCurrent((prev) => ({
                 ...prev,
                 group_holding_name: selectedName,
-                groups_holdings_id: matchedGroup?.id || null,
+                group_holding_id: matchedGroup?._id || null,
               }));
             }}
             names={groupHoldingName}
           />
-          {/* <SingleSelectTextField name="Company" label="Company" value={current.company_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_name: e.target.value }))} names={userStatus} /> */}
           <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
             onChange={(e) => {
               const selectedName = e.target.value;
@@ -451,10 +445,19 @@ const UserRolesPage = () => {
             isdisable={isEditing ? true : false}
 
           />
-          {/* <SingleSelectTextField name="Location" label="Location" value={current.location} onChange={(e) => setCurrent((prev) => ({ ...prev, location: e.target.value }))} names={roleName} /> */}
 
+        </div> */}
+        <div className=''>
+          <MuiTextAreaField
+            value={current.user_description}
+            handleChange={handleChange}
+            name='user_description'
+            label='Description'
+            // error={!!errors.user_description}
+            // helperText={errors.user_description}
+            isRequired={true}
+          />
         </div>
-
         <div className="row row-gap-2">
           <div className='col col-12 col-md-6'>
             <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -472,6 +475,39 @@ const UserRolesPage = () => {
   const crudTitle = "Add New User Form"
   const editCrudTitle = "Edit User"
 
+
+  const handleToggleChange = async (e, params) => {
+    const newIsActive = {
+      "IsActive": e.target.checked
+    };
+    try {
+      const response = await updateUserStatusId(params.data._id, newIsActive);
+      const message = response?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      // console.error("Error:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to update user sataus";
+
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
+    const updatedData = await fetchAllUser();
+    setData(updatedData);
+  };
   const deleteModal = () => {
     return (
       <div>
@@ -495,21 +531,6 @@ const UserRolesPage = () => {
     )
 
   }
-
-
-  // "id": 1744096161424,
-  //     "username": "rupa",
-  //     "email": "jha@gmail.com",
-  //     "role_name": "Admin",
-  //     "status": "Active",
-  //     "group_holding": "Tata",
-  //     "company_name": 'xyz',
-  //     "location": "Mumbai",
-  //     "password": "password12",
-  //     "access_modules": [
-  //       "Admin",
-  //       "Editor"
-  //     ]
   const getRoleColor = (role) => {
     switch (role) {
       case 'Admin':
@@ -543,7 +564,7 @@ const UserRolesPage = () => {
                 setCurrent(params.data);
                 setIsEditing(true);
                 setIsModalOpen(true);
-                setUserId(params.data.id); // OR .user_id based on your data
+                setUserId(params.data._id); // OR .user_id based on your data
               }}
             >
               <EditIcon fontSize="small" className="action_icon" />
@@ -551,7 +572,7 @@ const UserRolesPage = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setUserId(params.data.id);
+                setUserId(params.data._id);
                 setIsDeleteModalOpen(true);
               }}
             >
@@ -560,7 +581,7 @@ const UserRolesPage = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setUserId(params.data.id);
+                setUserId(params.data._id);
                 setIsDeleteModalOpen(true);
               }}
             >
@@ -570,12 +591,10 @@ const UserRolesPage = () => {
           </div>
         );
       }
-    }
-    ,
-
-    { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    },
+    { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
-      field: 'role_name', headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+      field: 'role_name', width: 300, headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
       cellRenderer: (params) => {
         const { background, color } = getRoleColor(params.value);
         return (
@@ -599,26 +618,22 @@ const UserRolesPage = () => {
       }
     },
     { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
-            field: 'status',
-            headerName: 'Status',
-            editable: false,
-            filter: true,
-            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-            cellRenderer: (params) => {
-              const value = params.value;
-              const iconUrl = value === 'Active'
-                ? "https://www.ag-grid.com/example-assets/icons/tick-in-circle.png"
-                : "https://www.ag-grid.com/example-assets/icons/cross-in-circle.png";
-          
-              return (
-                <div >
-                  <img src={iconUrl} alt={value} />
-                </div>
-              );
-            }
-          },
-           {
+      headerName: 'Status',
+      field: 'common_attributes.is_active',
+      editable: false,
+      pinned: "right",
+      valueGetter: (params) => params.data?.common_attributes?.is_active,
+      cellRenderer: (params) => (
+        <Toggle
+          checked={!!params.value}
+          onChange={(e) => handleToggleChange(e, params)}
+        />
+      )
+    },
+    {
       field: 'email',
       headerName: 'Email',
       editable: false,
@@ -655,44 +670,18 @@ const UserRolesPage = () => {
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-
-      {/* Form for Create or Edit */}
-      {/* <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          value={current.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-        />
-        <input
-          type="number"
-          name="email"
-          value={current.email}
-          onChange={handleChange}
-          placeholder="Age"
-          required
-        />
-        <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
-      </form> */}
-
-      {/* Button to Delete All Selected Rows */}
-
-
+      <div>
+        <h5> Create User </h5>
+      </div>
       {/* Table to display data */}
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
           <div className='d-flex h-100'>
             <div class="search-bar-container h-25">
-              {/* <input type="text" placeholder="Search..." name="search" className='search-bar-input p-1 w-100' /> */}
               <MuiSearchBar label='Search...' type='text' />
               <button className='search-icon'><SearchIcon /></button>
             </div>
-            {/* <MultipleSelectFields placeholder='Filter By Role' roleName={roleName} /> */}
           </div>
-
-
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div className='pe-2'>
               <button className='crud_btn' onClick={openModal}>
@@ -700,7 +689,7 @@ const UserRolesPage = () => {
               </button>
             </div>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle}closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
 
@@ -716,95 +705,8 @@ const UserRolesPage = () => {
             pagination={true}
             // rowBuffer={rowBuffer}
             onRowValueChanged={onRowValueChanged}
-
           />
         </div>
-
-        {/* <table className='table_tag'>
-            <thead className='table_head_tag'>
-              <tr >
-                <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
-
-                <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
-                  <span className='ms-4'>
-                    <ExpandCircleDownIcon className='table_th_icon' />
-
-                  </span>
-                </th>
-
-                <th className='table_th_tag  ps-2 pe-2'><span>Email Id</span>
-                  <span className='ms-4'>
-                    <ExpandCircleDownIcon className='table_th_icon' />
-
-                  </span>
-                </th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Role</span>
-                  <span className='ms-4'>
-                    <ExpandCircleDownIcon className='table_th_icon' />
-                  </span>
-                </th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Status</span>
-                  <span className='ms-4'>
-                    <ExpandCircleDownIcon className='table_th_icon' />
-                  </span>
-                </th>
-                <th className='table_th_tag  ps-2 pe-2'><span>Password</span>
-                  <span className='ms-4'>
-                    <ExpandCircleDownIcon className='table_th_icon' />
-                  </span>
-                </th>
-                <th className="table_th_tag  ps-2 pe-2"><span>Group Holding</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-                <th className="table_th_tag  ps-2 pe-2"><span>Company</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-                <th className="table_th_tag  ps-2 pe-2"><span>Location</span><span className='ms-4'><ExpandCircleDownIcon className='table_th_icon' /></span></th>
-
-              </tr>
-            </thead>
-            <tbody>
-              {data.length === 0 ? (
-                <tr>
-                  <td colSpan="10" style={{ textAlign: 'center', height: '300px' }}> <div className='no_data_found'><span><BackupTableIcon /></span><span>No data available</span></div></td>
-                </tr>
-              ) : (
-                currentData.map((item) => (
-                  <tr key={item.id} className='table_tr'>
-                    <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
-                      <div>
-                        <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.user_id)}><EditIcon className='action_icon' /></button>
-                      </div>
-                      <div>
-                        <button className='btn  mt-1 btn-sm' onClick={() => {
-                          setUserId(item.user_id);
-                          setIsDeleteModalOpen(true);
-                        }}><DeleteIcon className='action_icon' /></button>
-                      </div>
-                    </td>
-                    <td className=' table_td_font ps-2 pe-2'>{item.username}</td>
-                    <td className=' table_td_font ps-2 pe-2'>{item.email}</td>
-                    <td className=' table_td_font ps-2 pe-2'>{item.role_name ? item.role_name : '-'}</td>
-                    <td className=' table_td_font ps-2 pe-2'><Toggle />
-                    </td>
-                    <td className=' table_td_font ps-2 pe-2'>{item.password}</td>
-                    <td className="table_td_font ps-2 pe-2">{item.group_holding ? item.group_holding : "-"}</td>
-                    <td className="table_td_font ps-2 pe-2">{item.company_name ? item.company_name : '-'}</td>
-                    <td className="table_td_font ps-2 pe-2">{item.location ? item.location_name : "-"}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table> */}
-
-        {/* <div className="justify-content-between pagination mt-3">
-          <div className='selected_row_text'>
-            Selected Rows: {selectedRows.length}
-          </div>
-          <div className='d-flex'>
-            <button className='btn btn-sm pagination_btn' onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button className=' btn btn-sm h-75 pagination_btn' key={index + 1} onClick={() => paginate(index + 1)}>{index + 1}</button>
-            ))}
-            <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-          </div>
-        </div> */}
       </div>
     </div>
   );

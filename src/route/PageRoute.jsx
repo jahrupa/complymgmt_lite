@@ -32,9 +32,10 @@ import Snackbars from '../component/Snackbars.jsx';
 import UserProfilePage from '../page/UserProfilePage.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
 import ModuleTracker from '../page/ModuleTracker.jsx';
+import LocationToModule from '../page/LocationToModule.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -180,8 +181,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/module_tracker" element={<ModuleTracker />} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
-
-
+            <Route path="/module_by_location" element={<LocationToModule />} />
           </Route>
         </Route>
 

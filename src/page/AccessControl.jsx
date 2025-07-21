@@ -301,8 +301,8 @@ const AccessControl = () => {
                     <div className="d-flex justify-content-around align-items-center">
                         <button className="btn btn-sm" onClick={() => {
                             //   setCurrent(params.data);
-                            //   setIsEditing(true);
-                            //   setIsModalOpen(true);
+                              setIsEditing(true);
+                              setIsModalOpen(true);
                             //   setUserId(params.data._id);
                         }}>
                             <EditIcon fontSize="small" className="action_icon" />

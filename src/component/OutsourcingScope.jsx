@@ -133,7 +133,7 @@ const OutsourcingScope = () => {
   return (
     <div className="client-onboarding-2">
       {/* Add NavBar if you have it */}
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
 
       <h5>Client Onboarding - 2C Outsourcing Scope</h5>
       <div className='table_div  p-3'>

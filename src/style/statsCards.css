@@ -1,0 +1,117 @@
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #6366f1;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --info-color: #06b6d4;
+  --light-color: #f8fafc;
+  --dark-color: #1e293b;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --border-radius: 12px;
+  --box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--gray-100);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--box-shadow-lg);
+}
+
+.stat-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-info h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.stat-icon {
+  padding: 0.75rem;
+  border-radius: 50%;
+  color: white;
+}
+
+.stat-icon.green {
+  background-color: var(--success-color);
+}
+
+.stat-icon.blue {
+  background-color: var(--primary-color);
+}
+
+.stat-icon.orange {
+  background-color: var(--warning-color);
+}
+
+.stat-icon.purple {
+  background-color: var(--secondary-color);
+}
+
+.stat-trend {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.trend-icon {
+  margin-right: 0.25rem;
+}
+
+.trend-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.trend-value.positive {
+  color: var(--success-color);
+}
+
+.trend-value.negative {
+  color: var(--danger-color);
+}
+
+.trend-text {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  margin-left: 0.5rem;
+}

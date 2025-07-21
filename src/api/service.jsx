@@ -16,7 +16,7 @@ import {
   DELETE_GROUP,
   GET_ALL_USER,
   DELETE_USER_BY_ID,
-  GET_ALL_Roles_NAME,
+  GET_ALL_ROLE_NAME,
   CREATE_USER,
   GET_LOCATION_NAME,
   GET_COMPANY_BY_GROUP_HOLDING_ID,
@@ -36,7 +36,21 @@ import {
   VIEW_MODULE_NAME,
   DELETE_SUB_MODULE_BY_ID,
   UPDATE_SUB_MODULE_BY_ID,
-  GET_ALL_SERVICE_TRACKER
+  GET_ALL_SERVICE_TRACKER,
+  GET_LOCATION_BY_COMPANY_ID,
+  UPDATE_USER_BY_ID,
+  UPDATE_USER_STATUS_BY_ID,
+  GET_ALL_ROLE,
+  DELETE_ROLE_BY_ID,
+  CREATE_ROLE,
+  UPDATE_ROLE_BY_ID,
+  UPDATE_ROLE_STATUS_BY_ID,
+  VIEW_MODULE_BY_LOCATION_ID,
+  CREATE_LOCATION_TO_MODULE,
+  UPDATE_LOCATION_TO_MODULE_BY_ID,
+  GET_ALL_LOCATION_TO_MODULE,
+  UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID,
+  DELETE_LOCATION_TO_MODULE_BY_ID
 
 } from "./Endpoint";
 // Login Api
@@ -215,6 +229,15 @@ export const deleteLocationById = async (id) => {
   }
 };
 
+export const getLocationByCompanyId = async (id) => {
+  try {
+    const response = await API.get(`${GET_LOCATION_BY_COMPANY_ID}${id}`); 
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Location by company ID:", error);
+    throw error
+  }
+};
 
 // Group Holding
 export const fetchAllGroup = async () => {
@@ -258,7 +281,7 @@ export const deleteGroupById = async (id) => {
 };
 
 
-// Group Holding
+// user API
 export const fetchAllUser = async () => {
   try {
     const response = await API.get(GET_ALL_USER);
@@ -270,7 +293,7 @@ export const fetchAllUser = async () => {
 };
 export const fetchAllUserName = async () => {
   try {
-    const response = await API.get(GET_ALL_Roles_NAME);
+    const response = await API.get(GET_ALL_ROLE_NAME);
     return response.data;
   } catch (error) {
     console.error("Error fetching user Name:", error);
@@ -299,13 +322,82 @@ export const createUser = async (userData) => {
 
 export const updateUserById = async (id, userData) => {
   try {
-    const response = await API.put(`${UPDATE_GROUP}${id}`, userData);
+    const response = await API.put(`${UPDATE_USER_BY_ID}${id}`, userData);
     return response.data;
   } catch (error) {
     console.error("Error updating user:", error);
     throw error;
   }
 };
+export const updateUserStatusId = async (id, userData) => {
+  try {
+    const response = await API.put(`${UPDATE_USER_STATUS_BY_ID}${id}`, userData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+
+
+// user role API
+export const fetchAllRole = async () => {
+  try {
+    const response = await API.get(GET_ALL_ROLE);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching role:", error);
+    throw error;
+  }
+};
+export const fetchAllRoleName = async () => {
+  try {
+    const response = await API.get(GET_ALL_ROLE_NAME);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user role Name:", error);
+    throw error;
+  }
+};
+export const deleteRoleById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_ROLE_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user ROLE:", error);
+    throw error;
+  }
+};
+
+export const createRole = async (userRoleData) => {
+  try {
+    const response = await API.post(CREATE_ROLE, userRoleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating user ROLE:", error);
+    throw error;
+  }
+}
+
+export const updateRoleById = async (id, userRoleData) => {
+  try {
+    const response = await API.put(`${UPDATE_ROLE_BY_ID}${id}`, userRoleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+export const updateRoleStatusId = async (id, userRoleData) => {
+  try {
+    const response = await API.put(`${UPDATE_ROLE_STATUS_BY_ID}${id}`, userRoleData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+};
+
 
 // Modules
 export const fetchAllModule = async () => {
@@ -323,6 +415,15 @@ export const fetchAllModulesName = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Modules name:", error);
+    throw error;
+  }
+};
+export const fetchAllModulesNameByLocationId = async (id) => {
+  try {
+    const response = await API.get(`${VIEW_MODULE_BY_LOCATION_ID}${id}` );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Modules name by location id:", error);
     throw error;
   }
 };
@@ -425,3 +526,53 @@ export const fetchAllServiceTracker = async () => {
   }
 };
 
+
+// location To Module
+
+export const fetchLocationToModuleModule = async () => {
+  try {
+    const response = await API.get(GET_ALL_LOCATION_TO_MODULE);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sub Module:", error);
+    throw error;
+  }
+};
+
+export const createsLocationToModule= async (payload) => {
+  try {
+    const response = await API.post(CREATE_LOCATION_TO_MODULE, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating Location To module:", error);
+    throw error;
+  }
+}
+
+export const updateLocationToModuleById = async (id, payload) => {
+  try {
+    const response = await API.put(`${UPDATE_LOCATION_TO_MODULE_BY_ID}${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating location to module:", error);
+    throw error;
+  }
+};
+export const updateLocationToModuleByStatusId = async (id, status) => {
+  try {
+    const response = await API.put(`${UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID}${id}`, status);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating location to module status:", error);
+    throw error;
+  }
+};
+export const deleteLocationToModuleByStatusId = async (id, payload) => {
+  try {
+    const response = await API.delete(`${DELETE_LOCATION_TO_MODULE_BY_ID}${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error delete location to module status:", error);
+    throw error;
+  }
+};

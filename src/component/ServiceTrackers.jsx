@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { createGroup, deleteGroupById, fetchAllGroup, fetchAllGroupHolding, fetchAllServiceTracker, fetchCompaniesNameByGroupId, updateGroupById, updateGroupStatusById } from '../api/Service';
+import { createGroup, deleteGroupById, fetchAllGroup, fetchAllGroupHolding, fetchAllServiceTracker, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById } from '../api/Service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -55,6 +55,8 @@ const ServiceTrackers = () => {
     const [groupId, setgroupId] = useState(null)
     const [groupHoldingData, setGroupHoldinData] = useState([]);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
+    const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
+
     console.log(current, 'current')
     // Role wise access
     const names = [
@@ -186,9 +188,6 @@ const ServiceTrackers = () => {
         const newIsActive = {
             "IsActive": e.target.checked
         };
-
-
-
         try {
             const response = await updateGroupStatusById(params.data._id, newIsActive);
             const message = response?.message || "Status update successfully"
@@ -251,6 +250,24 @@ const ServiceTrackers = () => {
         }
     }, [current?.group_holdings_id]);
 
+
+    useEffect(() => {
+        const fetchLocationByCompanyId = async () => {
+            try {
+                const data = await getLocationByCompanyId(current?.company_name_id);
+                if (data) {
+                    setLocationNameByCompanyId(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by company_id:", error);
+            }
+        };
+
+        if (current?.company_name_id) {
+            fetchLocationByCompanyId();
+        }
+    }, [current?.company_name_id]);
+
     const crudForm = () => {
         return (
             <div>
@@ -302,7 +319,7 @@ const ServiceTrackers = () => {
                         label="Location"
                         // value={current?.location_name}
                         onChange={(e) => setCurrent((prev) => ({ ...prev, location_name: e.target.value }))}
-                    // names={groupHoldingData}
+                        names={locationNameByCompanyId}
                     // isdisable={isEditing}
                     />
 
@@ -521,7 +538,7 @@ const ServiceTrackers = () => {
                         </button>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+                        <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
 
                     </div>
                 </div>

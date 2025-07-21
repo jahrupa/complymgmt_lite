@@ -15,7 +15,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, fetchAllRole, updateRoleStatusId, fetchCompaniesNameByGroupId, getLocationByCompanyId, deleteRoleById, fetchAllModulesNameByLocationId } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 // import AccountBoxIcon from '@mui/icons-material/CalendarMonth';
@@ -205,12 +205,33 @@ const dummuJsonData = [
 ]
 const RoleManager = () => {
     const [data, setData] = useState(dummuJsonData);
-    const [current, setCurrent] = useState({ user_id: null, role_name: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', desc: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
+    const [current, setCurrent] = useState(
+        {
+            user_id: null,
+            role_name: '',
+            email: '',
+            role_name: '',
+            role_description: '',
+            role_id: null,
+            password: "",
+            status: 'Active',
+            desc: '',
+            access_modules: [],
+            group_holding_name: "",
+            group_holding_id: null,
+            company_name: "",
+            company_id: null,
+            location_name: "",
+            location_id: "",
+            module_name:'',
+            module_id:null,
+        });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
     const [locationName, setLocationName] = useState([])
+    const [moduleName, setModuleName] = useState([])
     const [rolesName, setRolesName] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [userId, setUserId] = useState(null)
@@ -309,11 +330,11 @@ const RoleManager = () => {
     // Handle Delete
     const handleDelete = async (userId) => {
         try {
-            const response = await deleteUserById(userId);
+            const response = await deleteRoleById(userId);
             const message = response?.message || "User deleted successfully";
 
             // Refresh data
-            const updatedData = await fetchAllUser();
+            const updatedData = await fetchAllRole();
             setData(updatedData);
             setIsDeleteModalOpen(false);
 
@@ -350,15 +371,15 @@ const RoleManager = () => {
         setSelectedRows([]); // Clear selected rows after deletion
     };
     // Pagination Logic: Slicing the data to display on the current page
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
+    // const indexOfLastItem = currentPage * itemsPerPage;
+    // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    // const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
 
     // Pagination Button Handler
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    // const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // Total number of pages
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    // const totalPages = Math.ceil(data.length / itemsPerPage);
 
     // Function to open the modal
     const openModal = () => {
@@ -367,6 +388,38 @@ const RoleManager = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
+    };
+    const handleToggleChange = async (e, params) => {
+        const newIsActive = {
+            "IsActive": e.target.checked
+        };
+        try {
+            const response = await updateRoleStatusId(params.data._id, newIsActive);
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to delete company";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllRole();
+        setData(updatedData);
     };
     const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
     const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
@@ -393,17 +446,17 @@ const RoleManager = () => {
         const fetchData = async () => {
             try {
                 const [userData, groupHolding, roleName, companyName, getLocationName] = await Promise.all([
-                    fetchAllUser(),
+                    fetchAllRole(),
                     fetchAllGroupHolding(),
-                    fetchAllUserName(),
-                    fetchAllCompaniesName(),
-                    fetchAllLocationName(),
+                    // fetchAllUserName(),
+                    // fetchAllCompaniesName(),
+                    // fetchAllLocationName(),
                 ]);
                 setData(userData);
                 setGroupHoldingName(groupHolding);
-                setRolesName(roleName)
-                setCompanyName(companyName)
-                setLocationName(getLocationName)
+                // setRolesName(roleName)
+                // setCompanyName(companyName)
+                // setLocationName(getLocationName)
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -411,7 +464,59 @@ const RoleManager = () => {
 
         fetchData();
     }, []);
+    console.log(current?.group_holding_id, 'group_holding_id')
+    useEffect(() => {
+        const fetchCompany = async () => {
+            try {
+                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
+                if (data) {
+                    setCompanyName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch company:", error);
+            }
+        };
 
+        if (current?.group_holding_id) {
+            fetchCompany();
+        }
+    }, [current?.group_holding_id]);
+
+
+    useEffect(() => {
+        const fetchLocationByCompanyId = async () => {
+            try {
+                const data = await getLocationByCompanyId(current?.company_id);
+                if (data) {
+                    setLocationName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by company_id:", error);
+            }
+        };
+
+        if (current?.company_id) {
+            fetchLocationByCompanyId();
+        }
+    }, [current?.company_id]);
+
+useEffect(() => {
+        const fetchModuleByLocationId = async () => {
+            try {
+                const data = await fetchAllModulesNameByLocationId(current?.location_id);
+                if (data) {
+                    setModuleName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by location_id:", error);
+            }
+        };
+
+        if (current?.location_id) {
+            fetchModuleByLocationId();
+        }
+    }, [current?.location_id]);
+    
 
     const getRoleColor = (role) => {
         switch (role) {
@@ -435,7 +540,6 @@ const RoleManager = () => {
             filter: false,
             editable: false,
             width: 130,
-            flex: 1,
             pinned: "left",
             cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
             cellRenderer: (params) => {
@@ -448,7 +552,7 @@ const RoleManager = () => {
                                 setCurrent(params.data);
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setUserId(params.data.id); // OR .user_id based on your data
+                                setUserId(params.data._id); // OR .user_id based on your data
                             }}
                         >
                             <EditIcon fontSize="small" className="action_icon" />
@@ -456,31 +560,19 @@ const RoleManager = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setUserId(params.data.id);
+                                setUserId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
-                        <button
-                            className="btn btn-sm"
-                            onClick={() => {
-                                setUserId(params.data.id);
-                                setIsDeleteModalOpen(true);
-                            }}
-                        >
-                            <VisibilityIcon fontSize="small" className="action_icon" />
-                        </button>
-                        {/* <VisibilityIcon/> */}
                     </div>
                 );
             }
-        }
-        ,
-
-        { field: 'id', headerName: 'ID', flex: 1,editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        },
+        { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
-            field: 'role_name', headerName: 'Role Name',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+            field: 'role_name', headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
             cellRenderer: (params) => {
                 const { background, color } = getRoleColor(params.value);
                 return (
@@ -503,31 +595,30 @@ const RoleManager = () => {
                 );
             }
         },
-        { field: 'access_modules', headerName: 'Access Modules',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'access_modules', headerName: 'Access Modules', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'role_description', headerName: 'Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
-            field: 'status',
             headerName: 'Status',
+            field: 'common_attributes.is_active',
             editable: false,
-            filter: true,
-            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-            cellRenderer: (params) => {
-                const value = params.value;
-                const iconUrl = value === 'Active'
-                    ? "https://www.ag-grid.com/example-assets/icons/tick-in-circle.png"
-                    : "https://www.ag-grid.com/example-assets/icons/cross-in-circle.png";
-
-                return (
-                    <div >
-                        <img src={iconUrl} alt={value} />
-                    </div>
-                );
-            }
+            pinned: "right",
+            valueGetter: (params) => params.data?.common_attributes?.is_active,
+            cellRenderer: (params) => (
+                <Toggle
+                    checked={!!params.value}
+                    onChange={(e) => handleToggleChange(e, params)}
+                />
+            )
         },
-
-
-        { field: 'location_name', headerName: 'Location',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'group_holding_name', headerName: 'Group Holding',flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'company_name', headerName: 'Company Name', flex: 1,editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.approval_time', headerName: 'Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
 
 
     ];
@@ -547,45 +638,12 @@ const RoleManager = () => {
                 {/* <form onSubmit={handleSubmit}> */}
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
                     <MuiTextField label='Role Name' type='text' isRequired={true} fieldName='role_name' handleChange={handleChange} value={current.role_name} />
-                    {/* <MultipleSelectTextFields label='Access Control' value={current.approved_by} onChange={handleRoleAccessChange} names={accessControl} /> */}
-                    {/* <MuiTextField label='email' type='email' isRequired={true} fieldName='email' handleChange={handleChange} value={current.email} /> */}
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-                    <SingleSelectTextField name="access Level" label="Access Level" value={current.access_modules} onChange={(e) => setCurrent((prev) => ({ ...prev, access_modules: e.target.value }))} names={accessLevel} />
-                    <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={accessControl} />
+                    <SingleSelectTextField name="access Level" label="Access Level" value={current.access_modules} onChange={(e) => setCurrent((prev) => ({ ...prev, access_modules: e.target.value }))} names={accessLevel} isdisable={true} />
+                    <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={accessControl} isdisable={true} />
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-                    {/* <SingleSelectTextField name="status" label="status" value={current.status} onChange={(e) => setCurrent((prev) => ({ ...prev, status: e.target.value }))} names={userStatus} /> */}
-                    {/* <PasswordInput name='password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.password} /> */}
-                    {/* <SingleSelectTextField name="role_name" label="role_name" value={current.role_name} onChange={(e) => setCurrent((prev) => ({ ...prev, role_name: e.target.value }))} names={roleName} /> */}
-                    {/* <SingleSelectTextField
-            name="role_name"
-            label="Role"
-            value={current.role_name}
-            onChange={(e) => {
-              const selectedName = e.target.value;
-              const matchedRole = rolesName.find(
-                (g) => g.name === selectedName
-              );
-              setCurrent((prev) => ({
-                ...prev,
-                role_name: selectedName,
-                groups_holdings_id: matchedRole?.id || null,
-              }));
-            }}
-            names={rolesName}
-          /> */}
-                </div>
-                <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-                    {/* <SingleSelectTextField name="User" label="User" value={current.role_name} onChange={(e) => setCurrent((prev) => ({ ...prev, role_name: e.target.value }))} names={userStatus} /> */}
-
-                    {/* <MuiTextField label='User Type' type='text' isRequired={true} fieldName='role_name' handleChange={handleChange} value={current.role_name} /> */}
-                    {/* <MultipleSelectTextFields label='Role Access' value={current.access_modules} onChange={handleRoleAccessChange} names={names} /> */}
-
-                </div>
-
-                <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-                    {/* <SingleSelectTextField name="Group Holding" label="Group Holding" value={current.group_holding_name} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding_name: e.target.value }))} names={userStatus} /> */}
                     <SingleSelectTextField
                         name="group_holding_name"
                         label="Group Holding"
@@ -598,12 +656,11 @@ const RoleManager = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 group_holding_name: selectedName,
-                                groups_holdings_id: matchedGroup?.id || null,
+                                group_holding_id: matchedGroup?._id || null,
                             }));
                         }}
                         names={groupHoldingName}
                     />
-                    {/* <SingleSelectTextField name="Company" label="Company" value={current.company_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_name: e.target.value }))} names={userStatus} /> */}
                     <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
                         onChange={(e) => {
                             const selectedName = e.target.value;
@@ -613,7 +670,7 @@ const RoleManager = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
-                                company_id: matchedCompany?.id || null,
+                                company_id: matchedCompany?._id || null,
                             }));
                         }}
                         names={companyName}
@@ -629,17 +686,65 @@ const RoleManager = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 location_name: selectedName,
-                                location_id: matchedLocation?.id || null,
+                                location_id: matchedLocation?._id || null,
                             }));
                         }}
                         names={locationName}
                         isdisable={isEditing ? true : false}
 
                     />
-                    {/* <SingleSelectTextField name="Location" label="Location" value={current.location_name} onChange={(e) => setCurrent((prev) => ({ ...prev, location_name: e.target.value }))} names={roleName} /> */}
-
                 </div>
-
+                <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
+                    <SingleSelectTextField
+                        name="module_name"
+                        label="Module"
+                        value={current.module_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = moduleName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                module_name: selectedName,
+                                module_id: matchedGroup?._id || null,
+                            }));
+                        }}
+                        names={moduleName}
+                    // error={!!errors.module_name}
+                    // helperText={errors.module_name}
+                    />
+                    <SingleSelectTextField
+                        name="sub_module"
+                        label="Sub Module"
+                        // value={current.group_holding_name}
+                        // onChange={(e) => {
+                        //     const selectedName = e.target.value;
+                        //     const matchedGroup = groupHoldingName.find(
+                        //         (g) => g.name === selectedName
+                        //     );
+                        //     setCurrent((prev) => ({
+                        //         ...prev,
+                        //         group_holding_name: selectedName,
+                        //         group_holding_id: matchedGroup?.id || null,
+                        //     }));
+                        // }}
+                        // names={groupHoldingName}
+                    // error={!!errors.group_holding_name}
+                    // helperText={errors.group_holding_name}
+                    />
+                </div>
+                <div className=''>
+                    <MuiTextAreaField
+                        value={current.role_description}
+                        handleChange={handleChange}
+                        name='role_description'
+                        label='Description'
+                        // error={!!errors.role_description}
+                        // helperText={errors.role_description}
+                        isRequired={true}
+                    />
+                </div>
                 <div className="row row-gap-2">
                     <div className='col col-12 col-md-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -728,7 +833,7 @@ const RoleManager = () => {
                             </button>
                         </div>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
                     </div>
                 </div>
 

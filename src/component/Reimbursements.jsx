@@ -133,7 +133,7 @@ const Reimbursements = () => {
   return (
     <div className="client-onboarding-2">
       {/* Add NavBar if you have it */}
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
 
       <h5>Client Onboarding - 2D_Reimbursements</h5>
       <div className='table_div  p-3'>

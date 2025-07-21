@@ -319,7 +319,7 @@ const AddUser = () => {
               </button>
             </div>
 
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle}closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
 

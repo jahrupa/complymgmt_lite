@@ -14,16 +14,15 @@ import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
+import { createModule, createsLocationToModule, deleteLocationToModuleByStatusId, deleteModuleById, fetchAllGroupHolding, fetchAllModule, fetchAllModulesName, fetchAllModulesNameByLocationId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateModuleById, updateModuleStatusById } from '../api/Service';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
-import { createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById } from '../api/Service';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -31,80 +30,91 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const dummuJsonData = [
     {
         id: 1744096161424,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
+        module_name: "Tata",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161425,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
+        module_name: "Tata",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161426,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
+        module_name: "Tata",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161427,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
+        module_name: "Tata",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161428,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
+        module_name: "Tata",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
+        approved_by: "Admin"
     },
     {
         id: 1744096161429,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
+        module_name: "Tata",
+        module_description: "XYZ",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-
+        approved_by: "Admin"
     },
 ];
 
-const SubModule = () => {
+const LocationToModule = () => {
     // const [data, setData] = useState([]);
     // if you want to show dummy jason data 
     const [data, setData] = useState(dummuJsonData);
-    const [current, setCurrent] = useState({ id: null, sub_module_name: '', sub_module_description: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: '', module_name: '', module_id: null });
+    const [current, setCurrent] = useState(
+        {
+            id: null,
+            module_description: '',
+            created_at: '',
+            updated_at: '',
+            desc: '',
+            approved_by: '',
+            group_name: "",
+            group_holdings_id: null,
+            company_name: "",
+            company_id: null,
+            location_name: "",
+            location_id: null,
+            module_name: '',
+            module_id: null,
+        });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [subModuleId, setSubModuleId] = useState(null)
-    const [moduleId, setModuleId] = useState(null)
-    // console.log(moduleId, subModuleId, 'subModuleId')
-    const [errors, setErrors] = useState({});
+    const [id, setId] = useState(null)
+    // console.log(id, 'id')
+    const [groupHoldingName, setGroupHoldingName] = useState([])
+    const [companyName, setCompanyName] = useState([])
+    const [locationName, setLocationName] = useState([])
+    const [moduleName, setModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -112,35 +122,16 @@ const SubModule = () => {
         message: '',
         severityType: '',
     });
-    const [moduleName, setModuleName] = useState([]);
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
 
-
-    // Handle input change
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCurrent((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const validate = () => {
-        let tempErrors = {};
-        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub-Module Name is required";
-        if (!current?.sub_module_description) tempErrors.sub_module_description = "Description is required";
-        if (!current?.module_name) tempErrors.module_name = "Select Module Name";
-
-        setErrors(tempErrors);
-        return Object.keys(tempErrors).length === 0;
-    };
-
     const handleSubmit = async (e) => {
-        e?.preventDefault();
-        if (!validate()) return; // Don't proceed if validation fails
+        // e?.preventDefault();
         const payload = {
-            "SubModuleName": current.sub_module_name,
-            "SubModuleDescription": current.sub_module_description,
-            ModuleID: current.module_id,
+            "CompanyID": current?.company_id,
+            "LocationID": current?.location_id,
+            "ModuleID": current?.module_id,
             "CommonAttributes": {
                 "Created_By": "68480959d7038d326905b02c"
             }
@@ -150,105 +141,60 @@ const SubModule = () => {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateSubModuleById(subModuleId, {
-                    "SubModuleName": current.sub_module_name,
-                    "SubModuleDescription": current.sub_module_description,
-                    ModuleID: current.module_id,
+                response = await updateLocationToModuleById(id, {
+                    "CompanyID": current?.company_id,
+                    "LocationID": current?.location_id,
+                    "ModuleID": current?.module_id,
                     "CommonAttributes": {
                         "Updated_By": "68480959d7038d326905b02c"
                     }
                 });
             } else {
                 // Create new company
-                response = await createsSubModule(payload);
+                response = await createsLocationToModule(payload);
             }
-            const message = response?.message;
 
             // ✅ Get the message from response
+            const message = response?.message;
             // Set snackbar with message
             // setSnackbarMessage(message); // You'll need this state
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
             // Refresh data
-            const updatedData = await fetchAllSubModule();
+            const updatedData = await fetchLocationToModuleModule();
             setData(updatedData);
         } catch (error) {
-            // const message = response?.message;
-
-            // console.error("Error saving company:", error);
+            let errorMessage = error?.response?.data?.message
+            console.error("Error saving company:", error?.response?.data?.message);
             // setSnackbarMessage("Failed to save company");
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: errorMessage, severityType: 'error' });
         }
 
         // Reset form state
         setCurrent({
-            _id: null,
-            module_name: '', module_description: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: ''
+            group_name: "",
+            group_holdings_id: null,
+            company_name: "",
+            company_id: null,
+            location_name: "",
+            location_id: null,
+            module_name: '',
+            module_id: null,
         });
-
         setIsEditing(false);
         setIsModalOpen(false);
-        setErrors({}); // ✅ Reset errors after submission
-
-    };
-    // Handle Delete
-    // const handleDelete = (id) => {
-    //     setIsDeleteModalOpen(false)
-    //     const filteredData = data.filter((item) => item.id !== id);
-    //     setData(filteredData);
-    //     setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
-    // };
-
-        const handleDelete = async (id) => {
-            try {
-                const response = await deleteSubModuleById(id);
-                const message = response?.message || "Company deleted successfully";
-    
-                // Refresh data
-                const updatedData = await fetchAllSubModule();
-                setData(updatedData);
-                setIsDeleteModalOpen(false);
-    
-                // Show success snackbar
-                setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message,
-                    severityType: 'success',
-                });
-            } catch (error) {
-                console.error("Error deleting company:", error);
-    
-                // Extract error message safely
-                const errorMessage =
-                    error?.response?.data?.message ||
-                    error?.message ||
-                    "Failed to delete company";
-    
-                // Show error snackbar
-                setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: errorMessage,
-                    severityType: 'error',
-                });
-            }
-        };
-    // Function to open the modal
-    const openModal = () => {
-        setIsModalOpen(true);
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-  const handleToggleChange = async (e, params) => {
-        const newIsActive = {
-            "IsActive": e.target.checked
-        };
+    const handleDelete = async (id) => {
         try {
-            const response = await updateSubModuleStatusById(params.data._id, newIsActive);
-            const message = response?.message || "Status update successfully"
+            const response = await deleteLocationToModuleByStatusId(id);
+            const message = response?.message || "Module deleted successfully";
+
+            // Refresh data
+            const updatedData = await fetchLocationToModuleModule();
+            setData(updatedData);
+            setIsDeleteModalOpen(false);
+
             // Show success snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -257,11 +203,10 @@ const SubModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete company";
+                "Failed to delete";
 
             // Show error snackbar
             setIsSnackbarsOpen({
@@ -271,71 +216,168 @@ const SubModule = () => {
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllSubModule();
-        setData(updatedData);
     };
+
+
+    // Function to open the modal
+    const openModal = () => {
+        setIsModalOpen(true);
+        setIsEditing(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setIsEditing(false);
+        setCurrent({
+            group_name: "",
+            group_holdings_id: null,
+            company_name: "",
+            company_id: null,
+            location_name: "",
+            location_id: null,
+            module_name: '',
+            module_id: null,
+        });
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [locationToModuleData, groupHolding, moduleName] = await Promise.all([
+                    fetchLocationToModuleModule(),
+                    fetchAllGroupHolding(),
+                    fetchAllModulesName(),
+                ]);
+                setData(locationToModuleData);
+                setGroupHoldingName(groupHolding);
+                setModuleName(moduleName);
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+    useEffect(() => {
+        const fetchCompany = async () => {
+            try {
+                const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+                if (data) {
+                    setCompanyName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch company:", error);
+            }
+        };
+
+        if (current?.group_holdings_id) {
+            fetchCompany();
+        }
+    }, [current?.group_holdings_id]);
+
+    useEffect(() => {
+        const fetchLocationByCompanyId = async () => {
+            try {
+                const data = await getLocationByCompanyId(current?.company_id);
+                if (data) {
+                    setLocationName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by company_id:", error);
+            }
+        };
+
+        if (current?.company_id) {
+            fetchLocationByCompanyId();
+        }
+    }, [current?.company_id]);
+
     const crudForm = () => {
         return (
             <div>
-                {/* <form onSubmit={handleSubmit}> */}
-                <div>
-                    <MuiTextField
-                        error={!!errors.sub_module_name}
-                        helperText={errors.sub_module_name}
-                        isRequired={true}
-                        label='Sub Module Name'
-                        type='text'
-                        fieldName='sub_module_name'
-                        handleChange={handleChange}
-                        value={current.sub_module_name} />
+                <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
+                    <SingleSelectTextField
+                        name="group_name"
+                        label="Group Holding"
+                        value={current.group_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = groupHoldingName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                group_name: selectedName,
+                                group_holdings_id: matchedGroup?._id || null,
+                                company_name: '',
+                                location_name: '',
+                            }));
+                        }}
+                        names={groupHoldingName}
+                    />
+                    <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedCompany = companyName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                company_name: selectedName,
+                                company_id: matchedCompany?._id || null,
+                            }));
+                        }}
+                        names={companyName}
+                    // isdisable={isEditing ? true : false}
 
-                    {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
+                    />
+                    <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedLocation = locationName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                location_name: selectedName,
+                                location_id: matchedLocation?._id || null,
+                            }));
+                        }}
+                        names={locationName}
+                    // isdisable={isEditing ? true : false}
 
-                </div>
-                <div className=''>
-                    <MuiTextAreaField
-                        value={current.sub_module_description}
-                        handleChange={handleChange}
-                        name='sub_module_description'
-                        label='Sub Module Description'
-                        error={!!errors.sub_module_description}
-                        helperText={errors.sub_module_description}
-                        isRequired={true}
                     />
                 </div>
-                <div>
-                    {/* <SingleSelectTextField name="module_name" label="Module" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value ,module_id:''}))} names={moduleName} /> */}
+                <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
                     <SingleSelectTextField
                         name="module_name"
                         label="Module"
                         value={current.module_name}
-                        isRequired={true}
                         onChange={(e) => {
                             const selectedName = e.target.value;
-                            const matchedModule = moduleName.find((m) => m.name === selectedName) || {};
+                            const matchedGroup = moduleName.find(
+                                (g) => g.name === selectedName
+                            );
                             setCurrent((prev) => ({
                                 ...prev,
                                 module_name: selectedName,
-                                module_id: matchedModule._id || ''
+                                module_id: matchedGroup?._id || null,
+
                             }));
                         }}
                         names={moduleName}
-                        error={!!errors.module_name}
-                        helperText={errors.module_name}
+                    // error={!!errors.module_name}
+                    // helperText={errors.module_name}
                     />
-
                 </div>
-                {/* <div>
-                    <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
-
-                </div> */}
 
                 <div className="row row-gap-2">
                     <div className='col col-12 col-md-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
                     <div className='col col-12 col-md-6 d-flex justify-content-end'>
-                        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create SubModule</span>}</button>
+                        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Tag Module</span>}</button>
                     </div>
                 </div>
                 {/* </form> */}
@@ -344,14 +386,13 @@ const SubModule = () => {
         )
 
     }
-    const crudTitle = "Add New SubModule"
-    const editCrudTitle = "Edit SubModule"
-
+    const crudTitle = "Tag Module To Location"
+    const editCrudTitle = "Edit Taged Module"
     const deleteModal = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this Sub Module?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Taged Module?
                 </div>
 
                 <div className="row row-gap-2 mt-4">
@@ -361,7 +402,7 @@ const SubModule = () => {
                     <div className='col col-12 col-md-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
-                            onClick={() => handleDelete(subModuleId)}>Yes, I'm sure</button>
+                            onClick={() => handleDelete(id)}>Yes, I'm sure</button>
                     </div>
                 </div>
             </div>
@@ -386,6 +427,39 @@ const SubModule = () => {
         }
     };
 
+    const handleToggleChange = async (e, params) => {
+        const newIsActive = {
+            "IsActive": e.target.checked
+        };
+        try {
+            const response = await updateLocationToModuleByStatusId(params.data._id, newIsActive);
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            // console.error("Error:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update status";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchLocationToModuleModule();
+        setData(updatedData);
+    };
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -393,6 +467,7 @@ const SubModule = () => {
             filter: false,
             editable: false,
             width: 130,
+
             pinned: "left",
             cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
             cellRenderer: (params) => {
@@ -405,8 +480,7 @@ const SubModule = () => {
                                 setCurrent(params.data);
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setSubModuleId(params.data._id); // OR .user_id based on your data
-                                setModuleId(params.data.module_id)
+                                setId(params.data._id); // OR .user_id based on your data
                             }}
                         >
                             <EditIcon fontSize="small" className="action_icon" />
@@ -414,22 +488,12 @@ const SubModule = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setSubModuleId(params.data._id);
+                                setId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
-                        <button
-                            className="btn btn-sm"
-                            onClick={() => {
-                                setSubModuleId(params.data._id);
-                                setIsDeleteModalOpen(true);
-                            }}
-                        >
-                            <VisibilityIcon fontSize="small" className="action_icon" />
-                        </button>
-                        {/* <VisibilityIcon/> */}
                     </div>
                 );
             }
@@ -437,10 +501,8 @@ const SubModule = () => {
         ,
 
         { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'module_name', headerName: 'Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
         {
-            field: 'approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+            field: 'approved_by', headerName: 'approved by', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
             cellRenderer: (params) => {
                 const { background, color } = getRoleColor(params.value);
                 return (
@@ -463,15 +525,29 @@ const SubModule = () => {
                 );
             }
         },
-        { field: 'sub_module_name', headerName: 'Sub-Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'sub_module_description', headerName: 'Sub-Module Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'sub_module_id', headerName: 'Sub-Module Access', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'module_name', headerName: 'Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            field: 'group_name',
+            headerName: 'Group Holding',
+            editable: true,
+            filter: true,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+        },
+        {
+            field: 'company_name',
+            headerName: 'Company Name',
+            editable: true,
+            filter: true,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+        },
+
+        { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-{
+        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
+        {
             headerName: 'Status',
             field: 'common_attributes.is_active',
             editable: false,
@@ -483,7 +559,7 @@ const SubModule = () => {
                     onChange={(e) => handleToggleChange(e, params)}
                 />
             )
-        },
+        }
 
     ];
     const gridRef = useRef();
@@ -497,25 +573,11 @@ const SubModule = () => {
         console.log('Row updated:', event.data);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [subModuleData, moduleNameList] = await Promise.all([
-                    fetchAllSubModule(),
-                    fetchAllModulesName(),
-                ]);
-                setData(subModuleData);
-                setModuleName(moduleNameList)
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        fetchData();
-    }, []);
     return (
         <div>
+            <div className='mb-4'>
+                <h5>Location To Module</h5>
+            </div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
@@ -528,11 +590,11 @@ const SubModule = () => {
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div className='pe-2'>
                             <button className='crud_btn' onClick={openModal}>
-                                <span><AddIcon /></span> <span className='button-style'>Add New SubModule</span>
+                                <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
                             </button>
                         </div>
+                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
@@ -555,4 +617,4 @@ const SubModule = () => {
     );
 };
 
-export default SubModule;
+export default LocationToModule;

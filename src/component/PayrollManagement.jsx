@@ -162,7 +162,7 @@ const PayrollManagement = () => {
 
   return (
     <div className="client-onboarding-2">
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
 
       <h5>Client Onboarding - 2E_Payroll_Management</h5>
 

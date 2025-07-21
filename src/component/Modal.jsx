@@ -1,8 +1,8 @@
 // Modal Component
-const Modal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,isEditing }) => {
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+const Modal = ({ crudForm, crudTitle, isModalOpen, editCrudTitle,isEditing,closeModal }) => {
+  // const closeModal = () => {
+  //   setIsModalOpen(false);
+  // };
 
   return (
     <div>

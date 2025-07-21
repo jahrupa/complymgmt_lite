@@ -134,7 +134,7 @@ const OnbardingPayrollCompliance = () => {
   return (
     <div className="client-onboarding-2">
       {/* Add NavBar if you have it */}
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Modal crudForm={crudForm}closeModal={closeModal} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
 
       <h5>Client Onboarding - 2B Payroll Compliance</h5>
       <div className='table_div  p-3'>

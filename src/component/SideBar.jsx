@@ -39,6 +39,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
         { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'module_by_location' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onboarding', link: 'onboarding' },
@@ -51,7 +52,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
         { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
-        { icon: (active) => <Cable  className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
+        { icon: (active) => <Cable className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
 
 
     ];
@@ -66,7 +67,6 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
 
     return (
         <div>
-
             <div className={`${sidebarOpen ? "sidebar sidebar-open" : "sidebar sidebar-close"}`}>
                 <div>
                     <div className={`${sidebarOpen ? 'd-flex open-sidebar-wrap open-sidebar-logo-wrap ' : 'd-flex close-sidebar-logo-wrap'}`} style={{ alignItems: 'center', marginBottom: 29 }}>

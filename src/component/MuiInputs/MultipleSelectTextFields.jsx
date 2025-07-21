@@ -21,7 +21,7 @@ const MenuProps = {
 };
 
 
-export default function MultipleSelectTextFields({ value, onChange,names,label }) {
+export default function MultipleSelectTextFields({ value, onChange,names,label,isdisable }) {
   const theme = useTheme();
 
 
@@ -40,19 +40,20 @@ export default function MultipleSelectTextFields({ value, onChange,names,label }
         labelId="demo-multiple-chip-label"
         id="demo-multiple-chip"
         multiple
-        value={value}
+        value={value || []}
+        disabled={isdisable}
         onChange={(e) => onChange(e.target.value)}
         input={<OutlinedInput id="select-multiple-chip" label={label} />}
         renderValue={(selected) => (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {selected.map((value) => (
+            {selected?.map((value) => (
               <Chip key={value} label={value} />
             ))}
           </Box>
         )}
         MenuProps={MenuProps}
       >
-        {names.map((name) => (
+        {names?.map((name) => (
           <MenuItem key={name} value={name} style={getStyles(name, value, theme)}>
             {name}
           </MenuItem>

@@ -144,7 +144,7 @@ const Onbarding = () => {
 
   return (
     <div className="client-onboarding">
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
 
       <h5>Client Onboarding</h5>
       <div className='table_div  p-3'>

@@ -19,6 +19,7 @@
     "@mui/x-data-grid": "^8.0.0",
     "@mui/x-date-pickers": "^8.5.1",
     "ag-grid-react": "^33.3.0",
+    "apexcharts": "^5.2.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "dayjs": "^1.11.13",
