@@ -50,7 +50,8 @@ import {
   UPDATE_LOCATION_TO_MODULE_BY_ID,
   GET_ALL_LOCATION_TO_MODULE,
   UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID,
-  DELETE_LOCATION_TO_MODULE_BY_ID
+  DELETE_LOCATION_TO_MODULE_BY_ID,
+  GET_SUB_MODULE_NAME_BY_MODULE_ID
 
 } from "./Endpoint";
 // Login Api
@@ -473,6 +474,15 @@ export const fetchAllSubModule = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching sub Module:", error);
+    throw error;
+  }
+};
+export const fetchAllSubModuleNameByModuleId = async (id) => {
+  try {
+    const response = await API.get(`${GET_SUB_MODULE_NAME_BY_MODULE_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sub Module name by module id:", error);
     throw error;
   }
 };

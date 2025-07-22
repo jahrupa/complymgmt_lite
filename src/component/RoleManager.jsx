@@ -15,7 +15,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, fetchAllRole, updateRoleStatusId, fetchCompaniesNameByGroupId, getLocationByCompanyId, deleteRoleById, fetchAllModulesNameByLocationId } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, fetchAllRole, updateRoleStatusId, fetchCompaniesNameByGroupId, getLocationByCompanyId, deleteRoleById, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 // import AccountBoxIcon from '@mui/icons-material/CalendarMonth';
@@ -223,8 +223,10 @@ const RoleManager = () => {
             company_id: null,
             location_name: "",
             location_id: "",
-            module_name:'',
-            module_id:null,
+            module_name: '',
+            module_id: null,
+            sub_module_name: '',
+            sub_module_id: null,
         });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
@@ -232,6 +234,7 @@ const RoleManager = () => {
     const [companyName, setCompanyName] = useState([])
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
+    const [SubModuleName, setSubModuleName] = useState([])
     const [rolesName, setRolesName] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [userId, setUserId] = useState(null)
@@ -268,21 +271,24 @@ const RoleManager = () => {
         // e?.preventDefault();
 
         const payload = {
-            "Name": "Rupa Jha",
-            "Email": current?.email,
-            "MobileNumber": "2345876543",
-            "IsKarma": false,
-            "Username": current?.role_name,
-            "Password": current?.password,
-            "IsActive": true,
-            "CreatedBy": 1
-        };
+            "RoleName": current?.role_name,
+            "RoleDescription": current?.role_description,
+            "CommonAttributes": {
+                "Created_By": "68480959d7038d326905b02c"
+            }
+        }
 
         try {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateUserById(userId, payload);
+                response = await updateUserById(userId, {
+                    "RoleName": current?.role_name,
+                    "RoleDescription": current?.role_description,
+                    "CommonAttributes": {
+                        "Updated_By": "68480959d7038d326905b02c"
+                    }
+                });
             } else {
                 // Create new company
                 response = await createUser(payload);
@@ -464,7 +470,9 @@ const RoleManager = () => {
 
         fetchData();
     }, []);
-    console.log(current?.group_holding_id, 'group_holding_id')
+    // console.log(current?.group_holding_id, 'group_holding_id')
+
+    // company by group id
     useEffect(() => {
         const fetchCompany = async () => {
             try {
@@ -482,7 +490,7 @@ const RoleManager = () => {
         }
     }, [current?.group_holding_id]);
 
-
+    // Location by company id
     useEffect(() => {
         const fetchLocationByCompanyId = async () => {
             try {
@@ -500,7 +508,8 @@ const RoleManager = () => {
         }
     }, [current?.company_id]);
 
-useEffect(() => {
+    // module by location id
+    useEffect(() => {
         const fetchModuleByLocationId = async () => {
             try {
                 const data = await fetchAllModulesNameByLocationId(current?.location_id);
@@ -516,7 +525,24 @@ useEffect(() => {
             fetchModuleByLocationId();
         }
     }, [current?.location_id]);
-    
+    // sub-module by module id
+    useEffect(() => {
+        const fetchSubModuleByModuleId = async () => {
+            try {
+                const data = await fetchAllSubModuleNameByModuleId(current?.module_id);
+                if (data) {
+                    setSubModuleName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by location_id:", error);
+            }
+        };
+
+        if (current?.module_id) {
+            fetchSubModuleByModuleId();
+        }
+    }, [current?.module_id]);
+
 
     const getRoleColor = (role) => {
         switch (role) {
@@ -715,21 +741,21 @@ useEffect(() => {
                     // helperText={errors.module_name}
                     />
                     <SingleSelectTextField
-                        name="sub_module"
+                        name="sub_module_name"
                         label="Sub Module"
-                        // value={current.group_holding_name}
-                        // onChange={(e) => {
-                        //     const selectedName = e.target.value;
-                        //     const matchedGroup = groupHoldingName.find(
-                        //         (g) => g.name === selectedName
-                        //     );
-                        //     setCurrent((prev) => ({
-                        //         ...prev,
-                        //         group_holding_name: selectedName,
-                        //         group_holding_id: matchedGroup?.id || null,
-                        //     }));
-                        // }}
-                        // names={groupHoldingName}
+                        value={current.sub_module_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = SubModuleName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                sub_module_name: selectedName,
+                                sub_module_id: matchedGroup?._id || null,
+                            }));
+                        }}
+                        names={SubModuleName}
                     // error={!!errors.group_holding_name}
                     // helperText={errors.group_holding_name}
                     />
@@ -833,7 +859,7 @@ useEffect(() => {
                             </button>
                         </div>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
+                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
                     </div>
                 </div>
 

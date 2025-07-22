@@ -4,6 +4,8 @@ import Modal from '../component/Modal'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import StatsCards from '../component/StatsCards';
+import Donut from '../component/charts/Donut';
+import StackedBar from '../component/charts/StackedBar';
 
 const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,7 +38,7 @@ const DashboardPage = () => {
               id="upload"
               type="file"
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            onChange={handleFileChange} // Handle file change event
+              onChange={handleFileChange} // Handle file change event
             />
           </div>
           {fileName ? <div className='mt-4 uploaded_file_name'><span ><FilePresentIcon /></span><span>{fileName}</span> </div> : <div className='mt-4  not_uploaded_file_text'><span><FilePresentIcon /></span>File is not uploaded </div>}
@@ -59,20 +61,28 @@ const DashboardPage = () => {
   const crudTitle = "Upload File"
   return (
     <div>
-      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
-      <div className=' d-flex justify-content-end'>
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
+      {/* <div className=' d-flex justify-content-end'>
         <button className='w-auto upload_btn' onClick={openModal}>Upload File</button>
-      </div>
+      </div> */}
       <div className='mb-4 d-flex'>
+        {/* <span className='v-line me-1 mt-1'></span>
         <span className='v-line me-1 mt-1'></span>
-        <span className='v-line me-1 mt-1'></span>
-        <span className='v-line me-1 mt-1'></span>
-        <span className='dashboard-heading ms-2'>CEO Dashboard</span>
+        <span className='v-line me-1 mt-1'></span> */}
+        <span className='dashboard-heading ms-2'>Dashboard</span>
       </div>
       <div>
-      <StatsCards/>
+        <StatsCards />
       </div>
-      <div className='row'>
+      <div className=' stats-grid'>
+        <div className='stat-card '>
+          <Donut />
+        </div>
+        <div className='stat-card '>
+          <StackedBar />
+        </div>
+      </div>
+      {/* <div className='row'>
         <div className='col-4 col-md-4'>
           <div className='white-card mb-3'>
             <div className='p-3'>
@@ -122,7 +132,7 @@ const DashboardPage = () => {
           <div className='white-card mb-3'>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

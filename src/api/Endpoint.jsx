@@ -63,6 +63,8 @@ export const CREATE_SUB_MODELE='/create_submodule';
 export const UPDATE_SUB_MODULE_BY_ID='/update_submodule_by_id/';
 export const DELETE_SUB_MODULE_BY_ID='/delete_submodule_by_id/';
 export const UPDATE_SUB_MODULE_STATUS_BY_ID='/update_submodule_status_by_id/';
+export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/view_submodules_names_by_modulesID/';
+
 
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/view_all_service_tracker';
