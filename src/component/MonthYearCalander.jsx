@@ -4,10 +4,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-export default function MonthYearCalander() {
+export default function MonthYearCalander({label,views}) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
+        // label={'"year", "month" and "day"'}
+        // views={['year', 'month', 'day']}
         slotProps={{
           textField: {
             sx: {
@@ -35,7 +37,7 @@ export default function MonthYearCalander() {
                 letterSpacing: 'inherit',
                 width: '182px',
               },
-              '& .css-1y4gq5a-MuiPickersSectionList-root-MuiPickersInputBase-sectionsContainer-MuiPickersOutlinedInput-sectionsContainer':{
+              '& .css-1y4gq5a-MuiPickersSectionList-root-MuiPickersInputBase-sectionsContainer-MuiPickersOutlinedInput-sectionsContainer': {
                 direction: 'ltr',
                 padding: '6.5px 0 !important',
                 fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -46,7 +48,10 @@ export default function MonthYearCalander() {
                 overflow: 'hidden',
                 letterSpacing: 'inherit',
                 width: '135px',
-              }
+              },
+              '& .css-19qnlrw-MuiFormLabel-root-MuiInputLabel-root': {
+                top: '-8px',
+              },
             },
           },
         }}

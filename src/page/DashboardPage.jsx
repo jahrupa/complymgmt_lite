@@ -6,9 +6,15 @@ import FilePresentIcon from '@mui/icons-material/FilePresent';
 import StatsCards from '../component/StatsCards';
 import Donut from '../component/charts/Donut';
 import StackedBar from '../component/charts/StackedBar';
+import NotificationPage from '../component/notification/NotificationPage';
 
 const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  //  const [showNotifications, setShowNotifications] = useState(false);
+  //    if (showNotifications) {
+  //   return <NotificationPage onBack={() => setShowNotifications(false)} />;
+  // }
+
   const openModal = () => {
     setIsModalOpen(true);
   };

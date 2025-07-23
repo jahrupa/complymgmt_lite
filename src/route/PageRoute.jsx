@@ -33,6 +33,7 @@ import UserProfilePage from '../page/UserProfilePage.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
 import ModuleTracker from '../page/ModuleTracker.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
+import NotificationPage from '../component/notification/NotificationPage.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(true)
@@ -182,6 +183,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/module_by_location" element={<LocationToModule />} />
+            <Route path="/notification" element={<NotificationPage />} />
           </Route>
         </Route>
 
