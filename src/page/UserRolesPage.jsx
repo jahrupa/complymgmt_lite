@@ -4,21 +4,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import PasswordInput from '../component/MuiInputs/PasswordInput';
-import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
 import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, updateUserStatusId } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
-
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -28,112 +22,15 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-
-const dummuJsonData = [
-  {
-    "id": 1744096161424,
-    "full_name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": "Active",
-    "group_holding": "Tata",
-    "company_name": 'xyz',
-    "location": "Mumbai",
-    "password": "password12",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
-  },
-  {
-    "id": 1744096161425,
-    "full_name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": "Inactive",
-    "password": "password12",
-    "group_holding": "Tata",
-    "company_name": 'xyz',
-    "location": "Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
-  },
-  {
-    "id": 1744096161426,
-    "full_name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": "Active",
-    "password": "password12",
-    "group_holding": "Tata",
-    "company_name": 'xyz',
-    "location": "Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
-  },
-  {
-    "id": 1744096161427,
-    "full_name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": "Inactive",
-    "password": "password12",
-    "group_holding": "Tata",
-    "company_name": 'xyz',
-    "location": "Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
-  },
-  {
-    "id": 1744096161428,
-    "full_name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": "Active",
-    "password": "password12",
-    "group_holding": "Tata",
-    "company_name": 'xyz',
-    "location": "Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
-  },
-  {
-    "id": 1744096161429,
-    "full_name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": "Inactive",
-    "password": "password12",
-    "group_holding": "Tata",
-    "company_name": 'xyz',
-    "location": "Mumbai",
-    "access_modules": [
-      "Admin",
-      "Editor"
-    ]
-  },
-]
-
 const UserRolesPage = () => {
-  // const [data, setData] = useState(dummuJsonData);
-  // if you want to show dummy jason data 
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState({ user_id: null, full_name: '', username: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', user_description: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [groupHoldingName, setGroupHoldingName] = useState([])
-  const [companyName, setCompanyName] = useState([])
-  const [locationName, setLocationName] = useState([])
-  const [rolesName, setRolesName] = useState([])
-  console.log(rolesName, groupHoldingName, 'rolesName')
+  // const [groupHoldingName, setGroupHoldingName] = useState([])
+  // const [companyName, setCompanyName] = useState([])
+  // const [locationName, setLocationName] = useState([])
+  // const [rolesName, setRolesName] = useState([])
+  // console.log(rolesName, groupHoldingName, 'rolesName')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -144,48 +41,29 @@ const UserRolesPage = () => {
     message: '',
     severityType: '',
   });
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // You can adjust the number of items per page
-  // Role wise access
-  const names = [
-    'Create',
-    'Editor',
-    'Viewer',
-    'Delete',
-    'All'
-  ];
-
+  const [errors, setErrors] = useState({});
+  const validate = () => {
+    let tempErrors = {};
+    if (!current?.full_name) tempErrors.full_name = "Full name is required";
+    if (!current?.email) tempErrors.email = "Email is required";
+    if (!current?.username) tempErrors.username = "Username is required";
+    if (!current?.password) tempErrors.password = "Password is required";
+    if (!current?.user_description) tempErrors.user_description = "Description is required";
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+  
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrent((prev) => ({ ...prev, [name]: value }));
+    // Clear error on change
+    setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
   };
-  // Handle role_name access change
-  const handleRoleAccessChange = (newValue) => {
-    setCurrent((prev) => ({ ...prev, access_modules: newValue }));
-  };
-  // Handle Add or Edit
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (isEditing) {
-  //     const updatedData = data.map((item) =>
-  //       item.id === current.id ? { ...item, full_name: current.full_name, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules } : item
-  //     );
-  //     setData(updatedData);
-  //   } else {
-  //     const newData = { id: Date.now(), full_name: current.full_name, email: current.email, role_name: current.role_name, password: current.password, group_holding: current.group_holding, company_name: current.company_name, location: current.location, status: current.status, desc: current.desc, access_modules: current.access_modules };
-  //     setData((prev) => [...prev, newData]);
-  //   }
-  //   setCurrent({ id: null, full_name: '', email: '', role_name: '', password: '', group_holding: '', company_name: '', location: '', status: '', desc: '', access_modules: [] });
-  //   setIsEditing(false);
-  //   setIsModalOpen(false);
-
-  // };
-
+  
   const handleSubmit = async (e) => {
-    // e?.preventDefault();
-
+    e?.preventDefault();
+    if (!validate()) return; // Don't proceed if validation fails
     const payload = {
       "FullName": current?.full_name,
       "Email": current.email,
@@ -208,9 +86,9 @@ const UserRolesPage = () => {
         response = await createUser(payload);
       }
 
-      // ✅ Get the message from response
+      //  Get the message from response
       const message = response?.message;
-      console.log(message, 'message')
+      // console.log(message, 'message')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
@@ -236,23 +114,6 @@ const UserRolesPage = () => {
     setIsEditing(false);
     setIsModalOpen(false);
   };
-
-  // Handle Edit
-  const handleEdit = (user_id) => {
-    const item = data.find((item) => item.user_id === user_id);
-    setCurrent(item);
-    setIsEditing(true);
-    setIsModalOpen(true);
-    setUserId(user_id)
-
-  };
-
-  // Handle Delete
-  // const handleDelete = (id) => {
-  //   const filteredData = data.filter((item) => item.id !== id);
-  //   setData(filteredData);
-  //   setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
-  // };
 
   // Handle Delete
   const handleDelete = async (userId) => {
@@ -291,43 +152,6 @@ const UserRolesPage = () => {
     }
   };
 
-  // Handle Delete All Selected
-  const handleDeleteAll = () => {
-    const filteredData = data.filter((item) => !selectedRows.includes(item.id));
-    setData(filteredData);
-    setSelectedRows([]); // Clear selected rows after deletion
-  };
-
-  // Handle Select All checkbox
-  const handleSelectAll = (e) => {
-    if (e.target.checked) {
-      const allIds = data.map((item) => item.id);
-      setSelectedRows(allIds);
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  // Handle individual row checkbox
-  const handleCheckboxChange = (e, id) => {
-    if (e.target.checked) {
-      setSelectedRows([...selectedRows, id]);
-    } else {
-      setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
-    }
-  };
-
-  // Pagination Logic: Slicing the data to display on the current page
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Pagination Button Handler
-  // const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Total number of pages
-  // const totalPages = Math.ceil(data.length / itemsPerPage);
-
   // Function to open the modal
   const openModal = () => {
     setIsModalOpen(true);
@@ -335,9 +159,9 @@ const UserRolesPage = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setErrors({});
   };
-  const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
-  const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -349,11 +173,11 @@ const UserRolesPage = () => {
           fetchAllLocationName(),
         ]);
         setData(userData);
-        console.log(data, 'data')
-        setGroupHoldingName(groupHolding);
-        setRolesName(roleName)
-        setCompanyName(companyName)
-        setLocationName(getLocationName)
+        // console.log(data, 'data')
+        // setGroupHoldingName(groupHolding);
+        // setRolesName(roleName)
+        // setCompanyName(companyName)
+        // setLocationName(getLocationName)
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -367,94 +191,57 @@ const UserRolesPage = () => {
   const crudForm = () => {
     return (
       <div>
-        {/* <form onSubmit={handleSubmit}> */}
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-          <MuiTextField label='Full Name' type='text' isRequired={true} fieldName='full_name' handleChange={handleChange} value={current.full_name} />
-          <MuiTextField label='email' type='email' isRequired={true} fieldName='email' handleChange={handleChange} value={current.email} />
+          <MuiTextField
+            label='Full Name'
+            type='text'
+            isRequired={true}
+            fieldName='full_name'
+            handleChange={handleChange}
+            value={current.full_name}
+            error={!!errors.full_name}
+            helperText={errors.full_name}
+          />
+          <MuiTextField
+            label='email'
+            type='email'
+            isRequired={true}
+            fieldName='email'
+            handleChange={handleChange}
+            value={current.email}
+            error={!!errors.email}
+            helperText={errors.email}
+          />
         </div>
         <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          <PasswordInput name='password' label="Temporary Password" isRequired={true} handleChange={handleChange} value={current.password} />
-          {/* <SingleSelectTextField
-            name="role_name"
-            label="Role"
-            value={current.role_name}
-            onChange={(e) => {
-              const selectedName = e.target.value;
-              const matchedRole = rolesName.find(
-                (g) => g.name === selectedName
-              );
-              setCurrent((prev) => ({
-                ...prev,
-                role_name: selectedName,
-
-              }));
-            }}
-            names={rolesName}
-          /> */}
-          <MuiTextField label='UserName' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} />
-
+          <PasswordInput
+            name='password'
+            label="Temporary Password"
+            isRequired={true}
+            handleChange={handleChange}
+            value={current.password}
+            error={!!errors.password}
+            helperText={errors.password}
+          />
+          <MuiTextField
+            label='UserName'
+            type='text'
+            isRequired={true}
+            fieldName='username'
+            handleChange={handleChange}
+            value={current.username}
+            error={!!errors.username}
+            helperText={errors.username}
+          />
         </div>
-        {/* <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-          <SingleSelectTextField
-            name="group_holding_name"
-            label="Group Holding"
-            value={current.group_holding_name}
-            onChange={(e) => {
-              const selectedName = e.target.value;
-              const matchedGroup = groupHoldingName.find(
-                (g) => g.name === selectedName
-              );
-              // console.log(matchedGroup,'matchedGroup')
-              setCurrent((prev) => ({
-                ...prev,
-                group_holding_name: selectedName,
-                group_holding_id: matchedGroup?._id || null,
-              }));
-            }}
-            names={groupHoldingName}
-          />
-          <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
-            onChange={(e) => {
-              const selectedName = e.target.value;
-              const matchedCompany = companyName.find(
-                (g) => g.name === selectedName
-              );
-              setCurrent((prev) => ({
-                ...prev,
-                company_name: selectedName,
-                company_id: matchedCompany?.id || null,
-              }));
-            }}
-            names={companyName}
-            isdisable={isEditing ? true : false}
-
-          />
-          <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
-            onChange={(e) => {
-              const selectedName = e.target.value;
-              const matchedLocation = locationName.find(
-                (g) => g.name === selectedName
-              );
-              setCurrent((prev) => ({
-                ...prev,
-                location_name: selectedName,
-                location_id: matchedLocation?.id || null,
-              }));
-            }}
-            names={locationName}
-            isdisable={isEditing ? true : false}
-
-          />
-
-        </div> */}
         <div className=''>
           <MuiTextAreaField
             value={current.user_description}
             handleChange={handleChange}
             name='user_description'
             label='Description'
-            // error={!!errors.user_description}
-            // helperText={errors.user_description}
+            error={!!errors.user_description}
+            helperText={errors.user_description}
             isRequired={true}
           />
         </div>
@@ -466,7 +253,6 @@ const UserRolesPage = () => {
             <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create User</span>}</button>
           </div>
         </div>
-        {/* </form> */}
       </div>
 
     )
@@ -526,8 +312,6 @@ const UserRolesPage = () => {
           </div>
         </div>
       </div>
-
-
     )
 
   }
@@ -647,8 +431,6 @@ const UserRolesPage = () => {
       filter: true,
       headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
-
-
     { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'group_holding', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
@@ -663,7 +445,7 @@ const UserRolesPage = () => {
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    // console.log('Row updated:', event.data);
   };
 
 
@@ -689,7 +471,7 @@ const UserRolesPage = () => {
               </button>
             </div>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle}closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
           </div>
         </div>
 

@@ -710,7 +710,7 @@ const ApprovedDocument = () => {
 
     const drawerHeader = () => {
         return (
-            <div className='p-3 fs-14 fw-600'><AttachFileIcon style={{ color: 'green' }} />Tage Document</div>
+            <div className='p-3 fs-14 fw-600'><AttachFileIcon style={{ color: 'green' }} />Tag Document</div>
         )
     }
     const drawerFilePreviewHeader = () => {

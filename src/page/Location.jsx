@@ -21,8 +21,6 @@ import Toggle from '../component/Toggle';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Location = () => {
-    // const [data, setData] = useState([]);
-    // if you want to show dummy jason data 
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState(
         {
@@ -37,7 +35,7 @@ const Location = () => {
             updated_at: '',
             city: '',
             state: '',
-            location_description:''
+            location_description: ''
         });
     // console.log(current, 'company_name')
     const [isEditing, setIsEditing] = useState(false);
@@ -54,14 +52,31 @@ const Location = () => {
     const [locationId, setLocationId] = useState(null);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
     // console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
+    const [errors, setErrors] = useState({});
 
+    const validate = () => {
+        let tempErrors = {};
+        if (!current?.company_name) tempErrors.company_name = "Company name is required";
+        if (!current?.location_name) tempErrors.location_name = "Location name is required";
+        if (!current?.group_name) tempErrors.group_name = "Group name is required";
+        if (!current?.location_description) tempErrors.location_description = "Description is required";
+        if (!current?.city) tempErrors.city = "City is required";
+        if (!current?.state) tempErrors.state = "State is required";
+
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
+    };
     // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrent((prev) => ({ ...prev, [name]: value }));
+        setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
     };
 
     const handleSubmit = async (e) => {
+        e?.preventDefault();
+        if (!validate()) return; // Don't proceed if validation fails
+
         const payload = {
             "GroupHoldingsID": current?.group_holdings_id,
             "CompanyID": current?.company_id,
@@ -108,21 +123,11 @@ const Location = () => {
             group_holdings_id: null,
             created_at: '',
             updated_at: '',
-            location_description:'',
+            location_description: '',
         });
 
         setIsEditing(false);
         setIsModalOpen(false);
-    };
-
-    // Handle Edit
-    const handleEdit = (location_id) => {
-        // setCurrent({ company_id: company_id })
-        const item = data.find((item) => item.location_id === location_id);
-        setCurrent(item);
-        setIsEditing(true);
-        setIsModalOpen(true);
-
     };
 
     const handleDelete = async (locationId) => {
@@ -168,6 +173,7 @@ const Location = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setErrors({})
     };
 
     useEffect(() => {
@@ -206,26 +212,6 @@ const Location = () => {
         }
     }, [current?.group_holdings_id]);
 
-    // This effect sets company_name & company_id after company list is available
-    // useEffect(() => {
-    //     if (
-    //         companyNameByGroupHoldingId.length &&
-    //         current?.company_name === undefined && // prevent re-setting if already set
-    //         current?.group_holdings_id
-    //     ) {
-    //         const matchedCompany = companyNameByGroupHoldingId.find(
-    //             (c) => c._id === current.company_id
-    //         );
-
-    //         setCurrent((prev) => ({
-    //             ...prev,
-    //             company_name: matchedCompany?.name || '',
-    //             company_id: matchedCompany?._id || null,
-    //         }));
-    //     }
-    // }, [companyNameByGroupHoldingId, current?.group_holdings_id]);
-
-
     const handleToggleChange = async (e, params) => {
         const newIsActive = {
             "IsActive": e.target.checked
@@ -262,7 +248,6 @@ const Location = () => {
     const crudForm = () => {
         return (
             <>
-
                 <div>
                     <SingleSelectTextField
                         name="group_name"
@@ -280,6 +265,8 @@ const Location = () => {
                         }}
                         names={groupHoldingData}
                         isdisable={isEditing}
+                        error={!!errors.group_name}
+                        helperText={errors.group_name}
                     />
                 </div>
 
@@ -299,12 +286,10 @@ const Location = () => {
                         }}
                         names={companyNameByGroupHoldingId}
                         isdisable={isEditing}
-
-
+                        error={!!errors.company_name}
+                        helperText={errors.company_name}
                     />
-
                 </div>
-
                 <div>
                     <MuiTextField
                         label="Location"
@@ -313,6 +298,8 @@ const Location = () => {
                         fieldName="location_name"
                         handleChange={handleChange}
                         value={current?.location_name || ''}
+                        error={!!errors.location_name}
+                        helperText={errors.location_name}
                     />
                 </div>
 
@@ -324,6 +311,8 @@ const Location = () => {
                         fieldName="city"
                         handleChange={handleChange}
                         value={current?.city || ''}
+                        error={!!errors.city}
+                        helperText={errors.city}
                     />
                 </div>
 
@@ -335,9 +324,11 @@ const Location = () => {
                         fieldName="state"
                         handleChange={handleChange}
                         value={current?.state || ''}
+                        error={!!errors.state}
+                        helperText={errors.state}
                     />
                 </div>
-                 <div>
+                <div>
                     <MuiTextField
                         label="Description"
                         type="text"
@@ -345,6 +336,8 @@ const Location = () => {
                         fieldName="location_description"
                         handleChange={handleChange}
                         value={current?.location_description || ''}
+                        error={!!errors.location_description}
+                        helperText={errors.location_description}
                     />
                 </div>
 
@@ -489,7 +482,7 @@ const Location = () => {
                             </button>
                         </div>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Location' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+                        <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
                     </div>
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>

@@ -122,6 +122,8 @@ const SubModule = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrent((prev) => ({ ...prev, [name]: value }));
+        setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
+
     };
 
     const validate = () => {
@@ -199,41 +201,41 @@ const SubModule = () => {
     //     setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
     // };
 
-        const handleDelete = async (id) => {
-            try {
-                const response = await deleteSubModuleById(id);
-                const message = response?.message || "Company deleted successfully";
-    
-                // Refresh data
-                const updatedData = await fetchAllSubModule();
-                setData(updatedData);
-                setIsDeleteModalOpen(false);
-    
-                // Show success snackbar
-                setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message,
-                    severityType: 'success',
-                });
-            } catch (error) {
-                console.error("Error deleting company:", error);
-    
-                // Extract error message safely
-                const errorMessage =
-                    error?.response?.data?.message ||
-                    error?.message ||
-                    "Failed to delete company";
-    
-                // Show error snackbar
-                setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: errorMessage,
-                    severityType: 'error',
-                });
-            }
-        };
+    const handleDelete = async (id) => {
+        try {
+            const response = await deleteSubModuleById(id);
+            const message = response?.message || "Company deleted successfully";
+
+            // Refresh data
+            const updatedData = await fetchAllSubModule();
+            setData(updatedData);
+            setIsDeleteModalOpen(false);
+
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            console.error("Error deleting company:", error);
+
+            // Extract error message safely
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to delete company";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+    };
     // Function to open the modal
     const openModal = () => {
         setIsModalOpen(true);
@@ -241,8 +243,10 @@ const SubModule = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setErrors({})
+        setCurrent({})
     };
-  const handleToggleChange = async (e, params) => {
+    const handleToggleChange = async (e, params) => {
         const newIsActive = {
             "IsActive": e.target.checked
         };
@@ -471,7 +475,7 @@ const SubModule = () => {
         { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-{
+        {
             headerName: 'Status',
             field: 'common_attributes.is_active',
             editable: false,
@@ -532,7 +536,7 @@ const SubModule = () => {
                             </button>
                         </div>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+                        <SmallSizeModal closeModal={closeModal}crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>

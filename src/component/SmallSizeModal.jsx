@@ -1,9 +1,5 @@
 // Modal Component
-const SmallSizeModal = ({ crudForm, crudTitle, isModalOpen, setIsModalOpen,editCrudTitle,isEditing }) => {
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
+const SmallSizeModal = ({ crudForm, crudTitle, isModalOpen,editCrudTitle,isEditing,closeModal }) => {
   return (
     <div>
       {isModalOpen && (

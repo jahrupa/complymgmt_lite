@@ -37,21 +37,6 @@ const GroupCompaniesPage = () => {
     severityType: '',
   });
   const [groupId, setgroupId] = useState(null)
-  // console.log(current, 'current')
-  // Role wise access
-  const names = [
-    'Create',
-    'Editor',
-    'Viewer',
-    'Delete',
-    'All'
-  ];
-
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCurrent((prev) => ({ ...prev, [name]: value }));
-  };
 
   const validate = () => {
     let tempErrors = {};
@@ -61,6 +46,12 @@ const GroupCompaniesPage = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCurrent((prev) => ({ ...prev, [name]: value }));
+    setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
+  };
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default submit behavior
 
@@ -107,17 +98,6 @@ const GroupCompaniesPage = () => {
     setErrors({}); // ✅ Reset errors after submission
   };
 
-
-
-  // Handle Edit
-  const handleEdit = (id) => {
-    const item = data.find((item) => item.groups_holdings_id === id);
-    setCurrent(item);
-    setIsEditing(true);
-    setIsModalOpen(true);
-
-  };
-
   // Handle Delete
   const handleDelete = async (groupId) => {
     try {
@@ -162,6 +142,7 @@ const GroupCompaniesPage = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setErrors({})
   };
   // Active/InActive status
   const handleToggleChange = async (e, params) => {
@@ -217,6 +198,7 @@ const GroupCompaniesPage = () => {
   const crudForm = () => {
     return (
       <div>
+       <div className='fs-12 info mb-2'>Group name must be at least 3 characters long and not just spaces.</div> 
         <MuiTextField
           label='Group Holding Name'
           type='text'
@@ -227,7 +209,6 @@ const GroupCompaniesPage = () => {
           error={!!errors.group_name}
           helperText={errors.group_name}
         />
-
         <MuiTextField
           label='Desc'
           type='text'
@@ -428,7 +409,7 @@ const GroupCompaniesPage = () => {
             </button>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
-            <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
           </div>
         </div>
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>

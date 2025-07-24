@@ -48,7 +48,9 @@ body {
 .card-border-green {
   border: 1px solid #4aac4e4a;
 }
-
+.info{
+  color: gray;
+}
 .card_div {
   background-color: white;
   border-radius: 10px;

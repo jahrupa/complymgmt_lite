@@ -97,18 +97,7 @@ const AccessControl = () => {
     const [data, setData] = useState(dummuJsonData);
     const [current, setCurrent] = useState({ id: null, sub_module_name: '', module_desc: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: [], sub_module_id: [] });
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // You can adjust the number of items per page
-
-
-    // Handle input change
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCurrent((prev) => ({ ...prev, [name]: value }));
-    };
 
     // Handle Add or Edit
     const handleSubmit = (e) => {
@@ -127,60 +116,6 @@ const AccessControl = () => {
         setIsModalOpen(false);
 
     };
-
-    // Handle Edit
-    const handleEdit = (id) => {
-        const item = data.find((item) => item.id === id);
-        setCurrent(item);
-        setIsEditing(true);
-        setIsModalOpen(true);
-
-    };
-
-    // Handle Delete
-    const handleDelete = (id) => {
-        const filteredData = data.filter((item) => item.id !== id);
-        setData(filteredData);
-        setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
-    };
-
-    // Handle Delete All Selected
-    const handleDeleteAll = () => {
-        const filteredData = data.filter((item) => !selectedRows.includes(item.id));
-        setData(filteredData);
-        setSelectedRows([]); // Clear selected rows after deletion
-    };
-
-    // Handle Select All checkbox
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            const allIds = data.map((item) => item.id);
-            setSelectedRows(allIds);
-        } else {
-            setSelectedRows([]);
-        }
-    };
-
-    // Handle individual row checkbox
-    const handleCheckboxChange = (e, id) => {
-        if (e.target.checked) {
-            setSelectedRows([...selectedRows, id]);
-        } else {
-            setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
-        }
-    };
-
-    // Pagination Logic: Slicing the data to display on the current page
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
-
-    // Pagination Button Handler
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    // Total number of pages
-    const totalPages = Math.ceil(data.length / itemsPerPage);
-
     // Function to open the modal
     const openModal = () => {
         setIsModalOpen(true);
@@ -251,13 +186,9 @@ const AccessControl = () => {
                     {/* <MuiTextField label='Sub Module Name' type='text' isRequired={true} fieldName='sub_module_name' handleChange={handleChange} value={current.sub_module_name} /> */}
                     <SingleSelectTextField name="service_trackers" label="Service Trackers" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
                     <SingleSelectTextField name="access Level" label="Access Level" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={accessLevel} />
-
-                    {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
-
                 </div>
 
                 <div>
-                    {/* <SingleSelectTextField name="sub_module_id" label="sub Module" value={current.sub_module_id} onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_id: e.target.value }))} names={groupHolding} /> */}
                     <MultipleSelectTextFields label='Access Control' value={current.approved_by} onChange={handleRoleAccessChange} names={accessControl} />
                 </div>
 

@@ -88,7 +88,7 @@ const Module = () => {
     // const [data, setData] = useState([]);
     // if you want to show dummy jason data 
     const [data, setData] = useState(dummuJsonData);
-    const [current, setCurrent] = useState({ module_name: '', module_description: '', });
+    const [current, setCurrent] = useState({ id: null, module_name: '', module_description: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: '' });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -175,6 +175,21 @@ const Module = () => {
         setIsModalOpen(false);
     };
 
+    // Handle Edit
+    const handleEdit = (id) => {
+        const item = data.find((item) => item.id === id);
+        setCurrent(item);
+        setIsEditing(true);
+        setIsModalOpen(true);
+
+    };
+
+    // Handle Delete
+    // const handleDelete = (id) => {
+    //     const filteredData = data.filter((item) => item.id !== id);
+    //     setData(filteredData);
+    //     setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
+    // };
     const handleDelete = async (moduleId) => {
         try {
             const response = await deleteModuleById(moduleId);
@@ -210,8 +225,42 @@ const Module = () => {
             });
         }
     };
+    // Handle Delete All Selected
+    const handleDeleteAll = () => {
+        const filteredData = data.filter((item) => !selectedRows.includes(item.id));
+        setData(filteredData);
+        setSelectedRows([]); // Clear selected rows after deletion
+    };
+
+    // Handle Select All checkbox
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            const allIds = data.map((item) => item.id);
+            setSelectedRows(allIds);
+        } else {
+            setSelectedRows([]);
+        }
+    };
+
+    // Handle individual row checkbox
+    const handleCheckboxChange = (e, id) => {
+        if (e.target.checked) {
+            setSelectedRows([...selectedRows, id]);
+        } else {
+            setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
+        }
+    };
 
     // Pagination Logic: Slicing the data to display on the current page
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
+
+    // Pagination Button Handler
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    // Total number of pages
+    const totalPages = Math.ceil(data.length / itemsPerPage);
 
     // Function to open the modal
     const openModal = () => {
@@ -220,18 +269,30 @@ const Module = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setErrors({})
     };
-
+    const groupHolding = [
+        "Tata",
+        "Groupon",
+        "Influitive",
+        "Spinfluence",
+        "Intellivision",
+        "Omnilert",
+        "Technologent",
+        "Securiteam"
+    ];
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [locationData] = await Promise.all([
+                const [locationData, groupHolding, companyName] = await Promise.all([
                     fetchAllModule(),
-
+                    // fetchAllGroupHolding(),
+                    // fetchAllCompaniesName(),
                 ]);
                 setData(locationData);
+                // setGroupHoldinData(groupHolding);
+                // setCompanyNameData(companyName);
+
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -243,28 +304,24 @@ const Module = () => {
     const crudForm = () => {
         return (
             <div>
+                {/* <form onSubmit={handleSubmit}> */}
                 <div>
-                    <MuiTextField
-                        label='Module Name'
-                        type='text'
-                        isRequired={true}
-                        fieldName='module_name'
-                        handleChange={handleChange}
-                        value={current.module_name}
-                        error={!!errors.module_name}
-                        helperText={errors.module_name}
-                    />
+                    <MuiTextField label='Module Name' type='text' isRequired={true} fieldName='module_name' handleChange={handleChange} value={current.module_name} />
+
+                    {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
+
                 </div>
                 <div className=''>
-                    <MuiTextAreaField
-                        value={current.module_description}
-                        handleChange={handleChange}
-                        name='module_description'
-                        label='Module Description'
-                        error={!!errors.module_description}
-                        helperText={errors.module_description}
-                    />
+                    <MuiTextAreaField value={current.module_description} handleChange={handleChange} name='module_description' label='Module Description' />
+
+                    {/* <SingleSelectTextField name="module_name" label="module_name" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value }))} names={groupHolding} /> */}
+
                 </div>
+                {/* <div>
+                    <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
+
+                </div> */}
+
                 <div className="row row-gap-2">
                     <div className='col col-12 col-md-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -273,7 +330,9 @@ const Module = () => {
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create Module</span>}</button>
                     </div>
                 </div>
+                {/* </form> */}
             </div>
+
         )
 
     }
@@ -472,26 +531,140 @@ const Module = () => {
                 <h5>Module</h5>
             </div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+            {/* Form for Create or Edit */}
+            {/* <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          value={current.name}
+          onChange={handleChange}
+          placeholder="Name"
+          required
+        />
+        <input
+          type="number"
+          name="module_description"
+          value={current.module_description}
+          onChange={handleChange}
+          placeholder="Age"
+          required
+        />
+        <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
+      </form> */}
+
+            {/* Button to Delete All Selected Rows */}
+
+
+            {/* Table to display data */}
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
                     <div className='d-flex h-100'>
                         <div class="search-bar-container h-25">
+                            {/* <input type="text" placeholder="Search..." name="search" className='search-bar-input p-1 w-100' /> */}
                             <MuiSearchBar label='Search...' type='text' />
                             <button className='search-icon'><SearchIcon /></button>
                         </div>
+                        {/* <MultipleSelectFields placeholder='Filter By Module' roleName={groupHolding} /> */}
                     </div>
+
+
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div className='pe-2'>
                             <button className='crud_btn' onClick={openModal}>
-                                <span><AddIcon /></span>
-                                <span className='button-style'>Add New Module</span>
+                                <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
                             </button>
                         </div>
-                        <SmallSizeModal closeModal={closeModal} crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+                        {/* <div>
+                            <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
+                                <span className='button-style'> Delete All</span>
+                            </button>
+                        </div> */}
+
+                        <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
                     </div>
                 </div>
+
+                {/* <div className='table_div2'>
+                    <table className='table_tag'>
+                        <thead className='table_head_tag'>
+                            <tr >
+                                <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
+                                <th className='table_th_tag  ps-2 pe-2'><span>Module Name</span>
+                                    <span className='ms-4'>
+                                        <ExpandCircleDownIcon className='table_th_icon' />
+
+                                    </span>
+                                </th>
+
+                                <th className='table_th_tag  ps-2 pe-2'><span>Module Description</span>
+                                    <span className='ms-4'>
+                                        <ExpandCircleDownIcon className='table_th_icon' />
+
+                                    </span>
+                                </th>
+                                <th className='table_th_tag  ps-2 pe-2'><span>Approved By</span>
+                                    <span className='ms-4'>
+                                        <ExpandCircleDownIcon className='table_th_icon' />
+
+                                    </span>
+                                </th>
+                                <th className='table_th_tag  ps-2 pe-2'><span>Created At</span>
+                                    <span className='ms-4'>
+                                        <ExpandCircleDownIcon className='table_th_icon' />
+                                    </span>
+                                </th>
+                                <th className='table_th_tag  ps-2 pe-2'><span>Updated At</span>
+                                    <span className='ms-4'>
+                                        <ExpandCircleDownIcon className='table_th_icon' />
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data.length === 0 ? (
+                                <tr>
+                                    <td colSpan="10" style={{ textAlign: 'center', height: '300px' }}> <div className='no_data_found'><span><BackupTableIcon /></span><span>No data available</span></div></td>
+                                </tr>
+                            ) : (
+                                currentData.map((item) => (
+                                    <tr key={item.id} className='table_tr'>
+                                        <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
+                                            <div>
+                                                <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
+                                            </div>
+                                            <div>
+                                                <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
+                                            </div>
+                                        </td>
+
+                                        <td className='table_td_font  ps-2 pe-2'>{item.module_name}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.module_description}</td>
+                                        <td className='table_td_font ps-2 pe-2'>{item.approved_by}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.created_at}</td>
+                                        <td className='table_td_font  ps-2 pe-2'>{item.updated_at}</td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div> */}
+
+                {/* Pagination Controls */}
+                {/* <div className="justify-content-between pagination mt-3">
+                    <div className='selected_row_text'>
+                        Selected Rows: {selectedRows.length}
+                    </div>
+                    <div className='d-flex'>
+                        <button className='btn btn-sm pagination_btn' onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button className=' btn btn-sm h-75 pagination_btn' key={index + 1} onClick={() => paginate(index + 1)}>{index + 1}</button>
+                        ))}
+                        <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
+                    </div>
+                </div> */}
+
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact
                         theme="legacy"

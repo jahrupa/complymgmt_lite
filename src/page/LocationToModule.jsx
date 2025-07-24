@@ -4,19 +4,11 @@ import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
-import MuiTextField from '../component/MuiInputs/MuiTextField';
-import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
-import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import { createModule, createsLocationToModule, deleteLocationToModuleByStatusId, deleteModuleById, fetchAllGroupHolding, fetchAllModule, fetchAllModulesName, fetchAllModulesNameByLocationId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateModuleById, updateModuleStatusById } from '../api/Service';
-
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, } from '../api/Service';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -126,8 +118,20 @@ const LocationToModule = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
 
+    const [errors, setErrors] = useState({});
+    const validate = () => {
+        let tempErrors = {};
+        if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
+        if (!current?.company_name) tempErrors.company_name = "Company is required";
+        if (!current?.location_name) tempErrors.location_name = "Location is required";
+        if (!current?.module_name) tempErrors.module_name = "Module is required";
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
+    };
     const handleSubmit = async (e) => {
-        // e?.preventDefault();
+        e?.preventDefault();
+        if (!validate()) return; // Don't proceed if validation fails
+
         const payload = {
             "CompanyID": current?.company_id,
             "LocationID": current?.location_id,
@@ -223,6 +227,7 @@ const LocationToModule = () => {
     const openModal = () => {
         setIsModalOpen(true);
         setIsEditing(true);
+        setErrors({})
     };
 
     const closeModal = () => {
@@ -315,6 +320,8 @@ const LocationToModule = () => {
                             }));
                         }}
                         names={groupHoldingName}
+                        error={!!errors.group_name}
+                        helperText={errors.group_name}
                     />
                     <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
                         onChange={(e) => {
@@ -329,6 +336,8 @@ const LocationToModule = () => {
                             }));
                         }}
                         names={companyName}
+                        error={!!errors.company_name}
+                        helperText={errors.company_name}
                     // isdisable={isEditing ? true : false}
 
                     />
@@ -345,7 +354,9 @@ const LocationToModule = () => {
                             }));
                         }}
                         names={locationName}
-                    // isdisable={isEditing ? true : false}
+                        // isdisable={isEditing ? true : false}
+                        error={!!errors.location_name}
+                        helperText={errors.location_name}
 
                     />
                 </div>
@@ -367,8 +378,8 @@ const LocationToModule = () => {
                             }));
                         }}
                         names={moduleName}
-                    // error={!!errors.module_name}
-                    // helperText={errors.module_name}
+                        error={!!errors.module_name}
+                        helperText={errors.module_name}
                     />
                 </div>
 
@@ -593,7 +604,7 @@ const LocationToModule = () => {
                                 <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
                             </button>
                         </div>
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
+                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
                     </div>
                 </div>
