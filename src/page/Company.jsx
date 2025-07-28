@@ -60,7 +60,7 @@ const Company = () => {
   // Handle Add or Edit
 
   const handleSubmit = async (e) => {
-    e?.preventDefault();
+    e.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
     const payload = {
       "CompanyName": current?.company_name || '',
@@ -238,7 +238,7 @@ const Company = () => {
             <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
           </div>
           <div className='col col-12 col-md-6 d-flex justify-content-end'>
-            <button type="submit" className="btn btn-primary" onClick={() => handleSubmit(companyId)}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create company</span>}</button>
+            <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create company</span>}</button>
           </div>
         </div>
         {/* </form> */}

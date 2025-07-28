@@ -356,6 +356,7 @@ const GroupCompaniesPage = () => {
       headerName: 'Is Active',
       field: 'common_attributes.is_active',
       editable: false,
+      pinned: "right",
       valueGetter: (params) => params.data?.common_attributes?.is_active,
       cellRenderer: (params) => (
         <Toggle

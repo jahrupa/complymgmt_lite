@@ -424,7 +424,7 @@ const SubModule = () => {
                         >
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
-                        <button
+                        {/* <button
                             className="btn btn-sm"
                             onClick={() => {
                                 setSubModuleId(params.data._id);
@@ -432,8 +432,7 @@ const SubModule = () => {
                             }}
                         >
                             <VisibilityIcon fontSize="small" className="action_icon" />
-                        </button>
-                        {/* <VisibilityIcon/> */}
+                        </button> */}
                     </div>
                 );
             }
@@ -520,6 +519,7 @@ const SubModule = () => {
     }, []);
     return (
         <div>
+            <h5>Sub-Module</h5>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>

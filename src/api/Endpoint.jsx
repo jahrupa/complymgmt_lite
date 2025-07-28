@@ -44,7 +44,7 @@ export const UPDATE_LOCATION_BY_ID='/update_location_by_id/';
 export const DELETE_LOCATION_BY_ID='/delete_location_by_id/';
 export const GET_LOCATION_NAME='/view_location_names';
 export const UPDATE_LOCATION_STATUS_BY_ID='/update_location_status_by_id/';
-export const GET_LOCATION_BY_COMPANY_ID='/get_locations_by_company_id/';
+export const GET_LOCATION_BY_COMPANY_ID='/view_locations_by_company_id/';
 
 
 // Module
@@ -75,6 +75,10 @@ export const CREATE_LOCATION_TO_MODULE='/create_location_to_modules';
 export const UPDATE_LOCATION_TO_MODULE_BY_ID='/update_location_to_module_by_id/';
 export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/update_location_to_module_status_by_id/';
 export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/';
+
+// File Upload
+export const FILE_UPLOAD='/classify-files';
+
 
 
 

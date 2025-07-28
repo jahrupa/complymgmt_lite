@@ -226,7 +226,7 @@ const LocationToModule = () => {
     // Function to open the modal
     const openModal = () => {
         setIsModalOpen(true);
-        setIsEditing(true);
+        setIsEditing(false);
         setErrors({})
     };
 

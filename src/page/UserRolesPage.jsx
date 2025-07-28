@@ -88,7 +88,7 @@ const UserRolesPage = () => {
 
       //  Get the message from response
       const message = response?.message;
-      // console.log(message, 'message')
+      console.log(response, 'response')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data

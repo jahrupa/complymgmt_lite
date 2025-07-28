@@ -410,7 +410,7 @@ const Location = () => {
                         >
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
-                        <button
+                        {/* <button
                             className="btn btn-sm"
                             onClick={() => {
                                 setIsDeleteModalOpen(true);
@@ -419,7 +419,7 @@ const Location = () => {
                             }}
                         >
                             <VisibilityIcon fontSize="small" className="action_icon" />
-                        </button>
+                        </button> */}
                     </div>
                 );
             }
@@ -465,6 +465,7 @@ const Location = () => {
     };
     return (
         <div>
+            <h5>Location</h5>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             {/* Table to display data */}
             <div className='table_div p-3'>

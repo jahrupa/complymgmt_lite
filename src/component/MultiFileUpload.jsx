@@ -3,14 +3,14 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 const MAX_COUNT = 5;
 
-function MultiFileUpload() {
+function MultiFileUpload({ uploadedFiles, setUploadedFiles }) {
 
-    const [uploadedFiles, setUploadedFiles] = useState([])
     const [fileLimit, setFileLimit] = useState(false);
 
 
     const handleUploadFiles = files => {
         const uploaded = [...uploadedFiles];
+        console.log(uploaded,'uploaded1')
         let limitExceeded = false;
         files.some((file) => {
             if (uploaded.findIndex((f) => f.name === file.name) === -1) {
@@ -25,12 +25,13 @@ function MultiFileUpload() {
             }
         })
         if (!limitExceeded) setUploadedFiles(uploaded)
-
     }
 
     const handleFileEvent = (e) => {
         const chosenFiles = Array.prototype.slice.call(e.target.files)
         handleUploadFiles(chosenFiles);
+        // const files = Array.from(e.target.files); 
+        setUploadedFiles(chosenFiles);
     }
 
     return (
@@ -40,7 +41,7 @@ function MultiFileUpload() {
                 <span>You can upload a maximum of 5 files at a time.</span>
             </div>
             <input id='multi-fileUpload' type='file' multiple
-                accept='.xlsx, .xls'
+                accept='.pdf, .jpg, .png ,jpeg'
                 onChange={handleFileEvent}
                 disabled={fileLimit}
                 className="upload_file_input"
@@ -58,7 +59,7 @@ function MultiFileUpload() {
                         <snap className='w-100'>{file.name}</snap>
 
                         <div className='d-flex justify-content-end'>
-                            <button style={{display:'contents'}}>x</button>
+                            <button style={{ display: 'contents' }}>x</button>
                         </div>
 
                     </div>

@@ -16,7 +16,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile } from '../api/Service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -249,7 +249,8 @@ const DocumentUpload = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
   const [fileName, setFileName] = useState(''); // State to store the file name
-
+  const [uploadedFiles, setUploadedFiles] = useState([])
+  console.log(uploadedFiles, 'uploadedFiles....')
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -405,34 +406,52 @@ const DocumentUpload = () => {
   const closeModal = () => {
     setIsFileUploadModalModalOpen(false);
   };
-  const uploadFile = () => {
-    const reader = new FileReader();
 
-    reader.onload = (evt) => {
-      const data = new Uint8Array(evt.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
+  // const handleFileUpload = async () => {
+  //   if (!uploadedFiles?.length) {
+  //     alert("Please select at least one file.");
+  //     return;
+  //   }
+  //   try {
+  //     const result = await uploadFile(uploadedFiles);
+  //     console.log("Files uploaded successfully:", result);
+  //     setIsFileUploadModalModalOpen(false);
+  //     alert('File uploaded successfully 🎉')
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //   }
+  // }
 
-      // Read second sheet (index 1)
-      const sheetName = workbook.SheetNames[0];
-      console.log('Sheet Name:', sheetName);
-      if (!sheetName) {
-        alert('The workbook does not have a second sheet.');
-        return;
+  const handleFileUpload = async () => {
+    if (!uploadedFiles?.length) {
+      alert("Please select at least one file.");
+      return;
+    }
+
+    try {
+      const result = await uploadFile(uploadedFiles);
+      console.log("Files uploaded successfully:", result);
+      setIsFileUploadModalModalOpen(false);
+
+      const { Data } = result;
+
+      if (Data && Data.length > 0) {
+        const summary = Data.map((file, index) => {
+          return `${index + 1}. 📄 ${file.filename}\n   🏷️ Doc Type: ${file.doc_type}\n   📊 Confidence: ${file.confidence}%`;
+        }).join("\n\n");
+
+        alert(`✅ Files uploaded successfully 🎉\n\n${summary}`);
+      } else {
+        alert("Files uploaded, but no metadata returned.");
       }
 
-      const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
-      const headers = sheet[0] || [];
-      const rows = sheet.slice(1).map(row =>
-        Object.fromEntries(headers.map((h, i) => [h, row?.[i] ?? '']))
-      );
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("❌ Upload failed. Please try again.");
+    }
+  };
 
-      setColumnDefs(headers.map(h => ({ field: h, editable: true })));
-      setData(rows);
-    };
-    setIsModalOpen(false);
 
-    reader.readAsArrayBuffer(fileName);
-  }
   const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
   const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
 
@@ -611,29 +630,8 @@ const DocumentUpload = () => {
       <div>
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
-            <MultiFileUpload />
-            {/* <label className="upload_button" htmlFor="upload">
-            <span className="me-2 upload_file_icon"><CloudUploadIcon /></span>Upload File
-          </label>
-          <input
-            className="upload_file_input"
-            id="upload"
-            type="file"
-            accept=".xlsx, .xls"
-            onChange={handleFileChange}
-          /> */}
+            <MultiFileUpload setUploadedFiles={setUploadedFiles} uploadedFiles={uploadedFiles} />
           </div>
-
-          {/* {fileName ? (
-          <div className="mt-4 uploaded_file_name">
-            <span><FilePresentIcon /></span>
-            <span>{fileName.name}</span>
-          </div>
-        ) : (
-          <div className="mt-4 not_uploaded_file_text">
-            <span><FilePresentIcon /></span>File is not uploaded
-          </div>
-        )} */}
         </div>
 
         <div className="row row-gap-2">
@@ -641,7 +639,7 @@ const DocumentUpload = () => {
             <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
           </div>
           <div className="col-12 col-md-6">
-            <button type="submit" className="btn btn-primary w-100" onClick={uploadFile}>Upload</button>
+            <button type="submit" className="btn btn-primary w-100" onClick={handleFileUpload}>Upload</button>
           </div>
         </div>
       </div>
@@ -875,7 +873,7 @@ const DocumentUpload = () => {
               {/* <button className='crud_btn' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New User Role</span>
                             </button> */}
-             
+
               <div>
                 <button className="reject upload-wrapper upload-label" onClick={openModal}>
                   <span className="icon">

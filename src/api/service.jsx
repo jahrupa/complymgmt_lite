@@ -51,7 +51,8 @@ import {
   GET_ALL_LOCATION_TO_MODULE,
   UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID,
   DELETE_LOCATION_TO_MODULE_BY_ID,
-  GET_SUB_MODULE_NAME_BY_MODULE_ID
+  GET_SUB_MODULE_NAME_BY_MODULE_ID,
+  FILE_UPLOAD
 
 } from "./Endpoint";
 // Login Api
@@ -586,3 +587,27 @@ export const deleteLocationToModuleByStatusId = async (id, payload) => {
     throw error;
   }
 };
+
+export const uploadFile = async (filesArray) => {
+  try {
+    const formData = new FormData();
+
+    filesArray.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const response = await API.post(FILE_UPLOAD, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed:", error.response?.data || error);
+    throw error;
+  }
+};
+
+
+
