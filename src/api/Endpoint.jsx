@@ -68,6 +68,10 @@ export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/view_submodules_names_by_modules
 
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/view_all_service_tracker';
+export const DELETE_SERVICE_TRACKER_BY_ID='/delete_service_tracker_by_id/';
+export const CREATE_SERVICE_TRACKER ='/create_service_tracker';
+export const UPDATE_SERVICE_TRACKER ='/update_service_tracker_by_id/';
+export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/update_service_tracker_status_by_id/';
 
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/view_all_location_to_modules';

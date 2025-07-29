@@ -183,9 +183,9 @@ const AccessControl = () => {
 
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-                    {/* <MuiTextField label='Sub Module Name' type='text' isRequired={true} fieldName='sub_module_name' handleChange={handleChange} value={current.sub_module_name} /> */}
-                    <SingleSelectTextField name="service_trackers" label="Service Trackers" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
-                    <SingleSelectTextField name="access Level" label="Access Level" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={accessLevel} />
+                    {/*  */}
+                    {/* <SingleSelectTextField name="service_trackers" label="Service Trackers" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} /> */}
+                    {/* <SingleSelectTextField name="access Level" label="Access Level" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={accessLevel} /> */}
                 </div>
 
                 <div>

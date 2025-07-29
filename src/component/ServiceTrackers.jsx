@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { createGroup, deleteGroupById, fetchAllGroup, fetchAllGroupHolding, fetchAllServiceTracker, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById } from '../api/Service';
+import { createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/Service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -20,6 +20,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import Toggle from '../component/Toggle';
 import Modal from './Modal';
 import SingleSelectTextField from './MuiInputs/SingleSelectTextField';
+import MuiTextAreaField from './MuiInputs/MuiTextAreaField';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -30,17 +31,20 @@ const ServiceTrackers = () => {
         {
             _id: null,
             service_tracker_name: '',
-            group_holdings_id: null,
-            group_holding_account_owner: '',
-            created_at: '',
-            group_holding_name: '',
+            group_holding_id: null,
+            group_name: '',
             company_name: '',
-            company_name_id: null,
+            company_id: null,
             location_name: '',
+            location_id: '',
             module_name: '',
+            module_id: null,
             sub_module_name: '',
-        });
+            sub_module_id: null,
+            service_tracker_description: ''
 
+        });
+    console.log(current, 'current')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -52,10 +56,14 @@ const ServiceTrackers = () => {
         message: '',
         severityType: '',
     });
-    const [groupId, setgroupId] = useState(null)
+    const [serviceTrackerId, setServiceTrackerId] = useState(null)
     const [groupHoldingData, setGroupHoldinData] = useState([]);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
     const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
+    const [moduleName, setModuleName] = useState([]);
+    const [subModuleName, setSubModuleName] = useState([]);
+
+
 
     console.log(current, 'current')
     // Role wise access
@@ -71,77 +79,80 @@ const ServiceTrackers = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrent((prev) => ({ ...prev, [name]: value }));
+        setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
     };
 
     const validate = () => {
         let tempErrors = {};
-        if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Group Holding Name is required";
-        if (!current?.group_holding_name) tempErrors.group_holding_name = "Description is required";
+        if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Tracker name is required";
+        if (!current?.group_name) tempErrors.group_name = "Group holding name is required";
+        if (!current?.company_name) tempErrors.company_name = "Company name is required";
+        if (!current?.location_name) tempErrors.location_name = "Location name is required";
+        if (!current?.module_name) tempErrors.module_name = "Module name is required";
+        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
+        if (!current?.service_tracker_description) tempErrors.service_tracker_description = "Description name is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent default submit behavior
-
         if (!validate()) return; // Don't proceed if validation fails
-
         const payload = {
-            "GroupDescription": current?.group_holding_name,
-            "GroupName": current?.service_tracker_name,
+            "ServiceTrackerName": current?.service_tracker_name,
+            "ServiceTrackerDescription": current?.service_tracker_description,
+            "SubModuleID": current?.sub_module_id,
+            "ModuleID": current?.module_id,
+            "LocationID": current?.location_id,
+            "CompanyID": current?.company_id,
             "CommonAttributes": {
-                "Approved_By": "68480959d7038d326905b02c",
-                "Created_By": "68480959d7038d326905b02c",
-                "IsActive": true,
-                "IsDeleted": false
+                "Created_By": "688331c4d3f5ece9a3ad0065"
             }
-        };
-
+        }
+        const updatedPayload = {
+            "ServiceTrackerName": current?.service_tracker_name,
+            "ServiceTrackerDescription": current?.service_tracker_description,
+            "SubModuleID": current?.sub_module_id,
+            "ModuleID": current?.module_id,
+            "LocationID": current?.location_id,
+            "CompanyID": current?.company_id,
+            "CommonAttributes": {
+                "Updated_By": "688331c4d3f5ece9a3ad0065"
+            }
+        }
         try {
             let response;
             if (isEditing) {
-                response = await updateGroupById(current?._id, payload);
+                response = await updateServiceTrackerById(current?._id, updatedPayload);
             } else {
-                response = await createGroup(payload);
+                response = await createServiceTracker(payload);
             }
 
             const message = response?.message;
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
-            const updatedData = await fetchAllGroup();
+            const updatedData = await fetchAllServiceTracker();
             setData(updatedData);
         } catch (error) {
-            console.error("Error saving company:", error);
+            console.error("Error saving service tracker:", error);
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: "Failed to save group", severityType: 'error' });
         }
-
         // Reset form state
         setCurrent({
             _id: null,
             service_tracker_name: '',
             group_holding_account_owner: '',
             created_at: '',
-            group_holding_name: '',
+            group_name: '',
         });
         setIsEditing(false);
         setIsModalOpen(false);
         setErrors({}); // ✅ Reset errors after submission
     };
 
-
-
-    // Handle Edit
-    const handleEdit = (id) => {
-        const item = data.find((item) => item.group_holdings_id === id);
-        setCurrent(item);
-        setIsEditing(true);
-        setIsModalOpen(true);
-
-    };
-
     // Handle Delete
-    const handleDelete = async (groupId) => {
+    const handleDelete = async (serviceTrackerId) => {
         try {
-            const response = await deleteGroupById(groupId);
+            const response = await deleteServiceTrackerById(serviceTrackerId);
             const message = response?.message || "Group holding  successfully";
 
             // Refresh data
@@ -157,13 +168,13 @@ const ServiceTrackers = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error deleting company:", error);
+            console.error("Error deleting service tracker:", error);
 
             // Extract error message safely
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete company";
+                "Failed to delete service tracker";
 
             // Show error snackbar
             setIsSnackbarsOpen({
@@ -182,6 +193,8 @@ const ServiceTrackers = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setErrors({});
+        setCurrent({})
     };
     // Active/InActive status
     const handleToggleChange = async (e, params) => {
@@ -189,7 +202,7 @@ const ServiceTrackers = () => {
             "IsActive": e.target.checked
         };
         try {
-            const response = await updateGroupStatusById(params.data._id, newIsActive);
+            const response = await updateServiceTrackerByStatusId(params.data._id, newIsActive);
             const message = response?.message || "Status update successfully"
             // Show success snackbar
             setIsSnackbarsOpen({
@@ -203,7 +216,7 @@ const ServiceTrackers = () => {
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete company";
+                "Failed to delete service tracker";
 
             // Show error snackbar
             setIsSnackbarsOpen({
@@ -213,7 +226,7 @@ const ServiceTrackers = () => {
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllGroup();
+        const updatedData = await fetchAllServiceTracker();
         setData(updatedData);
     };
 
@@ -232,11 +245,11 @@ const ServiceTrackers = () => {
         };
         fetchData();
     }, []);
-
+    // fetch company by group id
     useEffect(() => {
         const fetchCompany = async () => {
             try {
-                const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
                 if (data) {
                     setCompanyNameByGroupHoldingId(data);
                 }
@@ -245,16 +258,16 @@ const ServiceTrackers = () => {
             }
         };
 
-        if (current?.group_holdings_id) {
+        if (current?.group_holding_id) {
             fetchCompany();
         }
-    }, [current?.group_holdings_id]);
+    }, [current?.group_holding_id]);
 
-
+    // fetch location by company id
     useEffect(() => {
         const fetchLocationByCompanyId = async () => {
             try {
-                const data = await getLocationByCompanyId(current?.company_name_id);
+                const data = await getLocationByCompanyId(current?.company_id);
                 if (data) {
                     setLocationNameByCompanyId(data);
                 }
@@ -263,21 +276,67 @@ const ServiceTrackers = () => {
             }
         };
 
-        if (current?.company_name_id) {
+        if (current?.company_id) {
             fetchLocationByCompanyId();
         }
-    }, [current?.company_name_id]);
+    }, [current?.company_id]);
+
+
+    // module by location id
+    useEffect(() => {
+        const fetchModuleByLocationId = async () => {
+            try {
+                const data = await fetchAllModulesNameByLocationId(current?.location_id);
+                if (data) {
+                    setModuleName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by location_id:", error);
+            }
+        };
+
+        if (current?.location_id) {
+            fetchModuleByLocationId();
+        }
+    }, [current?.location_id]);
+    // sub-module by module id
+    useEffect(() => {
+        const fetchSubModuleByModuleId = async () => {
+            try {
+                const data = await fetchAllSubModuleNameByModuleId(current?.module_id);
+                if (data) {
+                    setSubModuleName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by location_id:", error);
+            }
+        };
+
+        if (current?.module_id) {
+            fetchSubModuleByModuleId();
+        }
+    }, [current?.module_id]);
+
 
     const crudForm = () => {
         return (
             <div>
                 <div className='d-lg-flex d-md-flex gap-2'>
-                    <MuiTextField label='Service Tracker Name' type='text' isRequired={true} fieldName='service_tracker_name' handleChange={handleChange} value={current.service_tracker_name} />
+                    <MuiTextField
+                        label='Service Tracker Name'
+                        type='text'
+                        isRequired={true}
+                        fieldName='service_tracker_name'
+                        handleChange={handleChange}
+                        value={current.service_tracker_name}
+                        error={!!errors.service_tracker_name}
+                        helperText={errors.service_tracker_name}
+                    />
 
                     <SingleSelectTextField
-                        name="group_holding_name"
-                        label="Group Holding"
-                        value={current?.group_holding_name}
+                        name="group_name"
+                        label="Group Holding Name"
+                        value={current?.group_name}
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = groupHoldingData.find(
@@ -285,13 +344,14 @@ const ServiceTrackers = () => {
                             );
                             setCurrent((prev) => ({
                                 ...prev,
-                                group_holding_name: selectedName,
-                                group_holdings_id: matchedGroup?._id || null,
+                                group_name: selectedName,
+                                group_holding_id: matchedGroup?._id || null,
                                 company_name: '',
                             }));
                         }}
                         names={groupHoldingData}
-                    // isdisable={isEditing}
+                        error={!!errors.group_name}
+                        helperText={errors.group_name}
                     />
 
                 </div>
@@ -308,19 +368,31 @@ const ServiceTrackers = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
-                                company_name_id: matchedGroup?._id || null,
+                                company_id: matchedGroup?._id || null,
                             }));
                         }}
                         names={companyNameByGroupHoldingId}
-                    // isdisable={isEditing}
+                        error={!!errors.company_name}
+                        helperText={errors.company_name}
                     />
-                    <SingleSelectTextField
-                        name="location_name"
-                        label="Location"
-                        // value={current?.location_name}
-                        onChange={(e) => setCurrent((prev) => ({ ...prev, location_name: e.target.value }))}
+                    <SingleSelectTextField name="location_name" label="Location"
+                        value={current?.location_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedLocation = locationNameByCompanyId.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                location_name: selectedName,
+                                location_id: matchedLocation?._id || null,
+                            }));
+                        }}
                         names={locationNameByCompanyId}
-                    // isdisable={isEditing}
+                        error={!!errors.location_name}
+                        helperText={errors.location_name}
+                    // isdisable={isEditing ? true : false}
+
                     />
 
 
@@ -329,32 +401,56 @@ const ServiceTrackers = () => {
                     <SingleSelectTextField
                         name="module_name"
                         label="Module"
-                        // value={current?.module_name}
+                        value={current.module_name}
                         onChange={(e) => {
-                            // const selectedName = e.target.value;
-                            // const matchedGroup = groupHoldingData.find(
-                            //     (g) => g.name === selectedName
-                            // );
-                            // setCurrent((prev) => ({
-                            //     ...prev,
-                            //     module_name: selectedName,
-                            //     group_holdings_id: matchedGroup?.id || null,
-                            //     module_name: '', 
-                            // }));
+                            const selectedName = e.target.value;
+                            const matchedGroup = moduleName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                module_name: selectedName,
+                                module_id: matchedGroup?._id || null,
+                            }));
                         }}
-                    // names={groupHoldingData}
-                    // isdisable={isEditing}
+                        names={moduleName}
+                        error={!!errors.module_name}
+                        helperText={errors.module_name}
                     />
-
                     <SingleSelectTextField
                         name="sub_module_name"
                         label="Sub-Module"
-                        // value={current?.sub_module_name}
-                        onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_name: e.target.value }))}
-                    // names={groupHoldingData}
+                        value={current?.sub_module_name}
+                        // onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_name: e.target.value, }))}
+
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = subModuleName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                sub_module_name: selectedName,
+                                sub_module_id: matchedGroup?._id || null,
+                            }));
+                        }}
+                        names={subModuleName}
+                        error={!!errors.sub_module_name}
+                        helperText={errors.sub_module_name}
                     // isdisable={isEditing}
                     />
                 </div>
+                <MuiTextAreaField
+                    isRequired={true}
+                    label='Description'
+                    type='text'
+                    fieldName='service_tracker_description'
+                    handleChange={handleChange}
+                    value={current.service_tracker_description}
+                    error={!!errors.service_tracker_description}
+                    helperText={errors.service_tracker_description}
+                />
+
                 <div className="row row-gap-2">
                     <div className='col col-12 col-md-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -373,7 +469,7 @@ const ServiceTrackers = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this Company Holding?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this service tracker?
                 </div>
 
                 <div className="row row-gap-2 mt-4">
@@ -383,7 +479,7 @@ const ServiceTrackers = () => {
                     <div className='col col-12 col-md-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
-                            onClick={() => handleDelete(groupId)}>Yes, I'm sure</button>
+                            onClick={() => handleDelete(serviceTrackerId)}>Yes, I'm sure</button>
                     </div>
                 </div>
             </div>
@@ -421,7 +517,7 @@ const ServiceTrackers = () => {
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>
                         <button className="btn btn-sm" onClick={() => {
-                            setgroupId(params.data._id);
+                            setServiceTrackerId(params.data._id);
                             setIsDeleteModalOpen(true);
                         }}>
                             <DeleteIcon fontSize="small" className="action_icon" />
@@ -432,7 +528,7 @@ const ServiceTrackers = () => {
         },
         { field: '_id', headerName: 'ID', filter: true, editable: false, },
         { field: 'service_tracker_name', headerName: 'Service Tracker Name', filter: true, editable: false, },
-        { field: 'group_holding_name', headerName: 'Group Holding', filter: true, editable: false, },
+        { field: 'group_name', headerName: 'Group Holding', filter: true, editable: false, },
         { field: 'company_name', headerName: 'company', filter: true, editable: false, },
         { field: 'location_name', headerName: 'Location', filter: true, editable: false, },
         { field: 'module_name', headerName: 'Module', filter: true, editable: false, },
@@ -538,7 +634,7 @@ const ServiceTrackers = () => {
                         </button>
                         <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal}/>
+                        <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
 
                     </div>
                 </div>

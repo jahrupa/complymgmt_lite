@@ -52,7 +52,11 @@ import {
   UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID,
   DELETE_LOCATION_TO_MODULE_BY_ID,
   GET_SUB_MODULE_NAME_BY_MODULE_ID,
-  FILE_UPLOAD
+  FILE_UPLOAD,
+  DELETE_SERVICE_TRACKER_BY_ID,
+  UPDATE_SERVICE_TRACKER,
+  CREATE_SERVICE_TRACKER,
+  UPDATE_SERVICE_TRACKER_BY_STATUS_ID
 
 } from "./Endpoint";
 // Login Api
@@ -536,8 +540,46 @@ export const fetchAllServiceTracker = async () => {
     throw error;
   }
 };
+export const deleteServiceTrackerById = async (id, payload) => {
+  try {
+    const response = await API.delete(`${DELETE_SERVICE_TRACKER_BY_ID}${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error delete service tracker:", error);
+    throw error;
+  }
+};
+export const updateServiceTrackerById = async (id, payload) => {
+  try {
+    const response = await API.put(`${UPDATE_SERVICE_TRACKER}${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error update service tracker:", error);
+    throw error;
+  }
+};
+
+export const createServiceTracker = async (payload) => {
+  try {
+    const response = await API.post(`${CREATE_SERVICE_TRACKER}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error create sevice tracker:", error);
+    throw error;
+  }
+};
 
 
+
+export const updateServiceTrackerByStatusId = async (id,payload) => {
+  try {
+    const response = await API.put(`${UPDATE_SERVICE_TRACKER_BY_STATUS_ID}${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error update sevice tracker status:", error);
+    throw error;
+  }
+};
 // location To Module
 
 export const fetchLocationToModuleModule = async () => {
@@ -587,7 +629,7 @@ export const deleteLocationToModuleByStatusId = async (id, payload) => {
     throw error;
   }
 };
-
+// File upload
 export const uploadFile = async (filesArray) => {
   try {
     const formData = new FormData();

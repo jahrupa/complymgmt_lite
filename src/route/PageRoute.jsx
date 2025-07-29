@@ -36,7 +36,7 @@ import LocationToModule from '../page/LocationToModule.jsx';
 import NotificationPage from '../component/notification/NotificationPage.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -140,9 +140,6 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 //     cleanup();
 //   };
 // }, []);
-
-
-
 
   return (
     <>
