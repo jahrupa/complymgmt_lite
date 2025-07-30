@@ -16,10 +16,12 @@ import {
 } from 'lucide-react';
 import '../../style/notification.css'
 import MonthYearCalander from '../MonthYearCalander';
+import { useNavigate } from 'react-router-dom';
 
 const NotificationPage = ({ onBack }) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   const allNotifications = [
     {
@@ -153,6 +155,10 @@ const NotificationPage = ({ onBack }) => {
         </div>
 
         <div className="notification-actions">
+          <button className="action-btn secondary" onClick={() => navigate('/create_notification')}>
+            <CheckCircle size={18} />
+            Create Notifaction
+          </button>
           <button className="action-btn secondary">
             <CheckCircle size={18} />
             Mark All Read

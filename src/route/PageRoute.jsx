@@ -34,6 +34,7 @@ import ProfileForm from '../page/ProfileForm.jsx';
 import ModuleTracker from '../page/ModuleTracker.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
 import NotificationPage from '../component/notification/NotificationPage.jsx';
+import CreateNotification from '../page/CreateNotification.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -47,99 +48,99 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   let tokenId = localStorage.getItem('token');
   // console.log(tokenId, 'tokenId',sessionStorage.getItem('browserSessionActive'),'..........')
   useEffect(() => {
-  if (tokenId) {
-    setIsAuthenticated(true)
-  }
+    if (tokenId) {
+      setIsAuthenticated(true)
+    }
   }, [tokenId])
-// useEffect(() => {
-//   const tabId = Date.now().toString();
-//   const activeTabsKey = 'activeTabs';
-// console.log(activeTabsKey,'activeTabsKey')
-//   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-//   tabs.push(tabId);
-//   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
+  // useEffect(() => {
+  //   const tabId = Date.now().toString();
+  //   const activeTabsKey = 'activeTabs';
+  // console.log(activeTabsKey,'activeTabsKey')
+  //   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
+  //   tabs.push(tabId);
+  //   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
 
-//   // Set session active
-//   sessionStorage.setItem('browserSessionActive', 'true');
+  //   // Set session active
+  //   sessionStorage.setItem('browserSessionActive', 'true');
 
-//   // ✅ Check token & session to set auth
-//   const token = localStorage.getItem('token');
-//   const sessionActive = sessionStorage.getItem('browserSessionActive');
+  //   // ✅ Check token & session to set auth
+  //   const token = localStorage.getItem('token');
+  //   const sessionActive = sessionStorage.getItem('browserSessionActive');
 
-//   if (token && sessionActive === 'true') {
-//     setIsAuthenticated(true);
-//   }
+  //   if (token && sessionActive === 'true') {
+  //     setIsAuthenticated(true);
+  //   }
 
-//   const cleanup = () => {
-//     let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-//     tabs = tabs.filter(id => id !== tabId);
-//     localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
+  //   const cleanup = () => {
+  //     let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
+  //     tabs = tabs.filter(id => id !== tabId);
+  //     localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
 
-//     const isSessionStillActive = sessionStorage.getItem('browserSessionActive');
+  //     const isSessionStillActive = sessionStorage.getItem('browserSessionActive');
 
-//     if (tabs.length === 0 && !isSessionStillActive) {
-//       localStorage.removeItem('token');
-//     }
-//   };
+  //     if (tabs.length === 0 && !isSessionStillActive) {
+  //       localStorage.removeItem('token');
+  //     }
+  //   };
 
-//   window.addEventListener('beforeunload', cleanup);
+  //   window.addEventListener('beforeunload', cleanup);
 
-//   return () => {
-//     window.removeEventListener('beforeunload', cleanup);
-//     cleanup();
-//   };
-// }, []);
+  //   return () => {
+  //     window.removeEventListener('beforeunload', cleanup);
+  //     cleanup();
+  //   };
+  // }, []);
 
 
-// 2nd ---------------------------------------------------------------
-// useEffect(() => {
-//   const tabId = Date.now().toString();
-//   const activeTabsKey = 'activeTabs';
+  // 2nd ---------------------------------------------------------------
+  // useEffect(() => {
+  //   const tabId = Date.now().toString();
+  //   const activeTabsKey = 'activeTabs';
 
-//   // Add this tab to activeTabs
-//   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-//   tabs.push(tabId);
-//   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
+  //   // Add this tab to activeTabs
+  //   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
+  //   tabs.push(tabId);
+  //   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
 
-//   sessionStorage.setItem('browserSessionActive', 'true');
+  //   sessionStorage.setItem('browserSessionActive', 'true');
 
-//   const token = localStorage.getItem('token');
-//   const sessionActive = sessionStorage.getItem('browserSessionActive');
+  //   const token = localStorage.getItem('token');
+  //   const sessionActive = sessionStorage.getItem('browserSessionActive');
 
-//   if (token && sessionActive === 'true') {
-//     setIsAuthenticated(true);
-//   }
+  //   if (token && sessionActive === 'true') {
+  //     setIsAuthenticated(true);
+  //   }
 
-//   const cleanup = () => {
-//     let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-//     tabs = tabs.filter(id => id !== tabId);
-//     localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
-//   };
+  //   const cleanup = () => {
+  //     let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
+  //     tabs = tabs.filter(id => id !== tabId);
+  //     localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
+  //   };
 
-//   // 👇 Handle cleanup on unload
-//   window.addEventListener('beforeunload', cleanup);
+  //   // 👇 Handle cleanup on unload
+  //   window.addEventListener('beforeunload', cleanup);
 
-//   // 👇 Listen for changes in localStorage
-//   const onStorage = (event) => {
-//     if (event.key === activeTabsKey) {
-//       const tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-//       const sessionActive = sessionStorage.getItem('browserSessionActive');
+  //   // 👇 Listen for changes in localStorage
+  //   const onStorage = (event) => {
+  //     if (event.key === activeTabsKey) {
+  //       const tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
+  //       const sessionActive = sessionStorage.getItem('browserSessionActive');
 
-//       // Token clear only if NO tabs left and this tab also has no session
-//       if (tabs.length === 0 && !sessionActive) {
-//         localStorage.removeItem('token');
-//       }
-//     }
-//   };
+  //       // Token clear only if NO tabs left and this tab also has no session
+  //       if (tabs.length === 0 && !sessionActive) {
+  //         localStorage.removeItem('token');
+  //       }
+  //     }
+  //   };
 
-//   window.addEventListener('storage', onStorage);
+  //   window.addEventListener('storage', onStorage);
 
-//   return () => {
-//     window.removeEventListener('beforeunload', cleanup);
-//     window.removeEventListener('storage', onStorage);
-//     cleanup();
-//   };
-// }, []);
+  //   return () => {
+  //     window.removeEventListener('beforeunload', cleanup);
+  //     window.removeEventListener('storage', onStorage);
+  //     cleanup();
+  //   };
+  // }, []);
 
   return (
     <>
@@ -181,6 +182,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/module_by_location" element={<LocationToModule />} />
             <Route path="/notification" element={<NotificationPage />} />
+            <Route path="/create_notification" element={<CreateNotification />} />
           </Route>
         </Route>
 
