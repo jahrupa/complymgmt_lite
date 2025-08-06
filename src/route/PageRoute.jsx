@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import PageLayout from '../layout/pageLayout';
+import PageLayout from '../layout/PageLayout';
 import DashboardPage from '../page/DashboardPage';
 import UserRolesPage from '../page/UserRolesPage';
 import Login from '../page/Login';
@@ -35,6 +35,8 @@ import ModuleTracker from '../page/ModuleTracker.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
 import NotificationPage from '../component/notification/NotificationPage.jsx';
 import CreateNotification from '../page/CreateNotification.jsx';
+import DetailsPage from '../page/DetailsPage.jsx';
+import ServiceTrackerInnerPage from '../page/ServiceTrackerInnerPage.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -183,6 +185,9 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/module_by_location" element={<LocationToModule />} />
             <Route path="/notification" element={<NotificationPage />} />
             <Route path="/create_notification" element={<CreateNotification />} />
+            <Route path="/details/:seriesName/:year" element={<DetailsPage />} />
+            <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
+
           </Route>
         </Route>
 

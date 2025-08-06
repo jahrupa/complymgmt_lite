@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { createCompany, deleteCompanyById, fetchAllCompanies, fetchAllGroupHolding, updateCompanyById, updateCompanyStatusById } from '../api/Service';
+import { createCompany, deleteCompanyById, fetchAllCompanies, fetchAllGroupHolding, updateCompanyById, updateCompanyStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -30,6 +30,7 @@ const Company = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [groupHoldingName, setGroupHoldingName] = useState([])
+  console.log(groupHoldingName,'groupHoldingName')
   const [companyId, setCompanyId] = useState(null)
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -66,6 +67,7 @@ const Company = () => {
       "CompanyName": current?.company_name || '',
       "CompanyDescription": current?.company_description || '',
       "GroupHoldingsID": current?.group_holding_id || null,
+      CompanyCommonName: current?.company_common_name || '',
       "CommonAttributes": {
         "Created_By": "507f1f77bcf86cd799439012",
       }
@@ -159,22 +161,32 @@ const Company = () => {
   };
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [companiesData, groupHolding] = await Promise.all([
-          fetchAllCompanies(),
-          fetchAllGroupHolding(),
-        ]);
-        setData(companiesData);
-        setGroupHoldingName(groupHolding);
-      } catch (error) {
-        // console.error("Error fetching data:", error);
-      }
-    };
+ useEffect(() => {
+  const fetchData = async () => {
+    const [companiesRes, groupHoldingRes] = await Promise.allSettled([
+      fetchAllCompanies(),
+      fetchAllGroupHolding(),
+    ]);
 
-    fetchData();
-  }, []);
+    if (companiesRes.status === 'fulfilled') {
+      setData(companiesRes.value);
+    } else {
+      console.warn("fetchAllCompanies failed:", companiesRes.reason);
+    }
+
+    if (groupHoldingRes.status === 'fulfilled') {
+      const groupHolding = groupHoldingRes.value;
+      if (groupHolding && groupHolding.length > 0) {
+        setGroupHoldingName(groupHolding);
+      }
+    } else {
+      console.warn("fetchAllGroupHolding failed:", groupHoldingRes.reason);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
 
 
@@ -445,8 +457,8 @@ const Company = () => {
             </div>
           </div>
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div className='pe-2'>
-              <button className='crud_btn' onClick={openModal}>
+            <div>
+              <button className='crud_btn w-100' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New Company</span>
               </button>
             </div>

@@ -148,11 +148,11 @@ const OnbardingPayrollCompliance = () => {
 
             <div className='d-lg-flex d-md-flex gap-2'>
               <div>
-                <button onClick={onBtnExport} className='crud_btn'><ExitToAppIcon style={{ width: 18 }} />Export</button>
+                <button onClick={onBtnExport} className='crud_btn w-100'><ExitToAppIcon style={{ width: 18 }} />Export</button>
               </div>
               <div>
                 <div className=' d-flex justify-content-end'>
-                  <button className='crud_btn' onClick={openModal}>Upload File</button>
+                  <button className='crud_btn w-100' onClick={openModal}>Upload File</button>
                 </div>
               </div>
               <div>

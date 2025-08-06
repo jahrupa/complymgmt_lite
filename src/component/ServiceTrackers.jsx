@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/Service';
+import { createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -21,6 +21,7 @@ import Toggle from '../component/Toggle';
 import Modal from './Modal';
 import SingleSelectTextField from './MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from './MuiInputs/MuiTextAreaField';
+import { useNavigate } from 'react-router-dom';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -57,24 +58,14 @@ const ServiceTrackers = () => {
         severityType: '',
     });
     const [serviceTrackerId, setServiceTrackerId] = useState(null)
-    const [groupHoldingData, setGroupHoldinData] = useState([]);
+    const [groupHoldingData, setGroupHoldingData] = useState([]);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
     const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
     const [moduleName, setModuleName] = useState([]);
     const [subModuleName, setSubModuleName] = useState([]);
 
 
-
-    console.log(current, 'current')
-    // Role wise access
-    const names = [
-        'Create',
-        'Editor',
-        'Viewer',
-        'Delete',
-        'All'
-    ];
-
+    const navigate = useNavigate();
     // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -156,7 +147,7 @@ const ServiceTrackers = () => {
             const message = response?.message || "Group holding  successfully";
 
             // Refresh data
-            const updatedData = await fetchAllGroup();
+            const updatedData = await fetchAllServiceTracker();
             setData(updatedData);
             setIsDeleteModalOpen(false);
 
@@ -238,7 +229,7 @@ const ServiceTrackers = () => {
                     fetchAllGroupHolding(),
                 ]);
                 setData(serviceTracker);
-                setGroupHoldinData(groupHolding);
+                setGroupHoldingData(groupHolding);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -527,7 +518,20 @@ const ServiceTrackers = () => {
             }
         },
         { field: '_id', headerName: 'ID', filter: true, editable: false, },
-        { field: 'service_tracker_name', headerName: 'Service Tracker Name', filter: true, editable: false, },
+        {
+            field: 'service_tracker_name',
+            headerName: 'Service Tracker Name',
+            filter: true,
+            editable: false,
+            cellRenderer: (params) => (
+                <span
+                    style={{ color: '#1976d2', cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => navigate(`/service/${encodeURIComponent(params.data.service_tracker_name)}/${params.data._id}`)}
+                >
+                    {params.value}
+                </span>
+            )
+        },
         { field: 'group_name', headerName: 'Group Holding', filter: true, editable: false, },
         { field: 'company_name', headerName: 'company', filter: true, editable: false, },
         { field: 'location_name', headerName: 'Location', filter: true, editable: false, },
@@ -618,8 +622,8 @@ const ServiceTrackers = () => {
                         </div>
                     </div>
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div className='pe-2'>
-                            <button className='crud_btn' onClick={openModal}>
+                        <div>
+                            <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add Service Tracker</span>
                             </button>
 

@@ -548,11 +548,11 @@
 }
 /* notification page search */
 
-.search-container {
+.notification-search-container {
   position: relative;
 }
 
-.search-input {
+.notification-search-input {
   padding: 0.5rem 0.75rem 0.5rem 2.5rem;
   border: 1px solid var(--gray-300);
   border-radius: var(--border-radius);
@@ -560,7 +560,7 @@
   transition: all 0.2s ease;
 }
 
-.search-input:focus {
+.notification-search-input:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);

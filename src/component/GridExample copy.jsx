@@ -81,10 +81,10 @@ const GridExample = () => {
         </div>
         <div className='d-lg-flex d-md-flex gap-2'>
           <div>
-            <button onClick={onBtnExport} className='crud_btn'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
+            <button onClick={onBtnExport} className='crud_btn w-100'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
           </div>
           <div>
-            <button onClick={onBtnExport} className='crud_btn'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
+            <button onClick={onBtnExport} className='crud_btn w-100'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
           </div>
         </div>
       </div>

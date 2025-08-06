@@ -1,15 +1,13 @@
 .crud_btn {
     background: #0d6efd;
-    border-radius: 5px;
-    height: 35px;
+    border-radius: 12px;
+    height: 40px;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 0px;
     padding-bottom: 0px;
     border: none;
     color: white;
-
-
 }
 
 .table_tag {
@@ -297,6 +295,16 @@
 .table_td_font{
     font-size: 11px;
     white-space: nowrap;
+}
+.service-tracker-inner-page-header {
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--gray-100);
 }
 @media screen and (max-width: 480px) {
     .text_area_field {

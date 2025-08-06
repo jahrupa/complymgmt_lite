@@ -31,7 +31,7 @@ import {
   UPDATE_MODULE_BY_ID,
   DELETE_MODULE_BY_ID,
   GET_ALL_SUB_MODULE,
-  CREATE_SUB_MODELE,
+  CREATE_SUB_MODULE,
   UPDATE_SUB_MODULE_STATUS_BY_ID,
   VIEW_MODULE_NAME,
   DELETE_SUB_MODULE_BY_ID,
@@ -56,7 +56,13 @@ import {
   DELETE_SERVICE_TRACKER_BY_ID,
   UPDATE_SERVICE_TRACKER,
   CREATE_SERVICE_TRACKER,
-  UPDATE_SERVICE_TRACKER_BY_STATUS_ID
+  UPDATE_SERVICE_TRACKER_BY_STATUS_ID,
+  GET_USER_ACCESS_LEVEL,
+  CREATE_USER_ACCESS_LEVEL,
+  UPDATE_USER_ACCESS_LEVEL,
+  DELETE_USER_ACCESS_LEVEL,
+  UPLOAD_EXCEL,
+  GET_ALL_INNER_PAGE_SERVICE_TRACKER
 
 } from "./Endpoint";
 // Login Api
@@ -142,7 +148,7 @@ export const deleteCompanyById = async (id) => {
 };
 export const getCompanyByGroupId = async (id) => {
   try {
-    const response = await API.get(`${GET_COMPANY_BY_GROUP_HOLDING_ID}${id}`); 
+    const response = await API.get(`${GET_COMPANY_BY_GROUP_HOLDING_ID}${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching company by group ID:", error);
@@ -237,7 +243,7 @@ export const deleteLocationById = async (id) => {
 
 export const getLocationByCompanyId = async (id) => {
   try {
-    const response = await API.get(`${GET_LOCATION_BY_COMPANY_ID}${id}`); 
+    const response = await API.get(`${GET_LOCATION_BY_COMPANY_ID}${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching Location by company ID:", error);
@@ -426,14 +432,14 @@ export const fetchAllModulesName = async () => {
 };
 export const fetchAllModulesNameByLocationId = async (id) => {
   try {
-    const response = await API.get(`${VIEW_MODULE_BY_LOCATION_ID}${id}` );
+    const response = await API.get(`${VIEW_MODULE_BY_LOCATION_ID}${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching Modules name by location id:", error);
     throw error;
   }
 };
-export const createModule= async (modulePayload) => {
+export const createModule = async (modulePayload) => {
   try {
     const response = await API.post(CREATE_MODELE, modulePayload);
     return response.data;
@@ -492,9 +498,9 @@ export const fetchAllSubModuleNameByModuleId = async (id) => {
   }
 };
 
-export const createsSubModule= async (subModulePayload) => {
+export const createsSubModule = async (subModulePayload) => {
   try {
-    const response = await API.post(CREATE_SUB_MODELE, subModulePayload);
+    const response = await API.post(CREATE_SUB_MODULE, subModulePayload);
     return response.data;
   } catch (error) {
     console.error("Error creating SUB module:", error);
@@ -540,6 +546,17 @@ export const fetchAllServiceTracker = async () => {
     throw error;
   }
 };
+
+export const fetchAllInnerPageServiceTracker = async (trackerName) => {
+  try {
+    const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching inner page service tracker:", error);
+    throw error;
+  }
+};
 export const deleteServiceTrackerById = async (id, payload) => {
   try {
     const response = await API.delete(`${DELETE_SERVICE_TRACKER_BY_ID}${id}`, payload);
@@ -571,7 +588,7 @@ export const createServiceTracker = async (payload) => {
 
 
 
-export const updateServiceTrackerByStatusId = async (id,payload) => {
+export const updateServiceTrackerByStatusId = async (id, payload) => {
   try {
     const response = await API.put(`${UPDATE_SERVICE_TRACKER_BY_STATUS_ID}${id}`, payload);
     return response.data;
@@ -592,7 +609,7 @@ export const fetchLocationToModuleModule = async () => {
   }
 };
 
-export const createsLocationToModule= async (payload) => {
+export const createsLocationToModule = async (payload) => {
   try {
     const response = await API.post(CREATE_LOCATION_TO_MODULE, payload);
     return response.data;
@@ -650,6 +667,69 @@ export const uploadFile = async (filesArray) => {
     throw error;
   }
 };
+export const uploadExcelFile = async (filesArray, metadata = {}) => {
+  try {
+    const formData = new FormData();
+
+    filesArray.forEach((file) => {
+      formData.append("file", file);
+    });
+
+    // Append other fields
+    Object.entries(metadata).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    const response = await API.post(UPLOAD_EXCEL, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed:", error.response?.data || error);
+    throw error;
+  }
+};
 
 
+// USER ACCESS LEVEL
+export const fetchAllUserAccessLevels = async () => {
+  try {
+    const response = await API.get(GET_USER_ACCESS_LEVEL);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user access levels:", error);
+    throw error;
+  }
+};
+
+export const createUserAccessLevel = async (userAccessData) => {
+  try {
+    const response = await API.post(CREATE_USER_ACCESS_LEVEL, userAccessData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating user access level:", error);
+    throw error;
+  }
+};
+export const updateUserAccessLevelById = async (id, userAccessData) => {
+  try {
+    const response = await API.put(`${UPDATE_USER_ACCESS_LEVEL}${id}`, userAccessData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user access level:", error);
+    throw error;
+  }
+};
+export const deleteUserAccessLevelById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_USER_ACCESS_LEVEL}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user access level:", error);
+    throw error;
+  }
+};
 

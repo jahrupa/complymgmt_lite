@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../style/sidebar.css';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import NextWeekOutlinedIcon from '@mui/icons-material/NextWeekOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
@@ -28,55 +28,66 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import TurnedInIcon from '@mui/icons-material/TurnedIn';
 import { Cable } from 'lucide-react';
+
 function SideBar({ sidebarOpen, setSidebarOpen }) {
-    const [activeItem, setActiveItem] = useState('Dashboard');
+    const location = useLocation();
+    const [activeItem, setActiveItem] = useState(() => {
+        return localStorage.getItem('activeSidebarItem') || 'Dashboard';
+    });
     const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
 
     const menuItems = [
-        { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
-        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
-        { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Group/Holding', link: 'group_holding' },
-        { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
-        { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'module_by_location' },
-        { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
-        { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
-        { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onboarding', link: 'onboarding' },
-        { icon: (active) => <ReceiptLongOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onbarding Compliance Scope', link: 'onbarding_compliance_scope' },
-        { icon: (active) => <CurrencyRupeeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Onbarding Payroll Compliance', link: 'onbarding_payroll_compliance' },
-        { icon: (active) => <NextWeekOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Outsourcing Scope', link: 'outsourcing_scope' },
-        { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Reimbursements', link: 'reimbursements' },
-        { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Payroll Management', link: 'payroll_management' },
-        { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Service Trackers', link: 'service_trackers' },
-        { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
-        { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
-        { icon: (active) => <Cable className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
-
-
+        { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
+        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
+        { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Group/Holding', link: 'group_holding' },
+        { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
+        { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'module_by_location' },
+        { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
+        { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
+        // { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onboarding', link: 'onboarding' },
+        // { icon: (active) => <ReceiptLongOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onbarding Compliance Scope', link: 'onbarding_compliance_scope' },
+        // { icon: (active) => <CurrencyRupeeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onbarding Payroll Compliance', link: 'onbarding_payroll_compliance' },
+        // { icon: (active) => <NextWeekOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Outsourcing Scope', link: 'outsourcing_scope' },
+        // { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Reimbursements', link: 'reimbursements' },
+        // { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Payroll Management', link: 'payroll_management' },
+        { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Service Trackers', link: 'service_trackers' },
+        { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
+        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
+        { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
+        { icon: (active) => <Cable className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
     ];
 
     const documentSubItems = [
-        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Approved Document', link: 'approved_documents' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Pending Document', link: 'pending_documents' },
-        { icon: (active) => <AttachFileIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Tagged Document', link: 'tagged_documents' },
-        { icon: (active) => <TurnedInIcon className={`${active ? 'side-bar-icon-active ' : 'side-bar-icon'}`} />, label: 'Untagged Document', link: 'untagged_documents' },
-
+        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Approved Document', link: 'approved_documents' },
+        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Pending Document', link: 'pending_documents' },
+        { icon: (active) => <AttachFileIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tagged Document', link: 'tagged_documents' },
+        { icon: (active) => <TurnedInIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Untagged Document', link: 'untagged_documents' },
     ];
+
+    // Sync active tab with URL on page load
+    useEffect(() => {
+        const currentPath = location.pathname.split('/')[1];
+        const allItems = [...menuItems, ...documentSubItems];
+        const match = allItems.find(item => item.link === currentPath);
+        if (match) {
+            setActiveItem(match.label);
+            localStorage.setItem('activeSidebarItem', match.label);
+        }
+    }, [location.pathname]);
 
     return (
         <div>
             <div className={`${sidebarOpen ? "sidebar sidebar-open" : "sidebar sidebar-close"}`}>
                 <div>
-                    <div className={`${sidebarOpen ? 'd-flex open-sidebar-wrap open-sidebar-logo-wrap ' : 'd-flex close-sidebar-logo-wrap'}`} style={{ alignItems: 'center', marginBottom: 29 }}>
-                        <button className="openbtn btn btn-sm w-auto" onClick={() => setSidebarOpen(prev => !prev)} style={!sidebarOpen ? { marginLeft: '6px' } : undefined}
-
-                        >
+                    <div className={`${sidebarOpen ? 'd-flex open-sidebar-wrap open-sidebar-logo-wrap' : 'd-flex close-sidebar-logo-wrap'}`} style={{ alignItems: 'center', marginBottom: 29 }}>
+                        <button className="openbtn btn btn-sm w-auto" onClick={() => setSidebarOpen(prev => !prev)} style={!sidebarOpen ? { marginLeft: '6px' } : undefined}>
                             {sidebarOpen ? <MenuOpenIcon /> : <MenuIcon />}
                         </button>
                         <img src={complyn_mgmt_logo} alt='logo' width={115} className={`${sidebarOpen ? 'mt-1 nav-open-logo' : 'mt-1 display-none'}`} />
                     </div>
+
                     <div style={{ paddingTop: 75 }}>
                         {menuItems.map(({ icon, label, link }, i) => {
                             const isActive = activeItem === label;
@@ -84,7 +95,10 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                 <div key={i}>
                                     <Link
                                         to={`/${link}`}
-                                        onClick={() => setActiveItem(label)}
+                                        onClick={() => {
+                                            setActiveItem(label);
+                                            localStorage.setItem('activeSidebarItem', label);
+                                        }}
                                     >
                                         <div
                                             className={`${sidebarOpen ? 'ms-2 mb-4 d-flex d-inline-block open-sidebar-wrap' : 'ms-2 mb-4 d-flex d-inline-block'}`}
@@ -101,23 +115,21 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                         </div>
                                     </Link>
                                 </div>
-
                             );
                         })}
+
+                        {/* Document Dropdown */}
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
-                                className={`${sidebarOpen ? 'd-flex align-items-center cursor-pointer mb-4 menu-sidebar-content' : 'd-flex align-items-center cursor-pointer mb-4 '}`}
+                                className="d-flex align-items-center cursor-pointer mb-4"
                                 onClick={() => setShowDocumentDropdown(!showDocumentDropdown)}
-                                style={{ cursor: 'pointer' }}
                             >
                                 <span className='sidebar-close-icon-span'>
                                     {showDocumentDropdown ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
-
                                 </span>
                                 <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
                                     Document Records
                                 </span>
-
                             </div>
 
                             {showDocumentDropdown && (
@@ -128,8 +140,10 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                             <div key={i}>
                                                 <Link
                                                     to={`/${link}`}
-                                                    onClick={() => setActiveItem(label)}
-                                                // className='d-flex d-inline-block mb-4'
+                                                    onClick={() => {
+                                                        setActiveItem(label);
+                                                        localStorage.setItem('activeSidebarItem', label);
+                                                    }}
                                                 >
                                                     <div
                                                         className='d-flex d-inline-block mb-4'
@@ -146,26 +160,20 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                                     </div>
                                                 </Link>
                                             </div>
-
                                         );
                                     })}
                                 </div>
                             )}
                         </div>
-
                     </div>
-
                 </div>
-
-
-
             </div>
+
             <div id="main" style={{ marginLeft: sidebarOpen ? '250px' : '90px' }} className='mobile-page-layout'>
                 <Outlet />
             </div>
         </div>
     );
 }
-
 
 export default SideBar;

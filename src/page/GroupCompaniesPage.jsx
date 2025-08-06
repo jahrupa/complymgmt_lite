@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { createGroup, deleteGroupById, fetchAllGroup, updateGroupById, updateGroupStatusById } from '../api/Service';
+import { createGroup, deleteGroupById, fetchAllGroup, updateGroupById, updateGroupStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -351,7 +351,7 @@ const GroupCompaniesPage = () => {
 
 
     { field: 'common_attributes.created_at', headerName: 'Created At', filter: true, editable: false, },
-    { field: 'updated_at', headerName: 'Updated At', filter: true, editable: false, },
+    { field: 'common_attributes.updated_at', headerName: 'Updated At', filter: true, editable: false, },
     {
       headerName: 'Is Active',
       field: 'common_attributes.is_active',
@@ -394,8 +394,8 @@ const GroupCompaniesPage = () => {
             </div>
           </div>
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div className='pe-2'>
-              <button className='crud_btn' onClick={openModal}>
+            <div>
+              <button className='crud_btn w-100' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
               </button>
 

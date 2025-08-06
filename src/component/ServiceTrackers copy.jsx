@@ -10,7 +10,7 @@ import FilePresentIcon from '@mui/icons-material/FilePresent';
 import exportCsvIcon from '../assets/Arrow-Line.png'
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import SingleSelectTextField from './MuiInputs/SingleSelectTextField';
-import { fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, fetchAllServiceTracker, getCompanyByGroupId } from '../api/Service';
+import { fetchAllCompaniesName, fetchAllGroupHolding, fetchAllLocation, fetchAllServiceTracker, getCompanyByGroupId } from '../api/service';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
 
 // Register module
@@ -395,11 +395,11 @@ function ServiceTrackers() {
 
                         <div className='d-lg-flex d-md-flex gap-2'>
                             {/* <div>
-                                <button onClick={onBtnExport} className='crud_btn'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
+                                <button onClick={onBtnExport} className='crud_btn w-100'><img src={exportCsvIcon} alt='csv export icon' width='12' className='mb-1 me-1' />Export</button>
                             </div> */}
                             <div>
                                 <div className=' d-flex justify-content-end'>
-                                    <button className='crud_btn' onClick={openModal}>Add Service Tracker</button>
+                                    <button className='crud_btn w-100' onClick={openModal}>Add Service Tracker</button>
                                 </div>
                             </div>
                         </div>

@@ -14,7 +14,7 @@ import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import { createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById } from '../api/Service';
+import { createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById } from '../api/service';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
@@ -551,8 +551,8 @@ const handleDelete = async (moduleId) => {
 
 
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div className='pe-2'>
-                            <button className='crud_btn' onClick={openModal}>
+                        <div>
+                            <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Link Location To Module</span>
                             </button>
                         </div>

@@ -16,7 +16,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -870,7 +870,7 @@ const DocumentUpload = () => {
 
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div className='pe-2 d-lg-flex d-md-flex gap-3'>
-              {/* <button className='crud_btn' onClick={openModal}>
+              {/* <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New User Role</span>
                             </button> */}
 
@@ -888,7 +888,7 @@ const DocumentUpload = () => {
 
             </div>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} />
+            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} closeModal={closeModal}/>
           </div>
         </div>
 

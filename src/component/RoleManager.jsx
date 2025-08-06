@@ -15,7 +15,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, fetchAllRole, updateRoleStatusId, fetchCompaniesNameByGroupId, getLocationByCompanyId, deleteRoleById, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, fetchAllRole, updateRoleStatusId, fetchCompaniesNameByGroupId, getLocationByCompanyId, deleteRoleById, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, createRole, updateRoleById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 // import AccountBoxIcon from '@mui/icons-material/CalendarMonth';
@@ -37,7 +37,7 @@ const dummuJsonData = [
         "email": "jha@gmail.com",
         "role_name": "Admin",
         "status": 'Active',
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "password": "password12",
@@ -53,7 +53,7 @@ const dummuJsonData = [
         "role_name": "Super Admin",
         "status": 'InActive',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -68,7 +68,7 @@ const dummuJsonData = [
         "role_name": "Client",
         "status": 'Active',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -83,7 +83,7 @@ const dummuJsonData = [
         "role_name": "Admin",
         "status": 'InActive',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -98,7 +98,7 @@ const dummuJsonData = [
         "role_name": "Client",
         "status": 'InActive',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -113,7 +113,7 @@ const dummuJsonData = [
         "role_name": "Super Admin",
         "status": 'Active',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -129,7 +129,7 @@ const dummuJsonData = [
         "role_name": "Admin",
         "status": 'Active',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -145,7 +145,7 @@ const dummuJsonData = [
         "role_name": "Super Admin",
         "status": 'InActive',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -161,7 +161,7 @@ const dummuJsonData = [
         "role_name": "Client",
         "status": 'Active',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -177,7 +177,7 @@ const dummuJsonData = [
         "role_name": "Admin",
         "status": 'Active',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -193,7 +193,7 @@ const dummuJsonData = [
         "role_name": "Super Admin",
         "status": 'InActive',
         "password": "password12",
-        "group_holding_name": "Tata",
+        "group_name": "Tata",
         "company_name": 'xyz',
         "location_name": "Mumbai",
         "access_modules": [
@@ -217,7 +217,7 @@ const RoleManager = () => {
             status: 'Active',
             desc: '',
             access_modules: [],
-            group_holding_name: "",
+            group_name: "",
             group_holding_id: null,
             company_name: "",
             company_id: null,
@@ -228,6 +228,7 @@ const RoleManager = () => {
             sub_module_name: '',
             sub_module_id: null,
         });
+    console.log(current, 'current...')
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [groupHoldingName, setGroupHoldingName] = useState([])
@@ -237,6 +238,7 @@ const RoleManager = () => {
     const [SubModuleName, setSubModuleName] = useState([])
     const [rolesName, setRolesName] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
+    console.log(isModalOpen,'isModalOpen')
     const [userId, setUserId] = useState(null)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -269,29 +271,39 @@ const RoleManager = () => {
     };
     const handleSubmit = async (e) => {
         // e?.preventDefault();
-
         const payload = {
             "RoleName": current?.role_name,
             "RoleDescription": current?.role_description,
+            "GroupHoldingsID": current?.group_holding_id,
+            "CompanyID": current?.company_id,
+            "LocationID": current?.location_id,
+            "ModuleID": current?.module_id,
+            "SubModuleID": current?.sub_module_id,
+            "ServiceTrackerID": current?.service_tracker_id,
             "CommonAttributes": {
-                "Created_By": "68480959d7038d326905b02c"
+                "Created_By": "68886d0c12968c416c8c8ba1"
             }
         }
-
         try {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateUserById(userId, {
+                response = await updateRoleById(userId, {
                     "RoleName": current?.role_name,
                     "RoleDescription": current?.role_description,
+                    "GroupHoldingsID": current?.group_holding_id,
+                    "CompanyID": current?.company_id,
+                    "LocationID": current?.location_id,
+                    "ModuleID": current?.module_id,
+                    "SubModuleID": current?.sub_module_id,
+                    "ServiceTrackerID": current?.service_tracker_id,
                     "CommonAttributes": {
-                        "Updated_By": "68480959d7038d326905b02c"
+                        "Updated_By": "68886d0c12968c416c8c8ba1"
                     }
                 });
             } else {
                 // Create new company
-                response = await createUser(payload);
+                response = await createRole(payload);
             }
 
             // ✅ Get the message from response
@@ -300,7 +312,7 @@ const RoleManager = () => {
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
             // Refresh data
-            const updatedData = await fetchAllUser();
+            const updatedData = await fetchAllRole();
             setData(updatedData);
         } catch (error) {
             console.error("Error saving user:", error);
@@ -596,7 +608,7 @@ const RoleManager = () => {
                 );
             }
         },
-        { field: 'id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
             field: 'role_name', headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
             cellRenderer: (params) => {
@@ -621,12 +633,14 @@ const RoleManager = () => {
                 );
             }
         },
-        { field: 'access_modules', headerName: 'Access Modules', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'access_modules', headerName: 'Access Modules', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'role_description', headerName: 'Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'module_name', headerName: 'Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'sub_module_name', headerName: 'Sub Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'service_tracker_name', headerName: 'Service Tracker Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
             headerName: 'Status',
             field: 'common_attributes.is_active',
@@ -640,13 +654,12 @@ const RoleManager = () => {
                 />
             )
         },
+        { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.approval_time', headerName: 'Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'group_holding_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
-
     ];
     const gridRef = useRef();
     const defaultColDef = {
@@ -671,9 +684,9 @@ const RoleManager = () => {
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
                     <SingleSelectTextField
-                        name="group_holding_name"
+                        name="group_name"
                         label="Group Holding"
-                        value={current.group_holding_name}
+                        value={current.group_name}
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = groupHoldingName.find(
@@ -681,7 +694,7 @@ const RoleManager = () => {
                             );
                             setCurrent((prev) => ({
                                 ...prev,
-                                group_holding_name: selectedName,
+                                group_name: selectedName,
                                 group_holding_id: matchedGroup?._id || null,
                             }));
                         }}
@@ -756,8 +769,8 @@ const RoleManager = () => {
                             }));
                         }}
                         names={SubModuleName}
-                    // error={!!errors.group_holding_name}
-                    // helperText={errors.group_holding_name}
+                    // error={!!errors.group_name}
+                    // helperText={errors.group_name}
                     />
                 </div>
                 <div className=''>
@@ -853,8 +866,8 @@ const RoleManager = () => {
 
 
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div className='pe-2'>
-                            <button className='crud_btn' onClick={openModal}>
+                        <div>
+                            <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New User Role</span>
                             </button>
                         </div>

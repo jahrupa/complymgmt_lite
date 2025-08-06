@@ -10,68 +10,64 @@ export const UPDATE_ROLE_STATUS_BY_ID='/update_role_status_by_id/';
 export const GET_ALL_ROLE_NAME='/view_role_names';
 
 // user
-export const GET_ALL_USER ='/view_all_users';
-export const DELETE_USER_BY_ID ='/delete_user_by_id/';
-export const CREATE_USER ='/create_user';
-export const UPDATE_USER_BY_ID ='update_user_by_id/';
-export const UPDATE_USER_STATUS_BY_ID='/update_user_status_by_id/';
-
+export const GET_ALL_USER ='/api/v1/user/view/multiple';
+export const DELETE_USER_BY_ID ='/api/v1/user/delete/';
+export const CREATE_USER ='/api/v1/user/create';
+export const UPDATE_USER_BY_ID ='/api/v1/user/update/';
+export const UPDATE_USER_STATUS_BY_ID='/api/v1/user/update/status/';
 
 // Company
-export const CREATE_COMPANY ='/create_company';
-export const UPDATE_COMPANY_BY_ID ='/update_company_by_id/';
-export const UPDATE_COMPANY_STATUS_BY_ID ='/update_company_status_by_id/';
-export const GET_ALL_COMPANY ='/view_all_companies';
-export const DELETE_COMPANY_BY_ID ='/delete_company_by_id/';
-export const GET_ALL_COMPANY_NAME ='/view_company_names';
-export const GET_COMPANY_NAME_BY_GROUP_ID ='/get_companies_by_group_id/';
-
+export const CREATE_COMPANY ='/api/v1/company/create';
+export const UPDATE_COMPANY_BY_ID ='/api/v1/company/update/';
+export const UPDATE_COMPANY_STATUS_BY_ID='/api/v1/company/update/status/';
+export const GET_ALL_COMPANY ='/api/v1/company/view/multiple';
+export const DELETE_COMPANY_BY_ID ='/api/v1/company/delete/';
+export const GET_ALL_COMPANY_NAME ='/api/v1/company/view/names/multiple';
+export const GET_COMPANY_NAME_BY_GROUP_ID ='/api/v1/company/view/group/multiple/';
+export const GET_COMPANY_BY_ID ='/api/v1/company/view/id/';
 
 // Group Holding
-export const GET_GROUP_HOLDING_BY_NAME ='/view_group_holdings_by_name';
-export const GET_ALL_GROUP ='/view_all_groups';
-export const CREATE_GROUP ='/create_group';
-export const UPDATE_GROUP ='/update_group_by_id/';
-export const DELETE_GROUP ='/delete_group_by_id/';
-export const GET_COMPANY_BY_ID ='/view_group_by_id/';
+export const GET_GROUP_HOLDING_BY_NAME ='/api/v1/group/view/names/multiple';
+export const GET_ALL_GROUP ='/api/v1/group/view/multiple';
+export const CREATE_GROUP ='/api/v1/group/create';
+export const UPDATE_GROUP ='/api/v1/group/update/';
+export const DELETE_GROUP ='/api/v1/group/delete/';
 export const GET_COMPANY_BY_GROUP_HOLDING_ID ='/get_company_by_group_id/';
-export const UPDATE_GROUP_STATUS ='/update_group_status_by_id/';
-
+export const UPDATE_GROUP_STATUS ='/api/v1/group/update/status/';
+export const GET_GROUP_BY_ID ='/api/v1/group/view/id/';
 // Location
-export const GET_ALL_LOCATION='/view_all_locations';
-export const CREATE_LOCATION='/create_location';
-export const UPDATE_LOCATION_BY_ID='/update_location_by_id/';
-export const DELETE_LOCATION_BY_ID='/delete_location_by_id/';
-export const GET_LOCATION_NAME='/view_location_names';
-export const UPDATE_LOCATION_STATUS_BY_ID='/update_location_status_by_id/';
-export const GET_LOCATION_BY_COMPANY_ID='/view_locations_by_company_id/';
-
+export const GET_ALL_LOCATION='/api/v1/company_location/view/multiple';
+export const CREATE_LOCATION='/api/v1/company_location/create';
+export const UPDATE_LOCATION_BY_ID='/api/v1/company_location/update/';
+export const DELETE_LOCATION_BY_ID='/api/v1/company_location/delete/';
+export const GET_LOCATION_NAME='/api/v1/company_location/view/names/multiple';
+export const UPDATE_LOCATION_STATUS_BY_ID='/api/v1/company_location/update/status/';
+export const GET_LOCATION_BY_COMPANY_ID='/api/v1/company_location/view/company/multiple/';
 
 // Module
-export const GET_ALL_MODULE='/view_all_modules';
-export const CREATE_MODELE='/create_module';
-export const UPDATE_MODULE_STATUS_BY_ID='/update_module_status_by_id/';
-export const UPDATE_MODULE_BY_ID='/update_module_by_id/';
-export const DELETE_MODULE_BY_ID='/delete_module_by_id/';
-export const VIEW_MODULE_NAME='/view_module_names';
-export const VIEW_MODULE_BY_LOCATION_ID='/view_modules_by_locationId/';
-
+export const GET_ALL_MODULE='/api/v1/module/view/multiple';
+export const CREATE_MODELE='/api/v1/module/create';
+export const UPDATE_MODULE_STATUS_BY_ID='/api/v1/module/update/status/';
+export const UPDATE_MODULE_BY_ID='/api/v1/module/update/';
+export const DELETE_MODULE_BY_ID='/api/v1/module/delete/';
+export const VIEW_MODULE_NAME='/api/v1/module/view/names/multiple';
+export const VIEW_MODULE_BY_LOCATION_ID='/api/v1/module_by_location/view/location/multiple/';
 
 // sub-module
-export const GET_ALL_SUB_MODULE='/view_all_submodules';
-export const CREATE_SUB_MODELE='/create_submodule';
-export const UPDATE_SUB_MODULE_BY_ID='/update_submodule_by_id/';
-export const DELETE_SUB_MODULE_BY_ID='/delete_submodule_by_id/';
-export const UPDATE_SUB_MODULE_STATUS_BY_ID='/update_submodule_status_by_id/';
-export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/view_submodules_names_by_modulesID/';
-
+export const GET_ALL_SUB_MODULE='/api/v1/submodule/view/multiple';
+export const CREATE_SUB_MODULE='/api/v1/submodule/create';
+export const UPDATE_SUB_MODULE_BY_ID='/api/v1/submodule/update/';
+export const DELETE_SUB_MODULE_BY_ID='/api/v1/submodule/delete/';
+export const UPDATE_SUB_MODULE_STATUS_BY_ID='/api/v1/submodule/update/status/';
+export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/api/v1/submodule/view/module/multiple/';
 
 // service tracker
-export const GET_ALL_SERVICE_TRACKER='/view_all_service_tracker';
-export const DELETE_SERVICE_TRACKER_BY_ID='/delete_service_tracker_by_id/';
-export const CREATE_SERVICE_TRACKER ='/create_service_tracker';
-export const UPDATE_SERVICE_TRACKER ='/update_service_tracker_by_id/';
-export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/update_service_tracker_status_by_id/';
+export const GET_ALL_SERVICE_TRACKER='/api/v1/service_tracker/view/multiple';
+export const GET_ALL_INNER_PAGE_SERVICE_TRACKER='/api/v1/service_tracker/view';
+export const DELETE_SERVICE_TRACKER_BY_ID='/api/v1/service_tracker/delete/';
+export const CREATE_SERVICE_TRACKER ='/api/v1/service_tracker/create';
+export const UPDATE_SERVICE_TRACKER ='/api/v1/service_tracker/update/';
+export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/api/v1/service_tracker/update/status/';
 
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/view_all_location_to_modules';
@@ -82,11 +78,14 @@ export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/'
 
 // File Upload
 export const FILE_UPLOAD='/classify-files';
+export const UPLOAD_EXCEL='/api/v1/upload_tracker/excel';
 
 
-
-
-
+// USER ACCESS LEVEL
+export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access_level/view/multiple';
+export const CREATE_USER_ACCESS_LEVEL ='/api/v1/user_access/create';
+export const UPDATE_USER_ACCESS_LEVEL ='/api/v1/user_access/update/';
+export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
 
 
 

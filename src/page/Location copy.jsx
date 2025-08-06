@@ -10,7 +10,7 @@ import {
     getCompanyByGroupId,
     updateLocationById,
     updateLocationStatusById
-} from '../api/Service';
+} from '../api/service';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -300,7 +300,7 @@ const Location = () => {
                         <MuiSearchBar label='Search...' />
                         <button className='search-icon'><SearchIcon /></button>
                     </div>
-                    <button className='crud_btn' onClick={() => setIsModalOpen(true)}><AddIcon /> Add Location</button>
+                    <button className='crud_btn w-100' onClick={() => setIsModalOpen(true)}><AddIcon /> Add Location</button>
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact

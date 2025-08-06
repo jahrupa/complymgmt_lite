@@ -10,10 +10,11 @@ import AddIcon from '@mui/icons-material/Add';
 import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, updateUserStatusId } from '../api/Service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, updateUserStatusId } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Search } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -52,7 +53,7 @@ const UserRolesPage = () => {
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
-  
+
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,7 +61,7 @@ const UserRolesPage = () => {
     // Clear error on change
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
   };
-  
+
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
@@ -165,12 +166,12 @@ const UserRolesPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userData, groupHolding, roleName, companyName, getLocationName] = await Promise.all([
+        const [userData] = await Promise.all([
           fetchAllUser(),
-          fetchAllGroupHolding(),
-          fetchAllUserName(),
-          fetchAllCompaniesName(),
-          fetchAllLocationName(),
+          // fetchAllGroupHolding(),
+          // fetchAllUserName(),
+          // fetchAllCompaniesName(),
+          // fetchAllLocationName(),
         ]);
         setData(userData);
         // console.log(data, 'data')
@@ -362,7 +363,7 @@ const UserRolesPage = () => {
             >
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
-            <button
+            {/* <button
               className="btn btn-sm"
               onClick={() => {
                 setUserId(params.data._id);
@@ -370,13 +371,13 @@ const UserRolesPage = () => {
               }}
             >
               <VisibilityIcon fontSize="small" className="action_icon" />
-            </button>
-            {/* <VisibilityIcon/> */}
+            </button> */}
           </div>
         );
       }
     },
     { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       field: 'role_name', width: 300, headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
       cellRenderer: (params) => {
@@ -403,7 +404,6 @@ const UserRolesPage = () => {
     },
     { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',
       field: 'common_attributes.is_active',
@@ -431,9 +431,9 @@ const UserRolesPage = () => {
       filter: true,
       headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
-    { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'group_holding', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // { field: 'group_holding', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
 
 
   ];
@@ -452,27 +452,39 @@ const UserRolesPage = () => {
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+      <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <div>
         <h5> Create User </h5>
       </div>
       {/* Table to display data */}
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
-          <div className='d-flex h-100'>
+          <div className="search-container">
+            <Search className="notification-search-icon" size={18} />
+            <input
+              type="text"
+              placeholder="Search users..."
+              // value={searchTerm}
+              // onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <div>
+            <button className='crud_btn w-100' onClick={openModal}>
+              <span><AddIcon /></span> <span className='button-style'>Add New User</span>
+            </button>
+          </div>
+          {/* <div className='d-flex h-100'>
             <div class="search-bar-container h-25">
               <MuiSearchBar label='Search...' type='text' />
               <button className='search-icon'><SearchIcon /></button>
             </div>
-          </div>
-          <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div className='pe-2'>
-              <button className='crud_btn' onClick={openModal}>
-                <span><AddIcon /></span> <span className='button-style'>Add New User</span>
-              </button>
-            </div>
-            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-          </div>
+          </div> */}
+
+
+
+
         </div>
 
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>

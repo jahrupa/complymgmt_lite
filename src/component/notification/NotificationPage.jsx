@@ -17,6 +17,7 @@ import {
 import '../../style/notification.css'
 import MonthYearCalander from '../MonthYearCalander';
 import { useNavigate } from 'react-router-dom';
+import { AnimatedSearchBar } from '../AnimatedSearchBar';
 
 const NotificationPage = ({ onBack }) => {
   const [filter, setFilter] = useState('all');
@@ -172,14 +173,15 @@ const NotificationPage = ({ onBack }) => {
 
       <div className="notification-filters">
         <div className="d-flex filter-search justify-content-between">
-          <div className="search-container">
+          {/* <AnimatedSearchBar/> */}
+          <div className="notification-search-container">
             <Search className="notification-search-icon" size={18} />
             <input
               type="text"
               placeholder="Search notifications..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+              className="notification-search-input"
             />
           </div>
           <div>

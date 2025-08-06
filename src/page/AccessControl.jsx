@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,6 +29,7 @@ import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
 import ResponsiveDatePickers from '../component/DatePicker';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
+import { fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, getLocationByCompanyId } from '../api/service';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -98,7 +99,13 @@ const AccessControl = () => {
     const [current, setCurrent] = useState({ id: null, sub_module_name: '', module_desc: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: [], sub_module_id: [] });
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [groupHoldingData, setGroupHoldingData] = useState([]);
+    console.log(groupHoldingData, 'groupHoldingData')
+    const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
+    const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
+    const [moduleName, setModuleName] = useState([]);
+    const [subModuleName, setSubModuleName] = useState([]);
+    const [userNameListRes, setUserNameListRes] = useState([]);
     // Handle Add or Edit
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -152,7 +159,8 @@ const AccessControl = () => {
         "Delete",
         "Can Approve",
     ];
-
+    const crudTitle = "Add New Access Control"
+    const editCrudTitle = "Edit Access Control"
     const handleRoleAccessChange = (newValue) => {
         setCurrent((prev) => ({ ...prev, approved_by: newValue }));
     };
@@ -162,30 +170,133 @@ const AccessControl = () => {
             <div>
                 {/* <form onSubmit={handleSubmit}> */}
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
-                    <SingleSelectTextField name="user_name" label="User Name" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
-                    <SingleSelectTextField name="group_holding" label="Group Holding" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
-
+                    <SingleSelectTextField 
+                    name="user_name" 
+                    label="User Name" 
+                    value={current.user_name} 
+                    onChange={(e) => setCurrent((prev) => ({ ...prev, user_name: e.target.value }))} 
+                    names={userNameListRes.map((item) => ({
+                            _id: item._id,
+                            name: item.name,
+                        }))}
+                         />
+                    <SingleSelectTextField
+                        name="group_name"
+                        label="Group Holding Name"
+                        value={current?.group_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = groupHoldingData.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                group_name: selectedName,
+                                group_name_id: matchedGroup?._id || null,
+                                company_name: '',
+                            }));
+                        }}
+                        names={groupHoldingData.map((item) => ({
+                            _id: item._id,
+                            name: item.name,
+                        }))}
+                    // error={!!errors.group_name}
+                    // helperText={errors.group_name}
+                    />
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
                     {/* <MuiTextField label='Sub Module Name' type='text' isRequired={true} fieldName='sub_module_name' handleChange={handleChange} value={current.sub_module_name} /> */}
-                    <SingleSelectTextField name="company" label="Company" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
-                    <SingleSelectTextField name="location" label="Location" value={current.location} onChange={(e) => setCurrent((prev) => ({ ...prev, location: e.target.value }))} names={groupHolding} />
+                    <SingleSelectTextField
+                        name="company_name"
+                        label="Company"
+                        value={current?.company_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = companyNameByGroupHoldingId.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                company_name: selectedName,
+                                company_id: matchedGroup?._id || null,
+                            }));
+                        }}
+                        names={companyNameByGroupHoldingId}
+                    // error={!!errors.company_name}
+                    // helperText={errors.company_name}
+                    />
+                    <SingleSelectTextField name="location_name" label="Location"
+                        value={current?.location_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedLocation = locationNameByCompanyId.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                location_name: selectedName,
+                                location_id: matchedLocation?._id || null,
+                            }));
+                        }}
+                        names={locationNameByCompanyId}
+                    // error={!!errors.location_name}
+                    // helperText={errors.location_name}
+
+                    />
 
                     {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
 
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
                     {/* <MuiTextField label='Sub Module Name' type='text' isRequired={true} fieldName='sub_module_name' handleChange={handleChange} value={current.sub_module_name} /> */}
-                    <SingleSelectTextField name="modules" label="Modules" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} />
-                    <SingleSelectTextField name="sub_module_name" label="Sub Modules" value={current.sub_module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_name: e.target.value }))} names={groupHolding} />
+                    <SingleSelectTextField
+                        name="module_name"
+                        label="Module"
+                        value={current.module_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = moduleName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                module_name: selectedName,
+                                module_id: matchedGroup?._id || null,
+                            }));
+                        }}
+                        names={moduleName}
+                    // error={!!errors.module_name}
+                    // helperText={errors.module_name}
+                    />
+                    <SingleSelectTextField
+                        name="sub_module_name"
+                        label="Sub-Module"
+                        value={current?.sub_module_name}
+                        // onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_name: e.target.value, }))}
+
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedGroup = subModuleName.find(
+                                (g) => g.name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                sub_module_name: selectedName,
+                                sub_module_id: matchedGroup?._id || null,
+                            }));
+                        }}
+                        names={subModuleName}
+                    // error={!!errors.sub_module_name}
+                    // helperText={errors.sub_module_name}
+                    />
 
                     {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
 
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
                     {/*  */}
-                    {/* <SingleSelectTextField name="service_trackers" label="Service Trackers" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={groupHolding} /> */}
-                    {/* <SingleSelectTextField name="access Level" label="Access Level" value={current.group_holding} onChange={(e) => setCurrent((prev) => ({ ...prev, group_holding: e.target.value }))} names={accessLevel} /> */}
+                    {/* <SingleSelectTextField name="service_trackers" label="Service Trackers" value={current.group_name} onChange={(e) => setCurrent((prev) => ({ ...prev, group_name: e.target.value }))} names={groupHolding} /> */}
+                    {/* <SingleSelectTextField name="access Level" label="Access Level" value={current.group_name} onChange={(e) => setCurrent((prev) => ({ ...prev, group_name: e.target.value }))} names={accessLevel} /> */}
                 </div>
 
                 <div>
@@ -206,17 +317,6 @@ const AccessControl = () => {
         )
 
     }
-    const crudTitle = "Add New Access Control"
-    const editCrudTitle = "Edit Access Control"
-
-
-    // id: 1744096161424,
-    // sub_module_name: "Tata",
-    // module_desc: "XYZ",
-    // created_at: "Tata",
-    // updated_at: "Tata",
-    // location: "Mumbai",
-    // approved_by: ["Admin"]
 
     const colDefs = [
         {
@@ -232,8 +332,8 @@ const AccessControl = () => {
                     <div className="d-flex justify-content-around align-items-center">
                         <button className="btn btn-sm" onClick={() => {
                             //   setCurrent(params.data);
-                              setIsEditing(true);
-                              setIsModalOpen(true);
+                            setIsEditing(true);
+                            setIsModalOpen(true);
                             //   setUserId(params.data._id);
                         }}>
                             <EditIcon fontSize="small" className="action_icon" />
@@ -263,18 +363,123 @@ const AccessControl = () => {
     ];
 
 
-      const gridRef = useRef();
-      const defaultColDef = {
+    const gridRef = useRef();
+    const defaultColDef = {
         sortable: true,
         filter: true,
         editable: true,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-      };
-      const onRowValueChanged = (event) => {
+    };
+    const onRowValueChanged = (event) => {
         console.log('Row updated:', event.data);
-      };
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const [ userAccessDataRes, groupHoldingRes,userNameListRes] = await Promise.allSettled([
+                fetchAllUserAccessLevels(),
+                fetchAllGroupHolding(),
+                fetchAllUser()
+            ]);
+
+            if (userAccessDataRes.status === 'fulfilled') {
+                setData(userAccessDataRes.value);
+            } else {
+                console.warn("fetchAllUserAccessLevels failed:", userAccessDataRes.reason);
+            }
+
+            if (groupHoldingRes.status === 'fulfilled') {
+                const groupHolding = groupHoldingRes.value;
+                if (groupHolding && groupHolding.length > 0) {
+                    setGroupHoldingData(groupHolding);
+                }
+            } else {
+                console.warn("fetchAllGroupHolding failed:", groupHoldingRes.reason);
+            }
+            if (userNameListRes.status === 'fulfilled') {
+                const userNameList = userNameListRes.value;
+                if (userNameList && userNameList.length > 0) {
+                    setUserNameListRes(userNameList);
+                }else {
+                    console.warn("fetchAllUser failed:", userNameListRes.reason);
+                }
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // fetch company by group id
+    useEffect(() => {
+        const fetchCompany = async () => {
+            try {
+                const data = await fetchCompaniesNameByGroupId(current?.group_name_id);
+                if (data) {
+                    setCompanyNameByGroupHoldingId(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch company:", error);
+            }
+        };
+
+        if (current?.group_name_id) {
+            fetchCompany();
+        }
+    }, [current?.group_name_id]);
+
+    // fetch location by company id
+    useEffect(() => {
+        const fetchLocationByCompanyId = async () => {
+            try {
+                const data = await getLocationByCompanyId(current?.company_id);
+                if (data) {
+                    setLocationNameByCompanyId(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by company_id:", error);
+            }
+        };
+
+        if (current?.company_id) {
+            fetchLocationByCompanyId();
+        }
+    }, [current?.company_id]);
 
 
+    // module by location id
+    useEffect(() => {
+        const fetchModuleByLocationId = async () => {
+            try {
+                const data = await fetchAllModulesNameByLocationId(current?.location_id);
+                if (data) {
+                    setModuleName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by location_id:", error);
+            }
+        };
+
+        if (current?.location_id) {
+            fetchModuleByLocationId();
+        }
+    }, [current?.location_id]);
+    // sub-module by module id
+    useEffect(() => {
+        const fetchSubModuleByModuleId = async () => {
+            try {
+                const data = await fetchAllSubModuleNameByModuleId(current?.module_id);
+                if (data) {
+                    setSubModuleName(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location by location_id:", error);
+            }
+        };
+
+        if (current?.module_id) {
+            fetchSubModuleByModuleId();
+        }
+    }, [current?.module_id]);
     return (
         <div>
             {/* Table to display data */}
@@ -289,8 +494,8 @@ const AccessControl = () => {
 
 
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div className='pe-2'>
-                            <button className='crud_btn' onClick={openModal}>
+                        <div>
+                            <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
                             </button>
                         </div>
@@ -298,133 +503,21 @@ const AccessControl = () => {
                         <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>
-
-                {/* <div className='table_div2'>
-                    <table className='table_tag'>
-                        <thead className='table_head_tag'>
-                            <tr >
-                                <th className='table_th_tag action_column ps-2 pe-2'>Actions</th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>User Name</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-
-                                <th className='table_th_tag  ps-2 pe-2'><span>Group Holding</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Company</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Location</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Sub Module</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Module</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-
-
-                                <th className='table_th_tag  ps-2 pe-2'><span>Service Trackers</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Access Level</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-                                <th className='table_th_tag  ps-2 pe-2'><span>Access Control</span>
-                                    <span className='ms-4'>
-                                        <ExpandCircleDownIcon className='table_th_icon' />
-
-                                    </span>
-                                </th>
-
-
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.length === 0 ? (
-                                <tr>
-                                    <td colSpan="10" style={{ textAlign: 'center', height: '300px' }}> <div className='no_data_found'><span><BackupTableIcon /></span><span>No data available</span></div></td>
-                                </tr>
-                            ) : (
-                                currentData.map((item) => (
-                                    <tr key={item.id} className='table_tr'>
-                                        <td className='d-flex table_td  ps-2 pe-2 justify-content-between sticky_col'>
-                                            <div>
-                                                <button className='btn  mt-1 btn-sm' onClick={() => handleEdit(item.id)}><EditIcon className='action_icon' /></button>
-                                            </div>
-                                            <div>
-                                                <button className='btn  mt-1 btn-sm' onClick={() => handleDelete(item.id)}><DeleteIcon className='action_icon' /></button>
-                                            </div>
-                                        </td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.module_desc}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.created_at}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.updated_at}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.location}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.sub_module_name}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.approved_by}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.sub_module_id}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.approved_by}</td>
-                                        <td className='  ps-2 pe-2 table_td_tag_space'>{item.sub_module_name}</td>
-
-
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="justify-content-between pagination mt-3">
-                    <div className='selected_row_text'>
-                        Selected Rows: {selectedRows.length}
-                    </div>
-                    <div className='d-flex'>
-                        <button className='btn btn-sm pagination_btn' onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
-                        {Array.from({ length: totalPages }, (_, index) => (
-                            <button className=' btn btn-sm h-75 pagination_btn' key={index + 1} onClick={() => paginate(index + 1)}>{index + 1}</button>
-                        ))}
-                        <button className='btn btn-sm pagination_btn ' onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                    </div>
-                </div> */}
-
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
-                          <AgGridReact
-                            theme="legacy"
-                            ref={gridRef}
-                            rowData={data}
-                            columnDefs={colDefs}
-                            defaultColDef={defaultColDef}
-                            editType="fullRow"
-                            rowSelection="single"
-                            pagination={true}
-                            // rowBuffer={rowBuffer}
-                            onRowValueChanged={onRowValueChanged}
-                
-                          />
-                        </div>
+                    <AgGridReact
+                        theme="legacy"
+                        ref={gridRef}
+                        rowData={data}
+                        columnDefs={colDefs}
+                        defaultColDef={defaultColDef}
+                        editType="fullRow"
+                        rowSelection="single"
+                        pagination={true}
+                        // rowBuffer={rowBuffer}
+                        onRowValueChanged={onRowValueChanged}
+
+                    />
+                </div>
 
 
 

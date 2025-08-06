@@ -23,7 +23,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
-import { createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById } from '../api/Service';
+import { createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -530,8 +530,8 @@ const SubModule = () => {
                         </div>
                     </div>
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div className='pe-2'>
-                            <button className='crud_btn' onClick={openModal}>
+                        <div>
+                            <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New SubModule</span>
                             </button>
                         </div>

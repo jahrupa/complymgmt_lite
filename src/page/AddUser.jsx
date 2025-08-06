@@ -308,13 +308,13 @@ const AddUser = () => {
 
 
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div className='pe-2'>
-              <button className='crud_btn' onClick={openModal}>
+            <div>
+              <button className='crud_btn w-100' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New User</span>
               </button>
             </div>
             <div>
-              <button className='crud_btn' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
+              <button className='crud_btn w-100' onClick={handleDeleteAll} disabled={selectedRows.length === 0}>
                 <span className='button-style'> Delete All</span>
               </button>
             </div>
