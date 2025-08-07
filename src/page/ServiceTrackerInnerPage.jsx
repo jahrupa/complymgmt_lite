@@ -33,12 +33,12 @@ const ServiceTrackerInnerPage = () => {
     const [columnDefs, setColumnDefs] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
-    console.log(fileName, 'fileName');
     const [isEditing, setIsEditing] = useState(false);
     const gridRef = useRef();
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
+    const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
 
     const defaultColDef = {
         sortable: true,
@@ -53,29 +53,6 @@ const ServiceTrackerInnerPage = () => {
         setFileName(file || '');
     };
 
-    // const handleFileUpload = async () => {
-    //     const payload = {
-    //         file: fileName?.name,
-    //         bo_user_id: '68919bb2e086be682a73a131',
-    //         tracker_name: trackerName,
-    //     };
-    //     if (!fileName) {
-    //         alert("Please select at least one file.");
-    //         return;
-    //     }
-
-    //     try {
-    //         const result = await uploadExcelFile(payload);
-    //         console.log("Files uploaded successfully:", result);
-    //         setIsModalOpen(false);
-
-    //     } catch (error) {
-    //         console.error("Upload failed:", error);
-    //         alert("❌ Upload failed. Please try again.");
-    //     }
-    // };
-
-
     const handleFileUpload = async () => {
         if (!fileName) {
             alert("Please select a file.");
@@ -89,6 +66,8 @@ const ServiceTrackerInnerPage = () => {
             const result = await uploadExcelFile([fileName], metadata);
             console.log("File uploaded successfully:", result);
             setIsModalOpen(false);
+            const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            setRowData(response.data || []);
         } catch (error) {
             console.error("Upload failed:", error);
             alert("❌ Upload failed. Please try again.");
@@ -222,7 +201,6 @@ const ServiceTrackerInnerPage = () => {
     );
 
     const crudTitle = "Upload File";
-    const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
     // Helper for status color
     const getRoleColorForFileStatus = (status) => {
         switch (status) {
@@ -293,7 +271,7 @@ const ServiceTrackerInnerPage = () => {
                             cellRenderer: (params) => (
                                 <Toggle
                                     checked={!!params.value}
-                                    // onChange={(e) => handleToggleChange(e, params)}
+                                // onChange={(e) => handleToggleChange(e, params)}
                                 />
                             )
                         };

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../style/sidebar.css';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import NextWeekOutlinedIcon from '@mui/icons-material/NextWeekOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import DomainAddOutlinedIcon from '@mui/icons-material/DomainAddOutlined';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
@@ -11,15 +9,10 @@ import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import AddModeratorOutlinedIcon from '@mui/icons-material/AddModeratorOutlined';
-import TableRowsOutlinedIcon from '@mui/icons-material/TableRowsOutlined';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import complyn_mgmt_logo from '../assets/complyn_mgmt_logo.png'
 import DesktopAccessDisabledOutlinedIcon from '@mui/icons-material/DesktopAccessDisabledOutlined';
-import EmojiPeopleOutlinedIcon from '@mui/icons-material/EmojiPeopleOutlined';
-import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
-import CurrencyExchangeOutlinedIcon from '@mui/icons-material/CurrencyExchangeOutlined';
-import CurrencyRupeeOutlinedIcon from '@mui/icons-material/CurrencyRupeeOutlined';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -27,7 +20,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import TurnedInIcon from '@mui/icons-material/TurnedIn';
-import { Cable } from 'lucide-react';
+import { Cable, ScanEye } from 'lucide-react';
 
 function SideBar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
@@ -35,7 +28,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         return localStorage.getItem('activeSidebarItem') || 'Dashboard';
     });
     const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
-
+    const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
         { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
@@ -43,7 +36,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
         { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'module_by_location' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'location_to_module' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         // { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onboarding', link: 'onboarding' },
@@ -52,7 +45,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         // { icon: (active) => <NextWeekOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Outsourcing Scope', link: 'outsourcing_scope' },
         // { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Reimbursements', link: 'reimbursements' },
         // { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Payroll Management', link: 'payroll_management' },
-        { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Service Trackers', link: 'service_trackers' },
+        // { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Service Trackers', link: 'service_trackers' },
         { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
         { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
@@ -66,10 +59,15 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <TurnedInIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Untagged Document', link: 'untagged_documents' },
     ];
 
+    const serviceTracker = [
+        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
+        { icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tracker Access', link: 'service_tracker_access' },
+    ];
+
     // Sync active tab with URL on page load
     useEffect(() => {
         const currentPath = location.pathname.split('/')[1];
-        const allItems = [...menuItems, ...documentSubItems];
+        const allItems = [...menuItems, ...documentSubItems, ...serviceTracker];
         const match = allItems.find(item => item.link === currentPath);
         if (match) {
             setActiveItem(match.label);
@@ -131,7 +129,6 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                     Document Records
                                 </span>
                             </div>
-
                             {showDocumentDropdown && (
                                 <div className='pt-2'>
                                     {documentSubItems.map(({ icon, label, link }, i) => {
@@ -164,6 +161,50 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                     })}
                                 </div>
                             )}
+                            <div
+                                className="d-flex align-items-center cursor-pointer mb-4"
+                                onClick={() => setShowServiceTrackerDropdown?.(prev => !prev)}
+                            >
+                                <span className='sidebar-close-icon-span'>
+                                    {showServiceTrackerDropdown ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
+                                </span>
+                                <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
+                                    Service Tracker
+                                </span>
+                            </div>
+                            {showServiceTrackerDropdown && (
+                                <div className='pt-2'>
+                                    {serviceTracker.map(({ icon, label, link }, i) => {
+                                        const isActive = activeItem === label;
+                                        return (
+                                            <div key={i}>
+                                                <Link
+                                                    to={`/${link}`}
+                                                    onClick={() => {
+                                                        setActiveItem(label);
+                                                        localStorage.setItem('activeSidebarItem', label);
+                                                    }}
+                                                >
+                                                    <div
+                                                        className='d-flex d-inline-block mb-4'
+                                                        tabIndex="0"
+                                                        data-toggle="tooltip"
+                                                        title={label}
+                                                    >
+                                                        <span className={`sidebar-close-icon-span ${isActive ? 'side-bar-active-tab' : ''}`}>
+                                                            {icon(isActive)}
+                                                        </span>
+                                                        <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
+                                                            {label}
+                                                        </span>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                           
                         </div>
                     </div>
                 </div>

@@ -48,9 +48,11 @@ body {
 .card-border-green {
   border: 1px solid #4aac4e4a;
 }
-.info{
+
+.info {
   color: gray;
 }
+
 .card_div {
   background-color: white;
   border-radius: 10px;
@@ -258,6 +260,14 @@ body {
 .approve {
   background: #28a745;
   box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+  border-radius: 12px;
+  height: 40px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  border: none;
+  color: white;
 }
 
 .reject {
@@ -358,5 +368,5 @@ body {
   /* font-size: 14px; */
   color: #332d2d;
   font-weight: 600;
-  
+
 }

@@ -1,5 +1,5 @@
 // Login
-export const LOGIN_API ='/api/v1/uam/login';
+export const LOGIN_API ='/api/v1/login';
 
 // Roles
 export const GET_ALL_ROLE ='/view_all_roles';
@@ -64,21 +64,26 @@ export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/api/v1/submodule/view/module/mul
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/api/v1/service_tracker/view/multiple';
 export const GET_ALL_INNER_PAGE_SERVICE_TRACKER='/api/v1/service_tracker/view';
+export const GET_ALL_SERVICE_TRACKER_NAME='/api/v1/service_tracker/view/names/multiple';
 export const DELETE_SERVICE_TRACKER_BY_ID='/api/v1/service_tracker/delete/';
 export const CREATE_SERVICE_TRACKER ='/api/v1/service_tracker/create';
 export const UPDATE_SERVICE_TRACKER ='/api/v1/service_tracker/update/';
 export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/api/v1/service_tracker/update/status/';
+export const GET_ALL_SERVICE_TRACKER_FIELDS ='/api/V1/service_tracker/view/';
+export const CREATE_SERVICE_TRACKER_SPECIFICS ='/api/v1/service_tracker/create/specifics';
+
+
 
 // Location To Module
-export const GET_ALL_LOCATION_TO_MODULE='/view_all_location_to_modules';
-export const CREATE_LOCATION_TO_MODULE='/create_location_to_modules';
+export const GET_ALL_LOCATION_TO_MODULE='/api/v1/module_by_location/view/multiple';
+export const CREATE_LOCATION_TO_MODULE='/api/v1/module_by_location/create';
 export const UPDATE_LOCATION_TO_MODULE_BY_ID='/update_location_to_module_by_id/';
 export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/update_location_to_module_status_by_id/';
 export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/';
 
 // File Upload
 export const FILE_UPLOAD='/classify-files';
-export const UPLOAD_EXCEL='/api/v1/upload_tracker/excel';
+export const UPLOAD_EXCEL='/api/v1/service_tracker/upload_tracker/excel';
 
 
 // USER ACCESS LEVEL

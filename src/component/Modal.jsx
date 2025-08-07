@@ -23,7 +23,7 @@ const Modal = ({ crudForm, crudTitle, isModalOpen, editCrudTitle, isEditing, clo
             display: 'block',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             // zIndex: 9999, // Ensure it appears above other content
-            zIndex: 10001, // Ensure it appears above other content
+            // zIndex: 10001, // Ensure it appears above other content
           }}
           onMouseDown={handleBackdropClick} // listen for backdrop clicks here
         >
