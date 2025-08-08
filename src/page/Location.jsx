@@ -176,6 +176,7 @@ const Location = () => {
         setErrors({})
     };
 
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -191,7 +192,6 @@ const Location = () => {
                 console.error("Error fetching data:", error);
             }
         };
-
         fetchData();
     }, []);
 

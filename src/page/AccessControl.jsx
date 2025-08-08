@@ -29,7 +29,9 @@ import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
 import ResponsiveDatePickers from '../component/DatePicker';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
-import { createUserAccessLevel, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, getLocationByCompanyId } from '../api/service';
+import { createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, getLocationByCompanyId, toggleUserAccessLevelStatus } from '../api/service';
+import Toggle from '../component/Toggle';
+import Snackbars from '../component/Snackbars';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -52,6 +54,7 @@ const AccessControl = () => {
         sub_module_id: null,
         access_type: '',
         approved_by: [],
+
     });
     console.log(current, 'current')
     const [isEditing, setIsEditing] = useState(false);
@@ -63,6 +66,13 @@ const AccessControl = () => {
     const [subModuleName, setSubModuleName] = useState([]);
     const [userNameListRes, setUserNameListRes] = useState([]);
     const [accessTypeList, setAccessTypeList] = useState([]);
+    const [isSnackbarsOpen, setIsSnackbarsOpen] = useState({
+        open: false,
+        vertical: 'top',
+        horizontal: 'center',
+        message: '',
+        severityType: '',
+    });
     console.log(accessTypeList, 'accessTypeList')
     const currentUserId = localStorage.getItem('user_id');
 
@@ -107,6 +117,54 @@ const AccessControl = () => {
         setIsModalOpen(false);
     };
 
+    const handleToggleChange = async (e, params) => {
+        const newIsActive = {
+            "IsActive": e.target.checked
+        };
+        try {
+            const response = await toggleUserAccessLevelStatus(params.data._id, newIsActive);
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...isSnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to delete company";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...isSnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
+        setData(updatedData);
+    };
+
+    const handleDelete = async (id) => {
+        const payload = {
+            "bo_user_id": currentUserId,
+        }
+        if (window.confirm("Are you sure you want to delete this access control?")) {
+            try {
+                await deleteUserAccessLevelById(id, payload);
+                const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
+                setData(updatedData);
+                // setIsSnackbarsOpen({ ...isSnackbarsOpen, open: true, message: 'Access control deleted successfully', severityType: 'success' });
+            } catch (error) {
+                console.error("Error deleting access control:", error);
+            }
+        };
+    }
     const accessControl = [
         'View',
         'Create',
@@ -383,6 +441,16 @@ const AccessControl = () => {
         );
     }
 
+    const getRoleColorForFileStatus = (status) => {
+        switch (status) {
+            case 1:
+                return { color: '#4CAF50' }; // green
+            case 0:
+                return { color: '#F44336' }; // brown
+            default:
+                return { color: '#41464b' }; // gray
+        }
+    };
     const colDefs = [
         {
             headerName: 'Actions',
@@ -403,7 +471,7 @@ const AccessControl = () => {
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>
                         <button className="btn btn-sm" onClick={() => {
-                            // Delete logic here
+                            handleDelete(params.data._id)
                         }}>
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
@@ -419,11 +487,66 @@ const AccessControl = () => {
         { field: 'create', headerName: 'Create', filter: true, editable: false },
         { field: 'update', headerName: 'Update', filter: true, editable: false },
         { field: 'delete', headerName: 'Delete', filter: true, editable: false },
-        { field: 'IsActive', headerName: 'Is Active', filter: true, editable: false },
+        {
+            field: 'Approval_Status', // or use valueGetter instead (recommended)
+            headerName: 'Approval Status',
+            editable: false,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+            filter: true,
+            valueGetter: (params) => params.data?.Approval_Status, // safer access
+
+            cellRenderer: (params) => {
+                const getApprovalStatusText = (status) => {
+                    switch (status) {
+                        case 0: return 'Pending';
+                        case 1: return 'Approved';
+                        default: return '-'; // fallback
+                    }
+                };
+
+                const status = params.value;
+                const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={true}
+                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                        />
+                        <span
+                            style={{
+                                color,
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {getApprovalStatusText(status)}
+                        </span>
+                    </div>
+                );
+            }
+        },
+        {
+            headerName: 'Status',
+            field: 'IsActive',
+            editable: false,
+            pinned: "right",
+            valueGetter: (params) => params.data?.IsActive,
+            cellRenderer: (params) => (
+                <Toggle
+                    checked={!!params.value}
+                    onChange={(e) => handleToggleChange(e, params)}
+                />
+            )
+        },
+        // { field: 'IsActive', headerName: 'Is Active', filter: true, editable: false },
         { field: 'Created_By', headerName: 'Created By', filter: true, editable: false },
         { field: 'Created_At', headerName: 'Created At', filter: true, editable: false },
         { field: 'Updated_By', headerName: 'Updated By', filter: true, editable: false },
         { field: 'Updated_At', headerName: 'Updated At', filter: true, editable: false },
+
         { field: 'Approval_Status', headerName: 'Approval Status', filter: true, editable: false },
         { field: 'Approved_By', headerName: 'Approved By', filter: true, editable: false },
         { field: 'Approved_At', headerName: 'Approved At', filter: true, editable: false },
@@ -554,6 +677,7 @@ const AccessControl = () => {
     }, [current?.module_id]);
     return (
         <div>
+            <Snackbars issnackbarsOpen={isSnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             {/* Table to display data */}
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>

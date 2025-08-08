@@ -66,7 +66,8 @@ import {
   GET_ALL_SERVICE_TRACKER_NAME,
   GET_ALL_SERVICE_TRACKER_FIELDS,
   CREATE_SERVICE_TRACKER_SPECIFICS,
-  GET_ALL_ACCESS_TYPES
+  GET_ALL_ACCESS_TYPES,
+  TOGGLE_USER_ACCESS_LEVEL_STATUS
 
 } from "./Endpoint";
 // Login Api
@@ -771,4 +772,12 @@ export const deleteUserAccessLevelById = async (id) => {
     throw error;
   }
 };
-
+export const toggleUserAccessLevelStatus = async (id, status) => {
+  try {
+    const response = await API.put(`${TOGGLE_USER_ACCESS_LEVEL_STATUS}${id}`, { status });
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling user access level status:", error);
+    throw error;
+  }
+};

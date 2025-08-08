@@ -75,8 +75,8 @@ export const CREATE_SERVICE_TRACKER_SPECIFICS ='/api/v1/service_tracker/create/s
 
 
 // Location To Module
-export const GET_ALL_LOCATION_TO_MODULE='/api/v1/module_by_location/view/multiple';
-export const CREATE_LOCATION_TO_MODULE='/api/v1/module_by_location/create';
+export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
+export const CREATE_LOCATION_TO_MODULE='/api/v1/location_to_module/create';
 export const UPDATE_LOCATION_TO_MODULE_BY_ID='/update_location_to_module_by_id/';
 export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/update_location_to_module_status_by_id/';
 export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/';
@@ -92,6 +92,7 @@ export const CREATE_USER_ACCESS_LEVEL ='/api/v1/user_access/create';
 export const UPDATE_USER_ACCESS_LEVEL ='/api/v1/user_access/update/';
 export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
 export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
+export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 
 
 
