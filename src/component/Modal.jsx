@@ -22,12 +22,14 @@ const Modal = ({ crudForm, crudTitle, isModalOpen, editCrudTitle, isEditing, clo
           style={{
             display: 'block',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          
             // zIndex: 9999, // Ensure it appears above other content
             // zIndex: 10001, // Ensure it appears above other content
           }}
           onMouseDown={handleBackdropClick} // listen for backdrop clicks here
         >
-          <div className="modal-dialog modal-dialog-centered" role="document" style={{ zIndex: 10001 }}>
+          <div className="modal-dialog modal-dialog-centered" role="document" style={{ zIndex: 10001,  width:'auto',
+            height: '100%', }}>
             <div
               className="modal-content"
               ref={modalRef}

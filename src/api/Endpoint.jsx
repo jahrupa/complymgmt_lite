@@ -87,10 +87,11 @@ export const UPLOAD_EXCEL='/api/v1/service_tracker/upload_tracker/excel';
 
 
 // USER ACCESS LEVEL
-export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access_level/view/multiple';
+export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access/view/user_id';
 export const CREATE_USER_ACCESS_LEVEL ='/api/v1/user_access/create';
 export const UPDATE_USER_ACCESS_LEVEL ='/api/v1/user_access/update/';
 export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
+export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 
 
 
