@@ -113,6 +113,7 @@ const SubModule = () => {
         severityType: '',
     });
     const [moduleName, setModuleName] = useState([]);
+    console.log(moduleName,'moduleName')
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
@@ -499,24 +500,46 @@ const SubModule = () => {
     const onRowValueChanged = (event) => {
         console.log('Row updated:', event.data);
     };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [subModuleData, moduleNameList] = await Promise.all([
-                    fetchAllSubModule(),
+ useEffect(() => {
+  const fetchData = async () => {
+    const [subModuleData, moduleNameList] = await Promise.allSettled([
+      fetchAllSubModule(),
                     fetchAllModulesName(),
-                ]);
-                setData(subModuleData);
-                setModuleName(moduleNameList)
+    ]);
 
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+    if (subModuleData.status === 'fulfilled') {
+      setData(subModuleData.value);
+    } else {
+      console.warn("fetchAllSubModule failed:", subModuleData.reason);
+    }
 
-        fetchData();
-    }, []);
+    if (moduleNameList.status === 'fulfilled') {
+      setModuleName(moduleNameList.value);
+    } else {
+      console.warn("fetchAllModulesName failed:", moduleNameList.reason);
+    }
+  };
+
+  fetchData();
+}, []);
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const [subModuleData, moduleNameList] = await Promise.all([
+    //                 fetchAllSubModule(),
+    //                 fetchAllModulesName(),
+    //             ]);
+    //             setData(subModuleData);
+    //             setModuleName(moduleNameList)
+
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, []);
     return (
         <div>
             <h5>Sub-Module</h5>

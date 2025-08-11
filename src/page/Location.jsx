@@ -25,7 +25,7 @@ const Location = () => {
     const [current, setCurrent] = useState(
         {
             _id: null,
-            group_holdings_id: null,
+            group_holding_id: null,
             company_name: '',
             company_id: null,
             group_name: '',
@@ -37,7 +37,7 @@ const Location = () => {
             state: '',
             location_description: ''
         });
-    // console.log(current, 'company_name')
+    console.log(current, 'company_name')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
@@ -78,7 +78,7 @@ const Location = () => {
         if (!validate()) return; // Don't proceed if validation fails
 
         const payload = {
-            "GroupHoldingsID": current?.group_holdings_id,
+            "GroupHoldingsID": current?.group_holding_id,
             "CompanyID": current?.company_id,
             "LocationName": current?.location_name,
             "LocationDescription": current?.location_description,
@@ -89,7 +89,7 @@ const Location = () => {
             }
         };
         const EditPayload = {
-            "GroupHoldingsID": current?.group_holdings_id,
+            "GroupHoldingsID": current?.group_holding_id,
             "CompanyID": current?.company_id,
             "LocationName": current?.location_name,
             "LocationDescription": current?.location_description,
@@ -120,7 +120,7 @@ const Location = () => {
             company_id: null,
             company_name: '',
             group_name: '',
-            group_holdings_id: null,
+            group_holding_id: null,
             created_at: '',
             updated_at: '',
             location_description: '',
@@ -198,7 +198,7 @@ const Location = () => {
     useEffect(() => {
         const fetchCompany = async () => {
             try {
-                const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
                 if (data) {
                     setCompanyNameByGroupHoldingId(data);
                 }
@@ -207,10 +207,10 @@ const Location = () => {
             }
         };
 
-        if (current?.group_holdings_id) {
+        if (current?.group_holding_id) {
             fetchCompany();
         }
-    }, [current?.group_holdings_id]);
+    }, [current?.group_holding_id]);
 
     const handleToggleChange = async (e, params) => {
         const newIsActive = {
@@ -259,7 +259,7 @@ const Location = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 group_name: selectedName,
-                                group_holdings_id: matchedGroup._id || null,
+                                group_holding_id: matchedGroup._id || null,
                                 company_name: '',
                             }));
                         }}
@@ -277,14 +277,18 @@ const Location = () => {
                         value={current?.company_name || ''}
                         onChange={(e) => {
                             const selectedName = e.target.value;
-                            const matchedGroup = companyNameByGroupHoldingId.find((g) => g.name === selectedName) || {};
+                            const matchedGroup = companyNameByGroupHoldingId.find((g) => g.company_name === selectedName) || {};
+                            console.log(matchedGroup,'matchedGroup')
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
                                 company_id: matchedGroup._id || null,
                             }));
                         }}
-                        names={companyNameByGroupHoldingId}
+                        names={companyNameByGroupHoldingId?.map((data) => ({
+                            _id: data?._id,
+                            name: data?.company_name
+                        }))}
                         isdisable={isEditing}
                         error={!!errors.company_name}
                         helperText={errors.company_name}

@@ -75,7 +75,7 @@ export const CREATE_SERVICE_TRACKER_SPECIFICS ='/api/v1/service_tracker/create/s
 
 
 // Location To Module
-export const GET_ALL_LOCATION_TO_MODULE='/api/v1/module_by_location/view/multiple';
+export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
 export const CREATE_LOCATION_TO_MODULE='/api/v1/module_by_location/create';
 export const UPDATE_LOCATION_TO_MODULE_BY_ID='/update_location_to_module_by_id/';
 export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/update_location_to_module_status_by_id/';
@@ -83,7 +83,7 @@ export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/'
 
 // File Upload
 export const FILE_UPLOAD='/classify-files';
-export const UPLOAD_EXCEL='/api/v1/service_tracker/upload_tracker/excel';
+export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
 
 
 // USER ACCESS LEVEL
