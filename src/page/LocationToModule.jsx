@@ -105,6 +105,7 @@ const LocationToModule = () => {
     // console.log(id, 'id')
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
+    console.log(companyName,'companyName')
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -244,21 +245,24 @@ const LocationToModule = () => {
             module_id: null,
         });
     };
-
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [locationToModuleData, groupHolding, moduleName] = await Promise.all([
+                const results = await Promise.allSettled([
                     fetchLocationToModuleModule(),
                     fetchAllGroupHolding(),
                     fetchAllModulesName(),
                 ]);
-                setData(locationToModuleData);
-                setGroupHoldingName(groupHolding);
-                setModuleName(moduleName);
-
+                if (results[0].status === 'fulfilled') setData(results[0].value);
+                if (results[1].status === 'fulfilled') setGroupHoldingName(results[1].value);
+                if (results[2].status === 'fulfilled') setModuleName(results[2].value);
+                results.forEach((result, idx) => {
+                    if (result.status === 'rejected') {
+                        console.error(`Error fetching data at index ${idx}:`, result.reason);
+                    }
+                });
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error in fetchData:", error);
             }
         };
 
@@ -327,7 +331,7 @@ const LocationToModule = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedCompany = companyName.find(
-                                (g) => g.name === selectedName
+                                (g) => g.company_name === selectedName
                             );
                             setCurrent((prev) => ({
                                 ...prev,
@@ -335,7 +339,10 @@ const LocationToModule = () => {
                                 company_id: matchedCompany?._id || null,
                             }));
                         }}
-                        names={companyName}
+                        names={companyName.map((item) => ({
+                                _id: item._id,
+                                name: item.company_name,
+                            }))}
                         error={!!errors.company_name}
                         helperText={errors.company_name}
                     // isdisable={isEditing ? true : false}
@@ -345,7 +352,7 @@ const LocationToModule = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedLocation = locationName.find(
-                                (g) => g.name === selectedName
+                                (g) => g.location_name === selectedName
                             );
                             setCurrent((prev) => ({
                                 ...prev,
@@ -353,7 +360,10 @@ const LocationToModule = () => {
                                 location_id: matchedLocation?._id || null,
                             }));
                         }}
-                        names={locationName}
+                         names={locationName.map((item) => ({
+                                _id: item._id,
+                                name: item.location_name,
+                            }))}
                         // isdisable={isEditing ? true : false}
                         error={!!errors.location_name}
                         helperText={errors.location_name}
@@ -397,13 +407,13 @@ const LocationToModule = () => {
         )
 
     }
-    const crudTitle = "Tag Module To Location"
-    const editCrudTitle = "Edit Taged Module"
+    const crudTitle = "Tag Location To Module"
+    const editCrudTitle = "Edit Tagged Location To Module"
     const deleteModal = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Taged Module?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Location To Module?
                 </div>
 
                 <div className="row row-gap-2 mt-4">

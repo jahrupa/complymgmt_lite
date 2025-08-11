@@ -415,7 +415,7 @@ const ServiceTrackers = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = subModuleName.find(
-                                (g) => g.name === selectedName
+                                (g) => g.sub_module_name === selectedName
                             );
                             setCurrent((prev) => ({
                                 ...prev,
@@ -423,7 +423,10 @@ const ServiceTrackers = () => {
                                 sub_module_id: matchedGroup?._id || null,
                             }));
                         }}
-                        names={subModuleName}
+                         names={subModuleName.map((item) => ({
+                                _id: item._id,
+                                name: item.sub_module_name,
+                            }))}
                         error={!!errors.sub_module_name}
                         helperText={errors.sub_module_name}
                     // isdisable={isEditing}

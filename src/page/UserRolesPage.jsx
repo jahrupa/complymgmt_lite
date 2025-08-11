@@ -163,32 +163,21 @@ const UserRolesPage = () => {
     setIsModalOpen(false);
     setErrors({});
   };
+ useEffect(() => {
+  const fetchData = async () => {
+    const [userData] = await Promise.allSettled([
+      fetchAllUser(),
+    ]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [userData] = await Promise.all([
-          fetchAllUser(),
-          // fetchAllGroupHolding(),
-          // fetchAllUserName(),
-          // fetchAllCompaniesName(),
-          // fetchAllLocationName(),
-        ]);
-        setData(userData);
-        // console.log(data, 'data')
-        // setGroupHoldingName(groupHolding);
-        // setRolesName(roleName)
-        // setCompanyName(companyName)
-        // setLocationName(getLocationName)
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    if (userData.status === 'fulfilled') {
+      setData(userData.value);
+    } else {
+      console.warn("fetchAllCompanies failed:", userData.reason);
+    }
+  };
 
-    fetchData();
-  }, []);
-
-
+  fetchData();
+}, []);
 
   const crudForm = () => {
     return (
