@@ -13,15 +13,23 @@ import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import { deepOrange } from '@mui/material/colors'
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+
 export default function UserProfile() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
+    const navigate = useNavigate();
+    
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
         setAnchorEl(null);
+    };
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.reload();
     };
     return (
         <React.Fragment>
@@ -90,7 +98,7 @@ export default function UserProfile() {
                 </MenuItem>
                 </Link>
                
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                         <Logout fontSize="small" />
                     </ListItemIcon>
