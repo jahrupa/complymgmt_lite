@@ -1,6 +1,5 @@
 // Login
 export const LOGIN_API ='/api/v1/login';
-export const LOGIN_API ='/api/v1/login';
 
 // Roles
 export const GET_ALL_ROLE ='/view_all_roles';
