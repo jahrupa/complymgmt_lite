@@ -1,5 +1,5 @@
 // Login
-export const LOGIN_API ='/api/v1/uam/login';
+export const LOGIN_API ='/api/v1/login';
 
 // Roles
 export const GET_ALL_ROLE ='/view_all_roles';
@@ -70,11 +70,11 @@ export const UPDATE_SERVICE_TRACKER ='/api/v1/service_tracker/update/';
 export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/api/v1/service_tracker/update/status/';
 
 // Location To Module
-export const GET_ALL_LOCATION_TO_MODULE='/view_all_location_to_modules';
-export const CREATE_LOCATION_TO_MODULE='/create_location_to_modules';
-export const UPDATE_LOCATION_TO_MODULE_BY_ID='/update_location_to_module_by_id/';
-export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/update_location_to_module_status_by_id/';
-export const DELETE_LOCATION_TO_MODULE_BY_ID='/delete_location_to_module_by_id/';
+export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
+export const CREATE_LOCATION_TO_MODULE='/api/v1/location_to_module/create';
+export const UPDATE_LOCATION_TO_MODULE_BY_ID='/api/v1/location_to_module/update/';
+export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/api/v1/location_to_module/update/status/';
+export const DELETE_LOCATION_TO_MODULE_BY_ID='/api/v1/location_to_module/delete/';
 
 // File Upload
 export const FILE_UPLOAD='/classify-files';
