@@ -29,7 +29,7 @@ import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
 import ResponsiveDatePickers from '../component/DatePicker';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
-import { createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, getLocationByCompanyId, toggleUserAccessLevelStatus } from '../api/service';
+import { createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, toggleUserAccessLevelStatus } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 // Register module
@@ -64,8 +64,14 @@ const AccessControl = () => {
     const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
     const [moduleName, setModuleName] = useState([]);
     const [subModuleName, setSubModuleName] = useState([]);
+    const [locationToModule, setLocationToModule] = useState([]);
+    console.log(locationToModule, 'locationToModule')
     const [userNameListRes, setUserNameListRes] = useState([]);
     const [accessTypeList, setAccessTypeList] = useState([]);
+    const [allPageList, setAllPageList] = useState([]);
+    const [allServiceTrackerList, setAllServiceTrackerList] = useState([]);
+    const [allInnerPageServiceTrackerList, setAllInnerPageServiceTrackerList] = useState([]);
+    console.log(allServiceTrackerList, 'allServiceTrackerList')
     const [isSnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -73,21 +79,29 @@ const AccessControl = () => {
         message: '',
         severityType: '',
     });
-    console.log(accessTypeList, 'accessTypeList')
+    // console.log(accessTypeList, 'accessTypeList')
     const currentUserId = localStorage.getItem('user_id');
 
     // Handle Add or Edit
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const accessType = current?.access_type === "service_tracker_wise";
         const payload = {
             user_id: current?.user_id,
-            entity_id: current?.group_name_id || current?.company_id || current?.location_id || current?.module_id || current?.sub_module_id || current?.service_tracker || current?.page,
-            entity_name: current?.group_name || current?.company_name || current?.location_name || current?.module_name || current?.sub_module_name || current?.service_tracker || current?.page,
+            entity_id: current?.group_name_id || current?.company_id || current?.location_id || current?.module_id || current?.sub_module_id || current?.service_tracker_id || current?.page_id || current?.service_tracker_inner_id,
+            entity_name: current?.group_name || current?.company_name || current?.location_name || current?.module_name || current?.sub_module_name || current?.service_tracker.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '_') || current?.page_name || current?.service_tracker_wise,
             entity_type: current?.access_type,
             bo_user_id: currentUserId,
             access: Array.isArray(current?.approved_by)
                 ? current.approved_by.map(a => a.toLowerCase())
                 : []
+        }
+        if (accessType) {
+            payload.entity_id = current?.service_tracker_inner_id;
+            payload.entity_name = current?.service_tracker_wise;
+            payload.entity_type = current?.service_tracker;
         }
         try {
             if (isEditing) {
@@ -205,6 +219,9 @@ const AccessControl = () => {
         const showLocationToModule = current.access_type === "location_to_module";
         const showPage = current.access_type === "page";
 
+        // Add service_tracker_wise logic
+        const showServiceTrackerWise = current.access_type === "service_tracker_wise";
+
         return (
             <div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
@@ -246,22 +263,14 @@ const AccessControl = () => {
                                 sub_module_name: '',
                                 sub_module_id: null,
                                 service_tracker: '',
+                                service_tracker_wise: '',
                                 page: ''
                             }));
                         }}
-                        names={[
-                            { name: "group" },
-                            { name: "company" },
-                            { name: "company_location" },
-                            { name: "module" },
-                            { name: "user" },
-                            { name: "submodule" },
-                            { name: "service_tracker" },
-                            { name: "location_to_module" },
-                            { name: "user_roles" },
-                            { name: "user_access" },
-                            { name: "page" }
-                        ]}
+                        names={accessTypeList.map((item) => ({
+                            _id: item._id,
+                            name: item.name
+                        }))}
                     />
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
@@ -303,7 +312,7 @@ const AccessControl = () => {
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedCompany = companyNameByGroupHoldingId.find(
-                                    (g) => g.name === selectedName
+                                    (g) => g.company_name === selectedName
                                 );
                                 setCurrent((prev) => ({
                                     ...prev,
@@ -317,7 +326,10 @@ const AccessControl = () => {
                                     sub_module_id: null
                                 }));
                             }}
-                            names={companyNameByGroupHoldingId}
+                            names={companyNameByGroupHoldingId?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.company_name
+                            }))}
                         />
                     )}
                 </div>
@@ -330,7 +342,7 @@ const AccessControl = () => {
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedLocation = locationNameByCompanyId.find(
-                                    (g) => g.name === selectedName
+                                    (g) => g.location_name === selectedName
                                 );
                                 setCurrent((prev) => ({
                                     ...prev,
@@ -342,7 +354,10 @@ const AccessControl = () => {
                                     sub_module_id: null
                                 }));
                             }}
-                            names={locationNameByCompanyId}
+                            names={locationNameByCompanyId?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.location_name
+                            }))}
                         />
                     )}
                     {showModule && (
@@ -353,7 +368,7 @@ const AccessControl = () => {
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedModule = moduleName.find(
-                                    (g) => g.name === selectedName
+                                    (g) => g.module_name === selectedName
                                 );
                                 setCurrent((prev) => ({
                                     ...prev,
@@ -363,7 +378,10 @@ const AccessControl = () => {
                                     sub_module_id: null
                                 }));
                             }}
-                            names={moduleName}
+                            names={moduleName?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.module_name
+                            }))}
                         />
                     )}
                 </div>
@@ -376,7 +394,7 @@ const AccessControl = () => {
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedSubModule = subModuleName.find(
-                                    (g) => g.name === selectedName
+                                    (g) => g.sub_module_name === selectedName
                                 );
                                 setCurrent((prev) => ({
                                     ...prev,
@@ -384,7 +402,10 @@ const AccessControl = () => {
                                     sub_module_id: matchedSubModule?._id || null
                                 }));
                             }}
-                            names={subModuleName}
+                            names={subModuleName?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.sub_module_name
+                            }))}
                         />
                     )}
                     {showServiceTracker && (
@@ -392,12 +413,67 @@ const AccessControl = () => {
                             name="service_tracker"
                             label="Service Tracker"
                             value={current?.service_tracker}
-                            onChange={(e) => setCurrent((prev) => ({
-                                ...prev,
-                                service_tracker: e.target.value,
+                            onChange={(e) => {
+                                const selectedName = e.target.value;
+                                const matchedServiceTracker = allServiceTrackerList.find(
+                                    (g) => g.service_tracker_name === selectedName
+                                );
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    service_tracker: selectedName,
+                                    service_tracker_id: matchedServiceTracker?._id || null
+                                }));
+                            }}
+                            names={allServiceTrackerList?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.service_tracker_name
                             }))}
-                            names={[]} // Provide your service tracker list here
                         />
+                    )}
+                    {/* Service Tracker Wise dropdowns */}
+                    {showServiceTrackerWise && (
+                        <>
+                            <SingleSelectTextField
+                                name="service_tracker"
+                                label="Service Tracker"
+                                value={current?.service_tracker}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedServiceTracker = allServiceTrackerList.find(
+                                        (g) => g.service_tracker_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        service_tracker: selectedName,
+                                        service_tracker_id: matchedServiceTracker?._id || null
+                                    }));
+                                }}
+                                names={allServiceTrackerList?.map((data) => ({
+                                    _id: data?._id,
+                                    name: data?.service_tracker_name
+                                }))}
+                            />
+                            <SingleSelectTextField
+                                name="service_tracker_wise"
+                                label="Service Tracker Wise"
+                                value={current?.service_tracker_wise}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedServiceTracker = allInnerPageServiceTrackerList.find(
+                                        (g) => g.company_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        service_tracker_wise: selectedName,
+                                        service_tracker_inner_id: matchedServiceTracker?._id || null
+                                    }));
+                                }}
+                                names={allInnerPageServiceTrackerList?.map((data) => ({
+                                    _id: data?._id,
+                                    name: data?.company_name
+                                }))}
+                            />
+                        </>
                     )}
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
@@ -410,19 +486,32 @@ const AccessControl = () => {
                                 ...prev,
                                 location_to_module: e.target.value,
                             }))}
-                            names={[]} // Provide your location to module list here
+                            names={locationToModule?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.location_name
+                            }))}
                         />
                     )}
                     {showPage && (
                         <SingleSelectTextField
-                            name="page"
+                            name="page_name"
                             label="Page"
-                            value={current?.page}
-                            onChange={(e) => setCurrent((prev) => ({
-                                ...prev,
-                                page: e.target.value,
+                            value={current?.page_name}
+                            onChange={(e) => {
+                                const selectedName = e.target.value;
+                                const matchedPage = allPageList.find(
+                                    (g) => g.page_name === selectedName
+                                );
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    page_name: selectedName,
+                                    page_id: matchedPage?._id || null
+                                }));
+                            }}
+                            names={allPageList?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.page_name
                             }))}
-                            names={[]} // Provide your page list here
                         />
                     )}
                 </div>
@@ -564,12 +653,16 @@ const AccessControl = () => {
         console.log('Row updated:', event.data);
     };
     useEffect(() => {
+        const formattedTrackerName = current?.service_tracker?.toLowerCase()?.replace(/\s+/g, '_');
         const fetchData = async () => {
-            const [userAccessDataRes, groupHoldingRes, userNameListRes, accessTypeListRes] = await Promise.allSettled([
+            const [userAccessDataRes, groupHoldingRes, userNameListRes, accessTypeListRes, allPageListRes, allServiceTrackerListRes, allInnerPageServiceTrackerListRes] = await Promise.allSettled([
                 fetchAllUserAccessLevels({ system_user_id: currentUserId }),
                 fetchAllGroupHolding(),
                 fetchAllUser(),
-                fetchAllAccessTypes()
+                fetchAllAccessTypes(),
+                fetchAllPages(),
+                fetchAllServiceTracker(),
+                fetchAllInnerPageServiceTracker(formattedTrackerName)
             ]);
 
             if (userAccessDataRes.status === 'fulfilled') {
@@ -599,10 +692,30 @@ const AccessControl = () => {
             } else {
                 console.warn("fetchAllUserAccessLevels failed:", accessTypeListRes.reason);
             }
+            if (allPageListRes.status === 'fulfilled') {
+                setAllPageList(allPageListRes.value);
+            } else {
+                console.warn("fetchAllPages failed:", allPageListRes.reason);
+            }
+            if (allServiceTrackerListRes.status === 'fulfilled') {
+                setAllServiceTrackerList(allServiceTrackerListRes.value);
+            } else {
+                console.warn("fetchAllServiceTracker failed:", allServiceTrackerListRes.reason);
+            }
+            if (allServiceTrackerListRes.status === 'fulfilled') {
+                setAllServiceTrackerList(allServiceTrackerListRes.value);
+            } else {
+                console.warn("fetchAllServiceTracker failed:", allServiceTrackerListRes.reason);
+            }
+            if (allInnerPageServiceTrackerListRes.status === 'fulfilled') {
+                setAllInnerPageServiceTrackerList(allInnerPageServiceTrackerListRes.value);
+            } else {
+                console.warn("fetchAllInnerPageServiceTracker failed:", allInnerPageServiceTrackerListRes.reason);
+            }
         };
 
         fetchData();
-    }, []);
+    }, [current]);
 
     // fetch company by group id
     useEffect(() => {
@@ -641,11 +754,11 @@ const AccessControl = () => {
     }, [current?.company_id]);
 
 
-    // module by location id
+    // module 
     useEffect(() => {
         const fetchModuleByLocationId = async () => {
             try {
-                const data = await fetchAllModulesNameByLocationId(current?.location_id);
+                const data = await fetchAllModule();
                 if (data) {
                     setModuleName(data);
                 }
@@ -653,11 +766,10 @@ const AccessControl = () => {
                 console.error("Failed to fetch location by location_id:", error);
             }
         };
+        fetchModuleByLocationId();
 
-        if (current?.location_id) {
-            fetchModuleByLocationId();
-        }
-    }, [current?.location_id]);
+    }, []);
+
     // sub-module by module id
     useEffect(() => {
         const fetchSubModuleByModuleId = async () => {
@@ -675,6 +787,22 @@ const AccessControl = () => {
             fetchSubModuleByModuleId();
         }
     }, [current?.module_id]);
+
+    // Fetch all location to module
+    useEffect(() => {
+        const fetchLocationToModule = async () => {
+            try {
+                const data = await fetchLocationToModuleModule();
+                if (data) {
+                    setLocationToModule(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch location to module:", error);
+            }
+        };
+        fetchLocationToModule();
+    }, []);
+
     return (
         <div>
             <Snackbars issnackbarsOpen={isSnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />

@@ -73,7 +73,7 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
                                     <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
                                 </div>
                                 <div className='mb-3 login_heading_text'>Log in</div>
-                                <label htmlFor="uname">Email address</label>
+                                <label htmlFor="uname">UserName</label>
                                 <input
                                     className='input_border_style'
                                     type="text"

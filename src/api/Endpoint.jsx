@@ -86,6 +86,9 @@ export const FILE_UPLOAD='/classify-files';
 export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
 
 
+// pages
+export const GET_ALL_PAGE='/api/v1/pages/view/all';
+
 // USER ACCESS LEVEL
 export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access/view/user_id';
 export const CREATE_USER_ACCESS_LEVEL ='/api/v1/user_access/create';

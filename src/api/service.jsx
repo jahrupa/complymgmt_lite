@@ -67,7 +67,8 @@ import {
   GET_ALL_SERVICE_TRACKER_FIELDS,
   CREATE_SERVICE_TRACKER_SPECIFICS,
   GET_ALL_ACCESS_TYPES,
-  TOGGLE_USER_ACCESS_LEVEL_STATUS
+  TOGGLE_USER_ACCESS_LEVEL_STATUS,
+  GET_ALL_PAGE
 
 } from "./Endpoint";
 // Login Api
@@ -778,6 +779,17 @@ export const toggleUserAccessLevelStatus = async (id, status) => {
     return response.data;
   } catch (error) {
     console.error("Error toggling user access level status:", error);
+    throw error;
+  }
+};
+
+// All pages
+export const fetchAllPages = async () => {
+  try {
+    const response = await API.get(GET_ALL_PAGE);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all pages:", error);
     throw error;
   }
 };
