@@ -62,7 +62,12 @@ import {
   UPDATE_USER_ACCESS_LEVEL,
   DELETE_USER_ACCESS_LEVEL,
   UPLOAD_EXCEL,
-  GET_ALL_INNER_PAGE_SERVICE_TRACKER
+  GET_ALL_INNER_PAGE_SERVICE_TRACKER,
+  GET_ALL_SERVICE_TRACKER_NAME,
+  GET_ALL_SERVICE_TRACKER_FIELDS,
+  CREATE_SERVICE_TRACKER_SPECIFICS,
+  GET_ALL_ACCESS_TYPES,
+  TOGGLE_USER_ACCESS_LEVEL_STATUS
 
 } from "./Endpoint";
 // Login Api
@@ -546,7 +551,15 @@ export const fetchAllServiceTracker = async () => {
     throw error;
   }
 };
-
+export const fetchAllServiceTrackerFields = async (tracker_name) => {
+  try {
+    const response = await API.get(`${GET_ALL_SERVICE_TRACKER_FIELDS}${encodeURIComponent(tracker_name)}/fields`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching service tracker fields:", error);
+    throw error;
+  }
+};
 export const fetchAllInnerPageServiceTracker = async (trackerName) => {
   try {
     const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data`;
@@ -557,6 +570,17 @@ export const fetchAllInnerPageServiceTracker = async (trackerName) => {
     throw error;
   }
 };
+
+export const fetchAllServiceTrackerName = async () => {
+  try {
+    const response = await API.get(GET_ALL_SERVICE_TRACKER_NAME);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching service tracker names:", error);
+    throw error;
+  }
+};
+
 export const deleteServiceTrackerById = async (id, payload) => {
   try {
     const response = await API.delete(`${DELETE_SERVICE_TRACKER_BY_ID}${id}`, payload);
@@ -586,7 +610,15 @@ export const createServiceTracker = async (payload) => {
   }
 };
 
-
+export const createServiceTrackerSpecifics = async (payload) => {
+  try {
+    const response = await API.post(`${CREATE_SERVICE_TRACKER_SPECIFICS}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating service tracker specifics:", error);
+    throw error;
+  }
+};
 
 export const updateServiceTrackerByStatusId = async (id, payload) => {
   try {
@@ -695,16 +727,24 @@ export const uploadExcelFile = async (filesArray, metadata = {}) => {
 
 
 // USER ACCESS LEVEL
-export const fetchAllUserAccessLevels = async () => {
+export const fetchAllUserAccessLevels = async ({ system_user_id }) => {
   try {
-    const response = await API.get(GET_USER_ACCESS_LEVEL);
+    const response = await API.get(`${GET_USER_ACCESS_LEVEL}/${system_user_id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user access levels:", error);
     throw error;
   }
 };
-
+export const fetchAllAccessTypes = async () => {
+  try {
+    const response = await API.get(GET_ALL_ACCESS_TYPES);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching access types:", error);
+    throw error;
+  }
+};
 export const createUserAccessLevel = async (userAccessData) => {
   try {
     const response = await API.post(CREATE_USER_ACCESS_LEVEL, userAccessData);
@@ -732,4 +772,12 @@ export const deleteUserAccessLevelById = async (id) => {
     throw error;
   }
 };
-
+export const toggleUserAccessLevelStatus = async (id, status) => {
+  try {
+    const response = await API.put(`${TOGGLE_USER_ACCESS_LEVEL_STATUS}${id}`, { status });
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling user access level status:", error);
+    throw error;
+  }
+};

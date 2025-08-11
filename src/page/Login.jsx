@@ -26,7 +26,9 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
 
         if (token) {
             localStorage.setItem('token', token);
-            sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
+            localStorage.setItem('username', response.data?.username );
+            localStorage.setItem('user_id', response.data?.user_id);
+            // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
             setIsAuthenticated(true);
             navigate('/dashboard');
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });

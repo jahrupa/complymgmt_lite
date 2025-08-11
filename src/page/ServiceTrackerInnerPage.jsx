@@ -19,7 +19,7 @@ import MonthYearCalander from '../component/MonthYearCalander';
 
 // Register modules
 ModuleRegistry.registerModules([AllCommunityModule]);
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import { fetchAllInnerPageServiceTracker, uploadExcelFile } from '../api/service';
@@ -33,13 +33,13 @@ const ServiceTrackerInnerPage = () => {
     const [columnDefs, setColumnDefs] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
-    console.log(fileName, 'fileName');
     const [isEditing, setIsEditing] = useState(false);
     const gridRef = useRef();
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
-
+    const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
+    const currentUser = localStorage.getItem('user_id');
     const defaultColDef = {
         sortable: true,
         filter: true,
@@ -53,41 +53,20 @@ const ServiceTrackerInnerPage = () => {
         setFileName(file || '');
     };
 
-    // const handleFileUpload = async () => {
-    //     const payload = {
-    //         file: fileName?.name,
-    //         bo_user_id: '68919bb2e086be682a73a131',
-    //         tracker_name: trackerName,
-    //     };
-    //     if (!fileName) {
-    //         alert("Please select at least one file.");
-    //         return;
-    //     }
-
-    //     try {
-    //         const result = await uploadExcelFile(payload);
-    //         console.log("Files uploaded successfully:", result);
-    //         setIsModalOpen(false);
-
-    //     } catch (error) {
-    //         console.error("Upload failed:", error);
-    //         alert("❌ Upload failed. Please try again.");
-    //     }
-    // };
-
-
     const handleFileUpload = async () => {
         if (!fileName) {
             alert("Please select a file.");
             return;
         }
         const metadata = {
-            bo_user_id: '68919bb2e086be682a73a131',
+            bo_user_id: currentUser,
             tracker_name: trackerName,
         };
         try {
             const result = await uploadExcelFile([fileName], metadata);
             console.log("File uploaded successfully:", result);
+            const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            setRowData(response || []);
             setIsModalOpen(false);
         } catch (error) {
             console.error("Upload failed:", error);
@@ -222,7 +201,6 @@ const ServiceTrackerInnerPage = () => {
     );
 
     const crudTitle = "Upload File";
-    const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
     // Helper for status color
     const getRoleColorForFileStatus = (status) => {
         switch (status) {
@@ -236,8 +214,8 @@ const ServiceTrackerInnerPage = () => {
         const fetchData = async () => {
             try {
                 const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
-                setRowData(response.data || []);
-                const dataSample = (response.data && response.data[0]) || {};
+                setRowData(response || []);
+                const dataSample = (response && response[0]) || {};
                 const dynamicCols = Object.keys(dataSample).map(key => {
                     // Approval Status column
                     if (key === 'approval_status' && dataSample.approval_status !== undefined) {
@@ -293,7 +271,7 @@ const ServiceTrackerInnerPage = () => {
                             cellRenderer: (params) => (
                                 <Toggle
                                     checked={!!params.value}
-                                    // onChange={(e) => handleToggleChange(e, params)}
+                                // onChange={(e) => handleToggleChange(e, params)}
                                 />
                             )
                         };
@@ -339,12 +317,16 @@ const ServiceTrackerInnerPage = () => {
 
 
 
+    // const { trackerName } = useParams();
+    const navigate = useNavigate();
+
     return (
         <div>
             <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
                 <div className="notification-page-title">
-                    <button className="back-button"
-                    // onClick={onBack}
+                    <button
+                        className="back-button"
+                        onClick={() => navigate("/service_trackers")}
                     >
                         <ArrowLeft size={20} />
                     </button>
@@ -352,7 +334,6 @@ const ServiceTrackerInnerPage = () => {
                         <h1>{trackerName}</h1>
                     </div>
                     <div>
-
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
@@ -361,7 +342,6 @@ const ServiceTrackerInnerPage = () => {
                         <span className="text">Upload</span>
                     </button>
                     <div className='btn-wrap-div'>
-
                         <button className="button approve w-100 justify-content-center">
                             <span className="icon">
                                 <svg viewBox="0 0 24 24">
@@ -372,21 +352,11 @@ const ServiceTrackerInnerPage = () => {
                         </button>
                     </div>
                 </div>
-
             </div>
-
             <div className="client-onboarding-2">
                 <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle="Edit Uploaded File" isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
-                {/* <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} /> */}
                 <div className="table_div p-3">
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                    {/* <div className="d-lg-flex d-md-flex justify-content-between">
-                        <div className="search-bar-container h-25">
-                            <AgGridSearchBar label="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                            <button className="search-icon"><SearchIcon /></button>
-                        </div>
-                    </div> */}
-
                     <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                         <AgGridReact
                             theme="legacy"
@@ -403,8 +373,6 @@ const ServiceTrackerInnerPage = () => {
                 </div>
             </div>
         </div>
-
-
     )
 }
 

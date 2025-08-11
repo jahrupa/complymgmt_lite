@@ -1,5 +1,6 @@
 // Login
 export const LOGIN_API ='/api/v1/login';
+export const LOGIN_API ='/api/v1/login';
 
 // Roles
 export const GET_ALL_ROLE ='/view_all_roles';
@@ -64,10 +65,15 @@ export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/api/v1/submodule/view/module/mul
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/api/v1/service_tracker/view/multiple';
 export const GET_ALL_INNER_PAGE_SERVICE_TRACKER='/api/v1/service_tracker/view';
+export const GET_ALL_SERVICE_TRACKER_NAME='/api/v1/service_tracker/view/names/multiple';
 export const DELETE_SERVICE_TRACKER_BY_ID='/api/v1/service_tracker/delete/';
 export const CREATE_SERVICE_TRACKER ='/api/v1/service_tracker/create';
 export const UPDATE_SERVICE_TRACKER ='/api/v1/service_tracker/update/';
 export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/api/v1/service_tracker/update/status/';
+export const GET_ALL_SERVICE_TRACKER_FIELDS ='/api/V1/service_tracker/view/';
+export const CREATE_SERVICE_TRACKER_SPECIFICS ='/api/v1/service_tracker/create/specifics';
+
+
 
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
@@ -78,14 +84,16 @@ export const DELETE_LOCATION_TO_MODULE_BY_ID='/api/v1/location_to_module/delete/
 
 // File Upload
 export const FILE_UPLOAD='/classify-files';
-export const UPLOAD_EXCEL='/api/v1/upload_tracker/excel';
+export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
 
 
 // USER ACCESS LEVEL
-export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access_level/view/multiple';
+export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access/view/user_id';
 export const CREATE_USER_ACCESS_LEVEL ='/api/v1/user_access/create';
 export const UPDATE_USER_ACCESS_LEVEL ='/api/v1/user_access/update/';
 export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
+export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
+export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 
 
 

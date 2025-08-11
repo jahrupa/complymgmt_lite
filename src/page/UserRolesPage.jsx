@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -20,6 +20,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -162,32 +163,21 @@ const UserRolesPage = () => {
     setIsModalOpen(false);
     setErrors({});
   };
+ useEffect(() => {
+  const fetchData = async () => {
+    const [userData] = await Promise.allSettled([
+      fetchAllUser(),
+    ]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [userData] = await Promise.all([
-          fetchAllUser(),
-          // fetchAllGroupHolding(),
-          // fetchAllUserName(),
-          // fetchAllCompaniesName(),
-          // fetchAllLocationName(),
-        ]);
-        setData(userData);
-        // console.log(data, 'data')
-        // setGroupHoldingName(groupHolding);
-        // setRolesName(roleName)
-        // setCompanyName(companyName)
-        // setLocationName(getLocationName)
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    if (userData.status === 'fulfilled') {
+      setData(userData.value);
+    } else {
+      console.warn("fetchAllCompanies failed:", userData.reason);
+    }
+  };
 
-    fetchData();
-  }, []);
-
-
+  fetchData();
+}, []);
 
   const crudForm = () => {
     return (
@@ -447,7 +437,12 @@ const UserRolesPage = () => {
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
-
+   const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+        );
+    }, []);
 
   return (
     <div>
@@ -460,7 +455,9 @@ const UserRolesPage = () => {
       {/* Table to display data */}
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
-          <div className="search-container">
+          <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+
+          {/* <div className="search-container">
             <Search className="notification-search-icon" size={18} />
             <input
               type="text"
@@ -469,7 +466,7 @@ const UserRolesPage = () => {
               // onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-          </div>
+          </div> */}
           <div>
             <button className='crud_btn w-100' onClick={openModal}>
               <span><AddIcon /></span> <span className='button-style'>Add New User</span>

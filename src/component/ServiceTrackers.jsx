@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
+import { createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesName, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -22,6 +22,7 @@ import Modal from './Modal';
 import SingleSelectTextField from './MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from './MuiInputs/MuiTextAreaField';
 import { useNavigate } from 'react-router-dom';
+import { AnimatedSearchBar } from './AnimatedSearchBar';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -76,9 +77,9 @@ const ServiceTrackers = () => {
     const validate = () => {
         let tempErrors = {};
         if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Tracker name is required";
-        if (!current?.group_name) tempErrors.group_name = "Group holding name is required";
-        if (!current?.company_name) tempErrors.company_name = "Company name is required";
-        if (!current?.location_name) tempErrors.location_name = "Location name is required";
+        // if (!current?.group_name) tempErrors.group_name = "Group holding name is required";
+        // if (!current?.company_name) tempErrors.company_name = "Company name is required";
+        // if (!current?.location_name) tempErrors.location_name = "Location name is required";
         if (!current?.module_name) tempErrors.module_name = "Module name is required";
         if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
         if (!current?.service_tracker_description) tempErrors.service_tracker_description = "Description name is required";
@@ -94,8 +95,8 @@ const ServiceTrackers = () => {
             "ServiceTrackerDescription": current?.service_tracker_description,
             "SubModuleID": current?.sub_module_id,
             "ModuleID": current?.module_id,
-            "LocationID": current?.location_id,
-            "CompanyID": current?.company_id,
+            // "LocationID": current?.location_id,
+            // "CompanyID": current?.company_id,
             "CommonAttributes": {
                 "Created_By": "688331c4d3f5ece9a3ad0065"
             }
@@ -105,8 +106,8 @@ const ServiceTrackers = () => {
             "ServiceTrackerDescription": current?.service_tracker_description,
             "SubModuleID": current?.sub_module_id,
             "ModuleID": current?.module_id,
-            "LocationID": current?.location_id,
-            "CompanyID": current?.company_id,
+            // "LocationID": current?.location_id,
+            // "CompanyID": current?.company_id,
             "CommonAttributes": {
                 "Updated_By": "688331c4d3f5ece9a3ad0065"
             }
@@ -236,48 +237,48 @@ const ServiceTrackers = () => {
         };
         fetchData();
     }, []);
-    // fetch company by group id
-    useEffect(() => {
-        const fetchCompany = async () => {
-            try {
-                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
-                if (data) {
-                    setCompanyNameByGroupHoldingId(data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch company:", error);
-            }
-        };
+    // // fetch company by group id
+    // useEffect(() => {
+    //     const fetchCompany = async () => {
+    //         try {
+    //             const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
+    //             if (data) {
+    //                 setCompanyNameByGroupHoldingId(data);
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to fetch company:", error);
+    //         }
+    //     };
 
-        if (current?.group_holding_id) {
-            fetchCompany();
-        }
-    }, [current?.group_holding_id]);
+    //     if (current?.group_holding_id) {
+    //         fetchCompany();
+    //     }
+    // }, [current?.group_holding_id]);
 
-    // fetch location by company id
-    useEffect(() => {
-        const fetchLocationByCompanyId = async () => {
-            try {
-                const data = await getLocationByCompanyId(current?.company_id);
-                if (data) {
-                    setLocationNameByCompanyId(data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch location by company_id:", error);
-            }
-        };
+    // // fetch location by company id
+    // useEffect(() => {
+    //     const fetchLocationByCompanyId = async () => {
+    //         try {
+    //             const data = await getLocationByCompanyId(current?.company_id);
+    //             if (data) {
+    //                 setLocationNameByCompanyId(data);
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to fetch location by company_id:", error);
+    //         }
+    //     };
 
-        if (current?.company_id) {
-            fetchLocationByCompanyId();
-        }
-    }, [current?.company_id]);
+    //     if (current?.company_id) {
+    //         fetchLocationByCompanyId();
+    //     }
+    // }, [current?.company_id]);
 
 
-    // module by location id
+    // // module by location id
     useEffect(() => {
         const fetchModuleByLocationId = async () => {
             try {
-                const data = await fetchAllModulesNameByLocationId(current?.location_id);
+                const data = await fetchAllModulesName();
                 if (data) {
                     setModuleName(data);
                 }
@@ -285,11 +286,8 @@ const ServiceTrackers = () => {
                 console.error("Failed to fetch location by location_id:", error);
             }
         };
-
-        if (current?.location_id) {
             fetchModuleByLocationId();
-        }
-    }, [current?.location_id]);
+    }, []);
     // sub-module by module id
     useEffect(() => {
         const fetchSubModuleByModuleId = async () => {
@@ -324,7 +322,7 @@ const ServiceTrackers = () => {
                         helperText={errors.service_tracker_name}
                     />
 
-                    <SingleSelectTextField
+                    {/* <SingleSelectTextField
                         name="group_name"
                         label="Group Holding Name"
                         value={current?.group_name}
@@ -343,10 +341,10 @@ const ServiceTrackers = () => {
                         names={groupHoldingData}
                         error={!!errors.group_name}
                         helperText={errors.group_name}
-                    />
+                    /> */}
 
                 </div>
-                <div className='d-lg-flex d-md-flex gap-2'>
+                {/* <div className='d-lg-flex d-md-flex gap-2'>
                     <SingleSelectTextField
                         name="company_name"
                         label="Company"
@@ -387,7 +385,7 @@ const ServiceTrackers = () => {
                     />
 
 
-                </div>
+                </div> */}
                 <div className='d-lg-flex d-md-flex gap-2'>
                     <SingleSelectTextField
                         name="module_name"
@@ -417,7 +415,7 @@ const ServiceTrackers = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = subModuleName.find(
-                                (g) => g.name === selectedName
+                                (g) => g.sub_module_name === selectedName
                             );
                             setCurrent((prev) => ({
                                 ...prev,
@@ -425,19 +423,20 @@ const ServiceTrackers = () => {
                                 sub_module_id: matchedGroup?._id || null,
                             }));
                         }}
-                        names={subModuleName}
+                         names={subModuleName.map((item) => ({
+                                _id: item._id,
+                                name: item.sub_module_name,
+                            }))}
                         error={!!errors.sub_module_name}
                         helperText={errors.sub_module_name}
                     // isdisable={isEditing}
                     />
                 </div>
                 <MuiTextAreaField
-                    isRequired={true}
-                    label='Description'
-                    type='text'
-                    fieldName='service_tracker_description'
-                    handleChange={handleChange}
                     value={current.service_tracker_description}
+                    handleChange={handleChange}
+                    name='service_tracker_description'
+                    label='Description'
                     error={!!errors.service_tracker_description}
                     helperText={errors.service_tracker_description}
                 />
@@ -451,9 +450,7 @@ const ServiceTrackers = () => {
                     </div>
                 </div>
             </div>
-
         )
-
     }
     const crudTitle = "Add New Service Tracker"
     const deleteModal = () => {
@@ -607,6 +604,12 @@ const ServiceTrackers = () => {
     const onRowValueChanged = (event) => {
         console.log('Row updated:', event.data);
     };
+        const onFilterTextBoxChanged = useCallback(() => {
+            gridRef.current.api.setGridOption(
+                'quickFilterText',
+                document.getElementById('filter-text-box').value
+            );
+        }, []);
     return (
         <div>
             <div className='mb-4'>
@@ -615,13 +618,14 @@ const ServiceTrackers = () => {
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
-                    <div className='d-flex h-100'>
+                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    {/* <div className='d-flex h-100'>
                         <div className="search-bar-container h-25">
                             <MuiSearchBar label='Search...' type='text' />
                             <button className='search-icon'><SearchIcon /></button>
                         </div>
-                    </div>
-                    <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+                    </div> */}
+                    <div className='d-lg-flex d-md-flex gap-2 justify-content-end mb-3'>
                         <div>
                             <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add Service Tracker</span>

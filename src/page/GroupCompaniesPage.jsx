@@ -24,7 +24,15 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const GroupCompaniesPage = () => {
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState({});
-  const [current, setCurrent] = useState({ _id: null, group_name: '', groups_holdings_id: null, group_holding_account_owner: '', created_at: '', group_description: '', });
+  const [current, setCurrent] = useState(
+    {
+      _id: null,
+      group_name: '',
+      groups_holdings_id: null,
+      group_holding_account_owner: '',
+      created_at: '',
+      group_description: '',
+    });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -198,7 +206,7 @@ const GroupCompaniesPage = () => {
   const crudForm = () => {
     return (
       <div>
-       <div className='fs-12 info mb-2'>Group name must be at least 3 characters long and not just spaces.</div> 
+        <div className='fs-12 info mb-2'>Group name must be at least 3 characters long and not just spaces.</div>
         <MuiTextField
           label='Group Holding Name'
           type='text'
@@ -210,7 +218,7 @@ const GroupCompaniesPage = () => {
           helperText={errors.group_name}
         />
         <MuiTextField
-          label='Desc'
+          label='Description'
           type='text'
           isRequired={true}
           fieldName='group_description'
