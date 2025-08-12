@@ -7,19 +7,15 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
-import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import { deepOrange } from '@mui/material/colors'
-import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export default function UserProfile() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
-    const navigate = useNavigate();
     
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -31,6 +27,7 @@ export default function UserProfile() {
         localStorage.clear();
         window.location.reload();
     };
+    const userName = localStorage.getItem('username');
     return (
         <React.Fragment>
             <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -44,7 +41,7 @@ export default function UserProfile() {
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
                     >
-                        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" sx={{ bgcolor: deepOrange[500] ,width:'30px',height:'30px',fontSize:'12px'}} />
+                        <Avatar alt={userName} src="/static/images/avatar/1.jpg" sx={{ bgcolor: deepOrange[500] ,width:'30px',height:'30px',fontSize:'12px'}} />
                     </IconButton>
                 </Tooltip>
             </Box>
@@ -86,7 +83,7 @@ export default function UserProfile() {
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
                 <MenuItem onClick={handleClose}>
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg"/> jharupa@gmail.com
+                    <Avatar alt={userName} src="/static/images/avatar/1.jpg"/> {userName}
                 </MenuItem>
                 <Divider />
                 <Link to={'/user_profile/1'}>

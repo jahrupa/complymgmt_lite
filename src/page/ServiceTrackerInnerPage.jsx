@@ -1,21 +1,13 @@
 import { ArrowLeft, Upload } from 'lucide-react';
-import AddIcon from '@mui/icons-material/Add';
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-import * as XLSX from 'xlsx';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import exportCsvIcon from '../assets/Arrow-Line.png';
-import Modal from '../component/Modal';
-import AgGridSearchBar from '../component/MuiInputs/AgGridSearchBar';
-import MonthYearCalander from '../component/MonthYearCalander';
 
 // Register modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -27,15 +19,12 @@ import Toggle from '../component/Toggle';
 
 const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
-    console.log(trackerName, 'trackerName', id, 'id');
-
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const gridRef = useRef();
-
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
     const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
@@ -46,6 +35,95 @@ const ServiceTrackerInnerPage = () => {
         editable: true,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
         flex: 1,
+    };
+    const fetchAndSetTrackerData = async (trackerName) => {
+        try {
+            const response = await fetchAllInnerPageServiceTracker(trackerName);
+            setRowData(response || []);
+            const dataSample = response?.[0] || {};
+
+            const dynamicCols = Object.keys(dataSample).map((key) => {
+                if (key === 'approval_status' && dataSample.approval_status !== undefined) {
+                    return {
+                        field: 'approval_status',
+                        headerName: 'Approval Status',
+                        editable: false,
+                        headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+                        filter: true,
+                        minWidth: 160,
+                        valueGetter: (params) => params.data?.approval_status,
+                        cellRenderer: (params) => {
+                            const getApprovalStatusText = (status) => {
+                                switch (status) {
+                                    case 0: return 'Pending';
+                                    case 1: return 'Approved';
+                                    default: return '-';
+                                }
+                            };
+                            const status = params.value;
+                            const { color } = getRoleColorForFileStatus(status ?? 0);
+                            return (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={status === 1}
+                                        readOnly
+                                        style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                                    />
+                                    <span style={{ color, fontSize: '0.8rem', fontWeight: 500 }}>
+                                        {getApprovalStatusText(status)}
+                                    </span>
+                                </div>
+                            );
+                        }
+                    };
+                }
+
+                if (key === 'is_active' && dataSample?.is_active !== undefined) {
+                    return {
+                        headerName: 'Status',
+                        field: 'is_active',
+                        editable: false,
+                        pinned: "right",
+                        valueGetter: (params) => params.data?.is_active,
+                        cellRenderer: (params) => (
+                            <Toggle checked={!!params.value} />
+                        )
+                    };
+                }
+
+                return {
+                    headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                    field: key,
+                    editable: key === 'file_name' || key === 'status',
+                    minWidth: 150,
+                };
+            });
+
+            const actionCol = {
+                headerName: 'Actions',
+                field: 'actions',
+                pinned: "left",
+                width: 130,
+                cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+                filter: false,
+                editable: false,
+                cellRenderer: (params) => (
+                    <div className="d-flex gap-2">
+                        <button className="btn btn-sm" onClick={() => setIsEditing(true)}>
+                            <EditIcon fontSize="small" className="action_icon" />
+                        </button>
+                        <button className="btn btn-sm" onClick={() => alert('Delete action')}>
+                            <DeleteIcon fontSize="small" className="action_icon" />
+                        </button>
+                    </div>
+                )
+            };
+
+            setColumnDefs([...dynamicCols, actionCol]);
+        } catch (error) {
+            console.error("Error fetching tracker data:", error);
+        }
     };
 
     const handleFileChange = (e) => {
@@ -64,9 +142,10 @@ const ServiceTrackerInnerPage = () => {
         };
         try {
             const result = await uploadExcelFile([fileName], metadata);
-            console.log("File uploaded successfully:", result);
+            // console.log("File uploaded successfully:", result);
             const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
             setRowData(response || []);
+            await fetchAndSetTrackerData(formattedTrackerName);
             setIsModalOpen(false);
         } catch (error) {
             console.error("Upload failed:", error);
@@ -74,84 +153,9 @@ const ServiceTrackerInnerPage = () => {
         }
     };
 
-    // const uploadFile = () => {
-    //     const reader = new FileReader();
-
-    //     reader.onload = (evt) => {
-    //         const data = new Uint8Array(evt.target.result);
-    //         const workbook = XLSX.read(data, { type: 'array' });
-
-    //         const sheetName = workbook.SheetNames[0];
-    //         if (!sheetName) {
-    //             alert('The workbook does not have any sheets.');
-    //             return;
-    //         }
-
-    //         const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
-    //         console.log(sheet,'sheet');
-    //         const headers = sheet[0] || [];
-    //         const rows = sheet.slice(1).map(row =>
-    //             Object.fromEntries(headers.map((h, i) => [h, row?.[i] ?? '']))
-    //         );
-
-    //         const dynamicCols = headers.map(h => ({
-    //             field: h,
-    //             editable: true,
-    //         }));
-    //         const actionCol = {
-    //             headerName: 'Actions',
-    //             field: 'actions',
-    //             filter: false,
-    //             editable: false,
-    //             width: 130,
-    //             pinned: 'left',
-    //             cellRenderer: (params) => {
-    //                 return (
-    //                     <>
-    //                         <button
-    //                             className="btn btn-sm"
-    //                             onClick={() => {
-    //                                 alert(`Edit row ${params.rowIndex}`);
-    //                                 setIsEditing(true);
-    //                             }}
-    //                         >
-    //                             Edit
-    //                         </button>
-    //                         <button
-    //                             className="btn btn-sm"
-    //                             onClick={() => alert(`Delete row ${params.rowIndex}`)}
-    //                         >
-    //                             Delete
-    //                         </button>
-    //                     </>
-    //                 );
-    //             }
-    //         };
-
-    //         setColumnDefs([actionCol, ...dynamicCols]);
-    //         setRowData(rows);
-    //         setIsModalOpen(false);
-    //     };
-
-    //     if (fileName) {
-    //         reader.readAsArrayBuffer(fileName);
-    //     } else {
-    //         alert('Please select a file to upload.');
-    //     }
-    // };
-
-    const addRow = () => {
-        const newRow = Object.fromEntries(columnDefs.map(col => [col.field, '']));
-        setRowData(prev => [...prev, newRow]);
-    };
-
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
-
-    const onBtnExport = useCallback(() => {
-        gridRef.current.api.exportDataAsCsv();
-    }, []);
 
     const onFilterTextBoxChanged = useCallback(() => {
         gridRef.current.api.setGridOption(
@@ -193,7 +197,6 @@ const ServiceTrackerInnerPage = () => {
                     <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
                 </div>
                 <div className="col-12 col-md-6">
-                    {/* <button type="submit" className="btn btn-primary w-100" onClick={uploadFile}>Upload</button> */}
                     <button type="submit" className="btn btn-primary w-100" onClick={handleFileUpload}>Upload</button>
                 </div>
             </div>
@@ -209,117 +212,118 @@ const ServiceTrackerInnerPage = () => {
             default: return { color: 'gray' };
         }
     };
-
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
-                setRowData(response || []);
-                const dataSample = (response && response[0]) || {};
-                const dynamicCols = Object.keys(dataSample).map(key => {
-                    // Approval Status column
-                    if (key === 'approval_status' && dataSample.approval_status !== undefined) {
-                        return {
-                            field: 'approval_status',
-                            headerName: 'Approval Status',
-                            editable: false,
-                            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-                            filter: true,
-                            minWidth: 160,
-                            valueGetter: (params) => params.data?.approval_status,
-                            cellRenderer: (params) => {
-                                const getApprovalStatusText = (status) => {
-                                    switch (status) {
-                                        case 0: return 'Pending';
-                                        case 1: return 'Approved';
-                                        default: return '-';
-                                    }
-                                };
-                                const status = params.value;
-                                const { color } = getRoleColorForFileStatus(status ?? 0);
-                                return (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={status === 1}
-                                            readOnly
-                                            style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-                                        />
-                                        <span
-                                            style={{
-                                                color,
-                                                fontSize: '0.8rem',
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {getApprovalStatusText(status)}
-                                        </span>
-                                    </div>
-                                );
-                            }
-                        };
-                    }
-                    // is_active UI column
-                    if (key === 'is_active' && dataSample?.is_active !== undefined) {
-                        const newLocal = 'is_active';
-                        return {
-                            headerName: 'Status',
-                            field: newLocal,
-                            editable: false,
-                            pinned: "right",
-                            valueGetter: (params) => params.data?.is_active,
-                            cellRenderer: (params) => (
-                                <Toggle
-                                    checked={!!params.value}
-                                // onChange={(e) => handleToggleChange(e, params)}
-                                />
-                            )
-                        };
-                    }
-                    // Default column
-                    return {
-                        headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-                        field: key,
-                        editable: key === 'file_name' || key === 'status',
-                        minWidth: 150,
-                    };
-                });
+        if (formattedTrackerName) {
+            fetchAndSetTrackerData(formattedTrackerName);
+        }
+    }, [formattedTrackerName]);
 
-                // Actions column
-                const actionCol = {
-                    headerName: 'Actions',
-                    field: 'actions',
-                    pinned: "left",
-                    width: 130,
-                    cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
-                    filter: false,
-                    editable: false,
-                    cellRenderer: (params) => (
-                        <div className="d-flex gap-2">
-                            <button className="btn btn-sm" onClick={() => setIsEditing(true)}>
-                                <EditIcon fontSize="small" className="action_icon" />
-                            </button>
-                            <button className="btn btn-sm" onClick={() => alert('Delete action')}>
-                                <DeleteIcon fontSize="small" className="action_icon" />
-                            </button>
-                        </div>
-                    )
-                };
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+    //             // console.log(response, 'response')
+    //             setRowData(response || []);
+    //             const dataSample = (response && response[0]) || {};
+    //             const dynamicCols = Object.keys(dataSample).map(key => {
+    //                 // Approval Status column
+    //                 if (key === 'approval_status' && dataSample.approval_status !== undefined) {
+    //                     return {
+    //                         field: 'approval_status',
+    //                         headerName: 'Approval Status',
+    //                         editable: false,
+    //                         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    //                         filter: true,
+    //                         minWidth: 160,
+    //                         valueGetter: (params) => params.data?.approval_status,
+    //                         cellRenderer: (params) => {
+    //                             const getApprovalStatusText = (status) => {
+    //                                 switch (status) {
+    //                                     case 0: return 'Pending';
+    //                                     case 1: return 'Approved';
+    //                                     default: return '-';
+    //                                 }
+    //                             };
+    //                             const status = params.value;
+    //                             const { color } = getRoleColorForFileStatus(status ?? 0);
+    //                             return (
+    //                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    //                                     <input
+    //                                         type="checkbox"
+    //                                         checked={status === 1}
+    //                                         readOnly
+    //                                         style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+    //                                     />
+    //                                     <span
+    //                                         style={{
+    //                                             color,
+    //                                             fontSize: '0.8rem',
+    //                                             fontWeight: 500,
+    //                                         }}
+    //                                     >
+    //                                         {getApprovalStatusText(status)}
+    //                                     </span>
+    //                                 </div>
+    //                             );
+    //                         }
+    //                     };
+    //                 }
+    //                 // is_active UI column
+    //                 if (key === 'is_active' && dataSample?.is_active !== undefined) {
+    //                     const newLocal = 'is_active';
+    //                     return {
+    //                         headerName: 'Status',
+    //                         field: newLocal,
+    //                         editable: false,
+    //                         pinned: "right",
+    //                         valueGetter: (params) => params.data?.is_active,
+    //                         cellRenderer: (params) => (
+    //                             <Toggle
+    //                                 checked={!!params.value}
+    //                             // onChange={(e) => handleToggleChange(e, params)}
+    //                             />
+    //                         )
+    //                     };
+    //                 }
+    //                 // Default column
+    //                 return {
+    //                     headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    //                     field: key,
+    //                     editable: key === 'file_name' || key === 'status',
+    //                     minWidth: 150,
+    //                 };
+    //             });
 
-                setColumnDefs([...dynamicCols, actionCol]);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+    //             // Actions column
+    //             const actionCol = {
+    //                 headerName: 'Actions',
+    //                 field: 'actions',
+    //                 pinned: "left",
+    //                 width: 130,
+    //                 cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+    //                 filter: false,
+    //                 editable: false,
+    //                 cellRenderer: (params) => (
+    //                     <div className="d-flex gap-2">
+    //                         <button className="btn btn-sm" onClick={() => setIsEditing(true)}>
+    //                             <EditIcon fontSize="small" className="action_icon" />
+    //                         </button>
+    //                         <button className="btn btn-sm" onClick={() => alert('Delete action')}>
+    //                             <DeleteIcon fontSize="small" className="action_icon" />
+    //                         </button>
+    //                     </div>
+    //                 )
+    //             };
 
-        fetchData();
-    }, []);
+    //             setColumnDefs([...dynamicCols, actionCol]);
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+    //     fetchData();
+    // }, []);
 
-
-
-    // const { trackerName } = useParams();
     const navigate = useNavigate();
-
     return (
         <div>
             <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
@@ -361,7 +365,7 @@ const ServiceTrackerInnerPage = () => {
                         <AgGridReact
                             theme="legacy"
                             ref={gridRef}
-                            rowData={rowData}
+                            rowData={rowData || []}
                             columnDefs={columnDefs}
                             defaultColDef={defaultColDef}
                             editType="fullRow"

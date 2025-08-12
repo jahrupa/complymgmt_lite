@@ -1,43 +1,27 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import BackupTableIcon from '@mui/icons-material/BackupTable';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
-import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
 import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
-
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import MenuPopup from '../component/MenuPopup';
-import MultiFileUpload from '../component/MultiFileUpload';
-import RightDrawer from '../component/RightDrawer';
-import ResponsiveDatePickers from '../component/DatePicker';
-import { ReactPDFViewer } from '../component/ReactPDFViewer';
-import { createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, toggleUserAccessLevelStatus } from '../api/service';
+import { createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const AccessControl = () => {
-    // const [data, setData] = useState([]);
-    // if you want to show dummy jason data 
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState({
         user_id: null,
@@ -53,10 +37,9 @@ const AccessControl = () => {
         sub_module_name: '',
         sub_module_id: null,
         access_type: '',
-        approved_by: [],
+        access: [],
 
     });
-    console.log(current, 'current')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldingData] = useState([]);
@@ -65,13 +48,11 @@ const AccessControl = () => {
     const [moduleName, setModuleName] = useState([]);
     const [subModuleName, setSubModuleName] = useState([]);
     const [locationToModule, setLocationToModule] = useState([]);
-    console.log(locationToModule, 'locationToModule')
     const [userNameListRes, setUserNameListRes] = useState([]);
     const [accessTypeList, setAccessTypeList] = useState([]);
     const [allPageList, setAllPageList] = useState([]);
     const [allServiceTrackerList, setAllServiceTrackerList] = useState([]);
     const [allInnerPageServiceTrackerList, setAllInnerPageServiceTrackerList] = useState([]);
-    console.log(allServiceTrackerList, 'allServiceTrackerList')
     const [isSnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -79,9 +60,36 @@ const AccessControl = () => {
         message: '',
         severityType: '',
     });
-    // console.log(accessTypeList, 'accessTypeList')
     const currentUserId = localStorage.getItem('user_id');
-
+    const handleEdit = async (data) => {
+        const userData = await fetchUserAccessById(data._id);
+        setCurrent((prev) => ({
+            ...prev,
+            id: data._id,
+            user_id: data.UserId,
+            access: userData.access || [],
+            user_name: userData.user_full_name || '',
+            group_name: userData.entity_name || '',
+            group_name_id: userData.entity_id || null,
+            company_name: userData.entity_name || '',
+            company_id: userData.entity_id || null,
+            location_name: userData.entity_name || '',
+            location_id: userData.entity_id || null,
+            module_name: userData.entity_name || '',
+            module_id: userData.entity_id || null,
+            sub_module_name: userData.entity_name || '',
+            sub_module_id: userData.entity_id || null,
+            service_tracker: userData.entity_name || '',
+            service_tracker_id: userData.entity_id || null,
+            service_tracker_wise: userData.entity_name || '',
+            service_tracker_inner_id: userData.entity_id || null,
+            page_name: userData.entity_name || '',
+            page_id: userData.page_id || null,
+            access_type: userData.entity_type || ''
+        }));
+        setIsEditing(true);
+        setIsModalOpen(true);
+    };
     // Handle Add or Edit
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -94,8 +102,8 @@ const AccessControl = () => {
                 .replace(/\s+/g, '_') || current?.page_name || current?.service_tracker_wise,
             entity_type: current?.access_type,
             bo_user_id: currentUserId,
-            access: Array.isArray(current?.approved_by)
-                ? current.approved_by.map(a => a.toLowerCase())
+            access: Array.isArray(current?.access)
+                ? current.access.map(a => a.toLowerCase())
                 : []
         }
         if (accessType) {
@@ -106,7 +114,7 @@ const AccessControl = () => {
         try {
             if (isEditing) {
                 // Update existing company
-                await updateLocationById(current._id, payload);
+                await updateUserAccessLevelById(current.id, payload);
             } else {
                 // Create new company
                 await createUserAccessLevel(payload);
@@ -117,7 +125,7 @@ const AccessControl = () => {
         } catch (error) {
             console.error("Error saving company:", error);
         }
-        setCurrent({ id: null, sub_module_name: '', module_desc: '', created_at: '', location: '', updated_at: '', desc: '', approved_by: [], sub_module_id: [] });
+        setCurrent({ id: null, sub_module_name: '', module_desc: '', created_at: '', location: '', updated_at: '', desc: '', access: [], sub_module_id: [] });
         setIsEditing(false);
         setIsModalOpen(false);
 
@@ -125,12 +133,13 @@ const AccessControl = () => {
     // Function to open the modal
     const openModal = () => {
         setIsModalOpen(true);
+        // setIsEditing(false);
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
         setIsEditing(false);
-        setCurrent({ }); // Reset to default
+        setCurrent({}); // Reset to default
     };
 
     const handleToggleChange = async (e, params) => {
@@ -201,7 +210,7 @@ const AccessControl = () => {
     const crudTitle = "Add New Access Control"
     const editCrudTitle = "Edit Access Control"
     const handleRoleAccessChange = (newValue) => {
-        setCurrent((prev) => ({ ...prev, approved_by: newValue }));
+        setCurrent((prev) => ({ ...prev, access: newValue }));
     };
 
     const crudForm = () => {
@@ -211,16 +220,35 @@ const AccessControl = () => {
         const showOnlyModule = current.access_type === "module";
         const showOnlyModuleAndSubModule = current.access_type === "submodule";
 
+        const isCompanyLocationEdit = current.access_type === "company_location" && isEditing;
+
         const showGroup = [
             "group",
             "company",
             "company_location"
-        ].includes(current.access_type) && !showOnlyModule && !showOnlyModuleAndSubModule;
+        ].includes(current.access_type) &&
+            !showOnlyModule &&
+            !showOnlyModuleAndSubModule &&
+            !isCompanyLocationEdit;
 
         const showCompany = [
             "company",
             "company_location"
-        ].includes(current.access_type) && !showOnlyModule && !showOnlyModuleAndSubModule;
+        ].includes(current.access_type) &&
+            !showOnlyModule &&
+            !showOnlyModuleAndSubModule &&
+            !isCompanyLocationEdit;
+        // const showGroup = [
+        //     "group",
+        //     "company",
+        //     "company_location"
+        // ].includes(current.access_type) && !showOnlyModule && !showOnlyModuleAndSubModule;
+
+        // const showCompany = [
+        //     "company",
+        //     "company_location"
+        // ].includes(current.access_type) && !showOnlyModule && !showOnlyModuleAndSubModule;
+
 
         const showLocation = [
             "company_location"
@@ -238,28 +266,52 @@ const AccessControl = () => {
         return (
             <div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-                    <SingleSelectTextField
-                        name="user_name"
-                        label="User Name"
-                        value={current.user_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedUser = userNameListRes.find((item) => item.full_name === selectedName);
-                            setCurrent((prev) => ({
-                                ...prev,
-                                user_name: selectedName,
-                                user_id: matchedUser?._id || null
-                            }));
-                        }}
-                        names={userNameListRes.map((item) => ({
-                            _id: item._id,
-                            name: item.full_name,
-                        }))}
-                    />
+                    {
+                        isEditing ? (
+                            <MuiTextField
+                                name="user_name"
+                                label="User Name"
+                                value={current.user_name}
+                                isdisabled={true}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        user_name: selectedName
+                                    }));
+                                }}
+                            />
+                        ) : (
+                            <SingleSelectTextField
+                                name="user_name"
+                                label="User Name"
+                                value={current.user_name}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedUser = userNameListRes.find(
+                                        (item) => item.full_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        user_name: selectedName,
+                                        user_id: matchedUser?._id || null
+                                    }));
+                                }}
+                                names={userNameListRes.map((item) => ({
+                                    _id: item._id,
+                                    name: item.full_name
+                                }))}
+                            />
+                        )
+                    }
+
+
+
                     <SingleSelectTextField
                         name="access_type"
                         label="Access Type"
                         value={current?.access_type}
+                        isdisable={isEditing ? true : false}
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             setCurrent((prev) => ({
@@ -283,6 +335,7 @@ const AccessControl = () => {
                         names={accessTypeList.map((item) => ({
                             _id: item._id,
                             name: item.name
+                            // name: item.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
                         }))}
                     />
                 </div>
@@ -292,6 +345,7 @@ const AccessControl = () => {
                             name="group_name"
                             label="Group Holding Name"
                             value={current?.group_name}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedGroup = groupHoldingData.find(
@@ -322,6 +376,7 @@ const AccessControl = () => {
                             name="company_name"
                             label="Company"
                             value={current?.company_name}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedCompany = companyNameByGroupHoldingId.find(
@@ -347,37 +402,58 @@ const AccessControl = () => {
                     )}
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
-                    {showLocation && (
-                        <SingleSelectTextField
+                    {isEditing && showLocation ? (
+                        <MuiTextField
                             name="location_name"
-                            label="Location"
-                            value={current?.location_name}
+                            label="Location Name"
+                            value={current.location_name}
+                            isdisable={isEditing ? true : false}
+                            isdisabled={true}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
-                                const matchedLocation = locationNameByCompanyId.find(
-                                    (g) => g.location_name === selectedName
-                                );
                                 setCurrent((prev) => ({
                                     ...prev,
-                                    location_name: selectedName,
-                                    location_id: matchedLocation?._id || null,
-                                    module_name: '',
-                                    module_id: null,
-                                    sub_module_name: '',
-                                    sub_module_id: null
+                                    location_name: selectedName
                                 }));
                             }}
-                            names={locationNameByCompanyId?.map((data) => ({
-                                _id: data?._id,
-                                name: data?.location_name
-                            }))}
                         />
+                    ) : (
+                        showLocation && (
+                            <SingleSelectTextField
+                                name="location_name"
+                                label="Location"
+                                value={current?.location_name}
+                                isdisable={isEditing ? true : false}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedLocation = locationNameByCompanyId.find(
+                                        (g) => g.location_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        location_name: selectedName,
+                                        location_id: matchedLocation?._id || null,
+                                        module_name: '',
+                                        module_id: null,
+                                        sub_module_name: '',
+                                        sub_module_id: null
+                                    }));
+                                }}
+                                names={locationNameByCompanyId?.map((data) => ({
+                                    _id: data?._id,
+                                    name: data?.location_name
+                                }))}
+                            />
+                        )
                     )}
+
+
                     {showModule && (
                         <SingleSelectTextField
                             name="module_name"
                             label="Module"
                             value={current.module_name}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedModule = moduleName.find(
@@ -404,6 +480,7 @@ const AccessControl = () => {
                             name="sub_module_name"
                             label="Sub-Module"
                             value={current?.sub_module_name}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedSubModule = subModuleName.find(
@@ -426,6 +503,7 @@ const AccessControl = () => {
                             name="service_tracker"
                             label="Service Tracker"
                             value={current?.service_tracker}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedServiceTracker = allServiceTrackerList.find(
@@ -450,6 +528,7 @@ const AccessControl = () => {
                                 name="service_tracker"
                                 label="Service Tracker"
                                 value={current?.service_tracker}
+                                isdisable={isEditing ? true : false}
                                 onChange={(e) => {
                                     const selectedName = e.target.value;
                                     const matchedServiceTracker = allServiceTrackerList.find(
@@ -470,6 +549,7 @@ const AccessControl = () => {
                                 name="service_tracker_wise"
                                 label="Service Tracker Wise"
                                 value={current?.service_tracker_wise}
+                                isdisable={isEditing ? true : false}
                                 onChange={(e) => {
                                     const selectedName = e.target.value;
                                     const matchedServiceTracker = allInnerPageServiceTrackerList.find(
@@ -495,6 +575,7 @@ const AccessControl = () => {
                             name="location_to_module"
                             label="Location To Module"
                             value={current?.location_to_module}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => setCurrent((prev) => ({
                                 ...prev,
                                 location_to_module: e.target.value,
@@ -510,6 +591,7 @@ const AccessControl = () => {
                             name="page_name"
                             label="Page"
                             value={current?.page_name}
+                            isdisable={isEditing ? true : false}
                             onChange={(e) => {
                                 const selectedName = e.target.value;
                                 const matchedPage = allPageList.find(
@@ -529,7 +611,7 @@ const AccessControl = () => {
                     )}
                 </div>
                 <div>
-                    <MultipleSelectTextFields label='Access Control' value={current.approved_by} onChange={handleRoleAccessChange} names={accessControl} />
+                    <MultipleSelectTextFields label='Access Control' value={current.access} onChange={handleRoleAccessChange} names={accessControl} />
                 </div>
                 <div className="row row-gap-2">
                     <div className='col col-12 col-md-6'>
@@ -553,6 +635,8 @@ const AccessControl = () => {
                 return { color: '#41464b' }; // gray
         }
     };
+
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -566,9 +650,7 @@ const AccessControl = () => {
                 return (
                     <div className="d-flex justify-content-around align-items-center">
                         <button className="btn btn-sm" onClick={() => {
-                            setIsEditing(true);
-                            setCurrent(params.data);
-                            setIsModalOpen(true);
+                            handleEdit(params.data);
                         }}>
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>
@@ -581,8 +663,6 @@ const AccessControl = () => {
                 );
             }
         },
-        // { field: 'UserId', headerName: 'User ID', filter: true, editable: false },
-        // { field: 'EntityId', headerName: 'Entity ID', filter: true, editable: false },
         { field: 'EntityName', headerName: 'Entity Name', filter: true, editable: false },
         { field: 'EntityType', headerName: 'Entity Type', filter: true, editable: false },
         { field: 'view', headerName: 'View', filter: true, editable: false },
@@ -815,28 +895,75 @@ const AccessControl = () => {
         };
         fetchLocationToModule();
     }, []);
-
+   const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+        );
+    }, []);
     return (
         <div>
             <Snackbars issnackbarsOpen={isSnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             {/* Table to display data */}
-            <div className='table_div p-3'>
-                <div className='d-lg-flex d-md-flex  justify-content-between'>
-                    <div className='d-flex h-100'>
-                        <div class="search-bar-container h-25">
-                            <MuiSearchBar label='Search...' type='text' />
-                            <button className='search-icon'><SearchIcon /></button>
-                        </div>
+            <div className='notification-page-header'>
+                <div className='w-100'>
+                    {/* <SingleSelectTextField
+                        name="user_name"
+                        label="User Name"
+                        value={current.user_name}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedUser = userNameListRes.find(
+                                (item) => item.full_name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                user_name: selectedName,
+                                user_id: matchedUser?._id || null
+                            }));
+                        }}
+                        names={userNameListRes.map((item) => ({
+                            _id: item._id,
+                            name: item.full_name
+                        }))}
+                    /> */}
+                    <div>
+                        <button className='crud_btn w-100' onClick={openModal}>
+                            <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
+                        </button>
                     </div>
+                </div>
+            </div>
+            <div className='table_div p-3'>
 
-
+                <div className='d-lg-flex d-md-flex  justify-content-between'>
+                        <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div>
+                        {/* <div>
                             <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
                             </button>
-                        </div>
-
+                        </div> */}
+                            <SingleSelectTextField
+                                name="user_name"
+                                label="User Name"
+                                value={current.user_name}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedUser = userNameListRes.find(
+                                        (item) => item.full_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        user_name: selectedName,
+                                        user_id: matchedUser?._id || null
+                                    }));
+                                }}
+                                names={userNameListRes.map((item) => ({
+                                    _id: item._id,
+                                    name: item.full_name
+                                }))}
+                            />
                         <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>

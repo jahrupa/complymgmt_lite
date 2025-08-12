@@ -222,72 +222,59 @@ const ServiceTrackers = () => {
         setData(updatedData);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [serviceTracker, groupHolding] = await Promise.all([
-                    fetchAllServiceTracker(),
-                    fetchAllGroupHolding(),
-                ]);
-                setData(serviceTracker);
-                setGroupHoldingData(groupHolding);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+   useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const results = await Promise.allSettled([
+                fetchAllServiceTracker(),
+                fetchAllGroupHolding(),
+                fetchAllModulesName()
+            ]);
+
+            const [serviceTrackerResult, groupHoldingResult, moduleNameResult] = results;
+
+            if (serviceTrackerResult.status === 'fulfilled') {
+                setData(serviceTrackerResult.value);
+            } else {
+                console.error("Failed to fetch service tracker:", serviceTrackerResult.reason);
             }
-        };
-        fetchData();
-    }, []);
-    // // fetch company by group id
+
+            if (groupHoldingResult.status === 'fulfilled') {
+                setGroupHoldingData(groupHoldingResult.value);
+            } else {
+                console.error("Failed to fetch group holding:", groupHoldingResult.reason);
+            }
+
+            if (moduleNameResult.status === 'fulfilled') {
+                setModuleName(moduleNameResult.value);
+            } else {
+                console.error("Failed to fetch module names:", moduleNameResult.reason);
+            }
+        } catch (error) {
+            console.error("Unexpected error fetching data:", error);
+            toast.error("Failed to load service tracker data");
+        }
+    };
+
+    fetchData();
+}, []);
+
+
+    // // // module by location id
     // useEffect(() => {
-    //     const fetchCompany = async () => {
+    //     const fetchModuleByLocationId = async () => {
     //         try {
-    //             const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
+    //             const data = await fetchAllModulesName();
     //             if (data) {
-    //                 setCompanyNameByGroupHoldingId(data);
+    //                 setModuleName(data);
     //             }
     //         } catch (error) {
-    //             console.error("Failed to fetch company:", error);
+    //             console.error("Failed to fetch location by location_id:", error);
     //         }
     //     };
+    //         fetchModuleByLocationId();
+    // }, []);
 
-    //     if (current?.group_holding_id) {
-    //         fetchCompany();
-    //     }
-    // }, [current?.group_holding_id]);
-
-    // // fetch location by company id
-    // useEffect(() => {
-    //     const fetchLocationByCompanyId = async () => {
-    //         try {
-    //             const data = await getLocationByCompanyId(current?.company_id);
-    //             if (data) {
-    //                 setLocationNameByCompanyId(data);
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to fetch location by company_id:", error);
-    //         }
-    //     };
-
-    //     if (current?.company_id) {
-    //         fetchLocationByCompanyId();
-    //     }
-    // }, [current?.company_id]);
-
-
-    // // module by location id
-    useEffect(() => {
-        const fetchModuleByLocationId = async () => {
-            try {
-                const data = await fetchAllModulesName();
-                if (data) {
-                    setModuleName(data);
-                }
-            } catch (error) {
-                console.error("Failed to fetch location by location_id:", error);
-            }
-        };
-            fetchModuleByLocationId();
-    }, []);
     // sub-module by module id
     useEffect(() => {
         const fetchSubModuleByModuleId = async () => {
@@ -529,8 +516,8 @@ const ServiceTrackers = () => {
                 </span>
             )
         },
-        { field: 'group_name', headerName: 'Group Holding', filter: true, editable: false, },
-        { field: 'company_name', headerName: 'company', filter: true, editable: false, },
+        // { field: 'group_name', headerName: 'Group Holding', filter: true, editable: false, },
+        // { field: 'company_name', headerName: 'company', filter: true, editable: false, },
         { field: 'location_name', headerName: 'Location', filter: true, editable: false, },
         { field: 'module_name', headerName: 'Module', filter: true, editable: false, },
         { field: 'sub_module_name', headerName: 'Sub-Module', filter: true, editable: false, },

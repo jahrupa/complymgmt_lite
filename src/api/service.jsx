@@ -68,7 +68,8 @@ import {
   CREATE_SERVICE_TRACKER_SPECIFICS,
   GET_ALL_ACCESS_TYPES,
   TOGGLE_USER_ACCESS_LEVEL_STATUS,
-  GET_ALL_PAGE
+  GET_ALL_PAGE,
+  GET_USER_ACCESS_BY_ID
 
 } from "./Endpoint";
 // Login Api
@@ -734,6 +735,15 @@ export const fetchAllUserAccessLevels = async ({ system_user_id }) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching user access levels:", error);
+    throw error;
+  }
+};
+export const fetchUserAccessById = async (id) => {
+  try {
+    const response = await API.get(`${GET_USER_ACCESS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user access by ID:", error);
     throw error;
   }
 };

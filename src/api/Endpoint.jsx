@@ -96,6 +96,7 @@ export const UPDATE_USER_ACCESS_LEVEL ='/api/v1/user_access/update/';
 export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
 export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
+export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
 
 
 
