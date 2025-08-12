@@ -129,6 +129,8 @@ const AccessControl = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
+        setIsEditing(false);
+        setCurrent({ }); // Reset to default
     };
 
     const handleToggleChange = async (e, params) => {
@@ -168,16 +170,27 @@ const AccessControl = () => {
         const payload = {
             "bo_user_id": currentUserId,
         }
-        if (window.confirm("Are you sure you want to delete this access control?")) {
-            try {
-                await deleteUserAccessLevelById(id, payload);
-                const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
-                setData(updatedData);
-                // setIsSnackbarsOpen({ ...isSnackbarsOpen, open: true, message: 'Access control deleted successfully', severityType: 'success' });
-            } catch (error) {
-                console.error("Error deleting access control:", error);
-            }
-        };
+
+        try {
+            await deleteUserAccessLevelById(id, payload);
+            const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
+            setData(updatedData);
+            setIsSnackbarsOpen({ ...isSnackbarsOpen, open: true, message: 'Access control deleted successfully', severityType: 'success' });
+        } catch (error) {
+            console.error("Error:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to delete company";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...isSnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
     }
     const accessControl = [
         'View',
