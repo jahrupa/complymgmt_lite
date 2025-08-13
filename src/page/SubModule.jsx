@@ -284,6 +284,29 @@ const SubModule = () => {
             <div>
                 {/* <form onSubmit={handleSubmit}> */}
                 <div>
+                    {/* <SingleSelectTextField name="module_name" label="Module" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value ,module_id:''}))} names={moduleName} /> */}
+                    <SingleSelectTextField
+                        name="module_name"
+                        label="Module"
+                        value={current.module_name}
+                        isRequired={true}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedModule = moduleName.find((m) => m.name === selectedName) || {};
+                            setCurrent((prev) => ({
+                                ...prev,
+                                module_name: selectedName,
+                                module_id: matchedModule._id || ''
+                            }));
+                        }}
+                        names={moduleName}
+                        error={!!errors.module_name}
+                        helperText={errors.module_name}
+                    />
+
+                </div>
+                
+                <div>
                     <MuiTextField
                         error={!!errors.sub_module_name}
                         helperText={errors.sub_module_name}
@@ -308,28 +331,7 @@ const SubModule = () => {
                         isRequired={true}
                     />
                 </div>
-                <div>
-                    {/* <SingleSelectTextField name="module_name" label="Module" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value ,module_id:''}))} names={moduleName} /> */}
-                    <SingleSelectTextField
-                        name="module_name"
-                        label="Module"
-                        value={current.module_name}
-                        isRequired={true}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedModule = moduleName.find((m) => m.name === selectedName) || {};
-                            setCurrent((prev) => ({
-                                ...prev,
-                                module_name: selectedName,
-                                module_id: matchedModule._id || ''
-                            }));
-                        }}
-                        names={moduleName}
-                        error={!!errors.module_name}
-                        helperText={errors.module_name}
-                    />
-
-                </div>
+                
                 {/* <div>
                     <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
 
