@@ -23,6 +23,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const AccessControl = () => {
     const [data, setData] = useState([]);
+    console.log(data, 'data')
     const [current, setCurrent] = useState({
         user_id: null,
         user_name: '',
@@ -38,6 +39,9 @@ const AccessControl = () => {
         sub_module_id: null,
         access_type: '',
         access: [],
+        isFilteredData: false,
+        filter_user_name: '',
+        filter_user_id: null
 
     });
     const [isEditing, setIsEditing] = useState(false);
@@ -49,6 +53,10 @@ const AccessControl = () => {
     const [subModuleName, setSubModuleName] = useState([]);
     const [locationToModule, setLocationToModule] = useState([]);
     const [userNameListRes, setUserNameListRes] = useState([]);
+    console.log(current, 'current');
+    console.log(userNameListRes, 'userNameListRes')
+
+
     const [accessTypeList, setAccessTypeList] = useState([]);
     const [allPageList, setAllPageList] = useState([]);
     const [allServiceTrackerList, setAllServiceTrackerList] = useState([]);
@@ -221,6 +229,7 @@ const AccessControl = () => {
         const showOnlyModuleAndSubModule = current.access_type === "submodule";
 
         const isCompanyLocationEdit = current.access_type === "company_location" && isEditing;
+        const isSubModuleEdit = current.access_type === "submodule" && isEditing;
 
         const showGroup = [
             "group",
@@ -254,7 +263,8 @@ const AccessControl = () => {
             "company_location"
         ].includes(current.access_type) && !showOnlyModule && !showOnlyModuleAndSubModule;
 
-        const showModule = showOnlyModule || showOnlyModuleAndSubModule;
+        // const showModule = showOnlyModule || showOnlyModuleAndSubModule;
+        const showModule = (showOnlyModule || showOnlyModuleAndSubModule) && !isSubModuleEdit;
         const showSubModule = current.access_type === "submodule";
         const showServiceTracker = current.access_type === "service_tracker";
         const showLocationToModule = current.access_type === "location_to_module";
@@ -475,6 +485,48 @@ const AccessControl = () => {
                     )}
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
+                    {isEditing && showSubModule ? (
+                        <MuiTextField
+                            name="sub_module_name"
+                            label="Sub-Module Name"
+                            value={current.sub_module_name}
+                            isdisable={isEditing ? true : false}
+                            isdisabled={true}
+                            onChange={(e) => {
+                                const selectedName = e.target.value;
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    sub_module_name: selectedName
+                                }));
+                            }}
+                        />
+                    ) : (
+                        showSubModule && (
+                            <SingleSelectTextField
+                                name="sub_module_name"
+                                label="Sub-Module"
+                                value={current?.sub_module_name}
+                                isdisable={isEditing ? true : false}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedSubModule = subModuleName.find(
+                                        (g) => g.sub_module_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        sub_module_name: selectedName,
+                                        sub_module_id: matchedSubModule?._id || null
+                                    }));
+                                }}
+                                names={subModuleName?.map((data) => ({
+                                    _id: data?._id,
+                                    name: data?.sub_module_name
+                                }))}
+                            />
+                        )
+                    )}
+                    {/* 
+
                     {showSubModule && (
                         <SingleSelectTextField
                             name="sub_module_name"
@@ -497,7 +549,7 @@ const AccessControl = () => {
                                 name: data?.sub_module_name
                             }))}
                         />
-                    )}
+                    )} */}
                     {showServiceTracker && (
                         <SingleSelectTextField
                             name="service_tracker"
@@ -758,7 +810,7 @@ const AccessControl = () => {
                 fetchAllInnerPageServiceTracker(formattedTrackerName)
             ]);
 
-            if (userAccessDataRes.status === 'fulfilled') {
+            if (userAccessDataRes.status === 'fulfilled' && current?.isFilteredData === false) {
                 setData(userAccessDataRes.value);
             } else {
                 console.warn("fetchAllUserAccessLevels failed:", userAccessDataRes.reason);
@@ -895,7 +947,7 @@ const AccessControl = () => {
         };
         fetchLocationToModule();
     }, []);
-   const onFilterTextBoxChanged = useCallback(() => {
+    const onFilterTextBoxChanged = useCallback(() => {
         gridRef.current.api.setGridOption(
             'quickFilterText',
             document.getElementById('filter-text-box').value
@@ -927,43 +979,64 @@ const AccessControl = () => {
                             name: item.full_name
                         }))}
                     /> */}
-                    <div>
-                        <button className='crud_btn w-100' onClick={openModal}>
-                            <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
-                        </button>
+                    <div className='d-flex justify-content-between'>
+                        <div><h1>Access Control</h1></div>
+                        <div className='d-flex gap-2'>
+                            <button className='crud_btn w-100' onClick={openModal}>
+                                <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
+                            </button>
+                            <button className="button approve w-100">
+                                <span className="icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                                    </svg>
+                                </span>
+                                <span className="text">Approve All</span>
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
             <div className='table_div p-3'>
 
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
-                        <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                    <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        {/* <div>
-                            <button className='crud_btn w-100' onClick={openModal}>
-                                <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
-                            </button>
-                        </div> */}
-                            <SingleSelectTextField
-                                name="user_name"
-                                label="User Name"
-                                value={current.user_name}
-                                onChange={(e) => {
-                                    const selectedName = e.target.value;
-                                    const matchedUser = userNameListRes.find(
-                                        (item) => item.full_name === selectedName
-                                    );
-                                    setCurrent((prev) => ({
-                                        ...prev,
-                                        user_name: selectedName,
-                                        user_id: matchedUser?._id || null
-                                    }));
-                                }}
-                                names={userNameListRes.map((item) => ({
-                                    _id: item._id,
-                                    name: item.full_name
-                                }))}
-                            />
+                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    <div className='w-25'>
+                        <SingleSelectTextField
+                            name="filter_user_name"
+                            label="User Name"
+                            value={current.filter_user_name}
+                            onChange={async (e) => {
+                                const selectedName = e.target.value;
+                                const matchedUser = userNameListRes.find(
+                                    (item) => item.full_name === selectedName
+                                );
+
+                                if (matchedUser?._id) {
+                                    try {
+                                        const filterUpdateData = await fetchAllUserAccessLevels({
+                                            system_user_id: matchedUser._id
+                                        });
+                                        setData(filterUpdateData);
+                                    } catch (error) {
+                                        console.error("Error fetching access levels:", error);
+                                    }
+                                }
+
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    filter_user_name: selectedName,
+                                    filter_user_id: matchedUser?._id || null,
+                                    isFilteredData: matchedUser?._id || selectedName ? true : false // Set to true to indicate filtered data
+                                }));
+                            }}
+                            names={userNameListRes.map((item) => ({
+                                _id: item._id,
+                                name: item.full_name
+                            }))}
+                        />
+
                         <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
                     </div>
                 </div>
