@@ -71,6 +71,8 @@ export const UPDATE_SERVICE_TRACKER ='/api/v1/service_tracker/update/';
 export const UPDATE_SERVICE_TRACKER_BY_STATUS_ID ='/api/v1/service_tracker/update/status/';
 export const GET_ALL_SERVICE_TRACKER_FIELDS ='/api/V1/service_tracker/view/';
 export const CREATE_SERVICE_TRACKER_SPECIFICS ='/api/v1/service_tracker/create/specifics';
+export const UPDATE_SERVICE_TRACKER_DATA ='api/v1/service_tracker/update/';
+export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/update/approve/bulk/';
 
 
 
@@ -98,9 +100,8 @@ export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
 
-
-
-
+// Common API
+export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';
 
 
 

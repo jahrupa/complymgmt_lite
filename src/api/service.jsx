@@ -69,7 +69,10 @@ import {
   GET_ALL_ACCESS_TYPES,
   TOGGLE_USER_ACCESS_LEVEL_STATUS,
   GET_ALL_PAGE,
-  GET_USER_ACCESS_BY_ID
+  GET_USER_ACCESS_BY_ID,
+  UPDATE_SERVICE_TRACKER_DATA,
+  BULK_APPROVE_ALL_SERVICE_TRACKER_DATA,
+  APPROVE_ALL_BY_ENTITY_TYPE
 
 } from "./Endpoint";
 // Login Api
@@ -601,6 +604,25 @@ export const updateServiceTrackerById = async (id, payload) => {
     throw error;
   }
 };
+export const updateServiceTrackerData = async (id, tracker_name, payload) => {
+  try {
+    const response = await API.put(`${UPDATE_SERVICE_TRACKER_DATA}${tracker_name}/data/${id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating service tracker data:", error);
+    throw error;
+  }
+};
+
+export const bulkApproveAllServiceTrackerData = async (tracker_name, payload) => {
+  try {
+    const response = await API.put(`${BULK_APPROVE_ALL_SERVICE_TRACKER_DATA}${tracker_name}/data/`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error bulk approving service tracker data:", error);
+    throw error;
+  }
+};
 
 export const createServiceTracker = async (payload) => {
   try {
@@ -800,6 +822,18 @@ export const fetchAllPages = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching all pages:", error);
+    throw error;
+  }
+};
+
+// Common API For Approve All
+export const bulkApproveAllPageData = async (page_name) => {
+  console.log(page_name,'page_name')
+  try {
+    const response = await API.put(`${APPROVE_ALL_BY_ENTITY_TYPE}${page_name}/update/approve/all`);
+    return response.data;
+  } catch (error) {
+    console.error("Error approving all service tracker data:", error);
     throw error;
   }
 };

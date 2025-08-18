@@ -5,16 +5,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import PasswordInput from '../component/MuiInputs/PasswordInput';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, updateUserStatusId } from '../api/service';
+import { fetchAllUser, deleteUserById, createUser, updateUserById, updateUserStatusId, bulkApproveAllPageData } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Search } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -163,21 +159,21 @@ const UserRolesPage = () => {
     setIsModalOpen(false);
     setErrors({});
   };
- useEffect(() => {
-  const fetchData = async () => {
-    const [userData] = await Promise.allSettled([
-      fetchAllUser(),
-    ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const [userData] = await Promise.allSettled([
+        fetchAllUser(),
+      ]);
 
-    if (userData.status === 'fulfilled') {
-      setData(userData.value);
-    } else {
-      console.warn("fetchAllCompanies failed:", userData.reason);
-    }
-  };
+      if (userData.status === 'fulfilled') {
+        setData(userData.value);
+      } else {
+        console.warn("fetchAllCompanies failed:", userData.reason);
+      }
+    };
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   const crudForm = () => {
     return (
@@ -437,20 +433,54 @@ const UserRolesPage = () => {
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
-   const onFilterTextBoxChanged = useCallback(() => {
-        gridRef.current.api.setGridOption(
-            'quickFilterText',
-            document.getElementById('filter-text-box').value
-        );
-    }, []);
-
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
+  const handleApproveAll = async () => {
+    try {
+      const response = await bulkApproveAllPageData('user');
+      console.log("Bulk approve response:", response);
+    } catch (error) {
+      console.error("Error approving all service tracker data:", error);
+    }
+  };
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
       <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      <div>
-        <h5> Create User </h5>
+      <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+        <div className="notification-page-title">
+          {/* <button
+                        className="back-button"
+                        onClick={() => navigate("/service_trackers")}
+                    >
+                        <ArrowLeft size={20} />
+                    </button> */}
+          <div>
+            <h1>Create User</h1>
+          </div>
+          <div>
+          </div>
+        </div>
+        <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+          <button className='crud_btn w-100' onClick={openModal}>
+            <span><AddIcon /></span> <span className='button-style'>Add New User</span>
+          </button>
+          <div className='btn-wrap-div'>
+            <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+              <span className="icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                </svg>
+              </span>
+              <span className="text">Approve</span>
+            </button>
+          </div>
+        </div>
       </div>
       {/* Table to display data */}
       <div className='table_div p-3'>
@@ -467,11 +497,7 @@ const UserRolesPage = () => {
               className="search-input"
             />
           </div> */}
-          <div>
-            <button className='crud_btn w-100' onClick={openModal}>
-              <span><AddIcon /></span> <span className='button-style'>Add New User</span>
-            </button>
-          </div>
+
           {/* <div className='d-flex h-100'>
             <div class="search-bar-container h-25">
               <MuiSearchBar label='Search...' type='text' />
