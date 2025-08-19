@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,9 +23,10 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
-import { createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById } from '../api/service';
+import { bulkApproveAllPageData, createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const dummuJsonData = [
@@ -113,7 +114,7 @@ const SubModule = () => {
         severityType: '',
     });
     const [moduleName, setModuleName] = useState([]);
-    console.log(moduleName,'moduleName')
+    console.log(moduleName, 'moduleName')
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10; // You can adjust the number of items per page
@@ -135,6 +136,35 @@ const SubModule = () => {
 
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
+    };
+
+    const handleApproveAll = async () => {
+        try {
+            const response = await bulkApproveAllPageData('submodule');
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update submodule sataus";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllUser();
+        setData(updatedData);
     };
 
     const handleSubmit = async (e) => {
@@ -305,7 +335,7 @@ const SubModule = () => {
                     />
 
                 </div>
-                
+
                 <div>
                     <MuiTextField
                         error={!!errors.sub_module_name}
@@ -331,17 +361,17 @@ const SubModule = () => {
                         isRequired={true}
                     />
                 </div>
-                
+
                 {/* <div>
                     <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
 
                 </div> */}
 
                 <div className="row row-gap-2">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create SubModule</span>}</button>
                     </div>
                 </div>
@@ -362,10 +392,10 @@ const SubModule = () => {
                 </div>
 
                 <div className="row row-gap-2 mt-4">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
                             onClick={() => handleDelete(subModuleId)}>Yes, I'm sure</button>
@@ -502,28 +532,28 @@ const SubModule = () => {
     const onRowValueChanged = (event) => {
         console.log('Row updated:', event.data);
     };
- useEffect(() => {
-  const fetchData = async () => {
-    const [subModuleData, moduleNameList] = await Promise.allSettled([
-      fetchAllSubModule(),
-                    fetchAllModulesName(),
-    ]);
+    useEffect(() => {
+        const fetchData = async () => {
+            const [subModuleData, moduleNameList] = await Promise.allSettled([
+                fetchAllSubModule(),
+                fetchAllModulesName(),
+            ]);
 
-    if (subModuleData.status === 'fulfilled') {
-      setData(subModuleData.value);
-    } else {
-      console.warn("fetchAllSubModule failed:", subModuleData.reason);
-    }
+            if (subModuleData.status === 'fulfilled') {
+                setData(subModuleData.value);
+            } else {
+                console.warn("fetchAllSubModule failed:", subModuleData.reason);
+            }
 
-    if (moduleNameList.status === 'fulfilled') {
-      setModuleName(moduleNameList.value);
-    } else {
-      console.warn("fetchAllModulesName failed:", moduleNameList.reason);
-    }
-  };
+            if (moduleNameList.status === 'fulfilled') {
+                setModuleName(moduleNameList.value);
+            } else {
+                console.warn("fetchAllModulesName failed:", moduleNameList.reason);
+            }
+        };
 
-  fetchData();
-}, []);
+        fetchData();
+    }, []);
 
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -542,27 +572,51 @@ const SubModule = () => {
 
     //     fetchData();
     // }, []);
+     const onFilterTextBoxChanged = useCallback(() => {
+          gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+          );
+        }, []);
     return (
         <div>
-            <h5>Sub-Module</h5>
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+                <div className="notification-page-title">
+                    <div>
+                        <h1>{data?.length > 1 ? "Sub-Modules" : "Sub-Module"}</h1>
+                    </div>
+                </div>
+                <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+                    <button className='crud_btn w-100 mb-2' onClick={openModal}>
+                        <span><AddIcon /></span> <span className='button-style'>Add New Sub-Module</span>
+                    </button>
+                    <div className='btn-wrap-div'>
+                        <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+                            <span className="icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                                </svg>
+                            </span>
+                            <span className="text">Approve</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+                                    <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+                        <SmallSizeModal closeModal={closeModal} crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
-                    <div className='d-flex h-100'>
-                        <div class="search-bar-container h-25">
-                            <MuiSearchBar label='Search...' type='text' />
-                            <button className='search-icon'><SearchIcon /></button>
-                        </div>
-                    </div>
-                    <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+                              <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    
+                    {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div>
                             <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New SubModule</span>
                             </button>
                         </div>
-                        <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <SmallSizeModal closeModal={closeModal}crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-                    </div>
+                    </div> */}
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact

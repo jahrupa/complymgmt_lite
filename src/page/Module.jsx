@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,7 +14,7 @@ import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import { createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById } from '../api/service';
+import { bulkApproveAllPageData, createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById } from '../api/service';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
@@ -25,6 +25,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const dummuJsonData = [
@@ -122,7 +123,34 @@ const Module = () => {
         setCurrent((prev) => ({ ...prev, [name]: value }));
         setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
     };
+    const handleApproveAll = async () => {
+        try {
+            const response = await bulkApproveAllPageData('module');
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update module status";
 
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllUser();
+        setData(updatedData);
+    };
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
@@ -266,10 +294,10 @@ const Module = () => {
                     />
                 </div>
                 <div className="row row-gap-2">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create Module</span>}</button>
                     </div>
                 </div>
@@ -287,10 +315,10 @@ const Module = () => {
                 </div>
 
                 <div className="row row-gap-2 mt-4">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
                             onClick={() => handleDelete(moduleId)}>Yes, I'm sure</button>
@@ -465,32 +493,52 @@ const Module = () => {
     const onRowValueChanged = (event) => {
         console.log('Row updated:', event.data);
     };
-
+    const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+        );
+    }, []);
     return (
         <div>
-            <div className='mb-4'>
-                <h5>Module</h5>
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+                <div className="notification-page-title">
+                    <div>
+                        <h1>{data?.length > 1 ? "Modules" : "Module"}</h1>
+                    </div>
+                </div>
+                <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+                    <button className='crud_btn w-100 mb-2' onClick={openModal}>
+                        <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
+                    </button>
+                    <div className='btn-wrap-div'>
+                        <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+                            <span className="icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                                </svg>
+                            </span>
+                            <span className="text">Approve</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+            <SmallSizeModal closeModal={closeModal} crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
-                    <div className='d-flex h-100'>
-                        <div class="search-bar-container h-25">
-                            <MuiSearchBar label='Search...' type='text' />
-                            <button className='search-icon'><SearchIcon /></button>
-                        </div>
-                    </div>
-                    <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div>
                             <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span>
                                 <span className='button-style'>Add New Module</span>
                             </button>
                         </div>
-                        <SmallSizeModal closeModal={closeModal} crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-                        <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
-                    </div>
+                    </div> */}
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact

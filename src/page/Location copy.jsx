@@ -152,10 +152,10 @@ const Location = () => {
         <div>
             <div className='p-4'>Are you sure you want to delete this location?</div>
             <div className="row row-gap-2 mt-4">
-                <div className='col col-12 col-md-6'>
+                <div className='col-6'>
                     <button type="button" className="btn-sm btn btn-secondary" onClick={() => setIsDeleteModalOpen(false)}>Cancel</button>
                 </div>
-                <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                <div className='col-6 d-flex justify-content-end'>
                     <button type="submit" className="btn-sm btn btn-primary" onClick={() => handleDelete(locationId)}>Yes, Delete</button>
                 </div>
             </div>
@@ -280,10 +280,10 @@ const Location = () => {
             <MuiTextField label='State' type='text' isRequired fieldName='state' handleChange={handleChange} value={current?.state} />
 
             <div className="row row-gap-2">
-                <div className='col col-12 col-md-6'>
+                <div className='col-6'>
                     <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
                 </div>
-                <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                <div className='col-6 d-flex justify-content-end'>
                     <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
                         {isEditing ? 'Save Changes' : 'Create Location'}
                     </button>

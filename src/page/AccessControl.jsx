@@ -14,7 +14,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById } from '../api/service';
+import { bulkApproveAllPageData, createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
@@ -97,6 +97,35 @@ const AccessControl = () => {
         }));
         setIsEditing(true);
         setIsModalOpen(true);
+    };
+
+    const handleApproveAll = async () => {
+        try {
+            const response = await bulkApproveAllPageData('user_access');
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update user_access sataus";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllUser();
+        setData(updatedData);
     };
     // Handle Add or Edit
     const handleSubmit = async (e) => {
@@ -666,10 +695,10 @@ const AccessControl = () => {
                     <MultipleSelectTextFields label='Access Control' value={current.access} onChange={handleRoleAccessChange} names={accessControl} />
                 </div>
                 <div className="row row-gap-2">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create Access Control</span>}</button>
                     </div>
                 </div>
@@ -957,47 +986,28 @@ const AccessControl = () => {
         <div>
             <Snackbars issnackbarsOpen={isSnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             {/* Table to display data */}
-            <div className='notification-page-header'>
-                <div className='w-100'>
-                    {/* <SingleSelectTextField
-                        name="user_name"
-                        label="User Name"
-                        value={current.user_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedUser = userNameListRes.find(
-                                (item) => item.full_name === selectedName
-                            );
-                            setCurrent((prev) => ({
-                                ...prev,
-                                user_name: selectedName,
-                                user_id: matchedUser?._id || null
-                            }));
-                        }}
-                        names={userNameListRes.map((item) => ({
-                            _id: item._id,
-                            name: item.full_name
-                        }))}
-                    /> */}
-                    <div className='d-flex justify-content-between'>
-                        <div><h1>Access Control</h1></div>
-                        <div className='d-flex gap-2'>
-                            <button className='crud_btn w-100' onClick={openModal}>
-                                <span><AddIcon /></span> <span className='button-style'>Add New Access Control</span>
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+                        <div className="notification-page-title">
+                            <div>
+                                <h1>Access Control</h1>
+                            </div>
+                        </div>
+                        <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+                            <button className='crud_btn w-100 mb-2' onClick={openModal}>
+                                <span><AddIcon /></span> <span className='button-style'>Add Access Control</span>
                             </button>
-                            <button className="button approve w-100">
-                                <span className="icon">
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
-                                    </svg>
-                                </span>
-                                <span className="text">Approve All</span>
-                            </button>
+                            <div className='btn-wrap-div'>
+                                <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+                                    <span className="icon">
+                                        <svg viewBox="0 0 24 24">
+                                            <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                                        </svg>
+                                    </span>
+                                    <span className="text">Approve</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-
-                </div>
-            </div>
             <div className='table_div p-3'>
 
                 <div className='d-lg-flex d-md-flex  justify-content-between'>

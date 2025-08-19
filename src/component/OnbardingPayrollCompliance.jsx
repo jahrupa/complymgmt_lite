@@ -106,10 +106,10 @@ const OnbardingPayrollCompliance = () => {
 
         </div>
         <div className="row row-gap-2">
-          <div className='col col-12 col-md-6'>
+          <div className='col-6'>
             <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancle</button>
           </div>
-          <div className='col col-12 col-md-6'>
+          <div className='col-6'>
             <button type="submit" className="btn btn-primary w-100" onClick={uploadFile}>Upload</button>
           </div>
         </div>

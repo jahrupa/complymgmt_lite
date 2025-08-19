@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, } from '../api/service';
+import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, } from '../api/service';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -17,6 +17,8 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { Link } from 'lucide-react';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const dummuJsonData = [
@@ -105,7 +107,7 @@ const LocationToModule = () => {
     // console.log(id, 'id')
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
-    console.log(companyName,'companyName')
+    console.log(companyName, 'companyName')
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -129,6 +131,37 @@ const LocationToModule = () => {
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
+
+
+    const handleApproveAll = async () => {
+        try {
+            const response = await bulkApproveAllPageData('location_to_module');
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update location_to_module sataus";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllUser();
+        setData(updatedData);
+    };
+
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
@@ -340,9 +373,9 @@ const LocationToModule = () => {
                             }));
                         }}
                         names={companyName.map((item) => ({
-                                _id: item._id,
-                                name: item.company_name,
-                            }))}
+                            _id: item._id,
+                            name: item.company_name,
+                        }))}
                         error={!!errors.company_name}
                         helperText={errors.company_name}
                     // isdisable={isEditing ? true : false}
@@ -360,10 +393,10 @@ const LocationToModule = () => {
                                 location_id: matchedLocation?._id || null,
                             }));
                         }}
-                         names={locationName.map((item) => ({
-                                _id: item._id,
-                                name: item.location_name,
-                            }))}
+                        names={locationName.map((item) => ({
+                            _id: item._id,
+                            name: item.location_name,
+                        }))}
                         // isdisable={isEditing ? true : false}
                         error={!!errors.location_name}
                         helperText={errors.location_name}
@@ -394,10 +427,10 @@ const LocationToModule = () => {
                 </div>
 
                 <div className="row row-gap-2">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Tag Module</span>}</button>
                     </div>
                 </div>
@@ -417,10 +450,10 @@ const LocationToModule = () => {
                 </div>
 
                 <div className="row row-gap-2 mt-4">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
                             onClick={() => handleDelete(id)}>Yes, I'm sure</button>
@@ -594,29 +627,52 @@ const LocationToModule = () => {
         console.log('Row updated:', event.data);
     };
 
+    const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+        );
+    }, []);
+
     return (
         <div>
-            <div className='mb-4'>
-                <h5>Location To Module</h5>
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+                <div className="notification-page-title">
+                    <div>
+                        {/* <h1>{data?.length > 1 ? "Companies" : "Company"}</h1> */}
+                        <h1>Location to module</h1>
+                    </div>
+                </div>
+                <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+                    <button className='crud_btn w-100 mb-2' onClick={openModal}>
+                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Location To Module</span>
+                    </button>
+                    <div className='btn-wrap-div'>
+                        <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+                            <span className="icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                                </svg>
+                            </span>
+                            <span className="text">Approve</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
+            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
-                    <div className='d-flex h-100'>
-                        <div class="search-bar-container h-25">
-                            <MuiSearchBar label='Search...' type='text' />
-                            <button className='search-icon'><SearchIcon /></button>
-                        </div>
-                    </div>
-                    <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div>
                             <button className='crud_btn w-100' onClick={openModal}>
                                 <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
                             </button>
                         </div>
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
-                        <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                    </div>
+                    </div> */}
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact

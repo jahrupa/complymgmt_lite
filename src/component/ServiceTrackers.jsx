@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesName, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
+import { bulkApproveAllPageData, createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesName, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -86,7 +86,34 @@ const ServiceTrackers = () => {
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
+    const handleApproveAll = async () => {
+        try {
+            const response = await bulkApproveAllPageData('service_tracker');
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update service_tracker sataus";
 
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllUser();
+        setData(updatedData);
+    };
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent default submit behavior
         if (!validate()) return; // Don't proceed if validation fails
@@ -222,42 +249,42 @@ const ServiceTrackers = () => {
         setData(updatedData);
     };
 
-   useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const results = await Promise.allSettled([
-                fetchAllServiceTracker(),
-                fetchAllGroupHolding(),
-                fetchAllModulesName()
-            ]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const results = await Promise.allSettled([
+                    fetchAllServiceTracker(),
+                    fetchAllGroupHolding(),
+                    fetchAllModulesName()
+                ]);
 
-            const [serviceTrackerResult, groupHoldingResult, moduleNameResult] = results;
+                const [serviceTrackerResult, groupHoldingResult, moduleNameResult] = results;
 
-            if (serviceTrackerResult.status === 'fulfilled') {
-                setData(serviceTrackerResult.value);
-            } else {
-                console.error("Failed to fetch service tracker:", serviceTrackerResult.reason);
+                if (serviceTrackerResult.status === 'fulfilled') {
+                    setData(serviceTrackerResult.value);
+                } else {
+                    console.error("Failed to fetch service tracker:", serviceTrackerResult.reason);
+                }
+
+                if (groupHoldingResult.status === 'fulfilled') {
+                    setGroupHoldingData(groupHoldingResult.value);
+                } else {
+                    console.error("Failed to fetch group holding:", groupHoldingResult.reason);
+                }
+
+                if (moduleNameResult.status === 'fulfilled') {
+                    setModuleName(moduleNameResult.value);
+                } else {
+                    console.error("Failed to fetch module names:", moduleNameResult.reason);
+                }
+            } catch (error) {
+                console.error("Unexpected error fetching data:", error);
+                toast.error("Failed to load service tracker data");
             }
+        };
 
-            if (groupHoldingResult.status === 'fulfilled') {
-                setGroupHoldingData(groupHoldingResult.value);
-            } else {
-                console.error("Failed to fetch group holding:", groupHoldingResult.reason);
-            }
-
-            if (moduleNameResult.status === 'fulfilled') {
-                setModuleName(moduleNameResult.value);
-            } else {
-                console.error("Failed to fetch module names:", moduleNameResult.reason);
-            }
-        } catch (error) {
-            console.error("Unexpected error fetching data:", error);
-            toast.error("Failed to load service tracker data");
-        }
-    };
-
-    fetchData();
-}, []);
+        fetchData();
+    }, []);
 
 
     // // // module by location id
@@ -410,10 +437,10 @@ const ServiceTrackers = () => {
                                 sub_module_id: matchedGroup?._id || null,
                             }));
                         }}
-                         names={subModuleName.map((item) => ({
-                                _id: item._id,
-                                name: item.sub_module_name,
-                            }))}
+                        names={subModuleName.map((item) => ({
+                            _id: item._id,
+                            name: item.sub_module_name,
+                        }))}
                         error={!!errors.sub_module_name}
                         helperText={errors.sub_module_name}
                     // isdisable={isEditing}
@@ -429,10 +456,10 @@ const ServiceTrackers = () => {
                 />
 
                 <div className="row row-gap-2">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create Service Tracker</span>}</button>
                     </div>
                 </div>
@@ -448,10 +475,10 @@ const ServiceTrackers = () => {
                 </div>
 
                 <div className="row row-gap-2 mt-4">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
                             onClick={() => handleDelete(serviceTrackerId)}>Yes, I'm sure</button>
@@ -591,47 +618,44 @@ const ServiceTrackers = () => {
     const onRowValueChanged = (event) => {
         console.log('Row updated:', event.data);
     };
-        const onFilterTextBoxChanged = useCallback(() => {
-            gridRef.current.api.setGridOption(
-                'quickFilterText',
-                document.getElementById('filter-text-box').value
-            );
-        }, []);
+    const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+        );
+    }, []);
     return (
         <div>
-            <div className='mb-4'>
-                <h5>Service Tracker Manager</h5>
-            </div>
-            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-            <div className='table_div p-3'>
-                <div className='d-lg-flex d-md-flex  justify-content-between'>
-                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                    {/* <div className='d-flex h-100'>
-                        <div className="search-bar-container h-25">
-                            <MuiSearchBar label='Search...' type='text' />
-                            <button className='search-icon'><SearchIcon /></button>
-                        </div>
-                    </div> */}
-                    <div className='d-lg-flex d-md-flex gap-2 justify-content-end mb-3'>
-                        <div>
-                            <button className='crud_btn w-100' onClick={openModal}>
-                                <span><AddIcon /></span> <span className='button-style'>Add Service Tracker</span>
-                            </button>
-
-                        </div>
-                        <button className="button approve">
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+                <div className="notification-page-title">
+                    <div>
+                        <h1>{data?.length > 1 ? "Service Trackers" : "Service Tracker"}</h1>
+                    </div>
+                </div>
+                <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+                    <button className='crud_btn w-100 mb-2' onClick={openModal}>
+                        <span><AddIcon /></span> <span className='button-style'>Add Service Tracker</span>
+                    </button>
+                    <div className='btn-wrap-div'>
+                        <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
                             <span className="icon">
                                 <svg viewBox="0 0 24 24">
                                     <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
                                 </svg>
                             </span>
-                            <span className="text">Approve All</span>
+                            <span className="text">Approve </span>
                         </button>
-                        <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-
-                        <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
-
                     </div>
+                </div>
+            </div>
+            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Service Tracker' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+
+            <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
+
+            <div className='table_div p-3'>
+                <div className='d-lg-flex d-md-flex  justify-content-between'>
+                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact
