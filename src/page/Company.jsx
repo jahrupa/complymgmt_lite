@@ -471,12 +471,12 @@ const Company = () => {
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
-   const onFilterTextBoxChanged = useCallback(() => {
-      gridRef.current.api.setGridOption(
-        'quickFilterText',
-        document.getElementById('filter-text-box').value
-      );
-    }, []);
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
   return (
     <div>
       <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
@@ -502,6 +502,8 @@ const Company = () => {
         </div>
       </div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+      <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+      <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
@@ -520,9 +522,6 @@ const Company = () => {
               </span>
               <span className="text">Approve All</span>
             </button>
-            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-
-            <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
           </div> */}
         </div>
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
