@@ -233,10 +233,10 @@ const UserRolesPage = () => {
           />
         </div>
         <div className="row row-gap-2">
-          <div className='col col-12 col-md-6'>
+          <div className='col-6'>
             <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
           </div>
-          <div className='col col-12 col-md-6 d-flex justify-content-end'>
+          <div className='col-6 d-flex justify-content-end'>
             <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create User</span>}</button>
           </div>
         </div>
@@ -247,7 +247,34 @@ const UserRolesPage = () => {
   }
   const crudTitle = "Add New User Form"
   const editCrudTitle = "Edit User"
+  const handleApproveAll = async () => {
+    try {
+      const response = await bulkApproveAllPageData('user');
+      const message = response?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to update user sataus";
 
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
+    const updatedData = await fetchAllUser();
+    setData(updatedData);
+  };
 
   const handleToggleChange = async (e, params) => {
     const newIsActive = {
@@ -289,10 +316,10 @@ const UserRolesPage = () => {
         </div>
 
         <div className="row row-gap-2 mt-4">
-          <div className='col col-12 col-md-6'>
+          <div className='col-6'>
             <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
           </div>
-          <div className='col col-12 col-md-6 d-flex justify-content-end'>
+          <div className='col-6 d-flex justify-content-end'>
             <button type="submit"
               className="btn-sm btn btn-primary"
               onClick={() => handleDelete(userId)}>Yes, I'm sure</button>
@@ -439,14 +466,7 @@ const UserRolesPage = () => {
       document.getElementById('filter-text-box').value
     );
   }, []);
-  const handleApproveAll = async () => {
-    try {
-      const response = await bulkApproveAllPageData('user');
-      console.log("Bulk approve response:", response);
-    } catch (error) {
-      console.error("Error approving all service tracker data:", error);
-    }
-  };
+
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
@@ -454,20 +474,12 @@ const UserRolesPage = () => {
       <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} closeModal={closeModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
         <div className="notification-page-title">
-          {/* <button
-                        className="back-button"
-                        onClick={() => navigate("/service_trackers")}
-                    >
-                        <ArrowLeft size={20} />
-                    </button> */}
           <div>
             <h1>Create User</h1>
           </div>
-          <div>
-          </div>
         </div>
         <div className='d-lg-flex d-md-flex gap-2 mt-2'>
-          <button className='crud_btn w-100' onClick={openModal}>
+          <button className='crud_btn w-100 mb-2' onClick={openModal}>
             <span><AddIcon /></span> <span className='button-style'>Add New User</span>
           </button>
           <div className='btn-wrap-div'>

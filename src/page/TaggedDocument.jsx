@@ -664,10 +664,10 @@ const TaggedDocument = () => {
                 </div>
 
                 <div className="row row-gap-2 mt-4">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
                             onClick={() => handleDelete(userId)}>Yes, I'm sure</button>

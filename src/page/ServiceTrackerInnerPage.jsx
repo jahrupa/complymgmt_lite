@@ -101,46 +101,46 @@ const ServiceTrackerInnerPage = () => {
         }
     };
     // console.log(rowData, 'rowData')
-    const handleToggleChange = async (e,userId) => {
-    try {
-        const row = rowData.find((r) => r._id === userId);
-        console.log(row,userId,rowData, 'row')
-        if (!row) throw new Error("Row not found");
+    const handleToggleChange = async (e, userId) => {
+        try {
+            const row = rowData.find((r) => r._id === userId);
+            console.log(row, userId, rowData, 'row')
+            if (!row) throw new Error("Row not found");
 
-        const updatedPayload = {
-            ...row,
-            is_active: !row.is_active, // toggle the value
-            // updated_by: localStorage.getItem("user_id"),
-            // updated_at: new Date().toISOString()
-        };
+            const updatedPayload = {
+                ...row,
+                is_active: !row.is_active, // toggle the value
+                // updated_by: localStorage.getItem("user_id"),
+                // updated_at: new Date().toISOString()
+            };
 
-        const response = await updateServiceTrackerData(userId, formattedTrackerName, updatedPayload);
+            const response = await updateServiceTrackerData(userId, formattedTrackerName, updatedPayload);
 
-        const message = response?.message || "Status updated";
+            const message = response?.message || "Status updated";
 
-        const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
-        setRowData(updatedData);
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            setRowData(updatedData);
 
-        setIsSnackbarsOpen({
-            open: true,
-            message,
-            severityType: 'success',
-            vertical: 'top',
-            horizontal: 'center'
-        });
+            setIsSnackbarsOpen({
+                open: true,
+                message,
+                severityType: 'success',
+                vertical: 'top',
+                horizontal: 'center'
+            });
 
-    } catch (error) {
-        const errorMessage = error?.response?.data?.message || error.message || "Update failed";
+        } catch (error) {
+            const errorMessage = error?.response?.data?.message || error.message || "Update failed";
 
-        setIsSnackbarsOpen({
-            open: true,
-            message: errorMessage,
-            severityType: 'error',
-            vertical: 'top',
-            horizontal: 'center'
-        });
-    }
-};
+            setIsSnackbarsOpen({
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+                vertical: 'top',
+                horizontal: 'center'
+            });
+        }
+    };
 
     // const handleToggleChange = async (e, tracker_id) => {
     //     const rowToToggleUpdate = rowData.find((row) => row._id === tracker_id);
@@ -268,12 +268,12 @@ const ServiceTrackerInnerPage = () => {
                         pinned: "right",
                         valueGetter: (params) => params.data?.is_active,
                         cellRenderer: (params) => (
-                            <Toggle 
-                            checked={!!params.value}
-                            onChange={(e) => handleToggleChange(e, params.data._id)} 
+                            <Toggle
+                                checked={!!params.value}
+                                onChange={(e) => handleToggleChange(e, params.data._id)}
                             />
                         )
-                        
+
                     };
                 }
 
@@ -340,13 +340,41 @@ const ServiceTrackerInnerPage = () => {
             alert("❌ Upload failed. Please try again.");
         }
     };
-const handleApproveAll = async () => {
+    const handleApproveAll = async () => {
         try {
             const response = await bulkApproveAllServiceTrackerData(formattedTrackerName);
-            // Handle the response as needed
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
         } catch (error) {
-            console.error("Error approving all service tracker data:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to update user sataus";
+
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+            });
         }
+        const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+        setRowData(response || []);
+        await fetchAndSetTrackerData(formattedTrackerName);
+        // setData(updatedData);
+        // try {
+        //     const response = await bulkApproveAllServiceTrackerData(formattedTrackerName);
+        //     // Handle the response as needed
+        // } catch (error) {
+        //     console.error("Error approving all service tracker data:", error);
+        // }
     };
 
     const onRowValueChanged = (event) => {
@@ -368,10 +396,10 @@ const handleApproveAll = async () => {
                 </div>
 
                 <div className="row row-gap-2 mt-4">
-                    <div className='col col-12 col-md-6'>
+                    <div className='col-6'>
                         <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
                     </div>
-                    <div className='col col-12 col-md-6 d-flex justify-content-end'>
+                    <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
                             className="btn-sm btn btn-primary"
                             onClick={() => handleDelete(trackerId)}>Yes, I'm sure</button>
