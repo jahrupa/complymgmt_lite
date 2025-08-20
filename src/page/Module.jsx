@@ -112,7 +112,7 @@ const Module = () => {
     const validate = () => {
         let tempErrors = {};
         if (!current?.module_name) tempErrors.module_name = "Module name is required";
-        if (!current?.module_description) tempErrors.module_description = "Description is required";
+        // if (!current?.module_description) tempErrors.module_description = "Description is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -289,8 +289,6 @@ const Module = () => {
                         handleChange={handleChange}
                         name='module_description'
                         label='Module Description'
-                        error={!!errors.module_description}
-                        helperText={errors.module_description}
                     />
                 </div>
                 <div className="row row-gap-2">
