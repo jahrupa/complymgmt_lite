@@ -50,7 +50,7 @@ const GroupCompaniesPage = () => {
   const validate = () => {
     let tempErrors = {};
     if (!current?.group_name) tempErrors.group_name = "Group Holding Name is required";
-    if (!current?.group_description) tempErrors.group_description = "Description is required";
+    // if (!current?.group_description) tempErrors.group_description = "Description is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -62,34 +62,34 @@ const GroupCompaniesPage = () => {
     setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
   };
 
-    const handleApproveAll = async () => {
-      try {
-        const response = await bulkApproveAllPageData('group');
-        const message = response?.message || "Status update successfully"
-        // Show success snackbar
-        setIsSnackbarsOpen({
-          ...issnackbarsOpen,
-          open: true,
-          message,
-          severityType: 'success',
-        });
-      } catch (error) {
-        const errorMessage =
-          error?.response?.data?.message ||
-          error?.message ||
-          "Failed to update user sataus";
-  
-        // Show error snackbar
-        setIsSnackbarsOpen({
-          ...issnackbarsOpen,
-          open: true,
-          message: errorMessage,
-          severityType: 'error',
-        });
-      }
-      const updatedData = await fetchAllUser();
-      setData(updatedData);
-    };
+  const handleApproveAll = async () => {
+    try {
+      const response = await bulkApproveAllPageData('group');
+      const message = response?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to update user sataus";
+
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
+    }
+    const updatedData = await fetchAllUser();
+    setData(updatedData);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default submit behavior
 
@@ -181,6 +181,7 @@ const GroupCompaniesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setErrors({})
+    setCurrent({})
   };
   // Active/InActive status
   const handleToggleChange = async (e, params) => {
@@ -236,7 +237,7 @@ const GroupCompaniesPage = () => {
   const crudForm = () => {
     return (
       <div>
-        <div className='fs-12 info mb-2'>Group name must be at least 3 characters long and not just spaces.</div>
+        <div className='fs-12 info mb-2'> Group name must be at least 3 non-whitespace characters and must not be a duplicate.</div>
         <MuiTextField
           label='Group Holding Name'
           type='text'
@@ -254,8 +255,6 @@ const GroupCompaniesPage = () => {
           fieldName='group_description'
           handleChange={handleChange}
           value={current?.group_description}
-          error={!!errors.group_description}
-          helperText={errors.group_description}
         />
 
         <div className="row row-gap-2">
@@ -417,24 +416,24 @@ const GroupCompaniesPage = () => {
   const onRowValueChanged = (event) => {
     console.log('Row updated:', event.data);
   };
-    const onFilterTextBoxChanged = useCallback(() => {
-      gridRef.current.api.setGridOption(
-        'quickFilterText',
-        document.getElementById('filter-text-box').value
-      );
-    }, []);
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
   return (
     <div>
       <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
         <div className="notification-page-title">
           <div>
-            <h1>{data?.length>1 ? "Group Holdings" : "Group Holding"}</h1>
+            <h1>{data?.length > 1 ? "Group Holdings" : "Group Holding"}</h1>
           </div>
         </div>
         <div className='d-lg-flex d-md-flex gap-2 mt-2'>
           <button className='crud_btn w-100 mb-2' onClick={openModal}>
-                <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
-              </button>
+            <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
+          </button>
           <div className='btn-wrap-div'>
             <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
               <span className="icon">
@@ -448,10 +447,13 @@ const GroupCompaniesPage = () => {
         </div>
       </div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+      <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+      <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
+
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
-                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-          
+          <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+
           {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div>
               <button className='crud_btn w-100' onClick={openModal}>
@@ -467,9 +469,6 @@ const GroupCompaniesPage = () => {
               </span>
               <span className="text">Approve All</span>
             </button>
-            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Company Holding' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-
-            <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
           </div> */}
         </div>
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>

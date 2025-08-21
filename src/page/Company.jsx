@@ -47,7 +47,7 @@ const Company = () => {
     if (!current?.company_name) tempErrors.company_name = "Company name is required";
     if (!current?.company_common_name) tempErrors.company_common_name = "Company common name is required";
     if (!current?.group_name) tempErrors.group_name = "Group name is required";
-    if (!current?.company_description) tempErrors.company_description = "Description is required";
+    // if (!current?.company_description) tempErrors.company_description = "Description is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -186,6 +186,7 @@ const Company = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setErrors({})
+    setCurrent({})
   };
 
 
@@ -222,26 +223,8 @@ const Company = () => {
     return (
       <div>
         {/* <form onSubmit={handleSubmit}> */}
-        <SingleSelectTextField
-          name="group_name"
-          label="Group Holding"
-          value={current.group_name}
-          onChange={(e) => {
-            const selectedName = e.target.value;
-            const matchedGroup = groupHoldingName.find(
-              (g) => g.name === selectedName
-            );
-            // console.log(matchedGroup,'matchedGroup')
-            setCurrent((prev) => ({
-              ...prev,
-              group_name: selectedName,
-              group_holding_id: matchedGroup?._id || null,
-            }));
-          }}
-          names={groupHoldingName}
-          error={!!errors.group_name}
-          helperText={errors.group_name}
-        />
+
+        <div className='fs-12 info mb-2'> Company name must be at least 3 non-whitespace characters and must not be a duplicate.</div>
         <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
           <MuiTextField
             label='Company Name'
@@ -263,14 +246,32 @@ const Company = () => {
             helperText={errors.company_common_name}
           />
         </div>
+        <SingleSelectTextField
+          name="group_name"
+          label="Group Holding"
+          value={current.group_name}
+          onChange={(e) => {
+            const selectedName = e.target.value;
+            const matchedGroup = groupHoldingName.find(
+              (g) => g.name === selectedName
+            );
+            // console.log(matchedGroup,'matchedGroup')
+            setCurrent((prev) => ({
+              ...prev,
+              group_name: selectedName,
+              group_holding_id: matchedGroup?._id || null,
+            }));
+          }}
+          names={groupHoldingName}
+          error={!!errors.group_name}
+          helperText={errors.group_name}
+        />
         <div>
           <MuiTextAreaField
             value={current.company_description}
             handleChange={handleChange}
             name='company_description'
             label='Company Description'
-            error={!!errors.company_common_name}
-            helperText={errors.company_common_name}
           />
         </div>
         <div className="row row-gap-2">

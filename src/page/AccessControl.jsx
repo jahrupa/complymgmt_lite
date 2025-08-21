@@ -14,17 +14,16 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { bulkApproveAllPageData, createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllServiceTrackerSheetData, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById } from '../api/service';
+import { bulkApproveAllPageData, createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
-import DeleteModal from '../component/DeleteModal';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const AccessControl = () => {
     const [data, setData] = useState([]);
-    // console.log(data, 'data')
+    console.log(data, 'data')
     const [current, setCurrent] = useState({
         user_id: null,
         user_name: '',
@@ -43,13 +42,12 @@ const AccessControl = () => {
         isFilteredData: false,
         filter_user_name: '',
         filter_user_id: null,
-        assign_user_name: '',
+        assign_user_name:'',
         assign_user_id: null,
 
     });
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldingData] = useState([]);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
     const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
@@ -57,17 +55,14 @@ const AccessControl = () => {
     const [subModuleName, setSubModuleName] = useState([]);
     const [locationToModule, setLocationToModule] = useState([]);
     const [userNameListRes, setUserNameListRes] = useState([]);
-    // console.log(current, 'current');
-    // console.log(userNameListRes, 'userNameListRes')
+    console.log(current, 'current');
+    console.log(userNameListRes, 'userNameListRes')
 
-    const [errors, setErrors] = useState({});
 
     const [accessTypeList, setAccessTypeList] = useState([]);
     const [allPageList, setAllPageList] = useState([]);
     const [allServiceTrackerList, setAllServiceTrackerList] = useState([]);
     const [allInnerPageServiceTrackerList, setAllInnerPageServiceTrackerList] = useState([]);
-    const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
-    // console.log(serviceTrackerSheet, 'serviceTrackerSheet')
     const [isSnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -103,8 +98,7 @@ const AccessControl = () => {
             access_type: userData.entity_type || '',
             assign_user_name: userData.entity_name || '',
             assign_user_id: userData.entity_id || null,
-            sheet_name_id: userData.entity_id || null,
-            sheet_name: userData.entity_name || '',
+
         }));
         setIsEditing(true);
         setIsModalOpen(true);
@@ -135,37 +129,17 @@ const AccessControl = () => {
                 severityType: 'error',
             });
         }
-             // Refresh data
-            const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
-            setData(updatedData);
-    };
-
-    const validate = () => {
-        let tempErrors = {};
-        if (!current?.company_name) tempErrors.company_name = "Company name is required";
-        if (!current?.location_name) tempErrors.location_name = "Location name is required";
-        if (!current?.group_name) tempErrors.group_name = "Group name is required";
-        if (!current?.module_name) tempErrors.module_name = "Module name is required";
-        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
-        if (!current?.service_tracker) tempErrors.service_tracker = "Service Tracker is required";
-        if (!current?.page_name) tempErrors.page_name = "Page name is required";
-        if (!current?.service_tracker_wise) tempErrors.service_tracker_wise = "Service Tracker Wise is required";
-        if (!current?.access_type) tempErrors.access_type = "Access Type is required";
-        if (!current.access || current.access.length === 0) tempErrors.access = 'Access is required';
-        if (!current?.user_name) tempErrors.user_name = "User Name is required";
-        if (!current?.sheet_name) tempErrors.sheet_name = "Sheet Name is required";
-        setErrors(tempErrors);
-        return Object.keys(tempErrors).length === 0;
+        const updatedData = await fetchAllUser();
+        setData(updatedData);
     };
     // Handle Add or Edit
     const handleSubmit = async (e) => {
-        e?.preventDefault();
-        if (!validate()) return; // Don't proceed if validation fails
+        e.preventDefault();
         const accessType = current?.access_type === "service_tracker_wise";
         const payload = {
             user_id: current?.user_id,
             entity_id: current?.group_name_id || current?.company_id || current?.location_id || current?.module_id || current?.sub_module_id || current?.service_tracker_id || current?.page_id || current?.service_tracker_inner_id || current?.assign_user_id,
-            entity_name: current?.group_name || current?.company_name || current?.location_name || current?.module_name || current?.sub_module_name || current?.service_tracker.toLowerCase()
+            entity_name: current?.group_name || current?.company_name || current?.location_name || current?.module_name || current?.sub_module_name || current?.service_tracker.toLowerCase() 
                 .replace(/[^a-z0-9\s]/g, '')
                 .replace(/\s+/g, '_') || current?.page_name || current?.service_tracker_wise || current?.assign_user_name,
             entity_type: current?.access_type,
@@ -174,18 +148,6 @@ const AccessControl = () => {
                 ? current.access.map(a => a.toLowerCase())
                 : []
         }
-        if (current?.access_type === "company") {
-            payload.entity_id = current?.company_id;
-            payload.entity_name = current?.company_name;
-        }
-        if (current?.access_type === "submodule") {
-            payload.entity_id = current?.sub_module_id;
-            payload.entity_name = current?.sub_module_name;
-        }
-        if (current?.access_type === "company_location") {
-            payload.entity_id = current?.location_id;
-            payload.entity_name = current?.location_name;
-        }
         if (accessType) {
             payload.entity_id = current?.service_tracker_inner_id;
             payload.entity_name = current?.service_tracker_wise;
@@ -193,34 +155,17 @@ const AccessControl = () => {
         }
         try {
             if (isEditing) {
-                // Update existing AccessControl
-                const response = await updateUserAccessLevelById(current.id, payload);
-                const message = response?.message || "update successfully"
-                // Show success snackbar
-                setIsSnackbarsOpen({
-                    ...isSnackbarsOpen,
-                    open: true,
-                    message,
-                    severityType: 'success',
-                });
+                // Update existing company
+                await updateUserAccessLevelById(current.id, payload);
             } else {
-                // Create new AccessControl
-                const response = await createUserAccessLevel(payload);
-                const message = response?.message || "create successfully"
-                // Show success snackbar
-                setIsSnackbarsOpen({
-                    ...isSnackbarsOpen,
-                    open: true,
-                    message,
-                    severityType: 'success',
-                });
-
+                // Create new company
+                await createUserAccessLevel(payload);
             }
             // Refresh data
             const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
             setData(updatedData);
         } catch (error) {
-            console.error("Error saving AccessControl:", error);
+            console.error("Error saving company:", error);
         }
         setCurrent({ id: null, sub_module_name: '', module_desc: '', created_at: '', location: '', updated_at: '', desc: '', access: [], sub_module_id: [] });
         setIsEditing(false);
@@ -237,7 +182,6 @@ const AccessControl = () => {
         setIsModalOpen(false);
         setIsEditing(false);
         setCurrent({}); // Reset to default
-        setErrors({});
     };
 
     const handleToggleChange = async (e, params) => {
@@ -259,7 +203,7 @@ const AccessControl = () => {
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete AccessControl";
+                "Failed to delete company";
 
             // Show error snackbar
             setIsSnackbarsOpen({
@@ -283,14 +227,12 @@ const AccessControl = () => {
             const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
             setData(updatedData);
             setIsSnackbarsOpen({ ...isSnackbarsOpen, open: true, message: 'Access control deleted successfully', severityType: 'success' });
-            setIsDeleteModalOpen(false);
-
         } catch (error) {
             console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
-                "Failed to delete AccessControl";
+                "Failed to delete company";
 
             // Show error snackbar
             setIsSnackbarsOpen({
@@ -313,35 +255,15 @@ const AccessControl = () => {
         setCurrent((prev) => ({ ...prev, access: newValue }));
     };
 
-    const deleteModal = () => {
-        return (
-            <div>
-                <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this company Location?
-                </div>
-
-                <div className="row row-gap-2 mt-4">
-                    <div className='col-6'>
-                        <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
-                    </div>
-                    <div className='col-6 d-flex justify-content-end'>
-                        <button type="submit"
-                            className="btn-sm btn btn-primary"
-                            onClick={() => handleDelete(current?._id)}>Yes, I'm sure</button>
-                    </div>
-                </div>
-            </div>
-        )
-    }
     const crudForm = () => {
         // Helper functions for conditional rendering based on current.access_type
         // If access_type is 'submodule', show only module and submodule dropdowns
         // If access_type is 'module', show only module dropdown
         const showOnlyModule = current.access_type === "module";
         const showOnlyModuleAndSubModule = current.access_type === "submodule";
+
         const isCompanyLocationEdit = current.access_type === "company_location" && isEditing;
         const isSubModuleEdit = current.access_type === "submodule" && isEditing;
-
         const ShowUser = current.access_type === "user";
         const showGroup = [
             "group",
@@ -390,9 +312,6 @@ const AccessControl = () => {
                                         user_name: selectedName
                                     }));
                                 }}
-                                error={!!errors.user_name}
-                                helperText={errors.user_name}
-                            // isRequired={true}
                             />
                         ) : (
                             <SingleSelectTextField
@@ -414,77 +333,41 @@ const AccessControl = () => {
                                     _id: item._id,
                                     name: item.full_name
                                 }))}
-                                error={!!errors.user_name}
-                                helperText={errors.user_name}
                             />
                         )
                     }
-                    {isEditing ?
-                        <MuiTextField
-                            name="access_type"
-                            label="Access Type"
-                            value={current?.access_type}
-                            isdisabled={true}
-                            onChange={(e) => {
-                                const selectedName = e.target.value;
-                                setCurrent((prev) => ({
-                                    ...prev,
-                                    access_type: selectedName,
-                                    group_name: '',
-                                    group_name_id: null,
-                                    company_name: '',
-                                    company_id: null,
-                                    location_name: '',
-                                    location_id: null,
-                                    module_name: '',
-                                    module_id: null,
-                                    sub_module_name: '',
-                                    sub_module_id: null,
-                                    service_tracker: '',
-                                    service_tracker_wise: '',
-                                    page: ''
-                                }));
-                            }}
-                            error={!!errors.access_type}
-                            helperText={errors.access_type}
-                        />
-                        :
-                        <SingleSelectTextField
-                            name="access_type"
-                            label="Access Type"
-                            value={current?.access_type}
-                            isdisable={isEditing ? true : false}
-                            onChange={(e) => {
-                                const selectedName = e.target.value;
-                                setCurrent((prev) => ({
-                                    ...prev,
-                                    access_type: selectedName,
-                                    group_name: '',
-                                    group_name_id: null,
-                                    company_name: '',
-                                    company_id: null,
-                                    location_name: '',
-                                    location_id: null,
-                                    module_name: '',
-                                    module_id: null,
-                                    sub_module_name: '',
-                                    sub_module_id: null,
-                                    service_tracker: '',
-                                    service_tracker_wise: '',
-                                    page: ''
-                                }));
-                            }}
-                            names={accessTypeList.map((item) => ({
-                                _id: item._id,
-                                name: item.name
-                                // name: item.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                            }))}
-                            error={!!errors.access_type}
-                            helperText={errors.access_type}
-                        />
 
-                    }
-
+                    <SingleSelectTextField
+                        name="access_type"
+                        label="Access Type"
+                        value={current?.access_type}
+                        isdisable={isEditing ? true : false}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            setCurrent((prev) => ({
+                                ...prev,
+                                access_type: selectedName,
+                                group_name: '',
+                                group_name_id: null,
+                                company_name: '',
+                                company_id: null,
+                                location_name: '',
+                                location_id: null,
+                                module_name: '',
+                                module_id: null,
+                                sub_module_name: '',
+                                sub_module_id: null,
+                                service_tracker: '',
+                                service_tracker_wise: '',
+                                page: ''
+                            }));
+                        }}
+                        names={accessTypeList.map((item) => ({
+                            _id: item._id,
+                            name: item.name
+                            // name: item.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                        }))}
+                    />
                 </div>
                 <div className='d-lg-flex d-md-flex justify-content-between gap-3'>
                     {showGroup && (
@@ -516,8 +399,6 @@ const AccessControl = () => {
                                 _id: item._id,
                                 name: item.name,
                             }))}
-                            error={!!errors.group_name}
-                            helperText={errors.group_name}
                         />
                     )}
                     {showCompany && (
@@ -547,8 +428,6 @@ const AccessControl = () => {
                                 _id: data?._id,
                                 name: data?.company_name
                             }))}
-                            error={!!errors.company_name}
-                            helperText={errors.company_name}
                         />
                     )}
                 </div>
@@ -567,8 +446,6 @@ const AccessControl = () => {
                                     location_name: selectedName
                                 }));
                             }}
-                            error={!!errors.location_name}
-                            helperText={errors.location_name}
                         />
                     ) : (
                         showLocation && (
@@ -596,8 +473,6 @@ const AccessControl = () => {
                                     _id: data?._id,
                                     name: data?.location_name
                                 }))}
-                                error={!!errors.location_name}
-                                helperText={errors.location_name}
                             />
                         )
                     )}
@@ -626,8 +501,6 @@ const AccessControl = () => {
                                 _id: data?._id,
                                 name: data?.module_name
                             }))}
-                            error={!!errors.module_name}
-                            helperText={errors.module_name}
                         />
                     )}
                 </div>
@@ -646,8 +519,6 @@ const AccessControl = () => {
                                     sub_module_name: selectedName
                                 }));
                             }}
-                            error={!!errors.sub_module_name}
-                            helperText={errors.sub_module_name}
                         />
                     ) : (
                         showSubModule && (
@@ -671,11 +542,34 @@ const AccessControl = () => {
                                     _id: data?._id,
                                     name: data?.sub_module_name
                                 }))}
-                                error={!!errors.sub_module_name}
-                                helperText={errors.sub_module_name}
                             />
                         )
                     )}
+                    {/* 
+
+                    {showSubModule && (
+                        <SingleSelectTextField
+                            name="sub_module_name"
+                            label="Sub-Module"
+                            value={current?.sub_module_name}
+                            isdisable={isEditing ? true : false}
+                            onChange={(e) => {
+                                const selectedName = e.target.value;
+                                const matchedSubModule = subModuleName.find(
+                                    (g) => g.sub_module_name === selectedName
+                                );
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    sub_module_name: selectedName,
+                                    sub_module_id: matchedSubModule?._id || null
+                                }));
+                            }}
+                            names={subModuleName?.map((data) => ({
+                                _id: data?._id,
+                                name: data?.sub_module_name
+                            }))}
+                        />
+                    )} */}
                     {showServiceTracker && (
                         <SingleSelectTextField
                             name="service_tracker"
@@ -697,8 +591,6 @@ const AccessControl = () => {
                                 _id: data?._id,
                                 name: data?.service_tracker_name
                             }))}
-                            error={!!errors.service_tracker}
-                            helperText={errors.service_tracker}
                         />
                     )}
                     {/* Service Tracker Wise dropdowns */}
@@ -724,31 +616,6 @@ const AccessControl = () => {
                                     _id: data?._id,
                                     name: data?.service_tracker_name
                                 }))}
-                                error={!!errors.service_tracker}
-                                helperText={errors.service_tracker}
-                            />
-                            <SingleSelectTextField
-                                name="sheet_name"
-                                label="Sheet Name"
-                                value={current?.sheet_name}
-                                isdisable={isEditing ? true : false}
-                                onChange={(e) => {
-                                    const selectedName = e.target.value;
-                                    const matchedServiceTracker = serviceTrackerSheet.find(
-                                        (g) => g.company_name === selectedName
-                                    );
-                                    setCurrent((prev) => ({
-                                        ...prev,
-                                        sheet_name: selectedName,
-                                        sheet_name_id: matchedServiceTracker?._id || null
-                                    }));
-                                }}
-                                names={serviceTrackerSheet?.map((data) => ({
-                                    _id: data?.name,
-                                    name: data?.name
-                                }))}
-                                error={!!errors.sheet_name}
-                                helperText={errors.sheet_name}
                             />
                             <SingleSelectTextField
                                 name="service_tracker_wise"
@@ -768,11 +635,8 @@ const AccessControl = () => {
                                 }}
                                 names={allInnerPageServiceTrackerList?.map((data) => ({
                                     _id: data?._id,
-                                    name: data?.company_name,
-                                    location: data?.location
+                                    name: data?.company_name
                                 }))}
-                                error={!!errors.service_tracker_wise}
-                                helperText={errors.service_tracker_wise}
                             />
                         </>
                     )}
@@ -792,8 +656,6 @@ const AccessControl = () => {
                                 _id: data?._id,
                                 name: data?.location_name
                             }))}
-                            error={!!errors.location_to_module}
-                            helperText={errors.location_to_module}
                         />
                     )}
                     {showPage && (
@@ -817,8 +679,6 @@ const AccessControl = () => {
                                 _id: data?._id,
                                 name: data?.page_name
                             }))}
-                            error={!!errors.page_name}
-                            helperText={errors.page_name}
                         />
                     )}
                 </div>
@@ -843,20 +703,11 @@ const AccessControl = () => {
                             _id: data?._id,
                             name: data?.full_name
                         }))}
-                        error={!!errors.assign_user_name}
-                        helperText={errors.assign_user_name}
                     />
                 )}
+
                 <div>
-                    <MultipleSelectTextFields
-                        label='Access Control'
-                        value={current.access}
-                        onChange={handleRoleAccessChange}
-                        names={accessControl}
-                        error={!!errors.access}
-                        helperText={errors.access}
-                        isRequired={true}
-                    />
+                    <MultipleSelectTextFields label='Access Control' value={current.access} onChange={handleRoleAccessChange} names={accessControl} />
                 </div>
                 <div className="row row-gap-2">
                     <div className='col-6'>
@@ -900,8 +751,7 @@ const AccessControl = () => {
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>
                         <button className="btn btn-sm" onClick={() => {
-                            setCurrent({ _id: params.data._id });
-                            setIsDeleteModalOpen(true);
+                            handleDelete(params.data._id)
                         }}>
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
@@ -994,15 +844,14 @@ const AccessControl = () => {
     useEffect(() => {
         const formattedTrackerName = current?.service_tracker?.toLowerCase()?.replace(/\s+/g, '_');
         const fetchData = async () => {
-            const [userAccessDataRes, groupHoldingRes, userNameListRes, accessTypeListRes, allPageListRes, allServiceTrackerListRes, allInnerPageServiceTrackerListRes, serviceTrackerSheet] = await Promise.allSettled([
+            const [userAccessDataRes, groupHoldingRes, userNameListRes, accessTypeListRes, allPageListRes, allServiceTrackerListRes, allInnerPageServiceTrackerListRes] = await Promise.allSettled([
                 fetchAllUserAccessLevels({ system_user_id: currentUserId }),
                 fetchAllGroupHolding(),
                 fetchAllUser(),
                 fetchAllAccessTypes(),
                 fetchAllPages(),
                 fetchAllServiceTracker(),
-                fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name),
-                fetchAllServiceTrackerSheetData(formattedTrackerName)
+                fetchAllInnerPageServiceTracker(formattedTrackerName)
             ]);
 
             if (userAccessDataRes.status === 'fulfilled' && current?.isFilteredData === false) {
@@ -1051,11 +900,6 @@ const AccessControl = () => {
                 setAllInnerPageServiceTrackerList(allInnerPageServiceTrackerListRes.value);
             } else {
                 console.warn("fetchAllInnerPageServiceTracker failed:", allInnerPageServiceTrackerListRes.reason);
-            }
-            if (serviceTrackerSheet.status === 'fulfilled') {
-                setServiceTrackerSheet(serviceTrackerSheet.value);
-            } else {
-                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheet.reason);
             }
         };
 
@@ -1156,8 +1000,6 @@ const AccessControl = () => {
     return (
         <div>
             <Snackbars issnackbarsOpen={isSnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete AccessControl' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-
             {/* Table to display data */}
             <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
                 <div className="notification-page-title">

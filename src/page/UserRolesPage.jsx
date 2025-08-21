@@ -46,7 +46,7 @@ const UserRolesPage = () => {
     if (!current?.email) tempErrors.email = "Email is required";
     if (!current?.username) tempErrors.username = "Username is required";
     if (!current?.password) tempErrors.password = "Password is required";
-    if (!current?.user_description) tempErrors.user_description = "Description is required";
+    // if (!current?.user_description) tempErrors.user_description = "Description is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -111,6 +111,13 @@ const UserRolesPage = () => {
 
     setIsEditing(false);
     setIsModalOpen(false);
+    setCurrent({
+      full_name: '',
+      email: '',
+      username: '',
+      password: '',
+      user_description: ''
+    });
   };
 
   // Handle Delete
@@ -158,6 +165,13 @@ const UserRolesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setErrors({});
+      setCurrent({
+      full_name: '',
+      email: '',
+      username: '',
+      password: '',
+      user_description: ''
+    });
   };
   useEffect(() => {
     const fetchData = async () => {
@@ -227,9 +241,6 @@ const UserRolesPage = () => {
             handleChange={handleChange}
             name='user_description'
             label='Description'
-            error={!!errors.user_description}
-            helperText={errors.user_description}
-            isRequired={true}
           />
         </div>
         <div className="row row-gap-2">

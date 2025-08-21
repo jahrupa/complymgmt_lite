@@ -131,7 +131,7 @@ const SubModule = () => {
     const validate = () => {
         let tempErrors = {};
         if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub-Module Name is required";
-        if (!current?.sub_module_description) tempErrors.sub_module_description = "Description is required";
+        // if (!current?.sub_module_description) tempErrors.sub_module_description = "Description is required";
         if (!current?.module_name) tempErrors.module_name = "Select Module Name";
 
         setErrors(tempErrors);
@@ -355,10 +355,10 @@ const SubModule = () => {
                         value={current.sub_module_description}
                         handleChange={handleChange}
                         name='sub_module_description'
-                        label='Sub Module Description'
-                        error={!!errors.sub_module_description}
-                        helperText={errors.sub_module_description}
-                        isRequired={true}
+                        label='Description'
+                        // error={!!errors.sub_module_description}
+                        // helperText={errors.sub_module_description}
+                        // isRequired={true}
                     />
                 </div>
 

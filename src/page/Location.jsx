@@ -60,7 +60,7 @@ const Location = () => {
         if (!current?.company_name) tempErrors.company_name = "Company name is required";
         if (!current?.location_name) tempErrors.location_name = "Location name is required";
         if (!current?.group_name) tempErrors.group_name = "Group name is required";
-        if (!current?.location_description) tempErrors.location_description = "Description is required";
+        // if (!current?.location_description) tempErrors.location_description = "Description is required";
         if (!current?.city) tempErrors.city = "City is required";
         if (!current?.state) tempErrors.state = "State is required";
 
@@ -106,45 +106,45 @@ const Location = () => {
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
+        const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]: "68480959d7038d326905b02c"
+        };
 
         const payload = {
             "GroupHoldingsID": current?.group_holding_id,
             "CompanyID": current?.company_id,
             "LocationName": current?.location_name,
             "LocationDescription": current?.location_description,
-            "City": current?.city,
+            "City": '',
             "State": current?.state,
-            "CommonAttributes": {
-                "Created_By": "68480959d7038d326905b02c"
-            }
+            "CommonAttributes": CommonAttributes
         };
-        const EditPayload = {
-            "GroupHoldingsID": current?.group_holding_id,
-            "CompanyID": current?.company_id,
-            "LocationName": current?.location_name,
-            "LocationDescription": current?.location_description,
-            "City": current?.city,
-            "State": current?.state,
-            "CommonAttributes": {
-                "Updated_By": "68480959d7038d326905b02c"
-            }
-        };
-
         try {
             if (isEditing) {
-                // Update existing company
-                await updateLocationById(current._id, EditPayload);
+                // Update existing location
+                const response = await updateLocationById(current._id, payload);
+                const message = response?.message || "Location updated successfully";
+                setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message,
+                    severityType: 'success',
+                });
             } else {
-                // Create new company
-                await createLocation(payload);
+                // Create new location
+                const response = await createLocation(payload);
+                const message = response?.message || "Location created successfully";
+                setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message,
+                    severityType: 'success',
+                });
             }
             // Refresh data
             const updatedData = await fetchAllLocation();
             setData(updatedData);
-        } catch (error) {
-            console.error("Error saving company:", error);
-        }
-
+            
         // Reset form state
         setCurrent({
             company_id: null,
@@ -158,6 +158,10 @@ const Location = () => {
 
         setIsEditing(false);
         setIsModalOpen(false);
+        } catch (error) {
+            console.error("Error saving location:", error);
+        }
+
     };
 
     const handleDelete = async (locationId) => {
@@ -204,6 +208,8 @@ const Location = () => {
     const closeModal = () => {
         setIsModalOpen(false);
         setErrors({})
+        setCurrent({})
+        setIsEditing(false);
     };
 
 
@@ -366,12 +372,10 @@ const Location = () => {
                     <MuiTextField
                         label="Description"
                         type="text"
-                        isRequired={true}
+                        // isRequired={true}
                         fieldName="location_description"
                         handleChange={handleChange}
                         value={current?.location_description || ''}
-                        error={!!errors.location_description}
-                        helperText={errors.location_description}
                     />
                 </div>
 
