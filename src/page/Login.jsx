@@ -13,38 +13,38 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
     const navigate = useNavigate();
 
     // Login handler
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        const response = await API.post(LOGIN_API, {
-            username,
-            password,
-        });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await API.post(LOGIN_API, {
+                username,
+                password,
+            });
 
-        const token = response.data?.token;
-        const message = response?.data?.message;
+            const token = response.data?.token;
+            const message = response?.data?.message;
 
-        if (token) {
-            localStorage.setItem('token', token);
-            localStorage.setItem('username', response.data?.username );
-            localStorage.setItem('user_id', response.data?.user_id);
-            // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
-            setIsAuthenticated(true);
-            navigate('/dashboard');
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
-        } else {
-            alert('Login failed: Token missing');
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'error' });
+            if (token) {
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', response.data?.username);
+                localStorage.setItem('user_id', response.data?.user_id);
+                // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
+                setIsAuthenticated(true);
+                navigate('/dashboard');
+                setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
+            } else {
+                alert('Login failed: Token missing');
+                setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'error' });
+            }
+        } catch (error) {
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message || 'Login failed',
+                severityType: 'error'
+            });
         }
-    } catch (error) {
-        setIsSnackbarsOpen({
-            ...issnackbarsOpen,
-            open: true,
-            message: error.response?.data?.error,
-            severityType: 'error'
-        });
-    }
-};
+    };
 
 
 

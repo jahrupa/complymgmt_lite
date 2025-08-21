@@ -72,7 +72,8 @@ import {
   GET_USER_ACCESS_BY_ID,
   UPDATE_SERVICE_TRACKER_DATA,
   BULK_APPROVE_ALL_SERVICE_TRACKER_DATA,
-  APPROVE_ALL_BY_ENTITY_TYPE
+  APPROVE_ALL_BY_ENTITY_TYPE,
+  GET_ALL_SERVICE_TRACKER_SHEET_DATA
 
 } from "./Endpoint";
 // Login Api
@@ -565,9 +566,9 @@ export const fetchAllServiceTrackerFields = async (tracker_name) => {
     throw error;
   }
 };
-export const fetchAllInnerPageServiceTracker = async (trackerName) => {
+export const fetchAllInnerPageServiceTracker = async (trackerName,sheetName) => {
   try {
-    const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data`;
+    const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data?sheet=${encodeURIComponent(sheetName)}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -646,13 +647,26 @@ export const createServiceTrackerSpecifics = async (payload) => {
 
 export const updateServiceTrackerByStatusId = async (id, payload) => {
   try {
-    const response = await API.put(`${UPDATE_SERVICE_TRACKER_BY_STATUS_ID}${id}`, payload);
+    const response = await API.get(`${GET_ALL_SERVICE_TRACKER_SHEET_DATA}${id}`, payload);
     return response.data;
   } catch (error) {
     console.error("Error update sevice tracker status:", error);
     throw error;
   }
 };
+
+export const fetchAllServiceTrackerSheetData = async (trackerName) => {
+  try {
+    // const response = await API.get(GET_ALL_SERVICE_TRACKER_SHEET_DATA);
+     const url = `${GET_ALL_SERVICE_TRACKER_SHEET_DATA}/${encodeURIComponent(trackerName)}/sheets`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching service tracker sheet data:", error);
+    throw error;
+  }
+};
+
 // location To Module
 
 export const fetchLocationToModuleModule = async () => {

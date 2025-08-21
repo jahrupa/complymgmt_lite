@@ -7,7 +7,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
-import '../../style/useRole.css'
+import FormHelperText from '@mui/material/FormHelperText';
+import '../../style/useRole.css';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -20,21 +21,27 @@ const MenuProps = {
   },
 };
 
-
-export default function MultipleSelectTextFields({ value, onChange,names,label,isdisable }) {
+export default function MultipleSelectTextFields({
+  value,
+  onChange,
+  names,
+  label,
+  isdisable,
+  error,
+  helperText,
+  isRequired,
+}) {
   const theme = useTheme();
-
-
-  const getStyles = (name, personName, theme) => {
+  const getStyles = (name, selectedValues, theme) => {
     return {
-      fontWeight: personName?.includes(name)
+      fontWeight: selectedValues?.includes(name)
         ? theme.typography.fontWeightMedium
         : theme.typography.fontWeightRegular,
     };
   };
 
   return (
-    <FormControl className='text_area_field w-100 mb-3'>
+    <FormControl className="text_area_field w-100 mb-3" error={error} required={isRequired}>
       <InputLabel id="demo-multiple-chip-label">{label}</InputLabel>
       <Select
         labelId="demo-multiple-chip-label"
@@ -59,6 +66,7 @@ export default function MultipleSelectTextFields({ value, onChange,names,label,i
           </MenuItem>
         ))}
       </Select>
+      {error && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );
 }

@@ -73,6 +73,10 @@ export const GET_ALL_SERVICE_TRACKER_FIELDS ='/api/V1/service_tracker/view/';
 export const CREATE_SERVICE_TRACKER_SPECIFICS ='/api/v1/service_tracker/create/specifics';
 export const UPDATE_SERVICE_TRACKER_DATA ='api/v1/service_tracker/update/';
 export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/update/approve/bulk/';
+// export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
+export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
+
+
 
 
 

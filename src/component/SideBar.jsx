@@ -210,7 +210,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                 </div>
             </div>
 
-            <div id="main" style={{ marginLeft: sidebarOpen ? '250px' : '90px' }} className='mobile-page-layout'>
+            <div id="main" style={{ marginLeft: sidebarOpen ? '250px' : '70px' }} className='mobile-page-layout'>
                 <Outlet />
             </div>
         </div>
