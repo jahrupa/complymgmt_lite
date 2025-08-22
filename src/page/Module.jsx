@@ -140,7 +140,7 @@ const Module = () => {
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllUser();
+        const updatedData = await fetchAllModule();
         setData(updatedData);
     };
     const handleSubmit = async (e) => {

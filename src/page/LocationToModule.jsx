@@ -152,7 +152,7 @@ const LocationToModule = () => {
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllUser();
+        const updatedData = await fetchLocationToModuleModule();
         setData(updatedData);
     };
 

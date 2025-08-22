@@ -98,7 +98,7 @@ const Location = () => {
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllUser();
+        const updatedData = await fetchAllLocation();
         setData(updatedData);
     };
 
