@@ -14,15 +14,25 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { bulkApproveAllServiceTrackerData, fetchAllInnerPageServiceTracker, updateServiceTrackerData, uploadExcelFile } from '../api/service';
+import { bulkApproveAllServiceTrackerData, fetchAllInnerPageServiceTracker, fetchAllServiceTrackerSheetData, updateServiceTrackerData, uploadExcelFile } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
+import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 
 const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
+    const [current, setCurrent] = useState({
+        sheet_name: '',
+        sheet_id: null,
+        isFilteredData: false,
+
+    });
+    console.log(current, 'current')
+    const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
+
     // console.log(columnDefs, 'columnDefs')
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
@@ -142,82 +152,6 @@ const ServiceTrackerInnerPage = () => {
             });
         }
     };
-
-    // const handleToggleChange = async (e, tracker_id) => {
-    //     const rowToToggleUpdate = rowData.find((row) => row._id === tracker_id);
-    //     if (!rowToToggleUpdate) {
-    //         throw new Error("Row not found for toggle update.");
-    //     }
-    //     const newIsActive = {
-    //         ...rowToToggleUpdate,
-    //         "IsActive": e.target.checked
-    //     };
-    //     try {
-    //         const response = await updateServiceTrackerData(tracker_id, formattedTrackerName, newIsActive);
-
-    //         const message = response?.message || "Status update successfully"
-    //         // Show success snackbar
-    //         setIsSnackbarsOpen({
-    //             ...issnackbarsOpen,
-    //             open: true,
-    //             message,
-    //             severityType: 'success',
-    //         });
-    //     } catch (error) {
-    //         // console.error("Error:", error);
-    //         const errorMessage =
-    //             error?.response?.data?.message ||
-    //             error?.message ||
-    //             "Failed to update user sataus";
-
-    //         // Show error snackbar
-    //         setIsSnackbarsOpen({
-    //             ...issnackbarsOpen,
-    //             open: true,
-    //             message: errorMessage,
-    //             severityType: 'error',
-    //         });
-    //     }
-    //     const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
-
-    //     setData(updatedData);
-    // };
-    // const handleDelete = async (userId) => {
-
-    //     try {
-    //         const response = await updateServiceTrackerData(userId);
-    //         const message = response?.message || "User deleted successfully";
-
-    //         // Refresh data
-    //         const updatedData = await fetchAllInnerPageServiceTracker(trackerName);
-    //         setRowData(updatedData);
-    //         setIsDeleteModalOpen(false);
-
-    //         // Show success snackbar
-    //         setIsSnackbarsOpen({
-    //             ...issnackbarsOpen,
-    //             open: true,
-    //             message,
-    //             severityType: 'success',
-    //         });
-    //     } catch (error) {
-    //         console.error("Error deleting user:", error);
-
-    //         // Extract error message safely
-    //         const errorMessage =
-    //             error?.response?.data?.message ||
-    //             error?.message ||
-    //             "Failed to delete user";
-
-    //         // Show error snackbar
-    //         setIsSnackbarsOpen({
-    //             ...issnackbarsOpen,
-    //             open: true,
-    //             message: errorMessage,
-    //             severityType: 'error',
-    //         });
-    //     }
-    // };
     const fetchAndSetTrackerData = async (trackerName) => {
         try {
             const response = await fetchAllInnerPageServiceTracker(trackerName);
@@ -334,12 +268,12 @@ const ServiceTrackerInnerPage = () => {
 
         try {
             setUploadStatus("pending"); // Set to pending before the request starts
-                setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "Uploading file...",
-                    severityType: 'info',
-                });
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "Uploading file...",
+                severityType: 'info',
+            });
             const result = await uploadExcelFile([fileName], metadata);
             setUploadStatus("success"); // Success status
             setIsSnackbarsOpen({
@@ -364,7 +298,7 @@ const ServiceTrackerInnerPage = () => {
             });
         }
     };
-    console.log(uploadStatus, 'uploadStatus')
+
     const handleApproveAll = async () => {
         try {
             const response = await bulkApproveAllServiceTrackerData(formattedTrackerName);
@@ -475,6 +409,26 @@ const ServiceTrackerInnerPage = () => {
         }
     }, [formattedTrackerName]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            const [serviceTrackerInnerPageData, serviceTrackerSheet] = await Promise.allSettled([
+                fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name),
+                fetchAllServiceTrackerSheetData(formattedTrackerName)
+            ]);
+            if (serviceTrackerInnerPageData.status === 'fulfilled' && current?.isFilteredData === false) {
+                setRowData(serviceTrackerInnerPageData.value);
+            } else {
+                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheet.reason);
+            }
+            if (serviceTrackerSheet.status === 'fulfilled') {
+                setServiceTrackerSheet(serviceTrackerSheet.value);
+            } else {
+                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheet.reason);
+            }
+        };
+
+        fetchData();
+    }, [current]);
     const navigate = useNavigate();
 
     return (
@@ -515,7 +469,46 @@ const ServiceTrackerInnerPage = () => {
             </div>
             <div className="client-onboarding-2">
                 <div className="table_div p-3">
-                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    <div className='d-lg-flex d-md-flex  justify-content-between'>
+ <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    <div className='w-25'>
+                        <SingleSelectTextField
+                            name="sheet_name"
+                            label="Sheet Name"
+                            value={current?.sheet_name || ''}
+                            onChange={async (e) => {
+                                const selectedName = e.target.value;
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    sheet_name: selectedName,
+                                    isFilteredData: selectedName ? true : false // Set to true to indicate filtered data
+                                }));
+
+                                if (selectedName) {
+                                    try {
+                                        const filterUpdateData = await fetchAllInnerPageServiceTracker(
+                                            formattedTrackerName,
+                                            selectedName
+                                        );
+                                        setRowData(filterUpdateData);
+                                    } catch (error) {
+                                        console.error("Error fetching service tracker data:", error);
+                                    }
+                                }
+                            }}
+                            names={
+                                serviceTrackerSheet?.map((data) => ({
+                                    _id: data?.name,
+                                    name: data?.name
+                                })) || []
+                            }
+                        />
+
+
+                        {/* <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} /> */}
+                    </div>
+                    </div>
+                   
                     <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                         <AgGridReact
                             theme="legacy"
