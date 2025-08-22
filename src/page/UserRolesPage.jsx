@@ -261,7 +261,7 @@ const UserRolesPage = () => {
   const handleApproveAll = async () => {
     try {
       const response = await bulkApproveAllPageData('user');
-      const message = response?.message || "Status update successfully"
+      const message = response?.message 
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -270,16 +270,10 @@ const UserRolesPage = () => {
         severityType: 'success',
       });
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to update user sataus";
-
-      // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
@@ -293,7 +287,7 @@ const UserRolesPage = () => {
     };
     try {
       const response = await updateUserStatusId(params.data._id, newIsActive);
-      const message = response?.message || "Status update successfully"
+      const message = response?.message 
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -302,17 +296,11 @@ const UserRolesPage = () => {
         severityType: 'success',
       });
     } catch (error) {
-      // console.error("Error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to update user sataus";
 
-      // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
