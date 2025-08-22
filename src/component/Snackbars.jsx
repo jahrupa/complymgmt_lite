@@ -1,10 +1,9 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
+
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen }) {
-  const { vertical, horizontal, open ,message,severityType} = issnackbarsOpen;
+export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadStatus }) {
+  const { vertical, horizontal, open, message, severityType } = issnackbarsOpen;
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -14,21 +13,43 @@ export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen }) {
   };
 
   return (
-    <Snackbar
-      open={open} // ✅ FIXED: this should be a boolean
-      autoHideDuration={2000}
-      onClose={handleClose}
-      anchorOrigin={{ vertical, horizontal }}
-      key={vertical + horizontal}
-    >
-      <Alert
+    <>
+      {uploadStatus === "pending" ? 
+      <Snackbar
+        open={open} // ✅ FIXED: this should be a boolean
+        // autoHideDuration={2000}
         onClose={handleClose}
-        severity={severityType}
-        variant="filled"
-        sx={{ width: '100%' }}
+        anchorOrigin={{ vertical, horizontal }}
+        key={vertical + horizontal}
       >
-        {message}
-      </Alert>
-    </Snackbar>
+        <Alert
+          onClose={handleClose}
+          severity={severityType}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+      : 
+      <Snackbar
+        open={open} // ✅ FIXED: this should be a boolean
+        autoHideDuration={2000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical, horizontal }}
+        key={vertical + horizontal}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={severityType}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+      }
+    
+    </>
   );
 }

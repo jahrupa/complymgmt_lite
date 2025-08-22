@@ -37,6 +37,7 @@ const ServiceTrackerInnerPage = () => {
         message: '',
         severityType: '',
     });
+    const [uploadStatus, setUploadStatus] = useState("idle"); // idle | pending | success | error
     const gridRef = useRef();
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -319,27 +320,51 @@ const ServiceTrackerInnerPage = () => {
         setFileName(file || '');
     };
 
+
     const handleFileUpload = async () => {
         if (!fileName) {
             alert("Please select a file.");
             return;
         }
+
         const metadata = {
             bo_user_id: currentUser,
             tracker_name: trackerName,
         };
+
         try {
+            setUploadStatus("pending"); // Set to pending before the request starts
+                setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "Uploading file...",
+                    severityType: 'info',
+                });
             const result = await uploadExcelFile([fileName], metadata);
-            // console.log("File uploaded successfully:", result);
+            setUploadStatus("success"); // Success status
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: result?.message,
+                severityType: 'success',
+            });
+
             const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
             setRowData(response || []);
             await fetchAndSetTrackerData(formattedTrackerName);
             setIsModalOpen(false);
         } catch (error) {
-            console.error("Upload failed:", error);
-            alert("❌ Upload failed. Please try again.");
+            setUploadStatus("error"); // Error status
+
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message || "Upload failed.",
+                severityType: 'error',
+            });
         }
     };
+    console.log(uploadStatus, 'uploadStatus')
     const handleApproveAll = async () => {
         try {
             const response = await bulkApproveAllServiceTrackerData(formattedTrackerName);
@@ -352,29 +377,16 @@ const ServiceTrackerInnerPage = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to update user sataus";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
         const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
         setRowData(response || []);
         await fetchAndSetTrackerData(formattedTrackerName);
-        // setData(updatedData);
-        // try {
-        //     const response = await bulkApproveAllServiceTrackerData(formattedTrackerName);
-        //     // Handle the response as needed
-        // } catch (error) {
-        //     console.error("Error approving all service tracker data:", error);
-        // }
     };
 
     const onRowValueChanged = (event) => {
@@ -442,7 +454,7 @@ const ServiceTrackerInnerPage = () => {
                     <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
                 </div>
                 <div className="col-12 col-md-6">
-                    <button type="submit" className="btn btn-primary w-100" onClick={handleFileUpload}>Upload</button>
+                    <button type="submit" className="btn btn-primary w-100" disabled={uploadStatus === "pending"} onClick={handleFileUpload}>Upload</button>
                 </div>
             </div>
         </div>
@@ -467,7 +479,7 @@ const ServiceTrackerInnerPage = () => {
 
     return (
         <div>
-            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} uploadStatus={uploadStatus} />
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Tracker' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
             <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle="Edit Uploaded File" isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
             <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>

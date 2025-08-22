@@ -135,9 +135,9 @@ const AccessControl = () => {
                 severityType: 'error',
             });
         }
-             // Refresh data
-            const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
-            setData(updatedData);
+        // Refresh data
+        const updatedData = await fetchAllUserAccessLevels({ system_user_id: currentUserId });
+        setData(updatedData);
     };
 
     const validate = () => {
@@ -160,7 +160,7 @@ const AccessControl = () => {
     // Handle Add or Edit
     const handleSubmit = async (e) => {
         e?.preventDefault();
-        if (!validate()) return; // Don't proceed if validation fails
+        // if (!validate()) return; // Don't proceed if validation fails
         const accessType = current?.access_type === "service_tracker_wise";
         const payload = {
             user_id: current?.user_id,
@@ -174,6 +174,7 @@ const AccessControl = () => {
                 ? current.access.map(a => a.toLowerCase())
                 : []
         }
+        console.log(payload, 'payload')
         if (current?.access_type === "company") {
             payload.entity_id = current?.company_id;
             payload.entity_name = current?.company_name;
@@ -909,6 +910,7 @@ const AccessControl = () => {
                 );
             }
         },
+        // { field: '_id', headerName: 'Entity Name', filter: true, editable: false },
         { field: 'EntityName', headerName: 'Entity Name', filter: true, editable: false },
         { field: 'EntityType', headerName: 'Entity Type', filter: true, editable: false },
         { field: 'view', headerName: 'View', filter: true, editable: false },

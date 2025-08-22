@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react'
 import '../style/servicetrackeraccess.css'
 import { createServiceTrackerSpecifics, fetchAllServiceTrackerFields, fetchAllServiceTrackerName } from '../api/service'
-import AddIcon from '@mui/icons-material/Add';
+import Snackbars from '../component/Snackbars'
 
 function ServiceTrackerAccess() {
     const [selectedCategory, setSelectedCategory] = useState('')
-    console.log(selectedCategory, 'selectedCategory')
+    // console.log(selectedCategory, 'selectedCategory')
     const [checkedItems, setCheckedItems] = useState({})
     const [trackerName, setTrackerName] = useState([])
     const [serviceTrackerFields, setServiceTrackerFields] = useState([])
-    console.log(serviceTrackerFields.data, 'serviceTrackerFields')
-    console.log(trackerName, 'trackerName')
-    console.log(checkedItems, 'checkedItems')
+    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+        open: false,
+        vertical: 'top',
+        horizontal: 'center',
+        message: '',
+        severityType: '',
+    });
+    // console.log(serviceTrackerFields.data, 'serviceTrackerFields')
+    // console.log(trackerName, 'trackerName')
+    // console.log(checkedItems, 'checkedItems')
     const formattedTrackerName = selectedCategory?.toLowerCase().replace(/\s+/g, '_');
 
     useEffect(() => {
@@ -52,19 +59,53 @@ function ServiceTrackerAccess() {
             [itemId]: !prev[itemId]
         }))
     }
-const handleSaveTrackerAccess = () => {
-    const selectedFields = Object.keys(checkedItems).filter(itemId => checkedItems[itemId]);
-    const selectedCategoryId = trackerName.find(category => category.name === selectedCategory)?._id;
-    // Call the API to save the selected fields
-    const payload = {
-        service_tracker_id: selectedCategoryId,
-        external_access: selectedFields
+
+    // const handleSaveTrackerAccess = async () => {
+    //     const selectedFields = Object.keys(checkedItems).filter(itemId => checkedItems[itemId]);
+    //     const selectedCategoryId = trackerName.find(category => category.name === selectedCategory)?._id;
+    //     // Call the API to save the selected fields
+    //     const payload = {
+    //         service_tracker_id: selectedCategoryId,
+    //         external_access: selectedFields
+    //     };
+
+
+
+    //     const result = await createServiceTrackerSpecifics(payload);
+    //     setIsSnackbarsOpen({
+    //         ...issnackbarsOpen,
+    //         open: true,
+    //         message: result?.message,
+    //         severityType: 'success',
+    //     });
+    //     console.log("Selected fields to save:", selectedFields);
+    // }
+
+    const handleSaveTrackerAccess = async () => {
+        const selectedFields = Object.keys(checkedItems).filter(itemId => checkedItems[itemId]);
+        const selectedCategoryId = trackerName.find(category => category.name === selectedCategory)?._id;
+        // Call the API to save the selected fields
+        const payload = {
+            service_tracker_id: selectedCategoryId,
+            external_access: selectedFields
+        };
+        try {
+            const result = await createServiceTrackerSpecifics(payload);
+            console.log(result,'result')
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: result?.message,
+                severityType: 'success',
+            });
+
+        } catch (error) {
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
+        }
     };
-    createServiceTrackerSpecifics(payload)
-    console.log("Selected fields to save:", selectedFields);
-}
     return (
         <div>
+            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             <div className="notification-page-title service-tracker-access-page-header">
                 <div>
                     <h1>Service Tracker Access For User</h1>
@@ -76,8 +117,8 @@ const handleSaveTrackerAccess = () => {
             <div className="service-tracker-access-main-div">
                 <div className="service-tracker-access-page-container">
                     <div className='d-flex justify-content-end'>
-                        <button className='crud_btn' onClick={() => {handleSaveTrackerAccess()}}>
-                             <span className='button-style'>Save Tracker Access</span>
+                        <button className='crud_btn' onClick={() => { handleSaveTrackerAccess() }}>
+                            <span className='button-style'>Save Tracker Access</span>
                         </button>
                     </div>
 

@@ -31,7 +31,6 @@ import PendingDocument from '../page/PendingDocument.jsx';
 import Snackbars from '../component/Snackbars.jsx';
 import UserProfilePage from '../page/UserProfilePage.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
-import ModuleTracker from '../page/ModuleTracker.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
 import NotificationPage from '../component/notification/NotificationPage.jsx';
 import CreateNotification from '../page/CreateNotification.jsx';
@@ -180,7 +179,6 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/tagged_documents" element={<TaggedDocument />} />
             <Route path="/untagged_documents" element={<UntaggedDocument />} />
             <Route path="/pending_documents" element={<PendingDocument />} />
-            <Route path="/module_tracker" element={<ModuleTracker />} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />

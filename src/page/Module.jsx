@@ -103,9 +103,6 @@ const Module = () => {
         message: '',
         severityType: '',
     });
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // You can adjust the number of items per page
     const [errors, setErrors] = useState({});
 
 
@@ -135,16 +132,11 @@ const Module = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to update module status";
-
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -180,17 +172,13 @@ const Module = () => {
 
             // ✅ Get the message from response
             const message = response?.message;
-            // Set snackbar with message
-            // setSnackbarMessage(message); // You'll need this state
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
             // Refresh data
             const updatedData = await fetchAllModule();
             setData(updatedData);
         } catch (error) {
-            // console.error("Error saving company:", error);
-            // setSnackbarMessage("Failed to save company");
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
         }
 
         // Reset form state
@@ -221,19 +209,11 @@ const Module = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error deleting company:", error);
-
-            // Extract error message safely
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete Module";
-
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -244,11 +224,14 @@ const Module = () => {
     // Function to open the modal
     const openModal = () => {
         setIsModalOpen(true);
+
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setErrors({})
+        setCurrent({ _id: null, module_name: '', module_description: '' });
+        setErrors({});
+        setIsEditing(false);
     };
 
 
@@ -378,6 +361,16 @@ const Module = () => {
     };
 
 
+    const getRoleColorForFileStatus = (status) => {
+        switch (status) {
+            case 1:
+                return { color: '#4CAF50' }; // green
+            case 0:
+                return { color: '#F44336' }; // brown
+            default:
+                return { color: '#41464b' }; // gray
+        }
+    };
     const colDefs = [
         {
             headerName: 'Actions',
@@ -428,7 +421,9 @@ const Module = () => {
         }
         ,
 
-        { field: '_id', headerName: 'ID', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: '_id', headerName: 'ID', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+
+        { field: 'module_name', headerName: 'Module Name', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
             field: 'approved_by', headerName: 'approved by', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
             cellRenderer: (params) => {
@@ -453,7 +448,47 @@ const Module = () => {
                 );
             }
         },
-        { field: 'module_name', headerName: 'Module Name', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
+            headerName: 'Approval Status',
+            editable: false,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+            filter: true,
+            valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
+
+            cellRenderer: (params) => {
+                const getApprovalStatusText = (status) => {
+                    switch (status) {
+                        case 0: return 'Pending';
+                        case 1: return 'Approved';
+                        default: return '-'; // fallback
+                    }
+                };
+
+                const status = params.value;
+                const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={true}
+                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                        />
+                        <span
+                            style={{
+                                color,
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {getApprovalStatusText(status)}
+                        </span>
+                    </div>
+                );
+            }
+        },
         {
             field: 'module_description',
             headerName: 'Module Description',

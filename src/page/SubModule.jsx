@@ -29,77 +29,10 @@ import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const dummuJsonData = [
-    {
-        id: 1744096161424,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-    },
-    {
-        id: 1744096161425,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-    },
-    {
-        id: 1744096161426,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-    },
-    {
-        id: 1744096161427,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-    },
-    {
-        id: 1744096161428,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-    },
-    {
-        id: 1744096161429,
-        sub_module_name: "Tata",
-        sub_module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin",
-        sub_module_id: ["tracker"]
-
-    },
-];
-
 const SubModule = () => {
-    // const [data, setData] = useState([]);
-    // if you want to show dummy jason data 
-    const [data, setData] = useState(dummuJsonData);
+    const [data, setData] = useState([]);
     const [current, setCurrent] = useState({ id: null, sub_module_name: '', sub_module_description: '', created_at: '', location: "", updated_at: '', desc: '', approved_by: '', module_name: '', module_id: null });
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [subModuleId, setSubModuleId] = useState(null)
@@ -114,11 +47,6 @@ const SubModule = () => {
         severityType: '',
     });
     const [moduleName, setModuleName] = useState([]);
-    console.log(moduleName, 'moduleName')
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // You can adjust the number of items per page
-
 
     // Handle input change
     const handleChange = (e) => {
@@ -131,9 +59,7 @@ const SubModule = () => {
     const validate = () => {
         let tempErrors = {};
         if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub-Module Name is required";
-        // if (!current?.sub_module_description) tempErrors.sub_module_description = "Description is required";
         if (!current?.module_name) tempErrors.module_name = "Select Module Name";
-
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -141,7 +67,7 @@ const SubModule = () => {
     const handleApproveAll = async () => {
         try {
             const response = await bulkApproveAllPageData('submodule');
-            const message = response?.message || "Status update successfully"
+            const message = response?.message
             // Show success snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -150,16 +76,11 @@ const SubModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to update submodule sataus";
-
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message:  error?.response?.data?.message ,
                 severityType: 'error',
             });
         }
@@ -196,21 +117,12 @@ const SubModule = () => {
                 response = await createsSubModule(payload);
             }
             const message = response?.message;
-
-            // ✅ Get the message from response
-            // Set snackbar with message
-            // setSnackbarMessage(message); // You'll need this state
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
-
             // Refresh data
             const updatedData = await fetchAllSubModule();
             setData(updatedData);
         } catch (error) {
-            // const message = response?.message;
-
-            // console.error("Error saving company:", error);
-            // setSnackbarMessage("Failed to save company");
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
         }
 
         // Reset form state
@@ -222,16 +134,7 @@ const SubModule = () => {
         setIsEditing(false);
         setIsModalOpen(false);
         setErrors({}); // ✅ Reset errors after submission
-
     };
-    // Handle Delete
-    // const handleDelete = (id) => {
-    //     setIsDeleteModalOpen(false)
-    //     const filteredData = data.filter((item) => item.id !== id);
-    //     setData(filteredData);
-    //     setSelectedRows(selectedRows.filter((rowId) => rowId !== id)); // Remove deleted row from selected
-    // };
-
     const handleDelete = async (id) => {
         try {
             const response = await deleteSubModuleById(id);
@@ -250,19 +153,10 @@ const SubModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error deleting company:", error);
-
-            // Extract error message safely
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete company";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -283,7 +177,7 @@ const SubModule = () => {
         };
         try {
             const response = await updateSubModuleStatusById(params.data._id, newIsActive);
-            const message = response?.message || "Status update successfully"
+            const message = response?.message 
             // Show success snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -292,17 +186,10 @@ const SubModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error:", error);
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete company";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -312,9 +199,7 @@ const SubModule = () => {
     const crudForm = () => {
         return (
             <div>
-                {/* <form onSubmit={handleSubmit}> */}
                 <div>
-                    {/* <SingleSelectTextField name="module_name" label="Module" value={current.module_name} onChange={(e) => setCurrent((prev) => ({ ...prev, module_name: e.target.value ,module_id:''}))} names={moduleName} /> */}
                     <SingleSelectTextField
                         name="module_name"
                         label="Module"
@@ -347,8 +232,6 @@ const SubModule = () => {
                         handleChange={handleChange}
                         value={current.sub_module_name} />
 
-                    {/* <MuiTextField label='Location' type='text' isRequired={true} fieldName='location' handleChange={handleChange} value={current.location} /> */}
-
                 </div>
                 <div className=''>
                     <MuiTextAreaField
@@ -356,17 +239,8 @@ const SubModule = () => {
                         handleChange={handleChange}
                         name='sub_module_description'
                         label='Description'
-                        // error={!!errors.sub_module_description}
-                        // helperText={errors.sub_module_description}
-                        // isRequired={true}
                     />
                 </div>
-
-                {/* <div>
-                    <SingleSelectTextField name="approved_by" label="Approved By" value={current.approved_by} onChange={(e) => setCurrent((prev) => ({ ...prev, approved_by: e.target.value }))} names={groupHolding} />
-
-                </div> */}
-
                 <div className="row row-gap-2">
                     <div className='col-6'>
                         <button type="button" className="btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
@@ -375,7 +249,6 @@ const SubModule = () => {
                         <button type="submit" className="btn btn-primary" onClick={handleSubmit}>{isEditing ? <span className='button-style'>Save Changes</span> : <span className='button-style'>Create SubModule</span>}</button>
                     </div>
                 </div>
-                {/* </form> */}
             </div>
 
         )

@@ -74,20 +74,15 @@ const GroupCompaniesPage = () => {
         severityType: 'success',
       });
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to update user sataus";
-
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
-    const updatedData = await fetchAllUser();
+    const updatedData = await fetchAllGroup();
     setData(updatedData);
   };
   const handleSubmit = async (e) => {
@@ -97,7 +92,7 @@ const GroupCompaniesPage = () => {
 
     const payload = {
       "GroupDescription": current?.group_description,
-      "GroupName": current?.group_name,
+      "GroupName": '',
       "CommonAttributes": {
         "Approved_By": "68480959d7038d326905b02c",
         "Created_By": "68480959d7038d326905b02c",
@@ -113,16 +108,13 @@ const GroupCompaniesPage = () => {
       } else {
         response = await createGroup(payload);
       }
-
       const message = response?.message;
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
       const updatedData = await fetchAllGroup();
       setData(updatedData);
     } catch (error) {
-      console.error("Error saving company:", error);
-      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: "Failed to save group", severityType: 'error' });
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
     }
-
     // Reset form state
     setCurrent({
       _id: null,
@@ -156,18 +148,11 @@ const GroupCompaniesPage = () => {
       });
     } catch (error) {
       console.error("Error deleting company:", error);
-
-      // Extract error message safely
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to delete company";
-
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
@@ -188,9 +173,6 @@ const GroupCompaniesPage = () => {
     const newIsActive = {
       "IsActive": e.target.checked
     };
-
-
-
     try {
       const response = await updateGroupStatusById(params.data._id, newIsActive);
       const message = response?.message || "Status update successfully"
@@ -203,16 +185,11 @@ const GroupCompaniesPage = () => {
       });
     } catch (error) {
       console.error("Error:", error);
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to delete company";
-
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }

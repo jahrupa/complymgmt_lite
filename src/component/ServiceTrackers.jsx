@@ -46,7 +46,7 @@ const ServiceTrackers = () => {
             service_tracker_description: ''
 
         });
-    console.log(current, 'current')
+    // console.log(current, 'current')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -82,7 +82,7 @@ const ServiceTrackers = () => {
         // if (!current?.location_name) tempErrors.location_name = "Location name is required";
         if (!current?.module_name) tempErrors.module_name = "Module name is required";
         if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
-        if (!current?.service_tracker_description) tempErrors.service_tracker_description = "Description name is required";
+        // if (!current?.service_tracker_description) tempErrors.service_tracker_description = "Description name is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -98,16 +98,11 @@ const ServiceTrackers = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to update service_tracker sataus";
-
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -122,8 +117,6 @@ const ServiceTrackers = () => {
             "ServiceTrackerDescription": current?.service_tracker_description,
             "SubModuleID": current?.sub_module_id,
             "ModuleID": current?.module_id,
-            // "LocationID": current?.location_id,
-            // "CompanyID": current?.company_id,
             "CommonAttributes": {
                 "Created_By": "688331c4d3f5ece9a3ad0065"
             }
@@ -133,8 +126,6 @@ const ServiceTrackers = () => {
             "ServiceTrackerDescription": current?.service_tracker_description,
             "SubModuleID": current?.sub_module_id,
             "ModuleID": current?.module_id,
-            // "LocationID": current?.location_id,
-            // "CompanyID": current?.company_id,
             "CommonAttributes": {
                 "Updated_By": "688331c4d3f5ece9a3ad0065"
             }
@@ -148,12 +139,11 @@ const ServiceTrackers = () => {
             }
 
             const message = response?.message;
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
             const updatedData = await fetchAllServiceTracker();
             setData(updatedData);
         } catch (error) {
-            console.error("Error saving service tracker:", error);
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: "Failed to save group", severityType: 'error' });
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
         }
         // Reset form state
         setCurrent({
@@ -173,7 +163,6 @@ const ServiceTrackers = () => {
         try {
             const response = await deleteServiceTrackerById(serviceTrackerId);
             const message = response?.message || "Group holding  successfully";
-
             // Refresh data
             const updatedData = await fetchAllServiceTracker();
             setData(updatedData);
@@ -187,19 +176,10 @@ const ServiceTrackers = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error deleting service tracker:", error);
-
-            // Extract error message safely
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete service tracker";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -231,17 +211,10 @@ const ServiceTrackers = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error:", error);
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete service tracker";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -286,22 +259,6 @@ const ServiceTrackers = () => {
         fetchData();
     }, []);
 
-
-    // // // module by location id
-    // useEffect(() => {
-    //     const fetchModuleByLocationId = async () => {
-    //         try {
-    //             const data = await fetchAllModulesName();
-    //             if (data) {
-    //                 setModuleName(data);
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to fetch location by location_id:", error);
-    //         }
-    //     };
-    //         fetchModuleByLocationId();
-    // }, []);
-
     // sub-module by module id
     useEffect(() => {
         const fetchSubModuleByModuleId = async () => {
@@ -335,71 +292,7 @@ const ServiceTrackers = () => {
                         error={!!errors.service_tracker_name}
                         helperText={errors.service_tracker_name}
                     />
-
-                    {/* <SingleSelectTextField
-                        name="group_name"
-                        label="Group Holding Name"
-                        value={current?.group_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedGroup = groupHoldingData.find(
-                                (g) => g.name === selectedName
-                            );
-                            setCurrent((prev) => ({
-                                ...prev,
-                                group_name: selectedName,
-                                group_holding_id: matchedGroup?._id || null,
-                                company_name: '',
-                            }));
-                        }}
-                        names={groupHoldingData}
-                        error={!!errors.group_name}
-                        helperText={errors.group_name}
-                    /> */}
-
                 </div>
-                {/* <div className='d-lg-flex d-md-flex gap-2'>
-                    <SingleSelectTextField
-                        name="company_name"
-                        label="Company"
-                        value={current?.company_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedGroup = companyNameByGroupHoldingId.find(
-                                (g) => g.name === selectedName
-                            );
-                            setCurrent((prev) => ({
-                                ...prev,
-                                company_name: selectedName,
-                                company_id: matchedGroup?._id || null,
-                            }));
-                        }}
-                        names={companyNameByGroupHoldingId}
-                        error={!!errors.company_name}
-                        helperText={errors.company_name}
-                    />
-                    <SingleSelectTextField name="location_name" label="Location"
-                        value={current?.location_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedLocation = locationNameByCompanyId.find(
-                                (g) => g.name === selectedName
-                            );
-                            setCurrent((prev) => ({
-                                ...prev,
-                                location_name: selectedName,
-                                location_id: matchedLocation?._id || null,
-                            }));
-                        }}
-                        names={locationNameByCompanyId}
-                        error={!!errors.location_name}
-                        helperText={errors.location_name}
-                    // isdisable={isEditing ? true : false}
-
-                    />
-
-
-                </div> */}
                 <div className='d-lg-flex d-md-flex gap-2'>
                     <SingleSelectTextField
                         name="module_name"
@@ -424,8 +317,6 @@ const ServiceTrackers = () => {
                         name="sub_module_name"
                         label="Sub-Module"
                         value={current?.sub_module_name}
-                        // onChange={(e) => setCurrent((prev) => ({ ...prev, sub_module_name: e.target.value, }))}
-
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = subModuleName.find(
@@ -443,7 +334,6 @@ const ServiceTrackers = () => {
                         }))}
                         error={!!errors.sub_module_name}
                         helperText={errors.sub_module_name}
-                    // isdisable={isEditing}
                     />
                 </div>
                 <MuiTextAreaField
@@ -451,8 +341,6 @@ const ServiceTrackers = () => {
                     handleChange={handleChange}
                     name='service_tracker_description'
                     label='Description'
-                    error={!!errors.service_tracker_description}
-                    helperText={errors.service_tracker_description}
                 />
 
                 <div className="row row-gap-2">

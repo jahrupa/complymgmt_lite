@@ -145,16 +145,10 @@ const LocationToModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to update location_to_module sataus";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -191,21 +185,14 @@ const LocationToModule = () => {
                 // Create new company
                 response = await createsLocationToModule(payload);
             }
-
             // ✅ Get the message from response
             const message = response?.message;
-            // Set snackbar with message
-            // setSnackbarMessage(message); // You'll need this state
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
-
             // Refresh data
             const updatedData = await fetchLocationToModuleModule();
             setData(updatedData);
         } catch (error) {
-            let errorMessage = error?.response?.data?.message
-            console.error("Error saving company:", error?.response?.data?.message);
-            // setSnackbarMessage("Failed to save company");
-            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: errorMessage, severityType: 'error' });
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
         }
 
         // Reset form state
@@ -241,16 +228,10 @@ const LocationToModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete";
-
-            // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }

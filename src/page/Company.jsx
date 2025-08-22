@@ -71,20 +71,15 @@ const Company = () => {
         severityType: 'success',
       });
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to update user sataus";
-
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
-    const updatedData = await fetchAllUser();
+    const updatedData = await fetchAllCompanies();
     setData(updatedData);
   };
   // Handle Add or Edit
@@ -110,20 +105,14 @@ const Company = () => {
         // Create new company
         response = await createCompany(payload);
       }
-
       // ✅ Get the message from response
       const message = response?.message;
-      // Set snackbar with message
-      // setSnackbarMessage(message); // You'll need this state
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
-
       // Refresh data
       const updatedData = await fetchAllCompanies();
       setData(updatedData);
     } catch (error) {
-      // console.error("Error saving company:", error);
-      // setSnackbarMessage("Failed to save company");
-      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
     }
 
     // Reset form state
@@ -159,20 +148,13 @@ const Company = () => {
         message,
         severityType: 'success',
       });
+      
     } catch (error) {
-      // console.error("Error deleting company:", error);
-
-      // Extract error message safely
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to delete company";
-
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
@@ -187,6 +169,7 @@ const Company = () => {
     setIsModalOpen(false);
     setErrors({})
     setCurrent({})
+    setIsEditing(false);
   };
 
 
@@ -261,6 +244,7 @@ const Company = () => {
               group_name: selectedName,
               group_holding_id: matchedGroup?._id || null,
             }));
+            setErrors(prevErrors => ({ ...prevErrors, group_name: '' }));
           }}
           names={groupHoldingName}
           error={!!errors.group_name}
@@ -398,15 +382,11 @@ const Company = () => {
     }
     ,
 
-    { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'company_common_name', headerName: 'Common Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'company_description', headerName: 'Company Desc', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    {
+     {
       field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
       headerName: 'Approval Status',
       editable: false,
@@ -447,6 +427,11 @@ const Company = () => {
         );
       }
     },
+    { field: 'company_description', headerName: 'Company Desc', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+   
     { field: 'common_attributes.approval_time', headerName: 'Status Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',

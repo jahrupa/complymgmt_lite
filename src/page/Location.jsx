@@ -4,15 +4,12 @@ import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -38,7 +35,7 @@ const Location = () => {
             state: '',
             location_description: ''
         });
-    console.log(current, 'company_name')
+    // console.log(current, 'company_name')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
@@ -49,6 +46,8 @@ const Location = () => {
         open: false,
         vertical: 'top',
         horizontal: 'center',
+        message: '',
+        severityType: '',
     });
     const [locationId, setLocationId] = useState(null);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
@@ -109,13 +108,12 @@ const Location = () => {
         const CommonAttributes = {
             [isEditing ? "Updated_By" : "Created_By"]: "68480959d7038d326905b02c"
         };
-
         const payload = {
             "GroupHoldingsID": current?.group_holding_id,
             "CompanyID": current?.company_id,
             "LocationName": current?.location_name,
             "LocationDescription": current?.location_description,
-            "City": '',
+            "City": current?.city,
             "State": current?.state,
             "CommonAttributes": CommonAttributes
         };
@@ -127,7 +125,7 @@ const Location = () => {
                 setIsSnackbarsOpen({
                     ...issnackbarsOpen,
                     open: true,
-                    message,
+                    message: message,
                     severityType: 'success',
                 });
             } else {
@@ -137,29 +135,29 @@ const Location = () => {
                 setIsSnackbarsOpen({
                     ...issnackbarsOpen,
                     open: true,
-                    message,
+                    message: message,
                     severityType: 'success',
                 });
             }
             // Refresh data
             const updatedData = await fetchAllLocation();
             setData(updatedData);
-            
-        // Reset form state
-        setCurrent({
-            company_id: null,
-            company_name: '',
-            group_name: '',
-            group_holding_id: null,
-            created_at: '',
-            updated_at: '',
-            location_description: '',
-        });
 
-        setIsEditing(false);
-        setIsModalOpen(false);
+            // Reset form state
+            setCurrent({
+                company_id: null,
+                company_name: '',
+                group_name: '',
+                group_holding_id: null,
+                created_at: '',
+                updated_at: '',
+                location_description: '',
+            });
+
+            setIsEditing(false);
+            setIsModalOpen(false);
         } catch (error) {
-            console.error("Error saving location:", error);
+            setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
         }
 
     };
@@ -182,19 +180,11 @@ const Location = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error deleting company:", error);
-
-            // Extract error message safely
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete company";
-
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -254,7 +244,7 @@ const Location = () => {
         };
         try {
             const response = await updateLocationStatusById(params.data._id, newIsActive);
-            const message = response?.message || "Status update successfully"
+            const message = response?.message
             // Show success snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -264,16 +254,11 @@ const Location = () => {
             });
         } catch (error) {
             console.error("Error:", error);
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete company";
-
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -298,6 +283,7 @@ const Location = () => {
                                 group_holding_id: matchedGroup._id || null,
                                 company_name: '',
                             }));
+                            setErrors(prevErrors => ({ ...prevErrors, group_name: '' }));
                         }}
                         names={groupHoldingData}
                         isdisable={isEditing}
@@ -314,12 +300,13 @@ const Location = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = companyNameByGroupHoldingId.find((g) => g.company_name === selectedName) || {};
-                            console.log(matchedGroup, 'matchedGroup')
+                            // console.log(matchedGroup, 'matchedGroup')
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
                                 company_id: matchedGroup._id || null,
                             }));
+                            setErrors(prevErrors => ({ ...prevErrors, company_name: '' }));
                         }}
                         names={companyNameByGroupHoldingId?.map((data) => ({
                             _id: data?._id,
@@ -415,6 +402,16 @@ const Location = () => {
         )
     }
 
+    const getRoleColorForFileStatus = (status) => {
+        switch (status) {
+            case 1:
+                return { color: '#4CAF50' }; // green
+            case 0:
+                return { color: '#F44336' }; // brown
+            default:
+                return { color: '#41464b' }; // gray
+        }
+    };
     const colDefs = [
         {
             headerName: 'Actions',
@@ -448,26 +445,55 @@ const Location = () => {
                         >
                             <DeleteIcon fontSize="small" className="action_icon" />
                         </button>
-                        {/* <button
-                            className="btn btn-sm"
-                            onClick={() => {
-                                setIsDeleteModalOpen(true);
-                                setLocationId(params.data._id)
-
-                            }}
-                        >
-                            <VisibilityIcon fontSize="small" className="action_icon" />
-                        </button> */}
                     </div>
                 );
             }
-        }
-        ,
-
-        { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        },
+        // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'city', headerName: 'City', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'state', headerName: 'State', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
+            field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
+            headerName: 'Approval Status',
+            editable: false,
+            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+            filter: true,
+            valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
+
+            cellRenderer: (params) => {
+                const getApprovalStatusText = (status) => {
+                    switch (status) {
+                        case 0: return 'Pending';
+                        case 1: return 'Approved';
+                        default: return '-'; // fallback
+                    }
+                };
+
+                const status = params.value;
+                const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+
+                return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={true}
+                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                        />
+                        <span
+                            style={{
+                                color,
+                                fontSize: '0.8rem',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {getApprovalStatusText(status)}
+                        </span>
+                    </div>
+                );
+            }
+        },
         { field: 'location_description', headerName: 'Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },

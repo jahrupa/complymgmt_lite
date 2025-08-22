@@ -647,7 +647,7 @@ export const createServiceTrackerSpecifics = async (payload) => {
 
 export const updateServiceTrackerByStatusId = async (id, payload) => {
   try {
-    const response = await API.get(`${GET_ALL_SERVICE_TRACKER_SHEET_DATA}${id}`, payload);
+    const response = await API.put(`${UPDATE_SERVICE_TRACKER_BY_STATUS_ID}${id}`, payload);
     return response.data;
   } catch (error) {
     console.error("Error update sevice tracker status:", error);

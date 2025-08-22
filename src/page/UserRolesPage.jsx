@@ -354,6 +354,18 @@ const UserRolesPage = () => {
         return { background: '#e2e3e5', color: '#41464b' }; // gray
     }
   };
+
+  
+  const getRoleColorForFileStatus = (status) => {
+    switch (status) {
+      case 1:
+        return { color: '#4CAF50' }; // green
+      case 0:
+        return { color: '#F44336' }; // brown
+      default:
+        return { color: '#41464b' }; // gray
+    }
+  };
   const colDefs = [
     {
       headerName: 'Actions',
@@ -387,20 +399,11 @@ const UserRolesPage = () => {
             >
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
-            {/* <button
-              className="btn btn-sm"
-              onClick={() => {
-                setUserId(params.data._id);
-                setIsDeleteModalOpen(true);
-              }}
-            >
-              <VisibilityIcon fontSize="small" className="action_icon" />
-            </button> */}
           </div>
         );
       }
     },
-    { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       field: 'role_name', width: 300, headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
@@ -427,6 +430,47 @@ const UserRolesPage = () => {
       }
     },
     { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+     {
+      field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
+      headerName: 'Approval Status',
+      editable: false,
+      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+      filter: true,
+      valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
+
+      cellRenderer: (params) => {
+        const getApprovalStatusText = (status) => {
+          switch (status) {
+            case 0: return 'Pending';
+            case 1: return 'Approved';
+            default: return '-'; // fallback
+          }
+        };
+
+        const status = params.value;
+        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input
+              type="checkbox"
+              checked={true}
+              readOnly // ✅ prevent manual toggle unless you implement onChange
+              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+            />
+            <span
+              style={{
+                color,
+                fontSize: '0.8rem',
+                fontWeight: 500,
+              }}
+            >
+              {getApprovalStatusText(status)}
+            </span>
+          </div>
+        );
+      }
+    },
     { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',

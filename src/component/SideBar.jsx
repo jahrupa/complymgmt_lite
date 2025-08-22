@@ -49,7 +49,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
         { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
-        { icon: (active) => <Cable className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
+        // { icon: (active) => <Cable className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
     ];
 
     const documentSubItems = [
