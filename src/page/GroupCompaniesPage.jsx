@@ -317,7 +317,7 @@ const GroupCompaniesPage = () => {
         );
       }
     },
-    { field: '_id', headerName: 'ID', filter: true, editable: false, },
+    // { field: '_id', headerName: 'ID', filter: true, editable: false, },
     { field: 'group_name', headerName: 'Group Name', filter: true, editable: false, },
     { field: 'group_description', headerName: 'Group Description', filter: true, editable: false, },
     {
