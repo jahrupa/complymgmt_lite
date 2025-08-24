@@ -15,6 +15,7 @@ export const DELETE_USER_BY_ID ='/api/v1/user/delete/';
 export const CREATE_USER ='/api/v1/user/create';
 export const UPDATE_USER_BY_ID ='/api/v1/user/update/';
 export const UPDATE_USER_STATUS_BY_ID='/api/v1/user/update/status/';
+export const UPDATE_USER_APPROVAL_STATUS_BY_ID='/api/v1/user/update/approval_status/';
 
 // Company
 export const CREATE_COMPANY ='/api/v1/company/create';

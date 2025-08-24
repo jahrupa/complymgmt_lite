@@ -8,7 +8,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import PasswordInput from '../component/MuiInputs/PasswordInput';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, deleteUserById, createUser, updateUserById, updateUserStatusId, bulkApproveAllPageData } from '../api/service';
+import { fetchAllUser, deleteUserById, createUser, updateUserById, updateUserStatusId, bulkApproveAllPageData, updateUserApprovalStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -165,7 +165,7 @@ const UserRolesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setErrors({});
-      setCurrent({
+    setCurrent({
       full_name: '',
       email: '',
       username: '',
@@ -261,7 +261,7 @@ const UserRolesPage = () => {
   const handleApproveAll = async () => {
     try {
       const response = await bulkApproveAllPageData('user');
-      const message = response?.message 
+      const message = response?.message
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -287,7 +287,7 @@ const UserRolesPage = () => {
     };
     try {
       const response = await updateUserStatusId(params.data._id, newIsActive);
-      const message = response?.message 
+      const message = response?.message
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -343,7 +343,7 @@ const UserRolesPage = () => {
     }
   };
 
-  
+
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
       case 1:
@@ -354,6 +354,23 @@ const UserRolesPage = () => {
         return { color: '#41464b' }; // gray
     }
   };
+
+  const handleCheckboxClick = async (rowId) => {
+    console.log("Checkbox clicked with status:", rowId);
+    const response = await updateUserApprovalStatusById(rowId);
+    const message = response?.message
+    
+    setIsSnackbarsOpen({
+      ...issnackbarsOpen,
+      open: true,
+      message,
+      severityType: 'success',
+    });
+
+    const updatedData = await fetchAllUser();
+    setData(updatedData);
+  };
+
   const colDefs = [
     {
       headerName: 'Actions',
@@ -418,7 +435,7 @@ const UserRolesPage = () => {
       }
     },
     { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-     {
+    {
       field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
       headerName: 'Approval Status',
       editable: false,
@@ -442,9 +459,12 @@ const UserRolesPage = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <input
               type="checkbox"
-              checked={true}
-              readOnly // ✅ prevent manual toggle unless you implement onChange
+              // checked={true}
+              // readOnly // ✅ prevent manual toggle unless you implement onChange
+              checked={status === 1}
+              readOnly={status === 1}
               style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{

@@ -73,7 +73,8 @@ import {
   UPDATE_SERVICE_TRACKER_DATA,
   BULK_APPROVE_ALL_SERVICE_TRACKER_DATA,
   APPROVE_ALL_BY_ENTITY_TYPE,
-  GET_ALL_SERVICE_TRACKER_SHEET_DATA
+  GET_ALL_SERVICE_TRACKER_SHEET_DATA,
+  UPDATE_USER_APPROVAL_STATUS_BY_ID
 
 } from "./Endpoint";
 // Login Api
@@ -362,6 +363,15 @@ export const updateUserStatusId = async (id, userData) => {
   }
 };
 
+export const updateUserApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_USER_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user approval status:", error);
+    throw error;
+  }
+};
 
 // user role API
 export const fetchAllRole = async () => {
