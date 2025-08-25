@@ -4,15 +4,10 @@ import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
-import SmallSizeModal from '../component/SmallSizeModal';
-import { bulkApproveAllPageData, createGroup, createServiceTracker, deleteGroupById, deleteServiceTrackerById, fetchAllGroup, fetchAllGroupHolding, fetchAllModulesName, fetchAllModulesNameByLocationId, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, getLocationByCompanyId, updateGroupById, updateGroupStatusById, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
+import { bulkApproveAllPageData, createServiceTracker, deleteServiceTrackerById, fetchAllGroupHolding, fetchAllModulesName, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
-
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -60,13 +55,10 @@ const ServiceTrackers = () => {
     });
     const [serviceTrackerId, setServiceTrackerId] = useState(null)
     const [groupHoldingData, setGroupHoldingData] = useState([]);
-    const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
-    const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
     const [moduleName, setModuleName] = useState([]);
     const [subModuleName, setSubModuleName] = useState([]);
-
-
     const navigate = useNavigate();
+
     // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -77,12 +69,8 @@ const ServiceTrackers = () => {
     const validate = () => {
         let tempErrors = {};
         if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Tracker name is required";
-        // if (!current?.group_name) tempErrors.group_name = "Group holding name is required";
-        // if (!current?.company_name) tempErrors.company_name = "Company name is required";
-        // if (!current?.location_name) tempErrors.location_name = "Location name is required";
         if (!current?.module_name) tempErrors.module_name = "Module name is required";
         if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
-        // if (!current?.service_tracker_description) tempErrors.service_tracker_description = "Description name is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -416,7 +404,6 @@ const ServiceTrackers = () => {
                 );
             }
         },
-        // { field: '_id', headerName: 'ID', filter: true, editable: false, },
         {
             field: 'service_tracker_name',
             headerName: 'Service Tracker Name',
@@ -557,11 +544,8 @@ const ServiceTrackers = () => {
                         pagination={true}
                         // rowBuffer={rowBuffer}
                         onRowValueChanged={onRowValueChanged}
-
                     />
                 </div>
-
-
             </div>
         </div>
     );

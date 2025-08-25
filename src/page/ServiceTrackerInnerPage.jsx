@@ -8,9 +8,6 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-
-// Register modules
-ModuleRegistry.registerModules([AllCommunityModule]);
 import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
@@ -18,28 +15,22 @@ import { bulkApproveAllServiceTrackerData, fetchAllInnerPageServiceTracker, fetc
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
+import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
+
+// Register modules
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
-    const [current, setCurrent] = useState({
-        sheet_name: '',
-        sheet_id: null,
-        isFilteredData: false,
-
-    });
-    console.log(current, 'current')
-    const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
-
-    // console.log(columnDefs, 'columnDefs')
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
     const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState(null);
     const [trackerId, setTrackerId] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    console.log(isDeleteModalOpen, isModalOpen, 'isDeleteModalOpen')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -47,12 +38,25 @@ const ServiceTrackerInnerPage = () => {
         message: '',
         severityType: '',
     });
-    const [uploadStatus, setUploadStatus] = useState("idle"); // idle | pending | success | error
+    const [current, setCurrent] = useState({
+        sheet_name: '',
+        sheet_id: null,
+        isFilteredData: false,
+
+    });
+    const [uploadStatus, setUploadStatus] = useState("idle");
+    const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
     const gridRef = useRef();
     const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setIsEditing(false);
+        setEditData(null);
+    };
     const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
     const currentUser = localStorage.getItem('user_id');
+    const navigate = useNavigate();
+
     const defaultColDef = {
         sortable: true,
         filter: true,
@@ -64,28 +68,19 @@ const ServiceTrackerInnerPage = () => {
     // Handle Delete
     const handleDelete = async (userId) => {
         try {
-            // Find the full data row for the given userId
             const rowToDelete = rowData.find((row) => row._id === userId);
             if (!rowToDelete) {
                 throw new Error("Row not found for deletion.");
             }
-            // Add delete-related fields dynamically
             const deletePayload = {
                 ...rowToDelete,
                 is_deleted: true,
             };
-
-            // Send the updated object to the backend
             const response = await updateServiceTrackerData(userId, formattedTrackerName, deletePayload);
-
             const message = response?.message || "Deleted successfully";
-
-            // Refresh the data
             const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
             setRowData(updatedData);
             setIsDeleteModalOpen(false);
-
-            // Show success notification
             setIsSnackbarsOpen({
                 open: true,
                 message,
@@ -93,15 +88,9 @@ const ServiceTrackerInnerPage = () => {
                 vertical: 'top',
                 horizontal: 'center'
             });
-
         } catch (error) {
             console.error("Error deleting user:", error);
-
-            const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to delete user";
-
+            const errorMessage = error?.response?.data?.message || error?.message || "Failed to delete user";
             setIsSnackbarsOpen({
                 open: true,
                 message: errorMessage,
@@ -111,27 +100,20 @@ const ServiceTrackerInnerPage = () => {
             });
         }
     };
-    // console.log(rowData, 'rowData')
+
+    // Handle Toggle
     const handleToggleChange = async (e, userId) => {
         try {
             const row = rowData.find((r) => r._id === userId);
-            console.log(row, userId, rowData, 'row')
             if (!row) throw new Error("Row not found");
-
             const updatedPayload = {
                 ...row,
-                is_active: !row.is_active, // toggle the value
-                // updated_by: localStorage.getItem("user_id"),
-                // updated_at: new Date().toISOString()
+                is_active: !row.is_active,
             };
-
             const response = await updateServiceTrackerData(userId, formattedTrackerName, updatedPayload);
-
             const message = response?.message || "Status updated";
-
             const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
             setRowData(updatedData);
-
             setIsSnackbarsOpen({
                 open: true,
                 message,
@@ -139,10 +121,8 @@ const ServiceTrackerInnerPage = () => {
                 vertical: 'top',
                 horizontal: 'center'
             });
-
         } catch (error) {
             const errorMessage = error?.response?.data?.message || error.message || "Update failed";
-
             setIsSnackbarsOpen({
                 open: true,
                 message: errorMessage,
@@ -152,12 +132,13 @@ const ServiceTrackerInnerPage = () => {
             });
         }
     };
+
+    // Fetch and Set Tracker Data
     const fetchAndSetTrackerData = async (trackerName) => {
         try {
             const response = await fetchAllInnerPageServiceTracker(trackerName);
             setRowData(response || []);
             const dataSample = response?.[0] || {};
-
             const dynamicCols = Object.keys(dataSample).map((key) => {
                 if (key === 'approval_status' && dataSample.approval_status !== undefined) {
                     return {
@@ -194,7 +175,6 @@ const ServiceTrackerInnerPage = () => {
                         }
                     };
                 }
-
                 if (key === 'is_active') {
                     return {
                         headerName: 'Status',
@@ -208,10 +188,8 @@ const ServiceTrackerInnerPage = () => {
                                 onChange={(e) => handleToggleChange(e, params.data._id)}
                             />
                         )
-
                     };
                 }
-
                 return {
                     headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
                     field: key,
@@ -219,7 +197,6 @@ const ServiceTrackerInnerPage = () => {
                     minWidth: 150,
                 };
             });
-
             const actionCol = {
                 headerName: 'Actions',
                 field: 'actions',
@@ -230,7 +207,12 @@ const ServiceTrackerInnerPage = () => {
                 editable: false,
                 cellRenderer: (params) => (
                     <div className="d-flex gap-2">
-                        <button className="btn btn-sm" onClick={() => setIsEditing(true)}>
+                        <button className="btn btn-sm" onClick={() => {
+                            setEditData(params.data);
+                            setTrackerId(params.data._id);
+                            setIsEditing(true);
+                            setIsModalOpen(true);
+                        }}>
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>
                         <button className="btn btn-sm" onClick={() => {
@@ -242,32 +224,30 @@ const ServiceTrackerInnerPage = () => {
                     </div>
                 )
             };
-
             setColumnDefs([...dynamicCols, actionCol]);
         } catch (error) {
             console.error("Error fetching tracker data:", error);
         }
     };
 
+    // Handle File Change
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setFileName(file || '');
     };
 
-
+    // Handle File Upload
     const handleFileUpload = async () => {
         if (!fileName) {
             alert("Please select a file.");
             return;
         }
-
         const metadata = {
             bo_user_id: currentUser,
             tracker_name: trackerName,
         };
-
         try {
-            setUploadStatus("pending"); // Set to pending before the request starts
+            setUploadStatus("pending");
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -275,21 +255,19 @@ const ServiceTrackerInnerPage = () => {
                 severityType: 'info',
             });
             const result = await uploadExcelFile([fileName], metadata);
-            setUploadStatus("success"); // Success status
+            setUploadStatus("success");
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
                 message: result?.message,
                 severityType: 'success',
             });
-
             const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
             setRowData(response || []);
             await fetchAndSetTrackerData(formattedTrackerName);
             setIsModalOpen(false);
         } catch (error) {
-            setUploadStatus("error"); // Error status
-
+            setUploadStatus("error");
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -299,28 +277,62 @@ const ServiceTrackerInnerPage = () => {
         }
     };
 
+    // Handle Approve All
     const handleApproveAll = async () => {
         try {
             const response = await bulkApproveAllServiceTrackerData(formattedTrackerName);
-            const message = response?.message || "Status update successfully"
-            // Show success snackbar
+            const message = response?.message || "Status updated successfully";
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
                 message,
                 severityType: 'success',
             });
+            const responseData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            setRowData(responseData || []);
+            await fetchAndSetTrackerData(formattedTrackerName);
         } catch (error) {
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: error?.response?.data?.message,
+                message: error?.response?.data?.message || "Approval failed.",
                 severityType: 'error',
             });
         }
-        const response = await fetchAllInnerPageServiceTracker(formattedTrackerName);
-        setRowData(response || []);
-        await fetchAndSetTrackerData(formattedTrackerName);
+    };
+
+    // Handle Edit Submission
+    const handleEditSubmit = async () => {
+        try {
+            const response = await updateServiceTrackerData(trackerId, formattedTrackerName, editData);
+            const message = response?.message || "Tracker updated successfully";
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            setRowData(updatedData);
+            setIsModalOpen(false);
+            setIsEditing(false);
+            setEditData(null);
+            setIsSnackbarsOpen({
+                open: true,
+                message,
+                severityType: 'success',
+                vertical: 'top',
+                horizontal: 'center'
+            });
+        } catch (error) {
+            const errorMessage = error?.response?.data?.message || error.message || "Update failed";
+            setIsSnackbarsOpen({
+                open: true,
+                message: errorMessage,
+                severityType: 'error',
+                vertical: 'top',
+                horizontal: 'center'
+            });
+        }
+    };
+
+    // Handle Edit Input Change
+    const handleEditChange = (e, key) => {
+        setEditData({ ...editData, [key]: e.target.value });
     };
 
     const onRowValueChanged = (event) => {
@@ -334,27 +346,26 @@ const ServiceTrackerInnerPage = () => {
         );
     }, []);
 
-    const deleteModal = () => {
-        return (
-            <div>
-                <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this tracker?
+    const deleteModal = () => (
+        <div>
+            <div className='delete_message p-4'>
+                Are you sure you want to delete <DeleteIcon className='action_icon' /> this tracker?
+            </div>
+            <div className="row row-gap-2 mt-4">
+                <div className='col-6'>
+                    <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}>
+                        <span className='button-style'>Cancel</span>
+                    </button>
                 </div>
-
-                <div className="row row-gap-2 mt-4">
-                    <div className='col-6'>
-                        <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
-                    </div>
-                    <div className='col-6 d-flex justify-content-end'>
-                        <button type="submit"
-                            className="btn-sm btn btn-primary"
-                            onClick={() => handleDelete(trackerId)}>Yes, I'm sure</button>
-                    </div>
+                <div className='col-6 d-flex justify-content-end'>
+                    <button type="submit" className="btn-sm btn btn-primary" onClick={() => handleDelete(trackerId)}>
+                        Yes, I'm sure
+                    </button>
                 </div>
             </div>
-        )
+        </div>
+    );
 
-    }
     const fileUploadForm = () => (
         <div>
             <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
@@ -370,7 +381,6 @@ const ServiceTrackerInnerPage = () => {
                         onChange={handleFileChange}
                     />
                 </div>
-
                 {fileName ? (
                     <div className="mt-4 uploaded_file_name">
                         <span><FilePresentIcon /></span>
@@ -382,7 +392,6 @@ const ServiceTrackerInnerPage = () => {
                     </div>
                 )}
             </div>
-
             <div className="row row-gap-2">
                 <div className="col-12 col-md-6">
                     <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
@@ -394,8 +403,41 @@ const ServiceTrackerInnerPage = () => {
         </div>
     );
 
-    const crudTitle = "Upload File";
-    // Helper for status color
+    const editServiceTracker = () => (
+        <div className="p-3">
+            <div className="mb-3">
+                {editData && Object.keys(editData).map((key) => {
+                    // Skip certain fields
+                    if (['_id', 'created_at', 'updated_at', 'deleted_at', 'is_deleted', 'is_active'].includes(key)) {
+                        return null;
+                    }
+                    return (
+                        <div key={key} className="mb-3">
+                            <label className="form-label">
+                                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={editData[key] || ''}
+                                onChange={(e) => handleEditChange(e, key)}
+                                disabled={key === 'approval_status' || key === 'approval_status_by_karma'}
+                            />
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="row row-gap-2">
+                <div className="col-12 col-md-6">
+                    <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
+                </div>
+                <div className="col-12 col-md-6">
+                    <button type="submit" className="btn btn-primary w-100" onClick={handleEditSubmit}>Save</button>
+                </div>
+            </div>
+        </div>
+    );
+
     const getRoleColorForFileStatus = (status) => {
         switch (status) {
             case 0: return { color: 'orange' };
@@ -403,11 +445,13 @@ const ServiceTrackerInnerPage = () => {
             default: return { color: 'gray' };
         }
     };
+
     useEffect(() => {
         if (formattedTrackerName) {
             fetchAndSetTrackerData(formattedTrackerName);
         }
     }, [formattedTrackerName]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -429,13 +473,20 @@ const ServiceTrackerInnerPage = () => {
 
         fetchData();
     }, [current]);
-    const navigate = useNavigate();
 
     return (
         <div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} uploadStatus={uploadStatus} />
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Tracker' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle="Edit Uploaded File" isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
+            <SmallSizeModal
+                crudForm={isEditing ? editServiceTracker : fileUploadForm}
+                crudTitle={isEditing ? 'Edit Tracker' : 'Upload File'}
+                isEditing={isEditing}
+                editCrudTitle="Edit Tracker"
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                closeModal={closeModal}
+            />
             <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
                 <div className="notification-page-title">
                     <button
@@ -446,8 +497,6 @@ const ServiceTrackerInnerPage = () => {
                     </button>
                     <div>
                         <h1>{trackerName}</h1>
-                    </div>
-                    <div>
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
@@ -470,45 +519,44 @@ const ServiceTrackerInnerPage = () => {
             <div className="client-onboarding-2">
                 <div className="table_div p-3">
                     <div className='d-lg-flex d-md-flex  justify-content-between'>
- <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                    <div className='w-25'>
-                        <SingleSelectTextField
-                            name="sheet_name"
-                            label="Sheet Name"
-                            value={current?.sheet_name || ''}
-                            onChange={async (e) => {
-                                const selectedName = e.target.value;
-                                setCurrent((prev) => ({
-                                    ...prev,
-                                    sheet_name: selectedName,
-                                    isFilteredData: selectedName ? true : false // Set to true to indicate filtered data
-                                }));
+                        <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                        <div className='w-25'>
+                            <SingleSelectTextField
+                                name="sheet_name"
+                                label="Sheet Name"
+                                value={current?.sheet_name || ''}
+                                onChange={async (e) => {
+                                    const selectedName = e.target.value;
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        sheet_name: selectedName,
+                                        isFilteredData: selectedName ? true : false // Set to true to indicate filtered data
+                                    }));
 
-                                if (selectedName) {
-                                    try {
-                                        const filterUpdateData = await fetchAllInnerPageServiceTracker(
-                                            formattedTrackerName,
-                                            selectedName
-                                        );
-                                        setRowData(filterUpdateData);
-                                    } catch (error) {
-                                        console.error("Error fetching service tracker data:", error);
+                                    if (selectedName) {
+                                        try {
+                                            const filterUpdateData = await fetchAllInnerPageServiceTracker(
+                                                formattedTrackerName,
+                                                selectedName
+                                            );
+                                            setRowData(filterUpdateData);
+                                        } catch (error) {
+                                            console.error("Error fetching service tracker data:", error);
+                                        }
                                     }
+                                }}
+                                names={
+                                    serviceTrackerSheet?.map((data) => ({
+                                        _id: data?.name,
+                                        name: data?.name
+                                    })) || []
                                 }
-                            }}
-                            names={
-                                serviceTrackerSheet?.map((data) => ({
-                                    _id: data?.name,
-                                    name: data?.name
-                                })) || []
-                            }
-                        />
+                            />
 
 
-                        {/* <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} /> */}
+                            {/* <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} /> */}
+                        </div>
                     </div>
-                    </div>
-                   
                     <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                         <AgGridReact
                             theme="legacy"
@@ -525,7 +573,7 @@ const ServiceTrackerInnerPage = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default ServiceTrackerInnerPage
+export default ServiceTrackerInnerPage;
