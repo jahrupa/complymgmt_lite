@@ -12,7 +12,7 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { bulkApproveAllPageData, createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllServiceTrackerSheetData, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById } from '../api/service';
+import { bulkApproveAllPageData, createUserAccessLevel, deleteUserAccessLevelById, fetchAllAccessTypes, fetchAllGroupHolding, fetchAllInnerPageServiceTracker, fetchAllModule, fetchAllModulesNameByLocationId, fetchAllPages, fetchAllServiceTracker, fetchAllServiceTrackerSheetData, fetchAllSubModuleNameByModuleId, fetchAllUser, fetchAllUserAccessLevels, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, fetchUserAccessById, getLocationByCompanyId, toggleUserAccessLevelStatus, updateUserAccessLevelById, approveUserAccess } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
@@ -133,8 +133,8 @@ const AccessControl = () => {
         setData(updatedData);
     };
 
-    
-      const validate = () => {
+
+    const validate = () => {
         const tempErrors = {};
         if (!current.user_name) tempErrors.user_name = 'User Name is required';
         if (!current.access_type) tempErrors.access_type = 'Access Type is required';
@@ -926,6 +926,29 @@ const AccessControl = () => {
         }
     };
 
+    const handleCheckboxClick = async (id) => {
+        try {
+            const response = await approveUserAccess(id);
+            const message = response?.message
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllSubModule();
+        setData(updatedData);
+    };
 
     const colDefs = [
         {
@@ -985,9 +1008,10 @@ const AccessControl = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
                             type="checkbox"
-                            checked={true}
-                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            checked={status === 1}
+                            readOnly={status === 1}
                             style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                            onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
                         />
                         <span
                             style={{

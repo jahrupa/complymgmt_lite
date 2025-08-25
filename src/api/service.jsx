@@ -80,7 +80,9 @@ import {
   UPDATE_COMPANY_LOCATION_APPROVAL_STATUS_BY_ID,
   UPDATE_MODULE_APPROVAL_STATUS_BY_ID,
   UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID,
-  UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID
+  UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID,
+  APPROVE_USER_ACCESS,
+  UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID
 
 } from "./Endpoint";
 // Login Api
@@ -731,6 +733,16 @@ export const fetchAllServiceTrackerSheetData = async (trackerName) => {
   }
 };
 
+export const updateServiceTrackerApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating service tracker approval status:", error);
+    throw error;
+  }
+};
+
 // location To Module
 
 export const fetchLocationToModuleModule = async () => {
@@ -900,6 +912,16 @@ export const toggleUserAccessLevelStatus = async (id, status) => {
     return response.data;
   } catch (error) {
     console.error("Error toggling user access level status:", error);
+    throw error;
+  }
+};
+
+export const approveUserAccess = async (id) => {
+  try {
+    const response = await API.put(`${APPROVE_USER_ACCESS}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error approving user access:", error);
     throw error;
   }
 };

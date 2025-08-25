@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
-import { bulkApproveAllPageData, createServiceTracker, deleteServiceTrackerById, fetchAllGroupHolding, fetchAllModulesName, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, updateServiceTrackerById, updateServiceTrackerByStatusId } from '../api/service';
+import { bulkApproveAllPageData, createServiceTracker, deleteServiceTrackerById, fetchAllGroupHolding, fetchAllModulesName, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, updateServiceTrackerById, updateServiceTrackerByStatusId, updateServiceTrackerApprovalStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 import { AgGridReact } from 'ag-grid-react';
@@ -374,6 +374,31 @@ const ServiceTrackers = () => {
                 return { color: '#41464b' }; // gray
         }
     };
+
+    const handleCheckboxClick = async (id) => {
+        try {
+            const response = await updateServiceTrackerApprovalStatusById(id, { "ApprovalStatus": 1 });
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllServiceTracker();
+        setData(updatedData);
+    };
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -448,9 +473,10 @@ const ServiceTrackers = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
                             type="checkbox"
-                            checked={true}
-                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            checked={status === 1}
+                            readOnly={status === 1}
                             style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                            onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
                         />
                         <span
                             style={{

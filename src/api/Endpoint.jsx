@@ -68,6 +68,7 @@ export const UPDATE_SUB_MODULE_STATUS_BY_ID='/api/v1/submodule/update/status/';
 export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/api/v1/submodule/view/module/multiple/';
 export const UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID = '/api/v1/submodule/update/approval_status/';
 
+
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/api/v1/service_tracker/view/multiple';
 export const GET_ALL_INNER_PAGE_SERVICE_TRACKER='/api/v1/service_tracker/view';
@@ -82,6 +83,7 @@ export const UPDATE_SERVICE_TRACKER_DATA ='api/v1/service_tracker/update/';
 export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/update/approve/bulk/';
 // export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
+export const UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID = '/api/v1/service_tracker/update/approval_status/';
 
 
 
@@ -111,6 +113,7 @@ export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
 export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
+export const APPROVE_USER_ACCESS = "/api/v1/user_access/update/approve/";
 
 // Common API
 export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';
