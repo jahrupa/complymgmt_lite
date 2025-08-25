@@ -128,9 +128,10 @@
 .table_div {
     /* background-color: #bdbdbd40; */
     background-color: white;
-
     border-radius: 10px;
     box-shadow: 0 1px 15px 1px rgba(62, 57, 107, .07);
+    overflow: hidden;
+    animation: slideIn 0.6s ease-out;
 }
 .table_td{
     background: #d5e1e7;
@@ -306,6 +307,8 @@
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     border: 1px solid var(--gray-100);
+    overflow: hidden;
+    animation: slideIn 0.6s ease-out;
 }
 @media screen and (max-width: 480px) {
     .text_area_field {
