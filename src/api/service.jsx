@@ -74,7 +74,13 @@ import {
   BULK_APPROVE_ALL_SERVICE_TRACKER_DATA,
   APPROVE_ALL_BY_ENTITY_TYPE,
   GET_ALL_SERVICE_TRACKER_SHEET_DATA,
-  UPDATE_USER_APPROVAL_STATUS_BY_ID
+  UPDATE_USER_APPROVAL_STATUS_BY_ID,
+  UPDATE_GROUP_APPROVAL_STATUS_BY_ID,
+  UPDATE_COMPANY_APPROVAL_STATUS_BY_ID,
+  UPDATE_COMPANY_LOCATION_APPROVAL_STATUS_BY_ID,
+  UPDATE_MODULE_APPROVAL_STATUS_BY_ID,
+  UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID,
+  UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID
 
 } from "./Endpoint";
 // Login Api
@@ -158,6 +164,7 @@ export const deleteCompanyById = async (id) => {
     throw error;
   }
 };
+
 export const getCompanyByGroupId = async (id) => {
   try {
     const response = await API.get(`${GET_COMPANY_BY_GROUP_HOLDING_ID}${id}`);
@@ -168,7 +175,15 @@ export const getCompanyByGroupId = async (id) => {
   }
 };
 
-
+export const updateCompanyApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_COMPANY_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating company approval status:", error);
+    throw error;
+  }
+};
 
 // Group Holding Api
 export const fetchAllGroupHolding = async () => {
@@ -263,6 +278,16 @@ export const getLocationByCompanyId = async (id) => {
   }
 };
 
+export const updateCompanyLocationApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_COMPANY_LOCATION_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating company location approval status:", error);
+    throw error;
+  }
+};
+
 // Group Holding
 export const fetchAllGroup = async () => {
   try {
@@ -300,6 +325,16 @@ export const deleteGroupById = async (id) => {
     return response.data;
   } catch (error) {
     console.error("Error deleting company:", error);
+    throw error;
+  }
+};
+
+export const updateGroupApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_GROUP_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating group approval status:", error);
     throw error;
   }
 };
@@ -498,6 +533,16 @@ export const deleteModuleById = async (id, moduleData) => {
   }
 };
 
+export const updateModuleApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_MODULE_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating module approval status:", error);
+    throw error;
+  }
+}
+
 // Sub-Module
 
 export const fetchAllSubModule = async () => {
@@ -556,6 +601,15 @@ export const deleteSubModuleById = async (id) => {
   }
 };
 
+export const updateApprovalStatusSubModulesById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating sub module approval status:", error);
+    throw error;
+  }
+}
 
 // Service Tracker
 export const fetchAllServiceTracker = async () => {
@@ -726,6 +780,17 @@ export const deleteLocationToModuleByStatusId = async (id, payload) => {
     throw error;
   }
 };
+
+export const updateLocationToModulesApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating location to module approval status:", error);
+    throw error;
+  }
+};
+
 // File upload
 export const uploadFile = async (filesArray) => {
   try {

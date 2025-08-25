@@ -23,7 +23,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DeleteModal from '../component/DeleteModal';
-import { bulkApproveAllPageData, createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById } from '../api/service';
+import { bulkApproveAllPageData, createsSubModule, deleteSubModuleById, fetchAllModulesName, fetchAllSubModule, updateSubModuleById, updateSubModuleStatusById, updateSubModuleApprovalStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
@@ -305,6 +305,31 @@ const SubModule = () => {
                 return { color: '#41464b' }; // gray
         }
     };
+
+    const handleCheckboxClick = async (id) => {
+        try {
+            const response = await updateSubModuleApprovalStatusById(id);
+            const message = response?.message
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',
+            });
+        } catch (error) {
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllSubModule();
+        setData(updatedData);
+    };
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -394,9 +419,10 @@ const SubModule = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
                             type="checkbox"
-                            checked={true}
-                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            checked={status === 1}
+                            readOnly={status === 1}
                             style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                            onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
                         />
                         <span
                             style={{

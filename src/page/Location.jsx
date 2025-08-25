@@ -7,7 +7,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById } from '../api/service';
+import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -202,7 +202,6 @@ const Location = () => {
         setIsEditing(false);
     };
 
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -381,6 +380,7 @@ const Location = () => {
 
     const crudTitle = "Add company Location"
     const editCrudTitle = "Edit Location"
+
     const deleteModal = () => {
         return (
             <div>
@@ -412,6 +412,22 @@ const Location = () => {
                 return { color: '#41464b' }; // gray
         }
     };
+
+    const handleCheckboxClick = async (rowId) => {
+        const response = await updateCompanyApprovalStatusById(rowId);
+        const message = response?.message
+
+        setIsSnackbarsOpen({
+            ...issnackbarsOpen,
+            open: true,
+            message,
+            severityType: 'success',
+        });
+
+        const updatedData = await fetchAllLocation();
+        setData(updatedData);
+    };
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -477,9 +493,10 @@ const Location = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
                             type="checkbox"
-                            checked={true}
-                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            readOnly={status === 1}
+                            checked={status === 1}
                             style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                            onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
                         />
                         <span
                             style={{

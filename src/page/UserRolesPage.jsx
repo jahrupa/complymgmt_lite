@@ -32,6 +32,9 @@ const UserRolesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const crudTitle = "Add New User Form"
+  const editCrudTitle = "Edit User"
+  const [errors, setErrors] = useState({});
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -39,7 +42,7 @@ const UserRolesPage = () => {
     message: '',
     severityType: '',
   });
-  const [errors, setErrors] = useState({});
+
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -173,6 +176,7 @@ const UserRolesPage = () => {
       user_description: ''
     });
   };
+
   useEffect(() => {
     const fetchData = async () => {
       const [userData] = await Promise.allSettled([
@@ -256,8 +260,7 @@ const UserRolesPage = () => {
     )
 
   }
-  const crudTitle = "Add New User Form"
-  const editCrudTitle = "Edit User"
+  
   const handleApproveAll = async () => {
     try {
       const response = await bulkApproveAllPageData('user');
@@ -307,6 +310,7 @@ const UserRolesPage = () => {
     const updatedData = await fetchAllUser();
     setData(updatedData);
   };
+
   const deleteModal = () => {
     return (
       <div>
@@ -328,6 +332,7 @@ const UserRolesPage = () => {
     )
 
   }
+
   const getRoleColor = (role) => {
     switch (role) {
       case 'Admin':
@@ -343,7 +348,6 @@ const UserRolesPage = () => {
     }
   };
 
-
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
       case 1:
@@ -356,7 +360,6 @@ const UserRolesPage = () => {
   };
 
   const handleCheckboxClick = async (rowId) => {
-    console.log("Checkbox clicked with status:", rowId);
     const response = await updateUserApprovalStatusById(rowId);
     const message = response?.message
     
@@ -513,16 +516,20 @@ const UserRolesPage = () => {
 
 
   ];
+
   const gridRef = useRef();
+
   const defaultColDef = {
     sortable: true,
     filter: true,
     editable: true,
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
+
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
+  
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       'quickFilterText',
