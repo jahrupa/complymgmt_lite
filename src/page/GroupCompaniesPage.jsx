@@ -92,7 +92,7 @@ const GroupCompaniesPage = () => {
 
     const payload = {
       "GroupDescription": current?.group_description,
-      "GroupName": '',
+      "GroupName": current?.group_name,
       "CommonAttributes": {
         "Approved_By": "68480959d7038d326905b02c",
         "Created_By": "68480959d7038d326905b02c",

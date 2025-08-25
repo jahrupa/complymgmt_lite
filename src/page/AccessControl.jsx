@@ -5,9 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
 import { AgGridReact } from 'ag-grid-react';
@@ -57,17 +55,12 @@ const AccessControl = () => {
     const [subModuleName, setSubModuleName] = useState([]);
     const [locationToModule, setLocationToModule] = useState([]);
     const [userNameListRes, setUserNameListRes] = useState([]);
-    // console.log(current, 'current');
-    // console.log(userNameListRes, 'userNameListRes')
-
     const [errors, setErrors] = useState({});
-
     const [accessTypeList, setAccessTypeList] = useState([]);
     const [allPageList, setAllPageList] = useState([]);
     const [allServiceTrackerList, setAllServiceTrackerList] = useState([]);
     const [allInnerPageServiceTrackerList, setAllInnerPageServiceTrackerList] = useState([]);
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
-    // console.log(serviceTrackerSheet, 'serviceTrackerSheet')
     const [isSnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -140,27 +133,78 @@ const AccessControl = () => {
         setData(updatedData);
     };
 
-    const validate = () => {
-        let tempErrors = {};
-        if (!current?.company_name) tempErrors.company_name = "Company name is required";
-        if (!current?.location_name) tempErrors.location_name = "Location name is required";
-        if (!current?.group_name) tempErrors.group_name = "Group name is required";
-        if (!current?.module_name) tempErrors.module_name = "Module name is required";
-        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
-        if (!current?.service_tracker) tempErrors.service_tracker = "Service Tracker is required";
-        if (!current?.page_name) tempErrors.page_name = "Page name is required";
-        if (!current?.service_tracker_wise) tempErrors.service_tracker_wise = "Service Tracker Wise is required";
-        if (!current?.access_type) tempErrors.access_type = "Access Type is required";
-        if (!current.access || current.access.length === 0) tempErrors.access = 'Access is required';
-        if (!current?.user_name) tempErrors.user_name = "User Name is required";
-        if (!current?.sheet_name) tempErrors.sheet_name = "Sheet Name is required";
+    
+      const validate = () => {
+        const tempErrors = {};
+        if (!current.user_name) tempErrors.user_name = 'User Name is required';
+        if (!current.access_type) tempErrors.access_type = 'Access Type is required';
+        if (!current.access || current.access.length === 0) tempErrors.access = 'At least one access permission is required';
+
+        // Conditional validation based on access_type
+        switch (current.access_type) {
+            case 'group':
+                if (!current.group_name) tempErrors.group_name = 'Group name is required';
+                break;
+            case 'company':
+                if (!current.group_name) tempErrors.group_name = 'Group name is required';
+                if (!current.company_name) tempErrors.company_name = 'Company name is required';
+                break;
+            case 'company_location':
+                if (!current.group_name) tempErrors.group_name = 'Group name is required';
+                if (!current.company_name) tempErrors.company_name = 'Company name is required';
+                if (!current.location_name) tempErrors.location_name = 'Location name is required';
+                break;
+            case 'module':
+                if (!current.module_name) tempErrors.module_name = 'Module name is required';
+                break;
+            case 'submodule':
+                if (!current.module_name) tempErrors.module_name = 'Module name is required';
+                if (!current.sub_module_name) tempErrors.sub_module_name = 'Sub-module name is required';
+                break;
+            case 'service_tracker':
+                if (!current.service_tracker) tempErrors.service_tracker = 'Service Tracker is required';
+                break;
+            case 'service_tracker_wise':
+                if (!current.service_tracker) tempErrors.service_tracker = 'Service Tracker is required';
+                if (!current.sheet_name) tempErrors.sheet_name = 'Sheet Name is required';
+                if (!current.service_tracker_wise) tempErrors.service_tracker_wise = 'Service Tracker Wise is required';
+                break;
+            case 'page':
+                if (!current.page_name) tempErrors.page_name = 'Page name is required';
+                break;
+            case 'user':
+                if (!current.assign_user_name) tempErrors.assign_user_name = 'Assigned user is required';
+                break;
+            case 'location_to_module':
+                if (!current.location_to_module) tempErrors.location_to_module = 'Location to module is required';
+                break;
+        }
+
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
+
+    // const validate = () => {
+    //     let tempErrors = {};
+    //     if (!current?.company_name) tempErrors.company_name = "Company name is required";
+    //     if (!current?.location_name) tempErrors.location_name = "Location name is required";
+    //     if (!current?.group_name) tempErrors.group_name = "Group name is required";
+    //     if (!current?.module_name) tempErrors.module_name = "Module name is required";
+    //     if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module name is required";
+    //     if (!current?.service_tracker) tempErrors.service_tracker = "Service Tracker is required";
+    //     if (!current?.page_name) tempErrors.page_name = "Page name is required";
+    //     if (!current?.service_tracker_wise) tempErrors.service_tracker_wise = "Service Tracker Wise is required";
+    //     if (!current?.access_type) tempErrors.access_type = "Access Type is required";
+    //     if (!current.access || current.access.length === 0) tempErrors.access = 'Access is required';
+    //     if (!current?.user_name) tempErrors.user_name = "User Name is required";
+    //     if (!current?.sheet_name) tempErrors.sheet_name = "Sheet Name is required";
+    //     setErrors(tempErrors);
+    //     return Object.keys(tempErrors).length === 0;
+    // };
     // Handle Add or Edit
     const handleSubmit = async (e) => {
         e?.preventDefault();
-        // if (!validate()) return; // Don't proceed if validation fails
+        if (!validate()) return; // Don't proceed if validation fails
         const accessType = current?.access_type === "service_tracker_wise";
         const payload = {
             user_id: current?.user_id,
@@ -1240,9 +1284,6 @@ const AccessControl = () => {
 
                     />
                 </div>
-
-
-
             </div>
         </div>
     );
