@@ -271,6 +271,9 @@ const RoleManager = () => {
     };
     const handleSubmit = async (e) => {
         // e?.preventDefault();
+           const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]:localStorage.getItem("user_id") || "",
+        };
         const payload = {
             "RoleName": current?.role_name,
             "RoleDescription": current?.role_description,
@@ -280,27 +283,13 @@ const RoleManager = () => {
             "ModuleID": current?.module_id,
             "SubModuleID": current?.sub_module_id,
             "ServiceTrackerID": current?.service_tracker_id,
-            "CommonAttributes": {
-                "Created_By": "68886d0c12968c416c8c8ba1"
-            }
+            "CommonAttributes": CommonAttributes
         }
         try {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateRoleById(userId, {
-                    "RoleName": current?.role_name,
-                    "RoleDescription": current?.role_description,
-                    "GroupHoldingsID": current?.group_holding_id,
-                    "CompanyID": current?.company_id,
-                    "LocationID": current?.location_id,
-                    "ModuleID": current?.module_id,
-                    "SubModuleID": current?.sub_module_id,
-                    "ServiceTrackerID": current?.service_tracker_id,
-                    "CommonAttributes": {
-                        "Updated_By": "68886d0c12968c416c8c8ba1"
-                    }
-                });
+                response = await updateRoleById(userId, payload);
             } else {
                 // Create new company
                 response = await createRole(payload);

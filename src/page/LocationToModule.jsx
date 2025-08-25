@@ -4,9 +4,6 @@ import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, } from '../api/service';
 import { AgGridReact } from 'ag-grid-react';
@@ -21,67 +18,8 @@ import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { Link } from 'lucide-react';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const dummuJsonData = [
-    {
-        id: 1744096161424,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161425,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161426,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161427,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161428,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161429,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-];
-
 const LocationToModule = () => {
-    // const [data, setData] = useState([]);
-    // if you want to show dummy jason data 
-    const [data, setData] = useState(dummuJsonData);
+    const [data, setData] = useState([]);
     const [current, setCurrent] = useState(
         {
             id: null,
@@ -100,14 +38,13 @@ const LocationToModule = () => {
             module_id: null,
         });
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [id, setId] = useState(null)
     // console.log(id, 'id')
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
-    console.log(companyName, 'companyName')
+    // console.log(companyName, 'companyName')
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -117,11 +54,10 @@ const LocationToModule = () => {
         message: '',
         severityType: '',
     });
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; // You can adjust the number of items per page
 
     const [errors, setErrors] = useState({});
+    const crudTitle = "Tag Location To Module"
+    const editCrudTitle = "Edit Tagged Location To Module"
     const validate = () => {
         let tempErrors = {};
         if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
@@ -131,7 +67,6 @@ const LocationToModule = () => {
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
-
 
     const handleApproveAll = async () => {
         try {
@@ -159,28 +94,21 @@ const LocationToModule = () => {
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
-
+        const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+        };
         const payload = {
             "CompanyID": current?.company_id,
             "LocationID": current?.location_id,
             "ModuleID": current?.module_id,
-            "CommonAttributes": {
-                "Created_By": "68480959d7038d326905b02c"
-            }
+            "CommonAttributes": CommonAttributes
         };
 
         try {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateLocationToModuleById(id, {
-                    "CompanyID": current?.company_id,
-                    "LocationID": current?.location_id,
-                    "ModuleID": current?.module_id,
-                    "CommonAttributes": {
-                        "Updated_By": "68480959d7038d326905b02c"
-                    }
-                });
+                response = await updateLocationToModuleById(id, payload);
             } else {
                 // Create new company
                 response = await createsLocationToModule(payload);
@@ -421,8 +349,7 @@ const LocationToModule = () => {
         )
 
     }
-    const crudTitle = "Tag Location To Module"
-    const editCrudTitle = "Edit Tagged Location To Module"
+
     const deleteModal = () => {
         return (
             <div>
@@ -563,7 +490,7 @@ const LocationToModule = () => {
             headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
         },
         { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-         {
+        {
             field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
             headerName: 'Approval Status',
             editable: false,
@@ -694,17 +621,9 @@ const LocationToModule = () => {
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
             <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                    {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-                        <div>
-                            <button className='crud_btn w-100' onClick={openModal}>
-                                <span><AddIcon /></span> <span className='button-style'>Add New Module</span>
-                            </button>
-                        </div>
-                    </div> */}
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact

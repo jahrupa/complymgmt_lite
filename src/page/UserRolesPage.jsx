@@ -24,11 +24,6 @@ const UserRolesPage = () => {
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState({ user_id: null, full_name: '', username: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', user_description: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
   const [isEditing, setIsEditing] = useState(false);
-  // const [groupHoldingName, setGroupHoldingName] = useState([])
-  // const [companyName, setCompanyName] = useState([])
-  // const [locationName, setLocationName] = useState([])
-  // const [rolesName, setRolesName] = useState([])
-  // console.log(rolesName, groupHoldingName, 'rolesName')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,17 +35,18 @@ const UserRolesPage = () => {
     severityType: '',
   });
   const [errors, setErrors] = useState({});
+  const gridRef = useRef();
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
     if (!current?.email) tempErrors.email = "Email is required";
     if (!current?.username) tempErrors.username = "Username is required";
     if (!current?.password) tempErrors.password = "Password is required";
-    // if (!current?.user_description) tempErrors.user_description = "Description is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
-
+  const crudTitle = "Add New User Form"
+  const editCrudTitle = "Edit User"
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,6 +58,9 @@ const UserRolesPage = () => {
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
+    const CommonAttributes = {
+      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+    };
     const payload = {
       "FullName": current?.full_name,
       "Email": current.email,
@@ -69,9 +68,7 @@ const UserRolesPage = () => {
       "Username": current?.username,
       "Password": current?.password,
       "UserType": null,
-      "CommonAttributes": {
-        "Created_By": "68480959d7038d326905b02c"
-      },
+      "CommonAttributes": CommonAttributes,
       "UserAccessLevel": null
     }
     try {
@@ -165,7 +162,7 @@ const UserRolesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setErrors({});
-      setCurrent({
+    setCurrent({
       full_name: '',
       email: '',
       username: '',
@@ -256,12 +253,11 @@ const UserRolesPage = () => {
     )
 
   }
-  const crudTitle = "Add New User Form"
-  const editCrudTitle = "Edit User"
+
   const handleApproveAll = async () => {
     try {
       const response = await bulkApproveAllPageData('user');
-      const message = response?.message 
+      const message = response?.message
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -287,7 +283,7 @@ const UserRolesPage = () => {
     };
     try {
       const response = await updateUserStatusId(params.data._id, newIsActive);
-      const message = response?.message 
+      const message = response?.message
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -343,7 +339,7 @@ const UserRolesPage = () => {
     }
   };
 
-  
+
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
       case 1:
@@ -418,7 +414,7 @@ const UserRolesPage = () => {
       }
     },
     { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-     {
+    {
       field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
       headerName: 'Approval Status',
       editable: false,
@@ -487,13 +483,7 @@ const UserRolesPage = () => {
       filter: true,
       headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
-    // { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    // { field: 'group_holding', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    // { field: 'company_name', headerName: 'Company Name', editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
-
   ];
-  const gridRef = useRef();
   const defaultColDef = {
     sortable: true,
     filter: true,
@@ -541,30 +531,7 @@ const UserRolesPage = () => {
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-
-          {/* <div className="search-container">
-            <Search className="notification-search-icon" size={18} />
-            <input
-              type="text"
-              placeholder="Search users..."
-              // value={searchTerm}
-              // onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div> */}
-
-          {/* <div className='d-flex h-100'>
-            <div class="search-bar-container h-25">
-              <MuiSearchBar label='Search...' type='text' />
-              <button className='search-icon'><SearchIcon /></button>
-            </div>
-          </div> */}
-
-
-
-
         </div>
-
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
             theme="legacy"

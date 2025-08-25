@@ -68,7 +68,7 @@ const DashboardPage = () => {
   const crudTitle = "Upload File"
   return (
     <div>
-      {/* <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
+      <Modal crudForm={crudForm} crudTitle={crudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
       <div className='mb-4 d-flex'>
         <span className='dashboard-heading ms-2'>Dashboard</span>
       </div>
@@ -82,7 +82,7 @@ const DashboardPage = () => {
         <div className='stat-card '>
           <StackedBar />
         </div>
-      </div> */}
+      </div>
       <div>
         <ComplianceMasterDashboard/>
       </div>

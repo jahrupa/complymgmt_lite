@@ -146,25 +146,20 @@ const Module = () => {
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
+            const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]:localStorage.getItem("user_id") || "",
+        };
         const payload = {
             "ModuleName": current.module_name,
             "ModuleDescription": current.module_description,
-            "CommonAttributes": {
-                "Created_By": "68480959d7038d326905b02c"
-            }
+            "CommonAttributes":CommonAttributes
         };
 
         try {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateModuleById(moduleId, {
-                    "ModuleName": current.module_name,
-                    "ModuleDescription": current.module_description,
-                    "CommonAttributes": {
-                        "Updated_By": "68480959d7038d326905b02c"
-                    }
-                });
+                response = await updateModuleById(moduleId, payload);
             } else {
                 // Create new company
                 response = await createModule(payload);

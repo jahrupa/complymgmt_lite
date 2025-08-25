@@ -86,14 +86,15 @@ const Company = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
+    const CommonAttributes = {
+      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+    };
     const payload = {
       "CompanyName": current?.company_name || '',
       "CompanyDescription": current?.company_description || '',
       "GroupHoldingsID": current?.group_holding_id || null,
       CompanyCommonName: current?.company_common_name || '',
-      "CommonAttributes": {
-        "Created_By": "507f1f77bcf86cd799439012",
-      }
+      "CommonAttributes": CommonAttributes
     };
 
     try {
