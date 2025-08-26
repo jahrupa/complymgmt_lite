@@ -89,16 +89,13 @@ const GroupCompaniesPage = () => {
     e.preventDefault(); // Prevent default submit behavior
 
     if (!validate()) return; // Don't proceed if validation fails
-
+ const CommonAttributes = {
+      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+    };
     const payload = {
       "GroupDescription": current?.group_description,
       "GroupName": current?.group_name,
-      "CommonAttributes": {
-        "Approved_By": "68480959d7038d326905b02c",
-        "Created_By": "68480959d7038d326905b02c",
-        "IsActive": true,
-        "IsDeleted": false
-      }
+      "CommonAttributes": CommonAttributes
     };
 
     try {

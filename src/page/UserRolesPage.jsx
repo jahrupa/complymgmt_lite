@@ -346,7 +346,6 @@ const UserRolesPage = () => {
   };
 
 
-
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
       case 1:
@@ -510,7 +509,6 @@ const UserRolesPage = () => {
       headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
   ];
-
   const defaultColDef = {
     sortable: true,
     filter: true,

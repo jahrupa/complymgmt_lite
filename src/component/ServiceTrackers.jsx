@@ -100,28 +100,20 @@ const ServiceTrackers = () => {
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent default submit behavior
         if (!validate()) return; // Don't proceed if validation fails
+        const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+        };
         const payload = {
             "ServiceTrackerName": current?.service_tracker_name,
             "ServiceTrackerDescription": current?.service_tracker_description,
             "SubModuleID": current?.sub_module_id,
             "ModuleID": current?.module_id,
-            "CommonAttributes": {
-                "Created_By": "688331c4d3f5ece9a3ad0065"
-            }
-        }
-        const updatedPayload = {
-            "ServiceTrackerName": current?.service_tracker_name,
-            "ServiceTrackerDescription": current?.service_tracker_description,
-            "SubModuleID": current?.sub_module_id,
-            "ModuleID": current?.module_id,
-            "CommonAttributes": {
-                "Updated_By": "688331c4d3f5ece9a3ad0065"
-            }
+            "CommonAttributes": CommonAttributes
         }
         try {
             let response;
             if (isEditing) {
-                response = await updateServiceTrackerById(current?._id, updatedPayload);
+                response = await updateServiceTrackerById(current?._id, payload);
             } else {
                 response = await createServiceTracker(payload);
             }

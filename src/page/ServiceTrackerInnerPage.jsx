@@ -44,6 +44,7 @@ const ServiceTrackerInnerPage = () => {
         isFilteredData: false,
 
     });
+    console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
     const gridRef = useRef();
@@ -456,26 +457,54 @@ const ServiceTrackerInnerPage = () => {
     }, [formattedTrackerName]);
 
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const [serviceTrackerInnerPageData, serviceTrackerSheet] = await Promise.allSettled([
-                fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name),
-                fetchAllServiceTrackerSheetData(formattedTrackerName)
-            ]);
-            if (serviceTrackerInnerPageData.status === 'fulfilled' && current?.isFilteredData === false) {
-                setRowData(serviceTrackerInnerPageData.value);
-            } else {
-                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheet.reason);
-            }
-            if (serviceTrackerSheet.status === 'fulfilled') {
-                setServiceTrackerSheet(serviceTrackerSheet.value);
-            } else {
-                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheet.reason);
-            }
-        };
+ useEffect(() => {
+    const fetchData = async () => {
+        const [serviceTrackerInnerPageData, serviceTrackerSheetResult] = await Promise.allSettled([
+            fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name),
+            fetchAllServiceTrackerSheetData(formattedTrackerName)
+        ]);
 
-        fetchData();
-    }, [current]);
+        // Set sheet data
+        if (serviceTrackerSheetResult.status === 'fulfilled') {
+            const sheets = serviceTrackerSheetResult.value;
+            setServiceTrackerSheet(sheets);
+
+            // If no sheet is selected yet, default to the first one
+            if (!current.sheet_name && sheets.length > 0) {
+                const firstSheet = sheets[0];
+                setCurrent({
+                    sheet_name: firstSheet.name,
+                    sheet_id: firstSheet.id || null,
+                    isFilteredData: true,
+                });
+
+                try {
+                    const filterUpdateData = await fetchAllInnerPageServiceTracker(
+                        formattedTrackerName,
+                        firstSheet.name
+                    );
+                    setRowData(filterUpdateData);
+                } catch (error) {
+                    console.error("Error fetching default sheet data:", error);
+                }
+
+                return; // Skip rest of the function because default sheet already handled
+            }
+        } else {
+            console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheetResult.reason);
+        }
+
+        // Fetch data only if not filtered and the sheet name is already set
+        if (serviceTrackerInnerPageData.status === 'fulfilled' && current?.isFilteredData === false) {
+            setRowData(serviceTrackerInnerPageData.value);
+        } else if (serviceTrackerInnerPageData.status === 'rejected') {
+            console.warn("fetchAllServiceTrackerInnerPage failed:", serviceTrackerInnerPageData.reason);
+        }
+    };
+
+    fetchData();
+}, [current]);
+
 
     const onFilterOpened = (params) => {
         console.log("Filter opened");

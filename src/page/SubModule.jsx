@@ -47,6 +47,8 @@ const SubModule = () => {
         severityType: '',
     });
     const [moduleName, setModuleName] = useState([]);
+    const crudTitle = "Add New SubModule"
+    const editCrudTitle = "Edit SubModule"
 
     // Handle input change
     const handleChange = (e) => {
@@ -91,27 +93,22 @@ const SubModule = () => {
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
+
+        const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+        };
         const payload = {
             "SubModuleName": current.sub_module_name,
             "SubModuleDescription": current.sub_module_description,
             ModuleID: current.module_id,
-            "CommonAttributes": {
-                "Created_By": "68480959d7038d326905b02c"
-            }
+            "CommonAttributes": CommonAttributes
         };
 
         try {
             let response;
             if (isEditing) {
                 // Update existing company
-                response = await updateSubModuleById(subModuleId, {
-                    "SubModuleName": current.sub_module_name,
-                    "SubModuleDescription": current.sub_module_description,
-                    ModuleID: current.module_id,
-                    "CommonAttributes": {
-                        "Updated_By": "68480959d7038d326905b02c"
-                    }
-                });
+                response = await updateSubModuleById(subModuleId, payload);
             } else {
                 // Create new company
                 response = await createsSubModule(payload);
@@ -254,8 +251,6 @@ const SubModule = () => {
         )
 
     }
-    const crudTitle = "Add New SubModule"
-    const editCrudTitle = "Edit SubModule"
 
     const deleteModal = () => {
         return (
