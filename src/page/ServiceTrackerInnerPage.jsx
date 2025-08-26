@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule, ColumnAutoSizeModule } from 'ag-grid-community';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
@@ -63,6 +63,9 @@ const ServiceTrackerInnerPage = () => {
         editable: true,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
         flex: 1,
+        filterParams: {
+            maxNumConditions: 10,
+        },
     };
 
     // Handle Delete
@@ -474,6 +477,83 @@ const ServiceTrackerInnerPage = () => {
         fetchData();
     }, [current]);
 
+    const onFilterOpened = (params) => {
+        console.log("Filter opened");
+        const field = params.column.getColId();
+
+        const rowData = [];
+
+        params.api.forEachNode((node) => {
+            if (node.data && node.data[field] !== undefined) {
+                rowData.push(node.data[field]);
+            }
+        });
+
+        const uniqueValues = [...new Set(rowData)];
+
+        console.log({ [field]: uniqueValues });
+
+        const filterComponent = document.querySelectorAll('.ag-filter')
+
+        const filterDiv = document.createElement('div');
+
+        filterDiv.style.padding = '10px';
+        filterDiv.innerHTML = `
+            <div><strong>Unique Values:</strong></div>
+            <div style="max-height: 150px; overflow-y: auto;">
+                ${uniqueValues.map(value => `
+                    <div>
+                        <label style="display:flex; align-items:center; gap:6px;">
+                            <input type="checkbox" value="${value}" class="form-check-input"/>
+                            <span>${value}</span>
+                        </label>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        filterComponent[0].appendChild(filterDiv);
+
+        const checkboxes = filterDiv.querySelectorAll('.form-check-input');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const checkedValues = Array.from(filterDiv.querySelectorAll('.form-check-input:checked')).map(checkbox => checkbox.value);
+                const filterInput = filterComponent[0].querySelectorAll('input[type="text"]');
+
+                const conditions = checkedValues.map(val => ({
+                    filterType: 'text',
+                    type: 'equals',
+                    filter: val
+                }));
+
+                if (conditions.length > 0) {
+                    gridRef.current.api.setFilterModel({
+                        [field]: {
+                            filterType: 'text',
+                            operator: 'OR',
+                            conditions: conditions
+                        }
+                    });
+                } else {
+                    // clear filter if nothing selected
+                    gridRef.current.api.setFilterModel(null);
+                }
+
+                gridRef.current.api.onFilterChanged();
+
+                // gridRef.current.api.setFilterModel({
+                //     ...gridRef.current.api.getFilterModel(),
+                //     [field]: {
+                //         type: 'set',
+                //         filter: checkedValues,
+                //     }
+                // });
+                // gridRef.current.api.onFilterChanged();
+            });
+        });
+    };
+
     return (
         <div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} uploadStatus={uploadStatus} />
@@ -567,6 +647,7 @@ const ServiceTrackerInnerPage = () => {
                             editType="fullRow"
                             rowSelection="single"
                             pagination={true}
+                            onFilterOpened={onFilterOpened}
                             onRowValueChanged={onRowValueChanged}
                         />
                     </div>
