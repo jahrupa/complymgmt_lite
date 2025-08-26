@@ -603,7 +603,7 @@ export const deleteSubModuleById = async (id) => {
   }
 };
 
-export const updateApprovalStatusSubModulesById = async (id) => {
+export const updateSubModuleApprovalStatusById = async (id) => {
   try {
     const response = await API.put(`${UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID}${id}`);
     return response.data;
