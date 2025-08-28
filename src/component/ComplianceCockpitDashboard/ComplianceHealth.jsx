@@ -1,81 +1,124 @@
-import React from 'react';
-import Chart from 'react-apexcharts';
-import '../../style/complianceHealth.css';
+import React from "react";
+import Chart from "react-apexcharts";
+import "../../style/complianceHealth.css";
+const complianceData = {
+  healthMetrics: [
+    {
+      title: "Compliance Health",
+      value: "90%",
+      progressPercent: 90
+    },
+    {
+      title: "Open Issues",
+      value: 8,
+      progressPercent: 40
+    }
+  ],
+  outsourcing: {
+    title: "Outsourcing",
+    employeeLifeCycle: {
+      title: "Employee Life Cycle",
+      progressPercent: 85
+    },
+    chart: {
+      type: "donut",
+      height: 120,
+      colors: ["#10B981", "#E5E7EB"],
+      series: [150, 50],
+      plotOptions: {
+        pie: {
+          donut: {
+            size: "70%"
+          }
+        }
+      },
+      dataLabelsEnabled: false,
+      legendShown: false,
+      strokeWidth: 0
+    },
+    stats: [
+      {
+        label: "Headcount",
+        value: 150
+      },
+      {
+        label: "Claims",
+        value: 5
+      },
+      {
+        label: "Grievances",
+        value: 2
+      }
+    ]
+  }
+};
 
 const ComplianceHealth = () => {
+  const { healthMetrics, outsourcing } = complianceData;
+
+  // Prepare chart options dynamically from JSON
   const circularChartOptions = {
     chart: {
-      type: 'donut',
-      height: 120,
+      type: outsourcing.chart.type,
+      height: outsourcing.chart.height
     },
-    colors: ['#10B981', '#E5E7EB'],
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '70%',
-        }
-      }
-    },
+    colors: outsourcing.chart.colors,
+    plotOptions: outsourcing.chart.plotOptions,
     dataLabels: {
-      enabled: false,
+      enabled: outsourcing.chart.dataLabelsEnabled
     },
     legend: {
-      show: false,
+      show: outsourcing.chart.legendShown
     },
     stroke: {
-      width: 0,
+      width: outsourcing.chart.strokeWidth
     }
   };
 
   return (
     <div className="compliance-health-container">
       <div className="health-card">
-        <div className="health-item">
-          <h3>Compliance Health</h3>
-          <div className="health-value">90%</div>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{width: '90%'}}></div>
+        {healthMetrics.map((metric, idx) => (
+          <div key={idx} className="health-item">
+            <h3>{metric.title}</h3>
+            <div className="health-value">{metric.value}</div>
+            <div className={`progress-bar${metric.title === "Open Issues" ? " secondary" : ""}`}>
+              <div
+                className="progress-fill"
+                style={{ width: `${metric.progressPercent}%` }}
+              ></div>
+            </div>
           </div>
-        </div>
-        
-        <div className="health-item">
-          <h3>Open Issues</h3>
-          <div className="health-value">8</div>
-          <div className="progress-bar secondary">
-            <div className="progress-fill" style={{width: '40%'}}></div>
-          </div>
-        </div>
+        ))}
       </div>
 
       <div className="outsourcing-card">
-        <h3>Outsourcing</h3>
+        <h3>{outsourcing.title}</h3>
+
         <div className="employee-lifecycle">
-          <h4>Employee Life Cycle</h4>
+          <h4>{outsourcing.employeeLifeCycle.title}</h4>
           <div className="progress-bar">
-            <div className="progress-fill" style={{width: '85%'}}></div>
+            <div
+              className="progress-fill"
+              style={{ width: `${outsourcing.employeeLifeCycle.progressPercent}%` }}
+            ></div>
           </div>
         </div>
-        
+
         <div className="chart-container">
           <Chart
             options={circularChartOptions}
-            series={[150, 50]}
-            type="donut"
-            height={120}
+            series={outsourcing.chart.series}
+            type={outsourcing.chart.type}
+            height={outsourcing.chart.height}
           />
           <div className="chart-stats">
-            <div className="stat-item">
-              <span className="stat-label">Headcount</span>
-              <span className="stat-value">150</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Claims</span>
-              <span className="stat-value">5</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Grievances</span>
-              <span className="stat-value">2</span>
-            </div>
+            {outsourcing.stats.map((stat, idx) => (
+              <div key={idx} className="stat-item">
+                <span className="stat-label">{stat.label}</span>
+                <span className="stat-value">{stat.value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

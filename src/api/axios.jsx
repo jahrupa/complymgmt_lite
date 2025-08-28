@@ -1,7 +1,12 @@
-// axiosConfig.js
 import axios from "axios";
+
+const isProd = import.meta.env.MODE === "production";
+const baseURL = isProd
+  ? import.meta.env.VITE_API_URL || "https://api.complymgmt.ai"
+  : "http://192.168.1.225:3001";
+
 const API = axios.create({
-  baseURL: "http://192.168.1.225:3001",
+  baseURL,
   headers: {
     "Content-Type": "application/json",
     "Cache-Control": "no-cache",
@@ -12,7 +17,7 @@ API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      config.headers.Authorization = `${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -22,7 +27,7 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error:", error.response);
+    console.error("API Error:", error.response || error.message);
     return Promise.reject(error);
   }
 );
