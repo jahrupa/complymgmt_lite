@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { bulkApproveAllPageData, createGroup, deleteGroupById, fetchAllGroup, updateGroupById, updateGroupStatusById } from '../api/service';
+import { bulkApproveAllPageData, createGroup, deleteGroupById, fetchAllGroup, updateGroupById, updateGroupStatusById, updateGroupApprovalStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
@@ -247,6 +247,7 @@ const GroupCompaniesPage = () => {
 
   const crudTitle = "Add New Group Holding"
   const editCrudTitle = "Edit Group Holding"
+
   const deleteModal = () => {
     return (
       <div>
@@ -278,6 +279,23 @@ const GroupCompaniesPage = () => {
         return { color: '#41464b' }; // gray
     }
   };
+
+  const handleCheckboxClick = async (rowId) => {
+    console.log("Checkbox clicked with status:", rowId);
+    const response = await updateGroupApprovalStatusById(rowId);
+    const message = response?.message
+
+    setIsSnackbarsOpen({
+      ...issnackbarsOpen,
+      open: true,
+      message,
+      severityType: 'success',
+    });
+
+    const updatedData = await fetchAllGroup();
+    setData(updatedData);
+  };
+
   const colDefs = [
     {
       headerName: 'Actions',
@@ -342,9 +360,10 @@ const GroupCompaniesPage = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <input
               type="checkbox"
-              checked={true}
-              readOnly // ✅ prevent manual toggle unless you implement onChange
+              checked={status === 1}
+              readOnly={status === 1}
               style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
@@ -381,21 +400,25 @@ const GroupCompaniesPage = () => {
   ];
 
   const gridRef = useRef();
+
   const defaultColDef = {
     sortable: true,
     filter: true,
     editable: true,
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
+
   const onRowValueChanged = (event) => {
     console.log('Row updated:', event.data);
   };
+
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       'quickFilterText',
       document.getElementById('filter-text-box').value
     );
   }, []);
+
   return (
     <div>
       <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>

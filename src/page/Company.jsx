@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createCompany, deleteCompanyById, fetchAllCompanies, fetchAllGroupHolding, updateCompanyById, updateCompanyStatusById } from '../api/service';
+import { bulkApproveAllPageData, createCompany, deleteCompanyById, fetchAllCompanies, fetchAllGroupHolding, updateCompanyApprovalStatusById, updateCompanyById, updateCompanyStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -26,13 +26,15 @@ const Company = () => {
   // if you want to show dummy jason data 
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState({ _id: null, company_name: '', company_description: '', group_name: '', group_holding_id: null, created_at: '', updated_at: '', company_common_name: '' });
-  // console.log(current,'current')
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [groupHoldingName, setGroupHoldingName] = useState([])
-  console.log(groupHoldingName, 'groupHoldingName')
   const [companyId, setCompanyId] = useState(null)
+  const crudTitle = "Add New company"
+  const editCrudTitle = "Edit company"
+  const gridRef = useRef();
+  const [errors, setErrors] = useState({});
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -40,7 +42,6 @@ const Company = () => {
     message: '',
     severityType: '',
   });
-  const [errors, setErrors] = useState({});
 
   const validate = () => {
     let tempErrors = {};
@@ -149,7 +150,7 @@ const Company = () => {
         message,
         severityType: 'success',
       });
-      
+
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -199,9 +200,6 @@ const Company = () => {
 
     fetchData();
   }, []);
-
-
-
 
   const crudForm = () => {
     return (
@@ -269,12 +267,9 @@ const Company = () => {
         </div>
         {/* </form> */}
       </div>
-
     )
-
   }
-  const crudTitle = "Add New company"
-  const editCrudTitle = "Edit company"
+
   const deleteModal = () => {
     return (
       <div>
@@ -293,12 +288,8 @@ const Company = () => {
           </div>
         </div>
       </div>
-
-
     )
-
   }
-
 
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
@@ -343,6 +334,22 @@ const Company = () => {
     const updatedData = await fetchAllCompanies();
     setData(updatedData);
   };
+
+  const handleCheckboxClick = async (rowId) => {
+    const response = await updateCompanyApprovalStatusById(rowId);
+    const message = response?.message
+
+    setIsSnackbarsOpen({
+      ...issnackbarsOpen,
+      open: true,
+      message,
+      severityType: 'success',
+    });
+
+    const updatedData = await fetchAllCompanies();
+    setData(updatedData);
+  };
+
   const colDefs = [
     {
       headerName: 'Actions',
@@ -387,7 +394,7 @@ const Company = () => {
     { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'company_common_name', headerName: 'Common Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-     {
+    {
       field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
       headerName: 'Approval Status',
       editable: false,
@@ -411,9 +418,10 @@ const Company = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <input
               type="checkbox"
-              checked={true}
-              readOnly // ✅ prevent manual toggle unless you implement onChange
+              checked={status === 1}
+              readOnly={status === 1}
               style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
@@ -432,7 +440,7 @@ const Company = () => {
     { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-   
+
     { field: 'common_attributes.approval_time', headerName: 'Status Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',
@@ -448,22 +456,25 @@ const Company = () => {
       )
     }
   ];
-  const gridRef = useRef();
+
   const defaultColDef = {
     sortable: true,
     filter: true,
     editable: true,
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
+
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
+
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       'quickFilterText',
       document.getElementById('filter-text-box').value
     );
   }, []);
+
   return (
     <div>
       <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>

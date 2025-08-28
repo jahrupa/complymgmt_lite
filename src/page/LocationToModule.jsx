@@ -432,6 +432,21 @@ const LocationToModule = () => {
                 return { color: '#41464b' }; // gray
         }
     };
+
+    const handleCheckboxClick = async (rowId) => {
+        const response = await updateLocationToModuleApprovalStatusById(rowId);
+        const message = response?.message
+
+        setIsSnackbarsOpen({
+            ...issnackbarsOpen,
+            open: true,
+            message,
+            severityType: 'success',
+        })
+        const updatedData = await fetchLocationToModuleModule();
+        setData(updatedData);
+    }
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -514,9 +529,10 @@ const LocationToModule = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
                             type="checkbox"
-                            checked={true}
-                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            checked={status === 1}
+                            readOnly={status === 1}
                             style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                            onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
                         />
                         <span
                             style={{

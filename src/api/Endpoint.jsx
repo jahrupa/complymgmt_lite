@@ -15,6 +15,7 @@ export const DELETE_USER_BY_ID ='/api/v1/user/delete/';
 export const CREATE_USER ='/api/v1/user/create';
 export const UPDATE_USER_BY_ID ='/api/v1/user/update/';
 export const UPDATE_USER_STATUS_BY_ID='/api/v1/user/update/status/';
+export const UPDATE_USER_APPROVAL_STATUS_BY_ID='/api/v1/user/update/approval_status/';
 
 // Company
 export const CREATE_COMPANY ='/api/v1/company/create';
@@ -25,6 +26,7 @@ export const DELETE_COMPANY_BY_ID ='/api/v1/company/delete/';
 export const GET_ALL_COMPANY_NAME ='/api/v1/company/view/names/multiple';
 export const GET_COMPANY_NAME_BY_GROUP_ID ='/api/v1/company/view/group/multiple/';
 export const GET_COMPANY_BY_ID ='/api/v1/company/view/id/';
+export const UPDATE_COMPANY_APPROVAL_STATUS_BY_ID = '/api/v1/company/update/approval_status/';
 
 // Group Holding
 export const GET_GROUP_HOLDING_BY_NAME ='/api/v1/group/view/names/multiple';
@@ -35,6 +37,8 @@ export const DELETE_GROUP ='/api/v1/group/delete/';
 export const GET_COMPANY_BY_GROUP_HOLDING_ID ='/get_company_by_group_id/';
 export const UPDATE_GROUP_STATUS ='/api/v1/group/update/status/';
 export const GET_GROUP_BY_ID ='/api/v1/group/view/id/';
+export const UPDATE_GROUP_APPROVAL_STATUS_BY_ID = '/api/v1/group/update/approval_status/';
+
 // Location
 export const GET_ALL_LOCATION='/api/v1/company_location/view/multiple';
 export const CREATE_LOCATION='/api/v1/company_location/create';
@@ -43,6 +47,7 @@ export const DELETE_LOCATION_BY_ID='/api/v1/company_location/delete/';
 export const GET_LOCATION_NAME='/api/v1/company_location/view/names/multiple';
 export const UPDATE_LOCATION_STATUS_BY_ID='/api/v1/company_location/update/status/';
 export const GET_LOCATION_BY_COMPANY_ID='/api/v1/company_location/view/company/multiple/';
+export const UPDATE_COMPANY_LOCATION_APPROVAL_STATUS_BY_ID = '/api/v1/company_location/update/approval_status/';
 
 // Module
 export const GET_ALL_MODULE='/api/v1/module/view/multiple';
@@ -52,6 +57,7 @@ export const UPDATE_MODULE_BY_ID='/api/v1/module/update/';
 export const DELETE_MODULE_BY_ID='/api/v1/module/delete/';
 export const VIEW_MODULE_NAME='/api/v1/module/view/names/multiple';
 export const VIEW_MODULE_BY_LOCATION_ID='/api/v1/module_by_location/view/location/multiple/';
+export const UPDATE_MODULE_APPROVAL_STATUS_BY_ID = '/api/v1/module/update/approval_status/';
 
 // sub-module
 export const GET_ALL_SUB_MODULE='/api/v1/submodule/view/multiple';
@@ -60,6 +66,8 @@ export const UPDATE_SUB_MODULE_BY_ID='/api/v1/submodule/update/';
 export const DELETE_SUB_MODULE_BY_ID='/api/v1/submodule/delete/';
 export const UPDATE_SUB_MODULE_STATUS_BY_ID='/api/v1/submodule/update/status/';
 export const GET_SUB_MODULE_NAME_BY_MODULE_ID='/api/v1/submodule/view/module/multiple/';
+export const UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID = '/api/v1/submodule/update/approval_status/';
+
 
 // service tracker
 export const GET_ALL_SERVICE_TRACKER='/api/v1/service_tracker/view/multiple';
@@ -75,6 +83,7 @@ export const UPDATE_SERVICE_TRACKER_DATA ='api/v1/service_tracker/update/';
 export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/update/approve/bulk/';
 // export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
+export const UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID = '/api/v1/service_tracker/update/approval_status/';
 
 
 
@@ -86,6 +95,7 @@ export const CREATE_LOCATION_TO_MODULE='/api/v1/location_to_module/create';
 export const UPDATE_LOCATION_TO_MODULE_BY_ID='/api/v1/location_to_module/update/';
 export const UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID='/api/v1/location_to_module/update/status/';
 export const DELETE_LOCATION_TO_MODULE_BY_ID='/api/v1/location_to_module/delete/';
+export const UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID='/api/v1/location_to_module/update/approval_status/';
 
 // File Upload
 export const FILE_UPLOAD='/classify-files';
@@ -103,6 +113,7 @@ export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
 export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
+export const APPROVE_USER_ACCESS = "/api/v1/user_access/update/approve/";
 
 // Common API
 export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';

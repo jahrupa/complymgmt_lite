@@ -14,7 +14,7 @@ import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import { bulkApproveAllPageData, createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById } from '../api/service';
+import { bulkApproveAllPageData, createModule, deleteModuleById, fetchAllModule, updateModuleById, updateModuleStatusById, updateModuleApprovalStatusById } from '../api/service';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
@@ -366,6 +366,31 @@ const Module = () => {
                 return { color: '#41464b' }; // gray
         }
     };
+
+    const handleCheckboxClick = async (rowId) => {
+        try {
+            const response = await updateModuleApprovalStatusById(rowId);
+            const message = response?.message || "Status update successfully"
+            // Show success snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: 'success',                
+            });
+        } catch (error) {
+            // Show error snackbar
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message,
+                severityType: 'error',
+            });
+        }
+        const updatedData = await fetchAllModule();
+        setData(updatedData);
+    };
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -467,9 +492,10 @@ const Module = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
                             type="checkbox"
-                            checked={true}
-                            readOnly // ✅ prevent manual toggle unless you implement onChange
+                            checked={status === 1}
+                            readOnly={status === 1}
                             style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+                            onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
                         />
                         <span
                             style={{

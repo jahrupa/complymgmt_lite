@@ -8,7 +8,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import PasswordInput from '../component/MuiInputs/PasswordInput';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, deleteUserById, createUser, updateUserById, updateUserStatusId, bulkApproveAllPageData } from '../api/service';
+import { fetchAllUser, deleteUserById, createUser, updateUserById, updateUserStatusId, bulkApproveAllPageData, updateUserApprovalStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -27,6 +27,10 @@ const UserRolesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const crudTitle = "Add New User Form"
+  const editCrudTitle = "Edit User"
+  
+  const [errors, setErrors] = useState({});
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -34,8 +38,7 @@ const UserRolesPage = () => {
     message: '',
     severityType: '',
   });
-  const [errors, setErrors] = useState({});
-  const gridRef = useRef();
+  
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -45,8 +48,7 @@ const UserRolesPage = () => {
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
-  const crudTitle = "Add New User Form"
-  const editCrudTitle = "Edit User"
+  
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -170,6 +172,7 @@ const UserRolesPage = () => {
       user_description: ''
     });
   };
+
   useEffect(() => {
     const fetchData = async () => {
       const [userData] = await Promise.allSettled([
@@ -253,6 +256,7 @@ const UserRolesPage = () => {
     )
 
   }
+  
 
   const handleApproveAll = async () => {
     try {
@@ -303,6 +307,7 @@ const UserRolesPage = () => {
     const updatedData = await fetchAllUser();
     setData(updatedData);
   };
+
   const deleteModal = () => {
     return (
       <div>
@@ -324,6 +329,7 @@ const UserRolesPage = () => {
     )
 
   }
+
   const getRoleColor = (role) => {
     switch (role) {
       case 'Admin':
@@ -350,6 +356,22 @@ const UserRolesPage = () => {
         return { color: '#41464b' }; // gray
     }
   };
+
+  const handleCheckboxClick = async (rowId) => {
+    const response = await updateUserApprovalStatusById(rowId);
+    const message = response?.message
+    
+    setIsSnackbarsOpen({
+      ...issnackbarsOpen,
+      open: true,
+      message,
+      severityType: 'success',
+    });
+
+    const updatedData = await fetchAllUser();
+    setData(updatedData);
+  };
+
   const colDefs = [
     {
       headerName: 'Actions',
@@ -438,9 +460,12 @@ const UserRolesPage = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <input
               type="checkbox"
-              checked={true}
-              readOnly // ✅ prevent manual toggle unless you implement onChange
+              // checked={true}
+              // readOnly // ✅ prevent manual toggle unless you implement onChange
+              checked={status === 1}
+              readOnly={status === 1}
               style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
@@ -490,9 +515,11 @@ const UserRolesPage = () => {
     editable: true,
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
+
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
+  
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       'quickFilterText',
