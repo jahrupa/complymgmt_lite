@@ -29,7 +29,7 @@ const UserRolesPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const crudTitle = "Add New User Form"
   const editCrudTitle = "Edit User"
-  
+
   const [errors, setErrors] = useState({});
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -38,7 +38,8 @@ const UserRolesPage = () => {
     message: '',
     severityType: '',
   });
-  
+  const gridRef = useRef();
+
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -48,7 +49,7 @@ const UserRolesPage = () => {
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
-  
+
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -256,7 +257,7 @@ const UserRolesPage = () => {
     )
 
   }
-  
+
 
   const handleApproveAll = async () => {
     try {
@@ -360,7 +361,7 @@ const UserRolesPage = () => {
   const handleCheckboxClick = async (rowId) => {
     const response = await updateUserApprovalStatusById(rowId);
     const message = response?.message
-    
+
     setIsSnackbarsOpen({
       ...issnackbarsOpen,
       open: true,
@@ -519,7 +520,7 @@ const UserRolesPage = () => {
   const onRowValueChanged = (event) => {
     // console.log('Row updated:', event.data);
   };
-  
+
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       'quickFilterText',
