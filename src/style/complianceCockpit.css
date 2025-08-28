@@ -1,0 +1,46 @@
+.compliance-cockpit {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cockpit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.cockpit-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr 400px;
+  gap: 24px;
+  min-height: 600px;
+}
+
+.left-section,
+.center-section,
+.right-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cockpit-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+}

@@ -8,6 +8,7 @@ import Donut from '../component/charts/Donut';
 import StackedBar from '../component/charts/StackedBar';
 import NotificationPage from '../component/notification/NotificationPage';
 import ComplianceMasterDashboard from './ComplianceMasterDashboard';
+import ComplianceCockpit from '../component/ComplianceCockpitDashboard/ComplianceCockpit';
 
 const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -85,6 +86,9 @@ const DashboardPage = () => {
       </div>
       <div>
         <ComplianceMasterDashboard/>
+      </div>
+       <div>
+        <ComplianceCockpit/>
       </div>
     </div>
   )

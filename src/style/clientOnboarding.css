@@ -1,0 +1,124 @@
+.client-onboarding {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+}
+
+.client-onboarding h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+.client-info {
+  margin-bottom: 32px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.company-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.spoc-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.spoc-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.spoc-email {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.stage-progress {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fef3c7;
+  border-radius: 12px;
+}
+
+.stage-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.progress-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stage-bar {
+  flex: 1;
+  height: 8px;
+  background: #fde68a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stage-fill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.sla-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #92400e;
+  min-width: 30px;
+}
+
+.sla-comparison {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.sla-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+  flex: 1;
+}
+
+.sla-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.sla-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}

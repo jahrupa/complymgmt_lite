@@ -1,0 +1,42 @@
+.navigation-tabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background: #d1d5db;
+}
+
+.tab-button.active {
+  background: #10b981;
+  color: white;
+}
+
+.more-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.more-button:hover {
+  background: #e5e7eb;
+}
