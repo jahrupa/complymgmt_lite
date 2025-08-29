@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const isProd = import.meta.env.MODE === "production";
-const baseURL = isProd
-  ? import.meta.env.VITE_API_URL || "https://api.complymgmt.ai"
-  : "http://192.168.1.225:3001";
+const isDev = window.location.hostname === "localhost" || window.location.hostname === "192.168.1.225";
+const baseURL = isDev
+  ? "http://192.168.1.225:3001"
+  : "https://api.complymgmt.ai";
 
 const API = axios.create({
   baseURL,
@@ -12,6 +12,7 @@ const API = axios.create({
     "Cache-Control": "no-cache",
   },
 });
+
 
 API.interceptors.request.use(
   (config) => {

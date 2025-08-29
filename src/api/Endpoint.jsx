@@ -85,10 +85,6 @@ export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/upd
 export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID = '/api/v1/service_tracker/update/approval_status/';
 
-
-
-
-
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
 export const CREATE_LOCATION_TO_MODULE='/api/v1/location_to_module/create';
@@ -101,12 +97,10 @@ export const UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID='/api/v1/location_
 export const FILE_UPLOAD='/classify-files';
 export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
 
-
 // pages
 export const GET_ALL_PAGE='/api/v1/pages/view/all';
-
 // USER ACCESS LEVEL
-export const GET_USER_ACCESS_LEVEL ='/api/v1/user_access/view/user_id';
+export const GET_USER_ACCESS_LEVEL_BY_USER_ID ='/api/v1/user_access/view/user_id';
 export const CREATE_USER_ACCESS_LEVEL ='/api/v1/user_access/create';
 export const UPDATE_USER_ACCESS_LEVEL ='/api/v1/user_access/update/';
 export const DELETE_USER_ACCESS_LEVEL ='/api/v1/user_access/delete/';
@@ -114,7 +108,6 @@ export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
 export const APPROVE_USER_ACCESS = "/api/v1/user_access/update/approve/";
-
 // Common API
 export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';
 

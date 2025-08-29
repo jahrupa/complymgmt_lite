@@ -71,7 +71,7 @@ console.log(names,'names')
         </MenuItem>
         {names.map((item) => (
           <MenuItem key={item._id} value={item.name}>
-            {item.name}{item.location?` - (${item.location})`:null}
+            {item.name}{item.optionalValue?` - (${item.optionalValue})`:null}
           </MenuItem>
         ))}
       </Select>

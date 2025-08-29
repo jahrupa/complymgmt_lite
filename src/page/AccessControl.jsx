@@ -43,8 +43,14 @@ const AccessControl = () => {
         filter_user_id: null,
         assign_user_name: '',
         assign_user_id: null,
+        access_user_name: '',
+        access_user_id: null,
+        access_user_type: '',
+        access_user_type_id: null,
+        is_access_user_type_dropdown: false
 
     });
+    console.log(current?.access_user_type_id, current?.access_user_name, 'access_user_type')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -98,6 +104,10 @@ const AccessControl = () => {
             assign_user_id: userData.entity_id || null,
             sheet_name_id: userData.entity_id || null,
             sheet_name: userData.entity_name || '',
+            access_user_name: userData.entity_name || '',
+            access_user_id: userData.entity_id || null,
+            access_user_type: userData.entity_name || '',
+            access_user_type_id: userData.entity_id || null,
         }));
         setIsEditing(true);
         setIsModalOpen(true);
@@ -214,7 +224,7 @@ const AccessControl = () => {
                 .replace(/\s+/g, '_') || current?.page_name || current?.service_tracker_wise || current?.assign_user_name,
             entity_type: current?.access_type,
             bo_user_id: currentUserId,
-            access: Array.isArray(current?.access)
+            0: Array.isArray(current?.access)
                 ? current.access.map(a => a.toLowerCase())
                 : []
         }
@@ -230,6 +240,10 @@ const AccessControl = () => {
         if (current?.access_type === "company_location") {
             payload.entity_id = current?.location_id;
             payload.entity_name = current?.location_name;
+        }
+        if (current?.access_type === "user_access") {
+            payload.entity_id = current?.access_user_type_id;
+            payload.entity_name = current?.access_user_name;
         }
         if (accessType) {
             payload.entity_id = current?.service_tracker_inner_id;
@@ -386,8 +400,9 @@ const AccessControl = () => {
         const showOnlyModuleAndSubModule = current.access_type === "submodule";
         const isCompanyLocationEdit = current.access_type === "company_location" && isEditing;
         const isSubModuleEdit = current.access_type === "submodule" && isEditing;
+        const showUser = current.access_type === "user";
+        const showUser_access = current.access_type === "user_access";
 
-        const ShowUser = current.access_type === "user";
         const showGroup = [
             "group",
             "company",
@@ -814,7 +829,7 @@ const AccessControl = () => {
                                 names={allInnerPageServiceTrackerList?.map((data) => ({
                                     _id: data?._id,
                                     name: data?.company_name,
-                                    location: data?.location
+                                    optionalValue: data?.location
                                 }))}
                                 error={!!errors.service_tracker_wise}
                                 helperText={errors.service_tracker_wise}
@@ -867,7 +882,7 @@ const AccessControl = () => {
                         />
                     )}
                 </div>
-                {ShowUser && (
+                {showUser && (
                     <SingleSelectTextField
                         name="assign_user_name"
                         label="User"
@@ -892,6 +907,73 @@ const AccessControl = () => {
                         helperText={errors.assign_user_name}
                     />
                 )}
+                {showUser_access && (
+                    <>
+                        <SingleSelectTextField
+                            name="access_user_name"
+                            label="Access User Name"
+                            value={current.access_user_name}
+                            isdisable={isEditing ? true : false}
+                            onChange={async (e) => {
+                                const selectedName = e.target.value;
+                                const matchedUser = userNameListRes.find(
+                                    (item) => item.full_name === selectedName
+                                );
+
+                                if (matchedUser?._id) {
+                                    try {
+                                        const filterUpdateData = await fetchAllUserAccessLevels({
+                                            system_user_id: matchedUser._id
+                                        });
+                                        setData(filterUpdateData);
+                                    } catch (error) {
+                                        console.error("Error fetching access levels:", error);
+                                    }
+                                }
+
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    access_user_name: selectedName,
+                                    access_user_id: matchedUser?._id || null,
+                                    is_access_user_type_dropdown: true
+                                }));
+                            }}
+                            names={userNameListRes.map((item) => ({
+                                _id: item._id,
+                                name: item.full_name
+                            }))}
+                        />
+
+                        <SingleSelectTextField
+                            name="access_user_type"
+                            label="Access User Type"
+                            value={current.access_user_type}
+                            isdisable={isEditing ? true : false}
+                            onChange={async (e) => {
+                                const selectedName = e.target.value;
+                                const matchedUser = data.find(
+                                    (item) => item.EntityName === selectedName
+                                );
+
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    access_user_type: selectedName,
+                                    access_user_type_id: matchedUser?._id || null,
+                                }));
+                            }}
+                            names={data?.map((item) => ({
+                                _id: item._id,
+                                name: item.EntityName,
+                                optionalValue: item.EntityType
+
+                            }))}
+                        />
+                    </>
+
+
+
+                )}
+
                 <div>
                     <MultipleSelectTextFields
                         label='Access Control'
@@ -1075,11 +1157,16 @@ const AccessControl = () => {
                 fetchAllServiceTrackerSheetData(formattedTrackerName)
             ]);
 
-            if (userAccessDataRes.status === 'fulfilled' && current?.isFilteredData === false) {
+            if (
+                userAccessDataRes.status === 'fulfilled' &&
+                current?.isFilteredData === false &&
+                current?.is_access_user_type_dropdown === false
+            ) {
                 setData(userAccessDataRes.value);
             } else {
                 console.warn("fetchAllUserAccessLevels failed:", userAccessDataRes.reason);
             }
+
 
             if (groupHoldingRes.status === 'fulfilled') {
                 const groupHolding = groupHoldingRes.value;

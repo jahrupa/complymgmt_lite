@@ -25,6 +25,7 @@ const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
+    // console.log(columnDefs, 'columnDefs')
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
     const [isEditing, setIsEditing] = useState(false);
@@ -138,9 +139,9 @@ const ServiceTrackerInnerPage = () => {
     };
 
     // Fetch and Set Tracker Data
-    const fetchAndSetTrackerData = async (trackerName) => {
+    const fetchAndSetTrackerData = async (trackerName,sheetName = null) => {
         try {
-            const response = await fetchAllInnerPageServiceTracker(trackerName);
+            const response = await fetchAllInnerPageServiceTracker(trackerName,sheetName);
             setRowData(response || []);
             const dataSample = response?.[0] || {};
             const dynamicCols = Object.keys(dataSample).map((key) => {
@@ -233,6 +234,69 @@ const ServiceTrackerInnerPage = () => {
             console.error("Error fetching tracker data:", error);
         }
     };
+
+
+//    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
+//     try {
+//         const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
+//         console.log("Fetched response:", response);
+//         setRowData(response || []);
+
+//         const dataSample = response?.[0];
+//         console.log("dataSample:", dataSample);
+
+//         if (!dataSample || Object.keys(dataSample).length === 0) {
+//             setColumnDefs([]);
+//             return;
+//         }
+
+//         const dynamicCols = Object.keys(dataSample).map(key => {
+//             // Simplified columns for debug:
+//             return {
+//                 headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+//                 field: key,
+//                 editable: false,
+//                 minWidth: 150,
+//             };
+//         });
+
+//         const actionCol = {
+//             headerName: 'Actions',
+//             field: 'actions',
+//             pinned: 'left',
+//             width: 130,
+//             cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+//             filter: false,
+//             editable: false,
+//             cellRenderer: (params) => (
+//                 <div className="d-flex gap-2">
+//                     <button className="btn btn-sm" onClick={() => {
+//                         setEditData(params.data);
+//                         setTrackerId(params.data._id);
+//                         setIsEditing(true);
+//                         setIsModalOpen(true);
+//                     }}>
+//                         <EditIcon fontSize="small" className="action_icon" />
+//                     </button>
+//                     <button className="btn btn-sm" onClick={() => {
+//                         setTrackerId(params.data._id);
+//                         setIsDeleteModalOpen(true);
+//                     }}>
+//                         <DeleteIcon fontSize="small" className="action_icon" />
+//                     </button>
+//                 </div>
+//             )
+//         };
+
+//         setColumnDefs([...dynamicCols, actionCol]);
+//         console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
+//     } catch (error) {
+//         console.error("Error fetching tracker data:", error);
+//         setColumnDefs([]);
+//     }
+// };
+
+
 
     // Handle File Change
     const handleFileChange = (e) => {
@@ -450,60 +514,68 @@ const ServiceTrackerInnerPage = () => {
         }
     };
 
+    // useEffect(() => {
+    //     if (formattedTrackerName) {
+    //         fetchAndSetTrackerData(formattedTrackerName);
+    //     }
+    // }, [formattedTrackerName]);
+
+
     useEffect(() => {
-        if (formattedTrackerName) {
-            fetchAndSetTrackerData(formattedTrackerName);
-        }
-    }, [formattedTrackerName]);
+    if (formattedTrackerName && current?.sheet_name) {
+        fetchAndSetTrackerData(formattedTrackerName, current.sheet_name);
+    }
+}, [formattedTrackerName, current?.sheet_name]);
 
 
- useEffect(() => {
-    const fetchData = async () => {
-        const [serviceTrackerInnerPageData, serviceTrackerSheetResult] = await Promise.allSettled([
-            fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name),
-            fetchAllServiceTrackerSheetData(formattedTrackerName)
-        ]);
 
-        // Set sheet data
-        if (serviceTrackerSheetResult.status === 'fulfilled') {
-            const sheets = serviceTrackerSheetResult.value;
-            setServiceTrackerSheet(sheets);
+    useEffect(() => {
+        const fetchData = async () => {
+            const [serviceTrackerInnerPageData, serviceTrackerSheetResult] = await Promise.allSettled([
+                fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name),
+                fetchAllServiceTrackerSheetData(formattedTrackerName)
+            ]);
 
-            // If no sheet is selected yet, default to the first one
-            if (!current.sheet_name && sheets.length > 0) {
-                const firstSheet = sheets[0];
-                setCurrent({
-                    sheet_name: firstSheet.name,
-                    sheet_id: firstSheet.id || null,
-                    isFilteredData: true,
-                });
+            // Set sheet data
+            if (serviceTrackerSheetResult.status === 'fulfilled') {
+                const sheets = serviceTrackerSheetResult.value;
+                setServiceTrackerSheet(sheets);
 
-                try {
-                    const filterUpdateData = await fetchAllInnerPageServiceTracker(
-                        formattedTrackerName,
-                        firstSheet.name
-                    );
-                    setRowData(filterUpdateData);
-                } catch (error) {
-                    console.error("Error fetching default sheet data:", error);
+                // If no sheet is selected yet, default to the first one
+                if (!current.sheet_name && sheets.length > 0) {
+                    const firstSheet = sheets[0];
+                    setCurrent({
+                        sheet_name: firstSheet.name,
+                        sheet_id: firstSheet.id || null,
+                        isFilteredData: true,
+                    });
+
+                    try {
+                        const filterUpdateData = await fetchAllInnerPageServiceTracker(
+                            formattedTrackerName,
+                            firstSheet.name
+                        );
+                        setRowData(filterUpdateData);
+                    } catch (error) {
+                        console.error("Error fetching default sheet data:", error);
+                    }
+
+                    return; // Skip rest of the function because default sheet already handled
                 }
-
-                return; // Skip rest of the function because default sheet already handled
+            } else {
+                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheetResult.reason);
             }
-        } else {
-            console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheetResult.reason);
-        }
 
-        // Fetch data only if not filtered and the sheet name is already set
-        if (serviceTrackerInnerPageData.status === 'fulfilled' && current?.isFilteredData === false) {
-            setRowData(serviceTrackerInnerPageData.value);
-        } else if (serviceTrackerInnerPageData.status === 'rejected') {
-            console.warn("fetchAllServiceTrackerInnerPage failed:", serviceTrackerInnerPageData.reason);
-        }
-    };
+            // Fetch data only if not filtered and the sheet name is already set
+            if (serviceTrackerInnerPageData.status === 'fulfilled' && current?.isFilteredData === false) {
+                setRowData(serviceTrackerInnerPageData.value);
+            } else if (serviceTrackerInnerPageData.status === 'rejected') {
+                console.warn("fetchAllServiceTrackerInnerPage failed:", serviceTrackerInnerPageData.reason);
+            }
+        };
 
-    fetchData();
-}, [current]);
+        fetchData();
+    }, [current]);
 
 
     const onFilterOpened = (params) => {
@@ -630,7 +702,7 @@ const ServiceTrackerInnerPage = () => {
                     <div className='d-lg-flex d-md-flex  justify-content-between'>
                         <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
                         <div className='w-25'>
-                            <SingleSelectTextField
+                            {/* <SingleSelectTextField
                                 name="sheet_name"
                                 label="Sheet Name"
                                 value={current?.sheet_name || ''}
@@ -660,7 +732,35 @@ const ServiceTrackerInnerPage = () => {
                                         name: data?.name
                                     })) || []
                                 }
+                            /> */}
+
+                            <SingleSelectTextField
+                                name="sheet_name"
+                                label="Sheet Name"
+                                value={current?.sheet_name || ''}
+                                onChange={async (e) => {
+                                    const selectedName = e.target.value;
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        sheet_name: selectedName,
+                                        isFilteredData: !!selectedName,
+                                    }));
+
+                                    try {
+                                        // Call fetchAndSetTrackerData with selectedName filter
+                                        await fetchAndSetTrackerData(formattedTrackerName, selectedName || null);
+                                    } catch (error) {
+                                        console.error("Error fetching service tracker data:", error);
+                                    }
+                                }}
+                                names={
+                                    serviceTrackerSheet?.map((data) => ({
+                                        _id: data?.name,
+                                        name: data?.name
+                                    })) || []
+                                }
                             />
+
 
 
                             {/* <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} /> */}

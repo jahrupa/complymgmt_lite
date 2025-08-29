@@ -57,7 +57,7 @@ import {
   UPDATE_SERVICE_TRACKER,
   CREATE_SERVICE_TRACKER,
   UPDATE_SERVICE_TRACKER_BY_STATUS_ID,
-  GET_USER_ACCESS_LEVEL,
+  GET_USER_ACCESS_LEVEL_BY_USER_ID,
   CREATE_USER_ACCESS_LEVEL,
   UPDATE_USER_ACCESS_LEVEL,
   DELETE_USER_ACCESS_LEVEL,
@@ -854,7 +854,7 @@ export const uploadExcelFile = async (filesArray, metadata = {}) => {
 // USER ACCESS LEVEL
 export const fetchAllUserAccessLevels = async ({ system_user_id }) => {
   try {
-    const response = await API.get(`${GET_USER_ACCESS_LEVEL}/${system_user_id}`);
+    const response = await API.get(`${GET_USER_ACCESS_LEVEL_BY_USER_ID}/${system_user_id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user access levels:", error);
