@@ -94,8 +94,13 @@ export const DELETE_LOCATION_TO_MODULE_BY_ID='/api/v1/location_to_module/delete/
 export const UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID='/api/v1/location_to_module/update/approval_status/';
 
 // File Upload
-export const FILE_UPLOAD='/classify-files';
+export const AUTO_FILE_UPLOAD_PYTHON='/classify-files';
+export const AUTO_FILE_UPLOAD_GOLANG='/api/v1/document_repository/create/file';
 export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
+export const GET_ALL_FILES='/api/v1/document_repository/view/files';
+export const DELETE_FILE_ID='/api/v1/document_repository/delete/file/';
+export const UPDATE_FILE='/api/v1/document_repository/update/file/';
+
 
 // pages
 export const GET_ALL_PAGE='/api/v1/pages/view/all';

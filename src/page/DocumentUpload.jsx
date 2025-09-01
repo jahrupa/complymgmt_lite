@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,7 +16,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile } from '../api/service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -39,6 +39,7 @@ import ResponsiveDatePickers from '../component/DatePicker';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
 import SmallSizeModal from '../component/SmallSizeModal';
 import MonthYearCalander from '../component/MonthYearCalander';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 const dummuJsonData = [
@@ -236,22 +237,15 @@ const dummuJsonData = [
   },
 ]
 const DocumentUpload = () => {
-  const [data, setData] = useState(dummuJsonData);
-  const [columnDefs, setColumnDefs] = useState([]);
-
+  const [data, setData] = useState([]);
   const [current, setCurrent] = useState({ user_id: null, role_name: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', desc: '', uploaded_file: [], group_holding_name: "", group_holding_id: null, company_common_name: "", company_id: null, location_name: "", location_id: "" });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [groupHoldingName, setGroupHoldingName] = useState([])
-  const [companyName, setCompanyName] = useState([])
-  const [locationName, setLocationName] = useState([])
-  const [rolesName, setRolesName] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
-  const [fileName, setFileName] = useState(''); // State to store the file name
   const [uploadedFiles, setUploadedFiles] = useState([])
-  console.log(uploadedFiles, 'uploadedFiles....')
-  const [userId, setUserId] = useState(null)
+  // console.log(uploadedFiles, 'uploadedFiles....')
+  const [documentId, setDocumentId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -260,17 +254,7 @@ const DocumentUpload = () => {
     message: '',
     severityType: '',
   });
-  // Pagination states
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // You can adjust the number of items per page
-  // Role wise access
-  const names = [
-    'Create',
-    'Editor',
-    'Viewer',
-    'Delete',
-    'All'
-  ];
+  const [isAutoUpload, setIsAutoUpload] = useState(true);
 
   // Handle input change
   const handleChange = (e) => {
@@ -299,7 +283,7 @@ const DocumentUpload = () => {
       let response;
       if (isEditing) {
         // Update existing company
-        response = await updateUserById(userId, payload);
+        response = await updateUserById(documentId, payload);
       } else {
         // Create new company
         response = await createUser(payload);
@@ -340,18 +324,18 @@ const DocumentUpload = () => {
     setCurrent(item);
     setIsEditing(true);
     setIsModalOpen(true);
-    setUserId(user_id)
+    setDocumentId(user_id)
 
   };
 
   // Handle Delete
-  const handleDelete = async (userId) => {
+  const handleDelete = async (documentId) => {
     try {
-      const response = await deleteUserById(userId);
-      const message = response?.message || "User deleted successfully";
+      const response = await deleteFileById(documentId);
+      const message = response?.message;
 
       // Refresh data
-      const updatedData = await fetchAllUser();
+      const updatedData = await fetchAllFiles();
       setData(updatedData);
       setIsDeleteModalOpen(false);
 
@@ -363,19 +347,11 @@ const DocumentUpload = () => {
         severityType: 'success',
       });
     } catch (error) {
-      console.error("Error deleting user:", error);
-
-      // Extract error message safely
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to delete user";
-
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error',
       });
     }
@@ -387,17 +363,6 @@ const DocumentUpload = () => {
     setData(filteredData);
     setSelectedRows([]); // Clear selected rows after deletion
   };
-  // Pagination Logic: Slicing the data to display on the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Pagination Button Handler
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Total number of pages
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-
   // Function to open the modal
   const openModal = () => {
     setIsFileUploadModalModalOpen(true);
@@ -429,29 +394,103 @@ const DocumentUpload = () => {
     }
 
     try {
-      const result = await uploadFile(uploadedFiles);
-      console.log("Files uploaded successfully:", result);
+      // const result = await uploadFile(uploadedFiles);
+      const result = await uploadFileGolang(uploadedFiles)
+      // console.log("Files uploaded successfully:", result);
       setIsFileUploadModalModalOpen(false);
+      const message = result?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+      // const { Data } = result;
 
-      const { Data } = result;
+      // if (Data && Data.length > 0) {
+      //   const summary = Data.map((file, index) => {
+      //     return `${index + 1}. 📄 ${file.filename}\n   🏷️ Doc Type: ${file.doc_type}\n   📊 Confidence: ${file.confidence}%`;
+      //   }).join("\n\n");
 
-      if (Data && Data.length > 0) {
-        const summary = Data.map((file, index) => {
-          return `${index + 1}. 📄 ${file.filename}\n   🏷️ Doc Type: ${file.doc_type}\n   📊 Confidence: ${file.confidence}%`;
-        }).join("\n\n");
-
-        alert(`✅ Files uploaded successfully 🎉\n\n${summary}`);
-      } else {
-        alert("Files uploaded, but no metadata returned.");
-      }
-
+      //   alert(`✅ Files uploaded successfully 🎉\n\n${summary}`);
+      // } else {
+      //   alert("Files uploaded, but no metadata returned.");
+      // }
+      const updatedData = await fetchAllFiles();
+      setData(updatedData);
     } catch (error) {
-      console.error("Upload failed:", error);
-      alert("❌ Upload failed. Please try again.");
+      // console.error("Upload failed:", error);
+      // alert("❌ Upload failed. Please try again.");
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
     }
+
   };
 
+  const handleToggleChange = async (e, params) => {
+    const newIsActive = {
+      "module_id": params.data.module_id,
+      "submodule_id": params.data.submodule_id,
+      "company_name": params.data.company_name,
+      "company_location": params.data.company_location,
+      "document_type": params.data.document_type,
+      "stage": params.data.stage,
+      "is_active": e.target.checked,
+      "approval_status": params.data.approval_status
+    };
+    try {
+      const response = await updateFileById(params.data.document_id, newIsActive);
+      const message = response?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+      const updatedData = await fetchAllFiles();
+      setData(updatedData);
+    } catch (error) {
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
+    }
 
+  };
+  const handleApproveAll = async () => {
+    try {
+      const response = await bulkApproveAllPageData('document_repository');
+      const message = response?.message || "Status update successfully"
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+      // Refresh data
+      const updatedData = await fetchAllFiles();
+      setData(updatedData);
+    } catch (error) {
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
+    }
+
+  };
   const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
   const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
 
@@ -476,18 +515,18 @@ const DocumentUpload = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userData, groupHolding, roleName, companyName, getLocationName] = await Promise.all([
-          fetchAllUser(),
-          fetchAllGroupHolding(),
-          fetchAllUserName(),
-          fetchAllCompaniesName(),
-          fetchAllLocationName(),
+        const [uploadedFile, groupHolding, roleName, companyName, getLocationName] = await Promise.all([
+          fetchAllFiles(),
+          // fetchAllGroupHolding(),
+          // fetchAllUserName(),
+          // fetchAllCompaniesName(),
+          // fetchAllLocationName(),
         ]);
-        setData(userData);
-        setGroupHoldingName(groupHolding);
-        setRolesName(roleName)
-        setCompanyName(companyName)
-        setLocationName(getLocationName)
+        setData(uploadedFile);
+        // setGroupHoldingName(groupHolding);
+        // setRolesName(roleName)
+        // setCompanyName(companyName)
+        // setLocationName(getLocationName)
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -513,16 +552,10 @@ const DocumentUpload = () => {
   };
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
-      case 'Approved':
+      case 0:
+        return { color: '#FFC107' }; // amber
+      case 1:
         return { color: '#4CAF50' }; // green
-      case 'Untagged':
-        return { color: '#9E9E9E' }; // blue
-      case 'Rejected':
-        return { color: '#F44336' }; // brown
-      case 'Tagged':
-        return { color: '#2196F3' }; // red
-      case 'Pending':
-        return { color: '#FFC107' }; // red
       default:
         return { color: '#41464b' }; // gray
     }
@@ -536,6 +569,7 @@ const DocumentUpload = () => {
       width: 130,
       flex: 1,
       pinned: "right",
+      editable: 'false',
       cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
       cellRenderer: (params) => {
         return (
@@ -547,7 +581,7 @@ const DocumentUpload = () => {
                 // setCurrent(params.data);
                 setIsEditing(false);
                 setIsModalOpen(true);
-                setUserId(params.data.id); // OR .user_id based on your data
+                setDocumentId(params.data.id); // OR .user_id based on your data
               }}
             >
               <AttachFileIcon fontSize="small" className="action_icon" />
@@ -555,7 +589,7 @@ const DocumentUpload = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setUserId(params.data.id);
+                setDocumentId(params.data.document_id);
                 setIsDeleteModalOpen(true);
               }}
             >
@@ -567,7 +601,7 @@ const DocumentUpload = () => {
                 setCurrent(params.data);
                 setIsEditing(true);
                 setIsModalOpen(true);
-                setUserId(params.data.id); // OR .user_id based on your data
+                setDocumentId(params.data.id); // OR .user_id based on your data
               }}
             >
               <EditIcon fontSize="small" className="action_icon" />
@@ -578,41 +612,90 @@ const DocumentUpload = () => {
       }
     }
     ,
-    { field: 'name', headerName: 'Uploaded By', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    //  { field: "_id", headerName: "ID",  },
+    { field: "file_name", headerName: "File Name", editable: 'false', },
+    { field: "document_type", headerName: "Document Type", editable: 'false', },
     {
-      field: 'role_name', headerName: 'Role Name', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
-
+      field: "file_path",
+      headerName: "File Path",
+      editable: 'false',
       cellRenderer: (params) => {
-        const { background, color } = getRoleColor(params.value);
-        return (
-          <span
-            style={{
-              //   padding: '4px 12px',
-              padding: '5px 12px',
-              backgroundColor: background,
-              color: color,
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              //   display: 'inline-block',
-              textAlign: 'center',
-              minWidth: '60px'
-            }}
-          >
-            <span> <PermIdentityIcon style={{ width: '15', height: '15' }} className='mb-1 me-1' /></span>{params.value}<span></span>
-          </span>
+        const path = params.value;
+        return path ? (
+          <a href={`/${path}`} target="_blank" rel="noopener noreferrer" style={{ background: 'cadetblue', color: 'white', padding: '4px', borderRadius: '5px', textDecoration: 'none', fontSize: '12px' }}>
+            Download
+          </a>
+        ) : (
+          "No File"
         );
       }
     },
     {
-      field: 'uploaded_file', headerName: 'Uploaded File', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
-      //  cellRenderer: (params) => {return(
-      //   <span style={{color:'gray'}}>{params?.value}</span>
-      //  )}
+      editable: 'false',
+      field: "is_active", headerName: "Status", valueGetter: (params) => params.data?.is_active,
+      cellRenderer: (params) => (
+        <Toggle
+          checked={!!params.value}
+          onChange={(e) => handleToggleChange(e, params)}
+        />
+      )
     },
-    { field: 'uploaded_at', headerName: 'Uploaded At', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'updated_at', headerName: 'Updated At', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    {
+      field: "approval_status",
+      headerName: "Approval Status",
+      editable: false,
+      width: 150,
+      valueGetter: (params) => params.data?.approval_status, // safer access
+      cellRenderer: (params) => {
+        const getApprovalStatusText = (status) => {
+          switch (status) {
+            case 0: return 'Pending';
+            case 1: return 'Approved';
+            default: return '-'; // fallback
+          }
+        };
 
+        const status = params.value;
+        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input
+              type="checkbox"
+              checked={status }
+              // readOnly={status === 1}
+              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+            />
+            <span
+              style={{
+                color,
+                fontSize: '0.8rem',
+                fontWeight: 500,
+              }}
+            >
+              {getApprovalStatusText(status)}
+            </span>
+          </div>
+        );
+      }
+    },
+    { field: "approved_at", headerName: "Approved At", editable: 'false', },
+    { field: "approved_by", headerName: "Approved By", editable: 'false', },
+    { field: "company_location", headerName: "Company Location", editable: 'false', },
+    { field: "company_name", headerName: "Company Name", editable: 'false', },
+    { field: "created_at", headerName: "Created At", editable: 'false', },
+    { field: "created_by", headerName: "Created By", editable: 'false', },
+    { field: "deleted_at", headerName: "Deleted At", editable: 'false', },
+    { field: "deleted_by", headerName: "Deleted By", editable: 'false', },
+    // { field: "document_id", headerName: "Document ID",  },
+    // { field: "is_archived", headerName: "Is Archived",  },
+    // { field: "is_deleted", headerName: "Is Deleted",  },
+    // { field: "module_id", headerName: "Module ID",  },
+    { field: "stage", headerName: "Stage", editable: 'false', },
+    // { field: "submodule_id", headerName: "Submodule ID",  },
+    { field: "updated_at", headerName: "Updated At", editable: 'false', },
+    { field: "updated_by", headerName: "Updated By", editable: 'false', }
 
   ];
   const gridRef = useRef();
@@ -625,9 +708,25 @@ const DocumentUpload = () => {
   const onRowValueChanged = (event) => {
     console.log('Row updated:', event.data);
   };
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
   const fileUploadForm = () => {
     return (
       <div>
+        <div className='d-flex align-items-center'>
+          <span>
+            <Toggle
+              checked={isAutoUpload}
+              onChange={() => setIsAutoUpload(!isAutoUpload)}
+            />
+          </span>
+          <span className='fs-12 ms-2 mt-1'>Auto Upload</span>
+        </div>
+
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
             <MultiFileUpload setUploadedFiles={setUploadedFiles} uploadedFiles={uploadedFiles} />
@@ -663,7 +762,7 @@ const DocumentUpload = () => {
           <div className='col-6 d-flex justify-content-end'>
             <button type="submit"
               className="btn-sm btn btn-primary"
-              onClick={() => handleDelete(userId)}>Yes, I'm sure</button>
+              onClick={() => handleDelete(documentId)}>Yes, I'm sure</button>
           </div>
         </div>
       </div>
@@ -859,21 +958,9 @@ const DocumentUpload = () => {
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
-          <div className='d-flex h-100'>
-            <div className="search-bar-container h-25">
-              <MuiSearchBar label='Search...' type='text' />
-              <button className='search-icon'><SearchIcon /></button>
-            </div>
-            {/* <MultipleSelectFields placeholder='Filter By Role' roleName={roleName} /> */}
-          </div>
-
-
+          <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
           <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div className='pe-2 d-lg-flex d-md-flex gap-3'>
-              {/* <button className='crud_btn w-100' onClick={openModal}>
-                                <span><AddIcon /></span> <span className='button-style'>Add New User Role</span>
-                            </button> */}
-
               <div>
                 <button className="reject upload-wrapper upload-label" onClick={openModal}>
                   <span className="icon">
@@ -884,11 +971,21 @@ const DocumentUpload = () => {
                   <span className="text">Upload File</span>
                 </button>
               </div>
-              <MonthYearCalander />
+              {/* <MonthYearCalander /> */}
+              <div className='btn-wrap-div'>
+                <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+                  <span className="icon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                    </svg>
+                  </span>
+                  <span className="text">Approve</span>
+                </button>
+              </div>
 
             </div>
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} closeModal={closeModal}/>
+            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} closeModal={closeModal} />
           </div>
         </div>
 
@@ -896,7 +993,7 @@ const DocumentUpload = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={data || []}
             columnDefs={colDefs}
             // columnDefs={columnDefs}
             defaultColDef={defaultColDef}

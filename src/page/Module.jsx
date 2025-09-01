@@ -517,9 +517,6 @@ const Module = () => {
             filter: true,
             headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
         },
-
-
-        { field: 'location', headerName: 'Location', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_at', headerName: 'Created At', flex: 1, editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.updated_at', headerName: 'Updated At', flex: 1, editable: true, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {

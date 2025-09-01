@@ -52,7 +52,7 @@ import {
   UPDATE_LOCATION_TO_MODULE_STATUS_BY_ID,
   DELETE_LOCATION_TO_MODULE_BY_ID,
   GET_SUB_MODULE_NAME_BY_MODULE_ID,
-  FILE_UPLOAD,
+  AUTO_FILE_UPLOAD_PYTHON,
   DELETE_SERVICE_TRACKER_BY_ID,
   UPDATE_SERVICE_TRACKER,
   CREATE_SERVICE_TRACKER,
@@ -82,7 +82,11 @@ import {
   UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID,
   UPDATE_APPROVAL_STATUS_SUBMODULES_BY_ID,
   APPROVE_USER_ACCESS,
-  UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID
+  UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID,
+  AUTO_FILE_UPLOAD_GOLANG,
+  GET_ALL_FILES,
+  DELETE_FILE_ID,
+  UPDATE_FILE
 
 } from "./Endpoint";
 // Login Api
@@ -812,7 +816,7 @@ export const uploadFile = async (filesArray) => {
       formData.append("files", file);
     });
 
-    const response = await API.post(FILE_UPLOAD, formData, {
+    const response = await API.post(AUTO_FILE_UPLOAD_PYTHON, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -824,6 +828,30 @@ export const uploadFile = async (filesArray) => {
     throw error;
   }
 };
+
+
+// File upload Golang
+export const uploadFileGolang = async (filesArray) => {
+  try {
+    const formData = new FormData();
+
+    filesArray.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed:", error.response?.data || error);
+    throw error;
+  }
+};
+
 export const uploadExcelFile = async (filesArray, metadata = {}) => {
   try {
     const formData = new FormData();
@@ -850,7 +878,33 @@ export const uploadExcelFile = async (filesArray, metadata = {}) => {
   }
 };
 
-
+export const deleteFileById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_FILE_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting file by ID:", error);
+    throw error;
+  }
+};
+export const fetchAllFiles = async () => {
+  try {
+    const response = await API.get(GET_ALL_FILES);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all files:", error);
+    throw error;
+  }
+};
+export const updateFileById = async (id, fileData) => {
+  try {
+    const response = await API.put(`${UPDATE_FILE}${id}`, fileData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating file by ID:", error);
+    throw error;
+  }
+};
 // USER ACCESS LEVEL
 export const fetchAllUserAccessLevels = async ({ system_user_id }) => {
   try {

@@ -1014,7 +1014,7 @@ const AccessControl = () => {
             const message = response?.message
             // Show success snackbar
             setIsSnackbarsOpen({
-                ...issnackbarsOpen,
+                ...isSnackbarsOpen,
                 open: true,
                 message,
                 severityType: 'success',
@@ -1022,13 +1022,13 @@ const AccessControl = () => {
         } catch (error) {
             // Show error snackbar
             setIsSnackbarsOpen({
-                ...issnackbarsOpen,
+                ...isSnackbarsOpen,
                 open: true,
                 message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllSubModule();
+        const updatedData = await fetchAllUserAccessLevels();
         setData(updatedData);
     };
 

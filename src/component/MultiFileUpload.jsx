@@ -41,7 +41,7 @@ function MultiFileUpload({ uploadedFiles, setUploadedFiles }) {
                 <span>You can upload a maximum of 5 files at a time.</span>
             </div>
             <input id='multi-fileUpload' type='file' multiple
-                accept='.pdf, .jpg, .png ,jpeg'
+                accept='.xlsx, .xls, .csv, .pdf, .doc, .docx, .png, .jpg, .jpeg'
                 onChange={handleFileEvent}
                 disabled={fileLimit}
                 className="upload_file_input"
