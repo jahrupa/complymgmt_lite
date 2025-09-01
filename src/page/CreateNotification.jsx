@@ -349,9 +349,8 @@ function CreateNotification() {
                         <div className="preview-panel">
                             <h2 className="panel-title">
                                 <Eye size={24} />
-                                Notifaction List
+                                Notification List
                             </h2>
-
                             <div className="preview-content" onClick={() => navigate('/send_notification')}>
                                 {/* Preview Notification */}
                                 <div className={`notification-preview ${notification.type} ${notification.isActive ? 'active' : 'inactive'}`}>
