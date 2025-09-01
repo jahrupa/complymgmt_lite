@@ -224,7 +224,7 @@ const AccessControl = () => {
                 .replace(/\s+/g, '_') || current?.page_name || current?.service_tracker_wise || current?.assign_user_name,
             entity_type: current?.access_type,
             bo_user_id: currentUserId,
-            0: Array.isArray(current?.access)
+            access: Array.isArray(current?.access)
                 ? current.access.map(a => a.toLowerCase())
                 : []
         }
