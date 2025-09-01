@@ -12,6 +12,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import '../style/createNotification.css';
+import { useNavigate } from 'react-router-dom';
 
 function CreateNotification() {
     const [notification, setNotification] = useState({
@@ -28,6 +29,7 @@ function CreateNotification() {
             backgroundColor: '#ffffff'
         }
     });
+  const navigate = useNavigate();
 
     const [showPreview, setShowPreview] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -109,29 +111,6 @@ function CreateNotification() {
 
     const currentTypeData = getNotificationTypeData(notification.type);
 
-    // === ✨ Format content with specific word styling ===
-    //   const formatNotificationContent = (text) => {
-    //     const boldPhrase = "Your notification content";
-    //     const redWord = "notification";
-    //     const parts = [];
-    //     let i = 0;
-    //     let key = 0;
-
-    //     while (i < text.length) {
-    //       if (text.slice(i, i + boldPhrase.length) === boldPhrase) {
-    //         parts.push(<strong key={key++}>{boldPhrase}</strong>);
-    //         i += boldPhrase.length;
-    //       } else if (text.slice(i, i + redWord.length) === redWord) {
-    //         parts.push(<span key={key++} style={{ color: 'red' }}>{redWord}</span>);
-    //         i += redWord.length;
-    //       } else {
-    //         parts.push(<span key={key++}>{text[i]}</span>);
-    //         i++;
-    //       }
-    //     }
-    //     return parts;
-    //   };
-
     return (
         <div className="">
             <div className="max-width-container">
@@ -202,7 +181,7 @@ function CreateNotification() {
                             </div>
                         </div>
                         {/* Dropdowns */}
-                        <div className="dropdown-grid">
+                        {/* <div className="dropdown-grid">
                             <div className="form-group">
                                 <label className="form-label">Notification Type</label>
                                 <div className="select-wrapper">
@@ -238,7 +217,7 @@ function CreateNotification() {
                                     <ChevronDown className="select-icon" size={20} />
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Header Input */}
                         <div className="form-group">
@@ -253,10 +232,9 @@ function CreateNotification() {
                         </div>
 
                         {/* Text Formatting Controls */}
-                        <div className="form-group">
+                        {/* <div className="form-group">
                             <label className="form-label">Text Formatting</label>
 
-                            {/* Style Controls */}
                             <div className="formatting-controls">
                                 <button
                                     onClick={() => updateTextStyle('bold', !notification.textStyle.bold)}
@@ -288,7 +266,6 @@ function CreateNotification() {
                                 </div>
                             </div>
 
-                            {/* Color Pickers */}
                             <div className="color-picker-grid">
                                 <div className="color-picker-section">
                                     <label className="color-label">Text Color</label>
@@ -318,7 +295,7 @@ function CreateNotification() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Content Textarea */}
                         <div className="form-group">
@@ -372,10 +349,10 @@ function CreateNotification() {
                         <div className="preview-panel">
                             <h2 className="panel-title">
                                 <Eye size={24} />
-                                Live Preview
+                                Notifaction List
                             </h2>
 
-                            <div className="preview-content">
+                            <div className="preview-content" onClick={() => navigate('/send_notification')}>
                                 {/* Preview Notification */}
                                 <div className={`notification-preview ${notification.type} ${notification.isActive ? 'active' : 'inactive'}`}>
                                     <div className="notification-content">
@@ -384,31 +361,44 @@ function CreateNotification() {
                                                 <Bell size={20} />
                                             </div>
                                             <div className="notification-text">
-                                                <div className="notification-title-row">
-                                                    <h3 className="notification-title">{notification.header}</h3>
-                                                    <span
-                                                        className="priority-badge"
-                                                        style={{ color: priorities.find(p => p.value === notification.priority)?.color }}
-                                                    >
-                                                        {priorities.find(p => p.value === notification.priority)?.label}
-                                                    </span>
+                                                <div className="notification-title-row justify-content-between">
+                                                    <div className="notification-title-row">
+                                                        <h3 className="notification-title">{notification.header}</h3>
+                                                        <span
+                                                            className="priority-badge"
+                                                            style={{ color: priorities.find(p => p.value === notification.priority)?.color }}
+                                                        >
+                                                            {priorities.find(p => p.value === notification.priority)?.label}
+                                                        </span>
+
+                                                    </div>
+
+                                                    <div className="">
+                                                        <div className={`status-badge ${notification.isActive ? 'status-active' : 'status-inactive'}`}>
+                                                            <div className="status-dot" />
+                                                            {notification.isActive ? 'Active' : 'Inactive'}
+                                                        </div>
+                                                    </div>
                                                 </div>
+
                                                 <div
-                                                    className="notification-message"
+                                                    className="notification-message p-2"
                                                     style={{
-                                                        fontWeight: notification.textStyle.bold ? 'bold' : 'normal',
-                                                        fontStyle: notification.textStyle.italic ? 'italic' : 'normal',
-                                                        fontSize: `${notification.textStyle.fontSize}px`,
+                                                        // fontWeight: notification.textStyle.bold ? 'bold' : 'normal',
+                                                        // fontStyle: notification.textStyle.italic ? 'italic' : 'normal',
+                                                        fontSize: '14px',
                                                         color: notification.textStyle.color,
                                                         backgroundColor: notification.textStyle.backgroundColor,
                                                         padding: notification.textStyle.backgroundColor !== '#ffffff' ? '8px 12px' : '0',
-                                                        borderRadius: notification.textStyle.backgroundColor !== '#ffffff' ? '6px' : '0'
+                                                        // borderRadius: notification.textStyle.backgroundColor !== '#ffffff' ? '6px' : '0'
+                                                        borderRadius: '5px'
                                                     }}
                                                 >
                                                     {notification.content}
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
 
                                     {/* Animated border effect */}
@@ -419,13 +409,13 @@ function CreateNotification() {
                                 </div>
 
                                 {/* Status Indicator */}
-                                <div className="status-indicator">
+                                {/* <div className="status-indicator">
                                     <span className="status-label">Status:</span>
                                     <div className={`status-badge ${notification.isActive ? 'status-active' : 'status-inactive'}`}>
                                         <div className="status-dot" />
                                         {notification.isActive ? 'Active' : 'Inactive'}
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     )}
