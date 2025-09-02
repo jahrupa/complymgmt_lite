@@ -903,7 +903,7 @@ const DocumentRepository = () => {
     }
     return (
         <div>
-            <RightDrawer drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            {/* <RightDrawer drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} /> */}
             <h5>Document Repository</h5>
             <div className='row  mb-4 mt-4'>
                 <div className='col col-12 col-lg-4 mb-3 col-md-4'>

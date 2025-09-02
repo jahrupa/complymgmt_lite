@@ -295,7 +295,7 @@ const DocumentUpload = () => {
     if (!current?.location_name) tempErrors.location_name = "Location is required";
     if (!current?.module_name) tempErrors.module_name = "Module is required";
     if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
-    if (!current?.service_tracker) tempErrors.service_tracker = "Service Tracker is required";
+    if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Service Tracker is required";
     if (!current?.document_type) tempErrors.document_type = "Document Type is required";
     if (!current?.stage) tempErrors.stage = "Stage is required";
     setErrors(tempErrors);
