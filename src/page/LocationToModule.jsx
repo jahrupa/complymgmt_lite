@@ -287,8 +287,6 @@ const LocationToModule = () => {
                         }))}
                         error={!!errors.company_name}
                         helperText={errors.company_name}
-                    // isdisable={isEditing ? true : false}
-
                     />
                     <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
                         onChange={(e) => {

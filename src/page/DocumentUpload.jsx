@@ -16,7 +16,7 @@ import PasswordInput from '../component/MuiInputs/PasswordInput';
 import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
 import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData } from '../api/service';
+import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -238,7 +238,32 @@ const dummuJsonData = [
 ]
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
-  const [current, setCurrent] = useState({ user_id: null, role_name: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', desc: '', uploaded_file: [], group_holding_name: "", group_holding_id: null, company_common_name: "", company_id: null, location_name: "", location_id: "" });
+  const [current, setCurrent] = useState(
+    {
+      // user_id: null,
+      //  role_name: '', 
+      //  email: '', 
+      //  role_name: '', 
+      //  role_id: null, 
+      //  password: "", 
+      //  status: 'Active', 
+      //  desc: '', 
+      // uploaded_file: [],
+      group_name: "",
+      group_holdings_id: null,
+      company_name: "",
+      company_id: null,
+      location_name: "",
+      location_id: null,
+      module_name: '',
+      module_id: null,
+      sub_module_name: '',
+      sub_module_id: null,
+      service_tracker_name: '',
+      service_tracker_id: null,
+      document_type: '',
+      stage: ''
+    });
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -255,65 +280,62 @@ const DocumentUpload = () => {
     severityType: '',
   });
   const [isAutoUpload, setIsAutoUpload] = useState(true);
-
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCurrent((prev) => ({ ...prev, [name]: value }));
+  const [errors, setErrors] = useState({});
+  const [groupHoldingName, setGroupHoldingName] = useState([])
+  const [companyName, setCompanyName] = useState([])
+  // console.log(companyName, 'companyName')
+  const [locationName, setLocationName] = useState([])
+  const [moduleName, setModuleName] = useState([])
+  const [subModuleName, setSubModuleName] = useState([]);
+  const [serviceTrackerName, setServiceTrackerName] = useState([]);
+  const validate = () => {
+    let tempErrors = {};
+    if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
+    if (!current?.company_name) tempErrors.company_name = "Company is required";
+    if (!current?.location_name) tempErrors.location_name = "Location is required";
+    if (!current?.module_name) tempErrors.module_name = "Module is required";
+    if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
+    if (!current?.service_tracker) tempErrors.service_tracker = "Service Tracker is required";
+    if (!current?.document_type) tempErrors.document_type = "Document Type is required";
+    if (!current?.stage) tempErrors.stage = "Stage is required";
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
   };
-  // Handle role_name access change
-  const handleRoleAccessChange = (newValue) => {
-    setCurrent((prev) => ({ ...prev, uploaded_file: newValue }));
-  };
+  const crudTitle = "Upload Your File"
+  const editCrudTitle = "Edit Your Uploaded File"
   const handleSubmit = async (e) => {
-    // e?.preventDefault();
-
+    e?.preventDefault();
+    if (!validate()) return; // Don't proceed if validation fails
     const payload = {
-      "Name": "Rupa Jha",
-      "Email": current?.email,
-      "MobileNumber": "2345876543",
-      "IsKarma": false,
-      "Username": current?.role_name,
-      "Password": current?.password,
-      "IsActive": true,
-      "CreatedBy": 1
+      "module_id": current?.module_id || "",
+      "submodule_id": current?.sub_module_id || "",
+      "company_name": current?.company_name || "",
+      "company_location": current?.location_name || "",
+      "document_type": current?.document_type || "",
+      "stage": current?.stage || "",
+      "is_active": null,
+      "approval_status": null
     };
 
     try {
       let response;
-      if (isEditing) {
-        // Update existing company
-        response = await updateUserById(documentId, payload);
-      } else {
-        // Create new company
-        response = await createUser(payload);
-      }
-
+      // Update existing company
+      response = await updateFileById(documentId, payload);
       // ✅ Get the message from response
       const message = response?.message;
-      // console.log(message, 'message')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
-      const updatedData = await fetchAllUser();
+      const updatedData = await fetchAllFiles();
       setData(updatedData);
     } catch (error) {
-      console.error("Error saving user:", error);
-
-      // Extract message from error response if available
-      const errorMessage =
-        error?.response?.data?.message || // for Axios
-        error?.message ||                 // native JS error
-        "Failed to save user";            // fallback message
-
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: errorMessage,
+        message: error?.response?.data?.message,
         severityType: 'error'
       });
     }
-
     setIsEditing(false);
     setIsModalOpen(false);
   };
@@ -356,13 +378,6 @@ const DocumentUpload = () => {
       });
     }
   };
-
-  // Handle Delete All Selected
-  const handleDeleteAll = () => {
-    const filteredData = data.filter((item) => !selectedRows.includes(item.id));
-    setData(filteredData);
-    setSelectedRows([]); // Clear selected rows after deletion
-  };
   // Function to open the modal
   const openModal = () => {
     setIsFileUploadModalModalOpen(true);
@@ -371,7 +386,9 @@ const DocumentUpload = () => {
   const closeModal = () => {
     setIsFileUploadModalModalOpen(false);
   };
-
+  const toggleDrawer = (newOpen) => () => {
+    setIsModalOpen(newOpen);
+  };
   // const handleFileUpload = async () => {
   //   if (!uploadedFiles?.length) {
   //     alert("Please select at least one file.");
@@ -491,50 +508,117 @@ const DocumentUpload = () => {
     }
 
   };
-  const roleName = ['Admin', 'Super Admin', 'Client', 'Manager'];
   const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
 
-  const accessLevel = [
-    "Group",
-    "Company",
-    "Location",
-    "Module",
-    "Sub-Module",
-    "Role",
-    "Tracker",
-    "Own/Self",
-    "All",
-
-  ];
-  const accessControl = [
-    "Upload/Add New",
-    "Edit",
-    "Delete",
-    "Can Approve",
-  ];
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [uploadedFile, groupHolding, roleName, companyName, getLocationName] = await Promise.all([
+        const results = await Promise.allSettled([
           fetchAllFiles(),
-          // fetchAllGroupHolding(),
-          // fetchAllUserName(),
-          // fetchAllCompaniesName(),
-          // fetchAllLocationName(),
+          fetchAllGroup(),
+          //  fetchAllModulesName(),
         ]);
-        setData(uploadedFile);
-        // setGroupHoldingName(groupHolding);
-        // setRolesName(roleName)
-        // setCompanyName(companyName)
-        // setLocationName(getLocationName)
+        if (results[0].status === 'fulfilled') setData(results[0].value);
+        if (results[1].status === 'fulfilled') setGroupHoldingName(results[1].value);
+        // if (results[2].status === 'fulfilled') setModuleName(results[2].value);
+        results.forEach((result, idx) => {
+          if (result.status === 'rejected') {
+            console.error(`Error fetching data at index ${idx}:`, result.reason);
+          }
+        });
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error in fetchData:", error);
       }
     };
 
     fetchData();
   }, []);
+  useEffect(() => {
+    const fetchCompany = async () => {
+      try {
+        const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+        if (data) {
+          setCompanyName(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch company:", error);
+      }
+    };
 
+    if (current?.group_holdings_id) {
+      fetchCompany();
+    }
+  }, [current?.group_holdings_id]);
+
+  useEffect(() => {
+    const fetchLocationByCompanyId = async () => {
+      try {
+        const data = await getLocationByCompanyId(current?.company_id);
+        if (data) {
+          setLocationName(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch location by company_id:", error);
+      }
+    };
+
+    if (current?.company_id) {
+      fetchLocationByCompanyId();
+    }
+  }, [current?.company_id]);
+
+  useEffect(() => {
+    const fetchModuleByLocationId = async () => {
+      try {
+        const data = await fetchAllModulesNameByLocationId(current?.location_id);
+        if (data) {
+          setModuleName(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch module by location_id:", error);
+      }
+    };
+
+    if (current?.location_id) {
+      fetchModuleByLocationId();
+    }
+  }, [current?.location_id]);
+
+  // sub-module by module id
+  useEffect(() => {
+    const fetchSubModuleByModuleId = async () => {
+      try {
+        const data = await fetchAllSubModuleNameByModuleId(current?.module_id);
+        if (data) {
+          setSubModuleName(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch sub-module by module_id:", error);
+      }
+    };
+
+    if (current?.module_id) {
+      fetchSubModuleByModuleId();
+    }
+  }, [current?.module_id]);
+  // Fetch service tracker by sub-module ID
+   useEffect(() => {
+    const getServiceTrackerBySubModuleId = async (id) => {
+    try {
+      const data = await fetchServiceTrackerBySubModuleId(id);
+      if (data) {
+        setServiceTrackerName(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch service tracker by sub module ID:", error);
+    }
+  };
+
+    if (current?.sub_module_id) {
+      getServiceTrackerBySubModuleId(current?.sub_module_id);
+    }
+  }, [current?.sub_module_id]);
+  
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -574,14 +658,12 @@ const DocumentUpload = () => {
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
-
             <button
               className="btn btn-sm"
               onClick={() => {
-                // setCurrent(params.data);
                 setIsEditing(false);
                 setIsModalOpen(true);
-                setDocumentId(params.data.id); // OR .user_id based on your data
+                setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
             >
               <AttachFileIcon fontSize="small" className="action_icon" />
@@ -601,7 +683,7 @@ const DocumentUpload = () => {
                 setCurrent(params.data);
                 setIsEditing(true);
                 setIsModalOpen(true);
-                setDocumentId(params.data.id); // OR .user_id based on your data
+                setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
             >
               <EditIcon fontSize="small" className="action_icon" />
@@ -662,10 +744,10 @@ const DocumentUpload = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <input
               type="checkbox"
-              checked={status }
+              checked={status}
               // readOnly={status === 1}
               style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
@@ -746,8 +828,7 @@ const DocumentUpload = () => {
     )
 
   }
-  const crudTitle = "Upload Your File"
-  const editCrudTitle = "Edit Your Uploaded File"
+
   const deleteModal = () => {
     return (
       <div>
@@ -786,29 +867,159 @@ const DocumentUpload = () => {
     return (
       <div className='p-3'>
         <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="company_common_name" label="Company Common Name" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
-          <MuiTextField label='Company Name' type='text' isRequired={true} fieldName='username' handleChange={handleChange} value={current.username} />
+          <SingleSelectTextField
+            name="group_name"
+            label="Group Holding"
+            value={current.group_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedGroup = groupHoldingName.find(
+                (g) => g.group_name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                group_name: selectedName,
+                group_holdings_id: matchedGroup?._id || null,
+                company_name: '',
+                location_name: '',
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, group_name: '' }));
+
+            }}
+            names={groupHoldingName.map((item) => ({
+              _id: item._id,
+              name: item.group_name,
+            }))}
+            error={!!errors.group_name}
+            helperText={errors.group_name}
+          />
+          <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedCompany = companyName.find(
+                (g) => g.company_name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                company_name: selectedName,
+                company_id: matchedCompany?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, company_name: '' }));
+
+            }}
+            names={companyName.map((item) => ({
+              _id: item._id,
+              name: item.company_name,
+            }))}
+            error={!!errors.company_name}
+            helperText={errors.company_name}
+          />
         </div>
         <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="company_common_name" label="Module" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
-          <SingleSelectTextField name="company_common_name" label="Module Type" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
+          <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = locationName.find(
+                (g) => g.location_name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                location_name: selectedName,
+                location_id: matchedLocation?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, location_name: '' }));
+
+            }}
+            names={locationName.map((item) => ({
+              _id: item._id,
+              name: item.location_name,
+            }))}
+            // isdisable={isEditing ? true : false}
+            error={!!errors.location_name}
+            helperText={errors.location_name}
+
+          />
+          <SingleSelectTextField name="module_name" label="Module" value={current?.module_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = moduleName.find(
+                (g) => g.name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                module_name: selectedName,
+                module_id: matchedLocation?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, module_name: '' }));
+
+            }}
+            names={moduleName}
+            // isdisable={isEditing ? true : false}
+            error={!!errors.module_name}
+            helperText={errors.module_name}
+
+          />
         </div>
         <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="company_common_name" label="Location" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
+          <SingleSelectTextField name="sub_module_name" label="Sub-Module" value={current?.sub_module_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = subModuleName.find(
+                (g) => g.sub_module_name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                sub_module_name: selectedName,
+                sub_module_id: matchedLocation?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, sub_module_name: '' }));
+
+            }}
+            names={subModuleName?.map((item) => ({
+              _id: item._id,
+              name: item.sub_module_name,
+            }))}
+            // isdisable={isEditing ? true : false}
+            error={!!errors.sub_module_name}
+            helperText={errors.sub_module_name}
+
+          />
+
+          {/* <SingleSelectTextField name="company_common_name" label="Sub-Module" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} /> */}
+          <SingleSelectTextField name="service_tracker_name" label="Service Tracker" value={current?.service_tracker_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = serviceTrackerName.find(
+                (g) => g.name === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                service_tracker_name: selectedName,
+                service_tracker_id: matchedLocation?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, service_tracker_name: '' }));
+
+            }}
+            names={serviceTrackerName?.map((item) => ({
+              _id: item._id,
+              name: item.service_tracker_name,
+            }))}
+            // isdisable={isEditing ? true : false}
+            error={!!errors.service_tracker_name}
+            helperText={errors.service_tracker_name}
+
+          />
+        </div>
+        <div className='d-lg-flex d-md-flex gap-3 mb-3'>
           <SingleSelectTextField name="company_common_name" label="Document Type" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
-        </div>
-        <div className='d-lg-flex d-md-flex gap-3 mb-3'>
           <SingleSelectTextField name="company_common_name" label="Stage" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
-          {/* <SingleSelectTextField name="company_common_name" label="Upload Date" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} /> */}
-          <ResponsiveDatePickers />
         </div>
         <div className='d-lg-flex d-md-flex d-flex justify-content-between'>
-
           <div>
-            <button type='submit' className='btn-sm btn btn-primary'>Cancle</button>
+            <button type='submit' className='btn btn-secondary' onClick={toggleDrawer(false)}>Cancle</button>
           </div>
           <div>
-            <button type='submit' className='btn-sm btn btn-primary'>{isEditing ? 'Save Changes' : 'Save'}</button>
+            <button type='submit' className='btn btn btn-primary' onClick={handleSubmit}>{isEditing ? 'Save Changes' : 'Save'}</button>
           </div>
         </div>
 
@@ -927,7 +1138,7 @@ const DocumentUpload = () => {
   }
   return (
     <div>
-      <RightDrawer drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <RightDrawer toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       <h5>Upload Document</h5>
       <div className='row  mb-4 mt-4'>
         <div className='col col-12 col-lg-4 mb-3 col-md-4'>
@@ -995,7 +1206,6 @@ const DocumentUpload = () => {
             ref={gridRef}
             rowData={data || []}
             columnDefs={colDefs}
-            // columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
             rowSelection="single"
