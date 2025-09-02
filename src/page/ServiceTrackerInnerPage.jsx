@@ -54,6 +54,7 @@ const ServiceTrackerInnerPage = () => {
         setIsModalOpen(false);
         setIsEditing(false);
         setEditData(null);
+
     };
     const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
     const currentUser = localStorage.getItem('user_id');
@@ -139,9 +140,9 @@ const ServiceTrackerInnerPage = () => {
     };
 
     // Fetch and Set Tracker Data
-    const fetchAndSetTrackerData = async (trackerName,sheetName = null) => {
+    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
         try {
-            const response = await fetchAllInnerPageServiceTracker(trackerName,sheetName);
+            const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
             setRowData(response || []);
             const dataSample = response?.[0] || {};
             const dynamicCols = Object.keys(dataSample).map((key) => {
@@ -236,65 +237,65 @@ const ServiceTrackerInnerPage = () => {
     };
 
 
-//    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
-//     try {
-//         const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
-//         console.log("Fetched response:", response);
-//         setRowData(response || []);
+    //    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
+    //     try {
+    //         const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
+    //         console.log("Fetched response:", response);
+    //         setRowData(response || []);
 
-//         const dataSample = response?.[0];
-//         console.log("dataSample:", dataSample);
+    //         const dataSample = response?.[0];
+    //         console.log("dataSample:", dataSample);
 
-//         if (!dataSample || Object.keys(dataSample).length === 0) {
-//             setColumnDefs([]);
-//             return;
-//         }
+    //         if (!dataSample || Object.keys(dataSample).length === 0) {
+    //             setColumnDefs([]);
+    //             return;
+    //         }
 
-//         const dynamicCols = Object.keys(dataSample).map(key => {
-//             // Simplified columns for debug:
-//             return {
-//                 headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-//                 field: key,
-//                 editable: false,
-//                 minWidth: 150,
-//             };
-//         });
+    //         const dynamicCols = Object.keys(dataSample).map(key => {
+    //             // Simplified columns for debug:
+    //             return {
+    //                 headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    //                 field: key,
+    //                 editable: false,
+    //                 minWidth: 150,
+    //             };
+    //         });
 
-//         const actionCol = {
-//             headerName: 'Actions',
-//             field: 'actions',
-//             pinned: 'left',
-//             width: 130,
-//             cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
-//             filter: false,
-//             editable: false,
-//             cellRenderer: (params) => (
-//                 <div className="d-flex gap-2">
-//                     <button className="btn btn-sm" onClick={() => {
-//                         setEditData(params.data);
-//                         setTrackerId(params.data._id);
-//                         setIsEditing(true);
-//                         setIsModalOpen(true);
-//                     }}>
-//                         <EditIcon fontSize="small" className="action_icon" />
-//                     </button>
-//                     <button className="btn btn-sm" onClick={() => {
-//                         setTrackerId(params.data._id);
-//                         setIsDeleteModalOpen(true);
-//                     }}>
-//                         <DeleteIcon fontSize="small" className="action_icon" />
-//                     </button>
-//                 </div>
-//             )
-//         };
+    //         const actionCol = {
+    //             headerName: 'Actions',
+    //             field: 'actions',
+    //             pinned: 'left',
+    //             width: 130,
+    //             cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+    //             filter: false,
+    //             editable: false,
+    //             cellRenderer: (params) => (
+    //                 <div className="d-flex gap-2">
+    //                     <button className="btn btn-sm" onClick={() => {
+    //                         setEditData(params.data);
+    //                         setTrackerId(params.data._id);
+    //                         setIsEditing(true);
+    //                         setIsModalOpen(true);
+    //                     }}>
+    //                         <EditIcon fontSize="small" className="action_icon" />
+    //                     </button>
+    //                     <button className="btn btn-sm" onClick={() => {
+    //                         setTrackerId(params.data._id);
+    //                         setIsDeleteModalOpen(true);
+    //                     }}>
+    //                         <DeleteIcon fontSize="small" className="action_icon" />
+    //                     </button>
+    //                 </div>
+    //             )
+    //         };
 
-//         setColumnDefs([...dynamicCols, actionCol]);
-//         console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
-//     } catch (error) {
-//         console.error("Error fetching tracker data:", error);
-//         setColumnDefs([]);
-//     }
-// };
+    //         setColumnDefs([...dynamicCols, actionCol]);
+    //         console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
+    //     } catch (error) {
+    //         console.error("Error fetching tracker data:", error);
+    //         setColumnDefs([]);
+    //     }
+    // };
 
 
 
@@ -376,9 +377,6 @@ const ServiceTrackerInnerPage = () => {
             const message = response?.message || "Tracker updated successfully";
             const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
             setRowData(updatedData);
-            setIsModalOpen(false);
-            setIsEditing(false);
-            setEditData(null);
             setIsSnackbarsOpen({
                 open: true,
                 message,
@@ -387,14 +385,16 @@ const ServiceTrackerInnerPage = () => {
                 horizontal: 'center'
             });
         } catch (error) {
-            const errorMessage = error?.response?.data?.message || error.message || "Update failed";
             setIsSnackbarsOpen({
                 open: true,
-                message: errorMessage,
+                message: error?.response?.data?.message,
                 severityType: 'error',
                 vertical: 'top',
                 horizontal: 'center'
             });
+            setIsModalOpen(false);
+            setIsEditing(false);
+            setEditData(null);
         }
     };
 
@@ -474,33 +474,90 @@ const ServiceTrackerInnerPage = () => {
     const editServiceTracker = () => (
         <div className="p-3">
             <div className="mb-3">
-                {editData && Object.keys(editData).map((key) => {
-                    // Skip certain fields
-                    if (['_id', 'created_at', 'updated_at', 'deleted_at', 'is_deleted', 'is_active'].includes(key)) {
-                        return null;
-                    }
-                    return (
-                        <div key={key} className="mb-3">
-                            <label className="form-label">
-                                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={editData[key] || ''}
-                                onChange={(e) => handleEditChange(e, key)}
-                                disabled={key === 'approval_status' || key === 'approval_status_by_karma'}
-                            />
-                        </div>
-                    );
-                })}
+                {editData &&
+                    Object.keys(editData).map((key) => {
+                        // Skip certain fields
+                        if (
+                            [
+                                '_id',
+                                'created_at',
+                                'updated_at',
+                                'deleted_at',
+                                'deleted_by',
+                                'is_deleted',
+                                'is_active',
+                            ].includes(key)
+                        ) {
+                            return null;
+                        }
+
+                        // Format label by replacing underscores and capitalizing words
+                        const label = key
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (l) => l.toUpperCase());
+
+                        // Determine if the field should be disabled
+                        const isDisabled = [
+                            // 'approval_status',
+                            'approval_status_by_karma',
+                            'approved_by',
+                            'approved_at',
+                            'created_by',
+                            'updated_by',
+                        ].includes(key);
+
+                        // Render select dropdown for approval_status
+                        if (key === 'approval_status') {
+                            return (
+                                <div key={key} className="mb-3">
+                                    <label className="form-label">{label}</label>
+                                    <select
+                                        className="form-select"
+                                        value={editData[key] || ''}
+                                        onChange={(e) => handleEditChange(e, key)}
+                                        disabled={isDisabled}
+                                    >
+                                        <option value="">Select Status</option>
+                                        <option value="0">Pending</option>
+                                        <option value="1">Approved</option>
+                                    </select>
+                                </div>
+                            );
+                        }
+
+                        // Render input for other fields
+                        return (
+                            <div key={key} className="mb-3">
+                                <label className="form-label">{label}</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={editData[key] || ''}
+                                    onChange={(e) => handleEditChange(e, key)}
+                                    disabled={isDisabled}
+                                />
+                            </div>
+                        );
+                    })}
             </div>
             <div className="row row-gap-2">
                 <div className="col-12 col-md-6">
-                    <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={closeModal}
+                    >
+                        Cancel
+                    </button>
                 </div>
                 <div className="col-12 col-md-6">
-                    <button type="submit" className="btn btn-primary w-100" onClick={handleEditSubmit}>Save</button>
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-100"
+                        onClick={handleEditSubmit}
+                    >
+                        Save
+                    </button>
                 </div>
             </div>
         </div>
@@ -522,10 +579,10 @@ const ServiceTrackerInnerPage = () => {
 
 
     useEffect(() => {
-    if (formattedTrackerName && current?.sheet_name) {
-        fetchAndSetTrackerData(formattedTrackerName, current.sheet_name);
-    }
-}, [formattedTrackerName, current?.sheet_name]);
+        if (formattedTrackerName && current?.sheet_name) {
+            fetchAndSetTrackerData(formattedTrackerName, current.sheet_name);
+        }
+    }, [formattedTrackerName, current?.sheet_name]);
 
 
 
