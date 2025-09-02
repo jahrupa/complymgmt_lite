@@ -1,20 +1,18 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 
-export default function RightDrawer({ drawerHeader, drawerBody, drawerFilePreviewHeader ,drawerFilePreviewBody,isModalOpen,setIsModalOpen}) {
-    const [open, setOpen] = React.useState(false);
-
-    const toggleDrawer = (newOpen) => () => {
-        setIsModalOpen(newOpen);
-    };
-
+export default function RightDrawer({ toggleDrawer, drawerHeader, drawerBody, drawerFilePreviewHeader, drawerFilePreviewBody, isModalOpen }) {
     const DrawerList = (
         <Box sx={{ width: 'auto' }} role="presentation">
-            {drawerHeader()}
+            <div className='d-flex justify-content-between'>
+                {drawerHeader()}
+                <button onClick={toggleDrawer(false)} className='align-items-center d-flex pe-3 btn'>x</button>
+            </div>
+
+
             <Divider />
             <List>
                 {drawerBody()}

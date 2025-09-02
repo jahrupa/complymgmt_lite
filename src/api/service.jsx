@@ -45,7 +45,7 @@ import {
   CREATE_ROLE,
   UPDATE_ROLE_BY_ID,
   UPDATE_ROLE_STATUS_BY_ID,
-  VIEW_MODULE_BY_LOCATION_ID,
+  VIEW_LOCATION_TO_MODULE_ID,
   CREATE_LOCATION_TO_MODULE,
   UPDATE_LOCATION_TO_MODULE_BY_ID,
   GET_ALL_LOCATION_TO_MODULE,
@@ -86,7 +86,8 @@ import {
   AUTO_FILE_UPLOAD_GOLANG,
   GET_ALL_FILES,
   DELETE_FILE_ID,
-  UPDATE_FILE
+  UPDATE_FILE,
+  GET_SERVICE_TRACKER_BY_SUBMODULE_ID
 
 } from "./Endpoint";
 // Login Api
@@ -494,7 +495,7 @@ export const fetchAllModulesName = async () => {
 };
 export const fetchAllModulesNameByLocationId = async (id) => {
   try {
-    const response = await API.get(`${VIEW_MODULE_BY_LOCATION_ID}${id}`);
+    const response = await API.get(`${VIEW_LOCATION_TO_MODULE_ID}${id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching Modules name by location id:", error);
@@ -747,6 +748,16 @@ export const updateServiceTrackerApprovalStatusById = async (id) => {
   }
 };
 
+
+export const fetchServiceTrackerBySubModuleId = async (id) => {
+  try {
+    const response = await API.get(`${GET_SERVICE_TRACKER_BY_SUBMODULE_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching service tracker by sub module ID:", error);
+    throw error;
+  }
+}
 // location To Module
 
 export const fetchLocationToModuleModule = async () => {

@@ -56,7 +56,7 @@ export const UPDATE_MODULE_STATUS_BY_ID='/api/v1/module/update/status/';
 export const UPDATE_MODULE_BY_ID='/api/v1/module/update/';
 export const DELETE_MODULE_BY_ID='/api/v1/module/delete/';
 export const VIEW_MODULE_NAME='/api/v1/module/view/names/multiple';
-export const VIEW_MODULE_BY_LOCATION_ID='/api/v1/module_by_location/view/location/multiple/';
+export const VIEW_LOCATION_TO_MODULE_ID='/api/v1/location_to_module/view/location/multiple/';
 export const UPDATE_MODULE_APPROVAL_STATUS_BY_ID = '/api/v1/module/update/approval_status/';
 
 // sub-module
@@ -84,6 +84,7 @@ export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/upd
 // export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID = '/api/v1/service_tracker/update/approval_status/';
+export const GET_SERVICE_TRACKER_BY_SUBMODULE_ID = '/api/v1/service_tracker/view/sub_module_id/multiple/';
 
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
