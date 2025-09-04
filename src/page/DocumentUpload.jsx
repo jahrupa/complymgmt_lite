@@ -2,253 +2,34 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Modal from '../component/Modal';
-import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
-import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
-import MuiTextField from '../component/MuiInputs/MuiTextField';
-import BackupTableIcon from '@mui/icons-material/BackupTable';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import PasswordInput from '../component/MuiInputs/PasswordInput';
-import MultipleSelectFields from '../component/MuiInputs/MultipleSelectFields';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import Toggle from '../component/Toggle';
-import { fetchAllUser, fetchAllGroupHolding, deleteUserById, fetchAllUserName, fetchAllCompaniesName, createUser, updateUserById, fetchAllLocationName, uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId } from '../api/service';
+import { uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId, fetchDocumentDropdownTypes, fetchDocumentDropdownStages } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 // import AccountBoxIcon from '@mui/icons-material/CalendarMonth';
 // import MenuPopup from './MenuPopup';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import MenuPopup from '../component/MenuPopup';
 import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
-import ResponsiveDatePickers from '../component/DatePicker';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
 import SmallSizeModal from '../component/SmallSizeModal';
-import MonthYearCalander from '../component/MonthYearCalander';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
-const dummuJsonData = [
-  {
-    "id": 1744096161424,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": 'Pending',
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "password": "password12",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-  },
-  {
-    "id": 1744096161425,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Super Admin",
-    "status": 'Tagged',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-  },
-  {
-    "id": 1744096161426,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Client",
-    "status": 'Rejected',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-  },
-  {
-    "id": 1744096161427,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": 'Untagged',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-  },
-  {
-    "id": 1744096161428,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Client",
-    "status": 'Approved',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-  },
-  {
-    "id": 1744096161429,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Super Admin",
-    "status": 'Untagged',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-  },
-  {
-    "id": 1744996161429,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": 'Approved',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
 
-  },
-  {
-    "id": 1244096161429,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Super Admin",
-    "status": 'Rejected',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-
-  },
-  {
-    "id": 1044096161429,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Client",
-    "status": 'Tagged',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-
-  },
-  {
-    "id": 1744096161419,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Admin",
-    "status": 'Pending',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-
-  },
-  {
-    "id": 1744096191429,
-    "name": "rupa",
-    "email": "jha@gmail.com",
-    "role_name": "Super Admin",
-    "status": 'Rejected',
-    "password": "password12",
-    "group_holding_name": "Tata",
-    "company_common_name": 'xyz',
-    "location_name": "Mumbai",
-    "uploaded_file": [
-      "File1",
-      "File2"
-    ],
-    'uploaded_at': new Date(),
-    'updated_at': new Date(),
-
-  },
-]
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState(
     {
-      // user_id: null,
-      //  role_name: '', 
-      //  email: '', 
-      //  role_name: '', 
-      //  role_id: null, 
-      //  password: "", 
-      //  status: 'Active', 
-      //  desc: '', 
-      // uploaded_file: [],
       group_name: "",
       group_holdings_id: null,
       company_name: "",
@@ -261,15 +42,17 @@ const DocumentUpload = () => {
       sub_module_id: null,
       service_tracker_name: '',
       service_tracker_id: null,
-      document_type: '',
-      stage: ''
+      document_type_name: '',
+      document_type_id: null,
+      stage: '',
+      stage_id: null
     });
+  console.log(current, 'current')
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
+  const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([])
-  // console.log(uploadedFiles, 'uploadedFiles....')
   const [documentId, setDocumentId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -283,11 +66,12 @@ const DocumentUpload = () => {
   const [errors, setErrors] = useState({});
   const [groupHoldingName, setGroupHoldingName] = useState([])
   const [companyName, setCompanyName] = useState([])
-  // console.log(companyName, 'companyName')
   const [locationName, setLocationName] = useState([])
   const [moduleName, setModuleName] = useState([])
   const [subModuleName, setSubModuleName] = useState([]);
   const [serviceTrackerName, setServiceTrackerName] = useState([]);
+  const [documentDropdownTypes, setDocumentDropdownTypes] = useState([]);
+  const [documentDropdownStages, setDocumentDropdownStages] = useState([]);
   const validate = () => {
     let tempErrors = {};
     if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
@@ -296,8 +80,8 @@ const DocumentUpload = () => {
     if (!current?.module_name) tempErrors.module_name = "Module is required";
     if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
     if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Service Tracker is required";
-    if (!current?.document_type) tempErrors.document_type = "Document Type is required";
-    if (!current?.stage) tempErrors.stage = "Stage is required";
+    if (!current?.document_type_name) tempErrors.document_type_name = "Document Type is required";
+    if (!current?.stage_name) tempErrors.stage_name = "Stage is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -306,16 +90,7 @@ const DocumentUpload = () => {
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
-    const payload = {
-      "module_id": current?.module_id || "",
-      "submodule_id": current?.sub_module_id || "",
-      "company_name": current?.company_name || "",
-      "company_location": current?.location_name || "",
-      "document_type": current?.document_type || "",
-      "stage": current?.stage || "",
-      "is_active": null,
-      "approval_status": null
-    };
+    const payload = current
 
     try {
       let response;
@@ -338,16 +113,6 @@ const DocumentUpload = () => {
     }
     setIsEditing(false);
     setIsModalOpen(false);
-  };
-
-  // Handle Edit
-  const handleEdit = (user_id) => {
-    const item = data.find((item) => item.user_id === user_id);
-    setCurrent(item);
-    setIsEditing(true);
-    setIsModalOpen(true);
-    setDocumentId(user_id)
-
   };
 
   // Handle Delete
@@ -389,20 +154,41 @@ const DocumentUpload = () => {
   const toggleDrawer = (newOpen) => () => {
     setIsModalOpen(newOpen);
   };
-  // const handleFileUpload = async () => {
+
+  //  =============================   auto file upload logic   =================================================
+  //  const handleFileUpload = async () => {
   //   if (!uploadedFiles?.length) {
   //     alert("Please select at least one file.");
   //     return;
   //   }
+
   //   try {
-  //     const result = await uploadFile(uploadedFiles);
-  //     console.log("Files uploaded successfully:", result);
+  //     const firstApiResponse = await uploadFile(uploadedFiles);
+  //     const secondApiResponse = await uploadFileGolang({
+  //       files: uploadedFiles,
+  //       previousResponse: firstApiResponse,
+  //     });
+
   //     setIsFileUploadModalModalOpen(false);
-  //     alert('File uploaded successfully 🎉')
+  //     const message = secondApiResponse?.message || "Status updated successfully";
+  //     setIsSnackbarsOpen({
+  //       ...issnackbarsOpen,
+  //       open: true,
+  //       message,
+  //       severityType: 'success',
+  //     });
+  //     const updatedData = await fetchAllFiles();
+  //     setData(updatedData);
   //   } catch (error) {
-  //     console.error("Upload failed:", error);
+  //     setIsSnackbarsOpen({
+  //       ...issnackbarsOpen,
+  //       open: true,
+  //       message: error?.response?.data?.message || "Upload failed. Please try again.",
+  //       severityType: 'error',
+  //     });
   //   }
-  // }
+  // };
+
 
   const handleFileUpload = async () => {
     if (!uploadedFiles?.length) {
@@ -455,7 +241,7 @@ const DocumentUpload = () => {
       "submodule_id": params.data.submodule_id,
       "company_name": params.data.company_name,
       "company_location": params.data.company_location,
-      "document_type": params.data.document_type,
+      "document_type_name": params.data.document_type_name,
       "stage": params.data.stage,
       "is_active": e.target.checked,
       "approval_status": params.data.approval_status
@@ -508,7 +294,6 @@ const DocumentUpload = () => {
     }
 
   };
-  const userStatus = [{ id: 1, name: 'Active' }, { id: 2, name: 'Inactive' }];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -602,23 +387,57 @@ const DocumentUpload = () => {
     }
   }, [current?.module_id]);
   // Fetch service tracker by sub-module ID
-   useEffect(() => {
+  useEffect(() => {
     const getServiceTrackerBySubModuleId = async (id) => {
-    try {
-      const data = await fetchServiceTrackerBySubModuleId(id);
-      if (data) {
-        setServiceTrackerName(data);
+      try {
+        const data = await fetchServiceTrackerBySubModuleId(id);
+        if (data) {
+          setServiceTrackerName(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch service tracker by sub module ID:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch service tracker by sub module ID:", error);
-    }
-  };
+    };
 
     if (current?.sub_module_id) {
       getServiceTrackerBySubModuleId(current?.sub_module_id);
     }
   }, [current?.sub_module_id]);
-  
+
+  useEffect(() => {
+    const getDocumentDropdownTypes = async (service_tracker_name) => {
+      try {
+        const data = await fetchDocumentDropdownTypes(service_tracker_name);
+        if (data) {
+          setDocumentDropdownTypes(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch document dropdown types:", error);
+      }
+    };
+
+    if (current?.service_tracker_name) {
+      getDocumentDropdownTypes(current?.service_tracker_name);
+    }
+  }, [current?.service_tracker_name]);
+
+
+  useEffect(() => {
+    const getDocumentDropdownStages = async (service_tracker_name) => {
+      try {
+        const data = await fetchDocumentDropdownStages(service_tracker_name);
+        if (data) {
+          setDocumentDropdownStages(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch document dropdown stages:", error);
+      }
+    };
+
+    if (current?.service_tracker_name) {
+      getDocumentDropdownStages(current?.service_tracker_name);
+    }
+  }, [current?.service_tracker_name]);
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -661,7 +480,8 @@ const DocumentUpload = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setIsEditing(false);
+                // setIsEditing(false);
+                setIsPdfView(true);
                 setIsModalOpen(true);
                 setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
@@ -683,6 +503,8 @@ const DocumentUpload = () => {
                 setCurrent(params.data);
                 setIsEditing(true);
                 setIsModalOpen(true);
+                setIsPdfView(false);
+
                 setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
             >
@@ -694,9 +516,8 @@ const DocumentUpload = () => {
       }
     }
     ,
-    //  { field: "_id", headerName: "ID",  },
     { field: "file_name", headerName: "File Name", editable: 'false', },
-    { field: "document_type", headerName: "Document Type", editable: 'false', },
+    { field: "document_type_name", headerName: "Document Type", editable: 'false', },
     {
       field: "file_path",
       headerName: "File Path",
@@ -770,12 +591,7 @@ const DocumentUpload = () => {
     { field: "created_by", headerName: "Created By", editable: 'false', },
     { field: "deleted_at", headerName: "Deleted At", editable: 'false', },
     { field: "deleted_by", headerName: "Deleted By", editable: 'false', },
-    // { field: "document_id", headerName: "Document ID",  },
-    // { field: "is_archived", headerName: "Is Archived",  },
-    // { field: "is_deleted", headerName: "Is Deleted",  },
-    // { field: "module_id", headerName: "Module ID",  },
     { field: "stage", headerName: "Stage", editable: 'false', },
-    // { field: "submodule_id", headerName: "Submodule ID",  },
     { field: "updated_at", headerName: "Updated At", editable: 'false', },
     { field: "updated_by", headerName: "Updated By", editable: 'false', }
 
@@ -910,6 +726,7 @@ const DocumentUpload = () => {
             names={companyName.map((item) => ({
               _id: item._id,
               name: item.company_name,
+              optionalValue: item?.company_common_name
             }))}
             error={!!errors.company_name}
             helperText={errors.company_name}
@@ -1007,12 +824,53 @@ const DocumentUpload = () => {
             // isdisable={isEditing ? true : false}
             error={!!errors.service_tracker_name}
             helperText={errors.service_tracker_name}
-
           />
         </div>
         <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="company_common_name" label="Document Type" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
-          <SingleSelectTextField name="company_common_name" label="Stage" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} />
+          <SingleSelectTextField name="document_type_name" label="Document Type" value={current?.document_type_name}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = documentDropdownTypes.find(
+                (g) => g.value === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                document_type_name: selectedName,
+                document_type_id: matchedLocation?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, document_type_name: '' }));
+
+            }}
+            names={documentDropdownTypes?.map((item) => ({
+              _id: item._id,
+              name: item.value,
+            }))}
+            // isdisable={isEditing ? true : false}
+            error={!!errors.document_type_name}
+            helperText={errors.document_type_name}
+          />
+          <SingleSelectTextField name="stage" label="Stage" value={current?.stage}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              const matchedLocation = documentDropdownStages.find(
+                (g) => g.value === selectedName
+              );
+              setCurrent((prev) => ({
+                ...prev,
+                stage_name: selectedName,
+                stage_id: matchedLocation?._id || null,
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, stage_name: '' }));
+
+            }}
+            names={documentDropdownStages?.map((item) => ({
+              _id: item._id,
+              name: item.value,
+            }))}
+            // isdisable={isEditing ? true : false}
+            error={!!errors.stage}
+            helperText={errors.stage}
+          />
         </div>
         <div className='d-lg-flex d-md-flex d-flex justify-content-between'>
           <div>
@@ -1130,15 +988,21 @@ const DocumentUpload = () => {
           </div>
 
         </div>
-        {/* <div>
-          <ReactPDFViewer />
-        </div> */}
+
       </div>
     )
   }
+
+  const pdfFile = () => {
+    return (
+      <div className='p-3 w-100'>
+        <ReactPDFViewer />
+      </div>
+    );
+  };
   return (
     <div>
-      <RightDrawer toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <RightDrawer isPdfView={isPdfView} toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} pdfFile={pdfFile}/>
       <h5>Upload Document</h5>
       <div className='row  mb-4 mt-4'>
         <div className='col col-12 col-lg-4 mb-3 col-md-4'>
