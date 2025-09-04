@@ -87,7 +87,9 @@ import {
   GET_ALL_FILES,
   DELETE_FILE_ID,
   UPDATE_FILE,
-  GET_SERVICE_TRACKER_BY_SUBMODULE_ID
+  GET_SERVICE_TRACKER_BY_SUBMODULE_ID,
+  GET_DOCUMENT_DROPDOWNS_TYPES,
+  GET_DOCUMENT_DROPDOWNS_STAGE
 
 } from "./Endpoint";
 // Login Api
@@ -842,13 +844,39 @@ export const uploadFile = async (filesArray) => {
 
 
 // File upload Golang
-export const uploadFileGolang = async (filesArray) => {
+// export const uploadFileGolang = async (filesArray) => {
+//   try {
+//     const formData = new FormData();
+
+//     filesArray.forEach((file) => {
+//       formData.append("files", file);
+//     });
+
+//     const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Upload failed:", error.response?.data || error);
+//     throw error;
+//   }
+// };
+
+// File upload Golang
+export const uploadFileGolang = async ({ files, previousResponse }) => {
   try {
     const formData = new FormData();
 
-    filesArray.forEach((file) => {
+    // Append files to FormData
+    files.forEach((file) => {
       formData.append("files", file);
     });
+
+    // Append the previous API response as a JSON string
+    formData.append("previousResponse", JSON.stringify(previousResponse));
 
     const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
       headers: {
@@ -913,6 +941,25 @@ export const updateFileById = async (id, fileData) => {
     return response.data;
   } catch (error) {
     console.error("Error updating file by ID:", error);
+    throw error;
+  }
+};
+
+export const fetchDocumentDropdownTypes = async (service_tracker_name) => {
+  try {
+    const response = await API.get(`${GET_DOCUMENT_DROPDOWNS_TYPES}${service_tracker_name}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching document dropdown types:", error);
+    throw error;
+  }
+};
+export const fetchDocumentDropdownStages = async (service_tracker_name) => {
+  try {
+    const response = await API.get(`${GET_DOCUMENT_DROPDOWNS_STAGE}${service_tracker_name}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching document dropdown stages:", error);
     throw error;
   }
 };

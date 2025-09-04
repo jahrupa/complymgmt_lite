@@ -101,7 +101,8 @@ export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
 export const GET_ALL_FILES='/api/v1/document_repository/view/files';
 export const DELETE_FILE_ID='/api/v1/document_repository/delete/file/';
 export const UPDATE_FILE='/api/v1/document_repository/update/file/';
-
+export const GET_DOCUMENT_DROPDOWNS_TYPES='/api/v1/document_repository/view/dropdowns/type/';
+export const GET_DOCUMENT_DROPDOWNS_STAGE='/api/v1/document_repository/view/dropdowns/stage/';
 
 // pages
 export const GET_ALL_PAGE='/api/v1/pages/view/all';
