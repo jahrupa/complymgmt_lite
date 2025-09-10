@@ -969,9 +969,6 @@ const AccessControl = () => {
                             }))}
                         />
                     </>
-
-
-
                 )}
 
                 <div>

@@ -7,7 +7,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 export default function ResponsiveDatePickers() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker defaultValue={dayjs(new Date())} sx={{ width: '100%' }} disabled/>
+          <DatePicker defaultValue={dayjs(new Date())} sx={{ width: '100%' }} />
     </LocalizationProvider>
   );
 }

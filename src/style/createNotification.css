@@ -330,7 +330,7 @@
 
 /* Toggle section */
 .toggle-section {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: space-between;
   padding: 16px;
@@ -446,7 +446,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 
 .notification-preview {
@@ -475,6 +475,20 @@
 .notification-preview.error {
   border-left-color: #ef4444;
   background: #fef2f2;
+}
+.notification-preview.reminder {
+  border-left-color: #6366f1; /* Indigo */
+  background: #eef2ff;       /* Light indigo background */
+}
+
+.notification-preview.notify {
+  border-left-color: #dc2626; /* Red for urgency */
+  background: #fef2f2;        /* Very light red background */
+}
+
+.notification-preview.other {
+  border-left-color: #6b7280; /* Neutral gray */
+  background: #f9fafb;        /* Light gray background */
 }
 
 .notification-preview.inactive {
@@ -524,7 +538,7 @@
   padding: 4px 8px;
   border-radius: 12px;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.7);
+  background: #e5e7eb6b;
 }
 
 .notification-message {

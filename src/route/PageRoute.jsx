@@ -33,11 +33,12 @@ import UserProfilePage from '../page/UserProfilePage.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
 import NotificationPage from '../component/notification/NotificationPage.jsx';
-import CreateNotification from '../page/CreateNotification.jsx';
+import CreateNotificationTemplate from '../page/CreateNotificationTemplate.jsx';
 import DetailsPage from '../page/DetailsPage.jsx';
 import ServiceTrackerInnerPage from '../page/ServiceTrackerInnerPage.jsx';
 import ServiceTrackerAccess from '../page/ServiceTrackerAccess.jsx';
 import SendNotification from '../page/SendNotification.jsx';
+import NotificationList from '../page/NotificationList.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -184,11 +185,13 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
             <Route path="/notification" element={<NotificationPage />} />
-            <Route path="/create_notification" element={<CreateNotification />} />
-            <Route path="/send_notification" element={<SendNotification />} />
+            <Route path="/create_notification" element={<CreateNotificationTemplate />} />
+            <Route path="/send_notification/:template_id" element={<SendNotification />} />
             <Route path="/details/:seriesName/:year" element={<DetailsPage />} />
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
+            <Route path="/notifications_list" element={<NotificationList />} />
+
 
           </Route>
         </Route>
