@@ -232,7 +232,9 @@ body {
   /* height: 100vh; */
   gap: 10px;
 }
-
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
 .button {
   position: relative;
   display: flex;

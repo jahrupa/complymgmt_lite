@@ -86,7 +86,12 @@ import {
   AUTO_FILE_UPLOAD_GOLANG,
   GET_ALL_FILES,
   DELETE_FILE_ID,
-  UPDATE_FILE
+  UPDATE_FILE,
+  GET_ALL_NOTIFICATION_TEMPLATE,
+  CREATE_NOTIFICATION_TEMPLATE,
+  UPDATE_NOTIFICATION_TEMPLATE,
+  DELETE_NOTIFICATION_TEMPLATE_BY_ID,
+  UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID
 
 } from "./Endpoint";
 // Login Api
@@ -999,6 +1004,55 @@ export const bulkApproveAllPageData = async (page_name) => {
     return response.data;
   } catch (error) {
     console.error("Error approving all service tracker data:", error);
+    throw error;
+  }
+};
+
+// Notification APIs
+
+export const createNotificationTemplate = async (templateData) => {
+  try {
+    const response = await API.post(CREATE_NOTIFICATION_TEMPLATE, templateData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating notification template:", error);
+    throw error;
+  }
+};
+export const fetchAllNotificationTemplates = async () => {
+  try {
+    const response = await API.get(GET_ALL_NOTIFICATION_TEMPLATE);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all notification templates:", error);
+    throw error;
+  }
+};
+export const updateNotificationTemplate = async (id, templateData) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_TEMPLATE}${id}`, templateData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification template:", error);
+    throw error;
+  }
+};
+
+export const deleteNotificationTemplateById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_NOTIFICATION_TEMPLATE_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting notification template:", error);
+    throw error;
+  }
+};
+export const updateNotificationTemplateApprovalStatusById = async (id, status) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification template approval status:", error);
     throw error;
   }
 };

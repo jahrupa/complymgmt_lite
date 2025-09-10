@@ -141,7 +141,12 @@ const NotificationPage = ({ onBack }) => {
   });
 
   const unreadCount = allNotifications.filter(n => n.unread).length;
+  const [currentPage, setCurrentPage] = useState('show');
 
+  const handleNavigate = (page) => {
+    setCurrentPage(page);
+    navigate(page === 'show' ? '/notifications_list' : '/create_notification');
+  };
   return (
     <div className="notification-page">
       <div className="notification-page-header">
@@ -150,7 +155,7 @@ const NotificationPage = ({ onBack }) => {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1>Notifications</h1>
+            <h1>Incomming Notifications</h1>
             <p>{unreadCount} unread notifications</p>
           </div>
         </div>
@@ -264,7 +269,23 @@ const NotificationPage = ({ onBack }) => {
             );
           })
         )}
+
       </div>
+      <div className="navigation">
+        <button
+          onClick={() => handleNavigate('show')}
+          className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
+        >
+          Created Notifications
+        </button>
+        <button
+          onClick={() => handleNavigate('create')}
+          className={`nav-button ${currentPage === 'create' ? 'active' : ''}`}
+        >
+          Create New
+        </button>
+      </div>
+
     </div>
   );
 };
