@@ -91,7 +91,14 @@ import {
   CREATE_NOTIFICATION_TEMPLATE,
   UPDATE_NOTIFICATION_TEMPLATE,
   DELETE_NOTIFICATION_TEMPLATE_BY_ID,
-  UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID
+  UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID,
+  CREATE_NOTIFICATION,
+  GET_ALL_NOTIFICATION,
+  DELETE_NOTIFICATION_BY_ID,
+  UPDATE_NOTIFICATION_BY_ID,
+  UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID,
+  UPDATE_NOTIFICATION_STATUS_BY_ID,
+  UPLOAD_BULK_NOTIFICATION
 
 } from "./Endpoint";
 // Login Api
@@ -1053,6 +1060,85 @@ export const updateNotificationTemplateApprovalStatusById = async (id, status) =
     return response.data;
   } catch (error) {
     console.error("Error updating notification template approval status:", error);
+    throw error;
+  }
+};
+// notification
+export const createNotification = async (notificationData) => {
+  try {
+    const response = await API.post(CREATE_NOTIFICATION, notificationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    throw error;
+  }
+};
+export const fetchAllNotifications = async () => {
+  try {
+    const response = await API.get(GET_ALL_NOTIFICATION);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all notifications:", error);
+    throw error;
+  }
+};
+export const deleteNotificationById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_NOTIFICATION_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    throw error;
+  }
+};
+export const updateNotificationById = async (id, notificationData) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_BY_ID}${id}`, notificationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification:", error);
+    throw error;
+  }
+};
+
+
+export const updateNotificationApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification approval status:", error);
+    throw error;
+  }
+};
+
+
+export const updateNotificationStatusById = async (id, status) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_STATUS_BY_ID}${id}`, status);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification status:", error);
+    throw error;
+  }
+};
+
+export const uploadBulkNotification = async (filesArray, id, metadata = {}) => {
+  try {
+    const formData = new FormData();
+    filesArray.forEach((file) => {
+      formData.append("files", file);
+    });
+    formData.append("metadata", JSON.stringify(metadata));
+
+    const response = await API.post(`${UPLOAD_BULK_NOTIFICATION}${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading bulk notification:", error);
     throw error;
   }
 };

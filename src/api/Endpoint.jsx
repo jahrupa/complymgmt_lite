@@ -124,6 +124,12 @@ export const GET_NOTIFICATION_BY_ID ='/api/v1/notification/view/';
 export const CREATE_NOTIFICATION_TEMPLATE ='/api/v1/notification/notification_template/create';
 export const CREATE_NOTIFICATION ='/api/v1/notification/create';
 export const UPDATE_NOTIFICATION_TEMPLATE ='/api/v1/notification/notification_template/update/';
-export const UPLOAD_BULK_NOTIFICATION ='/api/v1/create/bulk/upload/';
+export const UPLOAD_BULK_NOTIFICATION ='/api/v1/notification/create/bulk/upload/';
 export const DELETE_NOTIFICATION_TEMPLATE_BY_ID ='/api/v1/notification/notification_template/delete/';
 export const UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID='/api/v1/notification/notification_template/update/approval_status/';
+export const DELETE_NOTIFICATION_BY_ID ='/api/v1/notification/delete/';
+export const UPDATE_NOTIFICATION_BY_ID ='/api/v1/notification/update/';
+export const UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID='/api/v1/notification/update/approval_status/';
+export const UPDATE_NOTIFICATION_STATUS_BY_ID='/api/v1/notification/update/status/';
+
+
