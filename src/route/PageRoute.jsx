@@ -39,6 +39,7 @@ import ServiceTrackerInnerPage from '../page/ServiceTrackerInnerPage.jsx';
 import ServiceTrackerAccess from '../page/ServiceTrackerAccess.jsx';
 import NotificationList from '../page/NotificationList.jsx';
 import CreateNotification from '../page/CreateNotification.jsx';
+import ChangePassword from '../page/ChangePassword.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -166,13 +167,13 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/module" element={<Module />} />
             <Route path="/sub_module" element={<SubModule />} />
             <Route path="/access_control" element={<AccessControl />} />
-            <Route path="/onboarding" element={<Onbarding />} />
             {/* <Route path="/onboarding" element={<Onbarding />} /> */}
-            <Route path="/onbarding_compliance_scope" element={<OnbardingComplianceScope />} />
-            <Route path="/onbarding_payroll_compliance" element={<OnbardingPayrollCompliance />} />
-            <Route path="/outsourcing_scope" element={<OutsourcingScope />} />
-            <Route path="/reimbursements" element={<Reimbursements />} />
-            <Route path="/payroll_management" element={<PayrollManagement />} />
+            {/* <Route path="/onboarding" element={<Onbarding />} /> */}
+            {/* <Route path="/onbarding_compliance_scope" element={<OnbardingComplianceScope />} />
+            <Route path="/onbarding_payroll_compliance" element={<OnbardingPayrollCompliance />} /> */}
+            {/* <Route path="/outsourcing_scope" element={<OutsourcingScope />} /> */}
+            {/* <Route path="/reimbursements" element={<Reimbursements />} /> */}
+            {/* <Route path="/payroll_management" element={<PayrollManagement />} /> */}
             <Route path="/service_trackers" element={<ServiceTrackers />} />
             <Route path="/role_manager" element={<RoleManager />} />
             <Route path="/upload_documents" element={<DocumentUpload />} />
@@ -191,6 +192,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/notifications_list" element={<NotificationList />} />
             <Route path="/create_notification" element={<CreateNotification />} />
+            <Route path="/password_setting" element={<ChangePassword />} />
           </Route>
         </Route>
 

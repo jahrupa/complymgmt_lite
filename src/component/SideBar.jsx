@@ -24,9 +24,10 @@ import { Cable, ScanEye } from 'lucide-react';
 
 function SideBar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
-    const [activeItem, setActiveItem] = useState(() => {
-        return localStorage.getItem('activeSidebarItem') || 'Dashboard';
-    });
+    // const [activeItem, setActiveItem] = useState(() => {
+    //     return localStorage.getItem('activeSidebarItem') || 'Dashboard';
+    // });
+    const [activeItem, setActiveItem] = useState('Dashboard');
     const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const menuItems = [
@@ -39,17 +40,9 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'location_to_module' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
-        // { icon: (active) => <EmojiPeopleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onboarding', link: 'onboarding' },
-        // { icon: (active) => <ReceiptLongOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onbarding Compliance Scope', link: 'onbarding_compliance_scope' },
-        // { icon: (active) => <CurrencyRupeeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Onbarding Payroll Compliance', link: 'onbarding_payroll_compliance' },
-        // { icon: (active) => <NextWeekOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Outsourcing Scope', link: 'outsourcing_scope' },
-        // { icon: (active) => <CurrencyExchangeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Reimbursements', link: 'reimbursements' },
-        // { icon: (active) => <AccountBalanceWalletIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Payroll Management', link: 'payroll_management' },
-        // { icon: (active) => <TableRowsOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Service Trackers', link: 'service_trackers' },
         { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
         { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
-        // { icon: (active) => <Cable className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module Tracker', link: 'module_tracker' },
     ];
 
     const documentSubItems = [
@@ -65,15 +58,15 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
     ];
 
     // Sync active tab with URL on page load
-    useEffect(() => {
-        const currentPath = location.pathname.split('/')[1];
-        const allItems = [...menuItems, ...documentSubItems, ...serviceTracker];
-        const match = allItems.find(item => item.link === currentPath);
-        if (match) {
-            setActiveItem(match.label);
-            localStorage.setItem('activeSidebarItem', match.label);
-        }
-    }, [location.pathname]);
+    // useEffect(() => {
+    //     const currentPath = location.pathname.split('/')[1];
+    //     const allItems = [...menuItems, ...documentSubItems, ...serviceTracker];
+    //     const match = allItems.find(item => item.link === currentPath);
+    //     if (match) {
+    //         setActiveItem(match.label);
+    //         localStorage.setItem('activeSidebarItem', match.label);
+    //     }
+    // }, [location.pathname]);
 
     return (
         <div>
@@ -204,7 +197,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                     })}
                                 </div>
                             )}
-                           
+
                         </div>
                     </div>
                 </div>

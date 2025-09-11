@@ -93,8 +93,16 @@ export default function UserProfile() {
                     </ListItemIcon>
                     Profile Settings
                 </MenuItem>
+               </Link>
+               <Link to={'/password_setting'}>
+                 <MenuItem onClick={handleClose}>
+                    <ListItemIcon>
+                        <Settings fontSize="small" />
+                    </ListItemIcon>
+                    Change Password
+                </MenuItem>
+                
                 </Link>
-               
                 <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                         <Logout fontSize="small" />
