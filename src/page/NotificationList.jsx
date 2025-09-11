@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Search, Filter, Calendar, ChevronDown, ChevronUp, DeleteIcon, Upload, ArrowBigLeft } from 'lucide-react';
 import '../style/notificationList.css';
 import { useNavigate } from 'react-router-dom';
-import { bulkApproveAllPageData, deleteNotificationTemplateById, fetchAllNotificationTemplates, updateNotificationTemplate, updateNotificationTemplateApprovalStatusById } from '../api/service';
+import { bulkApproveAllPageData, createNotification, deleteNotificationTemplateById, fetchAllNotifications, fetchAllNotificationTemplates, updateNotificationTemplate, updateNotificationTemplateApprovalStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 import Toggle from '../component/Toggle';
 // import MultipleSelectTextFields from '../component/MuiInputs/MultipleSelectTextFields';
 // import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { useParams } from "react-router-dom";
-import CreateNotificationForm from '../component/CreateNotificationForm';
 const NotificationList = () => {
   // Your JSON data
   const [templates, setTemplates] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
@@ -85,8 +85,8 @@ const NotificationList = () => {
     setEditForm({ ...template });
     setIsNotificationCreated(true);
   };
-  // Save form
-  const handleSave = async (e) => {
+  // Save Template form
+  const handleSaveTemplate = async (e) => {
     e.preventDefault();
     // if (!validateForm()) return; // ✅ block submit if errors exist
     const deliveryTypes = [];
@@ -116,6 +116,51 @@ const NotificationList = () => {
       });
       // Refresh data
       const updatedData = await fetchAllNotificationTemplates();
+      setTemplates(updatedData);
+    } catch (error) {
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
+      console.error("Update failed:", error);
+    }
+
+    setEditForm({});
+    setIsNotificationCreated(false);
+  };
+
+  const handleSaveNotification = async (e) => {
+    e.preventDefault();
+    // if (!validateForm()) return; // ✅ block submit if errors exist
+    const payload = {
+      "group_holding_id": "68b54526b11e842072a11103",
+      "group_name": "TATA GROUP",
+      "company_id": "68b545e2b11e842072a11109",
+      "company_name": "Zudio",
+      "location_id": "68b54a43b11e842072a11123",
+      "location_name": "Andheri west",
+      "template_id": "1234567888889",
+      "template_name": "Abcd edfr",
+      "send_on": "23th sept",
+      "send_to": ["aoshin@karma.com"],
+      "cc": ["rupa@karma.com"],
+      "priority": "medium"
+    };
+
+    try {
+      const response = await createNotification(payload);
+      const message = response?.message || "Notification template created successfully";
+      setEditingId(null);
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+      // Refresh data
+      const updatedData = await fetchAllNotifications();
       setTemplates(updatedData);
     } catch (error) {
       setIsSnackbarsOpen({
@@ -277,6 +322,21 @@ const NotificationList = () => {
       console.error('Error fetching notifications:', err);
     });
   }, []);
+  useEffect(() => {
+    fetchAllNotifications().then(data => {
+      setNotifications(data);
+    }).catch(err => {
+      console.error('Error fetching notifications:', err);
+    });
+  }, []);
+  // useEffect(() => {
+  //   if (template_id) {
+  //     const templateToEdit = templates.find(t => t._id === template_id);
+  //     if (templateToEdit) {
+  //       handleEdit(templateToEdit);
+  //     }
+  //   }
+  // }, [template_id, templates]);
   return (
     <div className="show-notifications-container">
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
@@ -293,8 +353,8 @@ const NotificationList = () => {
             // onClick={() => handleCreateNotification(template)}
             className="create-button"
           >
-            <ArrowBigLeft />
-            Go To Create Notification
+            Create Notification
+            {/* <ArrowBigLeft /> */}
           </button>
           <button
             onClick={handleApproveAll}
@@ -402,7 +462,9 @@ const NotificationList = () => {
                 }
               </p>
               {!searchTerm && filterType === 'all' && filterPriority === 'all' && (
-                <button onClick={() => navigate('/create_notification')} className="create-first-button">
+                <button
+                  onClick={() => navigate('/create_notification')}
+                  className="create-first-button">
                   <Plus size={20} />
                   Create First Template
                 </button>
@@ -421,51 +483,70 @@ const NotificationList = () => {
                 <div className="edit-form">
                   <div className="edit-header">
                     <h4>
-                      {isNotificationCreated
+                      Edit Template
+                      {/* {isNotificationCreated
                         ? "Create Notification"
                         : editMode === "notification"
                           ? "Edit Notification"
-                          : "Edit Template"}
+                          : "Edit Template"} */}
                     </h4>
-
                     <div className="edit-actions">
-                      <button onClick={handleSave} className="save-button">Save</button>
-                      <button onClick={handleCancelEdit} className="cancel-button">Cancel</button>
+                      <button
+                        onClick={(e) => {
+                          if (isNotificationCreated || editMode === "notification") {
+                            handleSaveNotification(e);
+                          } else {
+                            handleSaveTemplate(e);
+                          }
+                        }}
+                        className="save-button"
+                      >
+                        Save
+                      </button>
+                      <button onClick={handleCancelEdit} className="cancel-button">
+                        Cancel
+                      </button>
                     </div>
                   </div>
 
-                  {editMode === "notification" || isNotificationCreated ? (
-                    <CreateNotificationForm editForm={editForm} setEditForm={setEditForm} />
-                  ) : (
                     <div className="edit-fields">
                       <input
                         type="text"
                         value={editForm.template_name}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, template_name: e.target.value }))}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({ ...prev, template_name: e.target.value }))
+                        }
                         placeholder="Template name"
                       />
 
                       <input
                         type="text"
                         value={editForm.template_subject}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, template_subject: e.target.value }))}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({ ...prev, template_subject: e.target.value }))
+                        }
                         placeholder="Template subject"
                       />
 
                       <textarea
                         value={editForm.template_body}
-                        onChange={(e) => setEditForm(prev => ({ ...prev, template_body: e.target.value }))}
+                        onChange={(e) =>
+                          setEditForm((prev) => ({ ...prev, template_body: e.target.value }))
+                        }
                         placeholder="Template body"
                         rows="3"
-                      />
+                      ></textarea>
 
                       <div className="edit-selects">
                         <select
                           value={editForm.template_type}
-                          onChange={(e) => setEditForm(prev => ({ ...prev, template_type: e.target.value }))}
+                          onChange={(e) =>
+                            setEditForm((prev) => ({ ...prev, template_type: e.target.value }))
+                          }
                         >
-                          {notificationTypes?.map(type => (
+                          {notificationTypes?.map((type) => (
                             <option key={type.value} value={type.value}>
+                              {type?.icon}
                               {type.label}
                             </option>
                           ))}
@@ -473,9 +554,14 @@ const NotificationList = () => {
 
                         <select
                           value={editForm.template_priority}
-                          onChange={(e) => setEditForm(prev => ({ ...prev, template_priority: e.target.value }))}
+                          onChange={(e) =>
+                            setEditForm((prev) => ({
+                              ...prev,
+                              template_priority: e.target.value,
+                            }))
+                          }
                         >
-                          {priorities?.map(priority => (
+                          {priorities?.map((priority) => (
                             <option key={priority.value} value={priority.value}>
                               {priority.label}
                             </option>
@@ -491,7 +577,7 @@ const NotificationList = () => {
                             checked={editForm.in_app}
                             onChange={(e) => {
                               if (!e.target.checked && !editForm.email) return; // prevent both unchecked
-                              setEditForm(prev => ({ ...prev, in_app: e.target.checked }));
+                              setEditForm((prev) => ({ ...prev, in_app: e.target.checked }));
                             }}
                           />
                           In-App
@@ -503,7 +589,7 @@ const NotificationList = () => {
                             checked={editForm.email}
                             onChange={(e) => {
                               if (!e.target.checked && !editForm.in_app) return; // prevent both unchecked
-                              setEditForm(prev => ({ ...prev, email: e.target.checked }));
+                              setEditForm((prev) => ({ ...prev, email: e.target.checked }));
                             }}
                           />
                           Email
@@ -514,12 +600,16 @@ const NotificationList = () => {
                           <Toggle
                             marginTop="0px"
                             checked={editForm.is_active}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, is_active: e.target.checked }))}
+                            onChange={(e) =>
+                              setEditForm((prev) => ({
+                                ...prev,
+                                is_active: e.target.checked,
+                              }))
+                            }
                           />
                         </div>
                       </div>
                     </div>
-                  )}
                 </div>
               ) : (
                 <>
@@ -548,19 +638,24 @@ const NotificationList = () => {
                       </button>
 
                       <button
-                        onClick={() => handleCreateNotification(template)}
-                        className="edit-button"
-                        title="Create Notification"
-                      >
-                        <Plus size={16} />
-                      </button>
-                      <button
+                          onClick={() => {
+                            handleEdit(template);
+                            setEditMode("template");
+                            setIsNotificationCreated(false);
+                          }}
+                          className="edit-button"
+                          title="Edit template"
+                          // style={{ margin: '0 0 12px 0' }}
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                      {/* <button
                         onClick={() => handleCreateNotification(template)}
                         className="edit-button"
                         title="Upload Template"
                       >
                         <Upload size={16} />
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => {
                           setTemplateId(template._id);
@@ -602,102 +697,6 @@ const NotificationList = () => {
                     <div className="expanded-details">
                       <div className='d-flex justify-content-between align-items-center'>
                         <h4>Template Details</h4>
-                        <button
-                          onClick={() => {
-                            handleEdit(template);
-                            setEditMode("template");
-                          }}
-                          className="edit-button"
-                          title="Edit template"
-                          style={{ margin: '0 0 12px 0' }}
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                      </div>
-
-                      <div className="details-grid">
-                        <div className="detail-item">
-                          <span className="detail-label">In-App:</span>
-                          <span className="detail-value">{template.in_app ? 'Yes' : 'No'}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Email:</span>
-                          <span className="detail-value">{template.email ? 'Yes' : 'No'}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Delivery Type:</span>
-                          <span className="detail-value">
-                            {template.delivery_type ?
-                              (Array.isArray(template.delivery_type) ?
-                                template.delivery_type.join(', ') :
-                                template.delivery_type) :
-                              'Not set'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* <h4>Common Attributes</h4> */}
-                      <div className="details-grid">
-                        <div className="detail-item">
-                          <span className="detail-label">Is Active:</span>
-                          <span className="detail-value">{template.is_active ? 'Yes' : 'No'}</span>
-                        </div>
-                        {/* <div className="detail-item">
-                          <span className="detail-label">Is Deleted:</span>
-                          <span className="detail-value">{template.IsDeleted ? 'Yes' : 'No'}</span>
-                        </div> */}
-                        <div className="detail-item">
-                          <span className="detail-label">Created By:</span>
-                          <span className="detail-value">{template.created_by}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Created At:</span>
-                          <span className="detail-value">{formatDate(template.created_at)}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Updated By:</span>
-                          <span className="detail-value">{template.updated_by}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Updated At:</span>
-                          <span className="detail-value">{formatDate(template.updated_at)}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Approval Status:</span>
-                          <span className="detail-value">
-                            {template.approval_status === 1 ? 'Approved' : 'Pending'}
-                          </span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Approved By:</span>
-                          <span className="detail-value">
-                            {template.approved_by !== "000000000000000000000000" ?
-                              template.approved_by : 'Not approved'}
-                          </span>
-                        </div>
-                        <div className="detail-item">
-                          <span className="detail-label">Approved At:</span>
-                          <span className="detail-value">{formatDate(template.approved_at)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {expandedId === template._id && (
-                    <div className="expanded-details">
-                      <div className='d-flex justify-content-between align-items-center'>
-                        <h4>Notification Details</h4>
-                        <button
-                          onClick={() => {
-                            handleEdit(template);
-                            setEditMode("notification");
-                          }}
-                          className="edit-button"
-                          title="Edit notification"
-                          style={{ margin: '0 0 12px 0' }}
-                        >
-                          <Edit2 size={16} />
-                        </button>
                       </div>
 
                       <div className="details-grid">

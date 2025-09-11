@@ -145,7 +145,7 @@ const NotificationPage = ({ onBack }) => {
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
-    navigate(page === 'show' ? '/notifications_list' : '/create_notification');
+    navigate(page === 'show' ? '/notifications_list' : '/create_notification_template');
   };
   return (
     <div className="notification-page">
@@ -161,7 +161,7 @@ const NotificationPage = ({ onBack }) => {
         </div>
 
         <div className="notification-actions">
-          <button className="action-btn secondary" onClick={() => navigate('/create_notification')}>
+          <button className="action-btn secondary" onClick={() => navigate('/create_notification_template')}>
             <CheckCircle size={18} />
             Create Notifaction
           </button>

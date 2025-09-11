@@ -92,6 +92,13 @@ import {
   UPDATE_NOTIFICATION_TEMPLATE,
   DELETE_NOTIFICATION_TEMPLATE_BY_ID,
   UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID,
+  CREATE_NOTIFICATION,
+  GET_ALL_NOTIFICATION,
+  DELETE_NOTIFICATION_BY_ID,
+  UPDATE_NOTIFICATION_BY_ID,
+  UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID,
+  UPDATE_NOTIFICATION_STATUS_BY_ID,
+  UPLOAD_BULK_NOTIFICATION,
   GET_SERVICE_TRACKER_BY_SUBMODULE_ID,
   GET_DOCUMENT_DROPDOWNS_TYPES,
   GET_DOCUMENT_DROPDOWNS_STAGE
@@ -644,7 +651,7 @@ export const fetchAllServiceTrackerFields = async (tracker_name) => {
     throw error;
   }
 };
-export const fetchAllInnerPageServiceTracker = async (trackerName,sheetName) => {
+export const fetchAllInnerPageServiceTracker = async (trackerName, sheetName) => {
   try {
     const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data?sheet=${encodeURIComponent(sheetName)}`;
     const response = await API.get(url);
@@ -736,7 +743,7 @@ export const updateServiceTrackerByStatusId = async (id, payload) => {
 export const fetchAllServiceTrackerSheetData = async (trackerName) => {
   try {
     // const response = await API.get(GET_ALL_SERVICE_TRACKER_SHEET_DATA);
-     const url = `${GET_ALL_SERVICE_TRACKER_SHEET_DATA}/${encodeURIComponent(trackerName)}/sheets`;
+    const url = `${GET_ALL_SERVICE_TRACKER_SHEET_DATA}/${encodeURIComponent(trackerName)}/sheets`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1056,7 +1063,7 @@ export const fetchAllPages = async () => {
 
 // Common API For Approve All
 export const bulkApproveAllPageData = async (page_name) => {
-  console.log(page_name,'page_name')
+  console.log(page_name, 'page_name')
   try {
     const response = await API.put(`${APPROVE_ALL_BY_ENTITY_TYPE}${page_name}/update/approve/all`);
     return response.data;
@@ -1111,6 +1118,85 @@ export const updateNotificationTemplateApprovalStatusById = async (id, status) =
     return response.data;
   } catch (error) {
     console.error("Error updating notification template approval status:", error);
+    throw error;
+  }
+};
+// notification
+export const createNotification = async (notificationData) => {
+  try {
+    const response = await API.post(CREATE_NOTIFICATION, notificationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    throw error;
+  }
+};
+export const fetchAllNotifications = async () => {
+  try {
+    const response = await API.get(GET_ALL_NOTIFICATION);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all notifications:", error);
+    throw error;
+  }
+};
+export const deleteNotificationById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_NOTIFICATION_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting notification:", error);
+    throw error;
+  }
+};
+export const updateNotificationById = async (id, notificationData) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_BY_ID}${id}`, notificationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification:", error);
+    throw error;
+  }
+};
+
+
+export const updateNotificationApprovalStatusById = async (id) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification approval status:", error);
+    throw error;
+  }
+};
+
+
+export const updateNotificationStatusById = async (id, status) => {
+  try {
+    const response = await API.put(`${UPDATE_NOTIFICATION_STATUS_BY_ID}${id}`, status);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification status:", error);
+    throw error;
+  }
+};
+
+export const uploadBulkNotification = async (filesArray, id, metadata = {}) => {
+  try {
+    const formData = new FormData();
+    filesArray.forEach((file) => {
+      formData.append("files", file);
+    });
+    formData.append("metadata", JSON.stringify(metadata));
+
+    const response = await API.post(`${UPLOAD_BULK_NOTIFICATION}${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading bulk notification:", error);
     throw error;
   }
 };
