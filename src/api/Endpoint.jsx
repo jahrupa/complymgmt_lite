@@ -134,4 +134,5 @@ export const UPDATE_NOTIFICATION_BY_ID ='/api/v1/notification/update/';
 export const UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID='/api/v1/notification/update/approval_status/';
 export const UPDATE_NOTIFICATION_STATUS_BY_ID='/api/v1/notification/update/status/';
 
-
+// Change Password
+export const CHANGE_PASSWORD_AFTER_LOGIN='/api/v1/password/update/temp_password/';

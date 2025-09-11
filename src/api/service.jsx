@@ -101,7 +101,8 @@ import {
   UPLOAD_BULK_NOTIFICATION,
   GET_SERVICE_TRACKER_BY_SUBMODULE_ID,
   GET_DOCUMENT_DROPDOWNS_TYPES,
-  GET_DOCUMENT_DROPDOWNS_STAGE
+  GET_DOCUMENT_DROPDOWNS_STAGE,
+  CHANGE_PASSWORD_AFTER_LOGIN
 
 } from "./Endpoint";
 // Login Api
@@ -1197,6 +1198,17 @@ export const uploadBulkNotification = async (filesArray, id, metadata = {}) => {
     return response.data;
   } catch (error) {
     console.error("Error uploading bulk notification:", error);
+    throw error;
+  }
+};
+
+// change password
+export const changePassword = async (userId, passwords) => {
+  try {
+    const response = await API.put(`${CHANGE_PASSWORD_AFTER_LOGIN}${userId}`, passwords);
+    return response.data;
+  } catch (error) {
+    console.error("Error changing password:", error);
     throw error;
   }
 };

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import '../style/changePassword.css';
+import { changePassword } from '../api/service';
+import Snackbars from '../component/Snackbars';
 
 function ChangePassword() {
   const [formData, setFormData] = useState({
@@ -14,7 +16,13 @@ function ChangePassword() {
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: 'top',
+    horizontal: 'center',
+    message: '',
+    severityType: '',
+  });
   const validatePassword = (password) => {
     const errors = [];
     if (password.length < 8) errors.push('At least 8 characters');
@@ -32,11 +40,11 @@ function ChangePassword() {
     if (validationErrors.length > 1) return { strength: 'medium', label: 'Medium' };
     return { strength: 'strong', label: 'Strong' };
   };
-
+  const currentUserId = localStorage.getItem('user_id');
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear errors when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -50,13 +58,21 @@ function ChangePassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+    const payload = {
+      // old_password: formData.currentPassword,
+      newPassword: formData.newPassword,
+      confirmPassword: formData.confirmPassword
+    };
+    const response = await changePassword(currentUserId, payload);
+    const message = response?.message
+
+
     const newErrors = {};
-    
+
     if (!formData.currentPassword) {
       newErrors.currentPassword = 'Current password is required';
     }
-    
+
     if (!formData.newPassword) {
       newErrors.newPassword = 'New password is required';
     } else {
@@ -65,21 +81,26 @@ function ChangePassword() {
         newErrors.newPassword = 'Password must meet all requirements';
       }
     }
-    
+
     if (formData.newPassword !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (formData.currentPassword === formData.newPassword) {
       newErrors.newPassword = 'New password must be different from current password';
     }
-    
+
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length === 0) {
       // Simulate API call
       setTimeout(() => {
-        alert('Password changed successfully!');
+        setIsSnackbarsOpen({
+          ...issnackbarsOpen,
+          open: true,
+          message,
+          severityType: 'success',
+        });
         setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         setIsSubmitting(false);
       }, 1000);
@@ -92,6 +113,7 @@ function ChangePassword() {
 
   return (
     <div className="change-password-container">
+      <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       <div className="change-password-card">
         <div className="card-header">
           <h1>Change Password</h1>
@@ -191,8 +213,8 @@ function ChangePassword() {
 
           <div className="form-actions">
             <button type="button" className="btn-secondary">Cancel</button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn-primary justify-content-center"
               disabled={isSubmitting}
             >
