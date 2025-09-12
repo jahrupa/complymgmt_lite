@@ -121,7 +121,7 @@ function ChangePassword() {
         </div>
 
         <form onSubmit={handleSubmit} className="password-form">
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="currentPassword">Current Password</label>
             <div className="password-input-wrapper">
               <input
@@ -142,7 +142,7 @@ function ChangePassword() {
               </button>
             </div>
             {errors.currentPassword && <span className="error-message">{errors.currentPassword}</span>}
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label htmlFor="newPassword">New Password</label>
@@ -212,7 +212,7 @@ function ChangePassword() {
           </div>
 
           <div className="form-actions">
-            <button type="button" className="btn-secondary">Cancel</button>
+            <button type="button" className="btn-secondary justify-content-center">Cancel</button>
             <button
               type="submit"
               className="btn-primary justify-content-center"
