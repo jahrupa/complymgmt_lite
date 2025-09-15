@@ -833,7 +833,7 @@ export const updateLocationToModulesApprovalStatusById = async (id) => {
   }
 };
 
-// File upload
+// File upload python code
 export const uploadFile = async (filesArray) => {
   try {
     const formData = new FormData();
@@ -856,40 +856,14 @@ export const uploadFile = async (filesArray) => {
 };
 
 
-// File upload Golang
-// export const uploadFileGolang = async (filesArray) => {
-//   try {
-//     const formData = new FormData();
-
-//     filesArray.forEach((file) => {
-//       formData.append("files", file);
-//     });
-
-//     const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
-//       headers: {
-//         "Content-Type": "multipart/form-data",
-//       },
-//     });
-
-//     return response.data;
-//   } catch (error) {
-//     console.error("Upload failed:", error.response?.data || error);
-//     throw error;
-//   }
-// };
-
-// File upload Golang
-export const uploadFileGolang = async ({ files, previousResponse }) => {
+// File upload Golang without python
+export const uploadFileGolang = async (filesArray) => {
   try {
     const formData = new FormData();
 
-    // Append files to FormData
-    files.forEach((file) => {
+    filesArray.forEach((file) => {
       formData.append("files", file);
     });
-
-    // Append the previous API response as a JSON string
-    formData.append("previousResponse", JSON.stringify(previousResponse));
 
     const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
       headers: {
@@ -903,6 +877,32 @@ export const uploadFileGolang = async ({ files, previousResponse }) => {
     throw error;
   }
 };
+
+// File upload Golang uncomment when you upload auto file whith python code
+// export const uploadFileGolang = async ({ files, previousResponse }) => {
+//   try {
+//     const formData = new FormData();
+
+//     // Append files to FormData
+//     files?.forEach((file) => {
+//       formData?.append("files", file);
+//     });
+
+//     // Append the previous API response as a JSON string
+//     formData?.append("previousResponse", JSON.stringify(previousResponse));
+
+//     const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+
+//     return response.data;
+//   } catch (error) {
+//     console.error("Upload failed:", error.response?.data || error);
+//     throw error;
+//   }
+// };
 
 export const uploadExcelFile = async (filesArray, metadata = {}) => {
   try {
