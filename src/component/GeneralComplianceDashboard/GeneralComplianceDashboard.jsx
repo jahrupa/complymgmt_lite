@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
+import { fetchGeneralCompaiancePortfolio } from '../../api/service';
 
 const GeneralComplianceDashboard = () => {
+    // const[data,setData]=useState([])
+    // useEffect(() => {
+    //   const dashboardData=fetchGeneralCompaiancePortfolio()
+    //   setData(dashboardData)
+    // }, [])
+    
     const data = {
         licenses: {
             active: 265,
@@ -33,29 +40,29 @@ const GeneralComplianceDashboard = () => {
         }
     };
 
-  // Payroll display items generated from data
-const payrollData = [
-    {
-        icon: '✔', label: 'Completed',
-        value: data.payroll.completed,
-        status: data.payroll.completed > 0 ? 'normal' : 'warning'
-    },
-    {
-        icon: '↻', label: 'In Progress',
-        value: data.payroll.in_progress,
-        status: data.payroll.in_progress > 0 ? 'progress' : 'normal'
-    },
-    {
-        icon: '⚠', label: 'Overdue',
-        value: data.payroll.overdue,
-        status: data.payroll.overdue > 0 ? 'warning' : 'normal'
-    },
-    {
-        icon: '⏳', label: 'Pending',
-        value: data.payroll.pending,
-        status: data.payroll.pending > 0 ? 'normal' : 'muted'
-    }
-];
+    // Payroll display items generated from data
+    const payrollData = [
+        {
+            icon: '✔', label: 'Completed',
+            value: data.payroll.completed,
+            status: data.payroll.completed > 0 ? 'normal' : 'warning'
+        },
+        {
+            icon: '↻', label: 'In Progress',
+            value: data.payroll.in_progress,
+            status: data.payroll.in_progress > 0 ? 'progress' : 'normal'
+        },
+        {
+            icon: '⚠', label: 'Overdue',
+            value: data.payroll.overdue,
+            status: data.payroll.overdue > 0 ? 'warning' : 'normal'
+        },
+        {
+            icon: '⏳', label: 'Pending',
+            value: data.payroll.pending,
+            status: data.payroll.pending > 0 ? 'normal' : 'muted'
+        }
+    ];
 
     // Licenses Pie Chart
     const licensesChart = {
@@ -197,7 +204,7 @@ const payrollData = [
             <div className='col-6 mb-4'>
                 {/* Licenses Section */}
                 <div className="general-compliance">
-                     <h2>Licenses (Total: {data.licenses.total})</h2>
+                    <h2>Licenses (Total: {data.licenses.total})</h2>
                     <Chart
                         options={licensesChart.options}
                         series={licensesChart.series}

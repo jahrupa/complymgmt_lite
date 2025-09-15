@@ -102,7 +102,8 @@ import {
   GET_SERVICE_TRACKER_BY_SUBMODULE_ID,
   GET_DOCUMENT_DROPDOWNS_TYPES,
   GET_DOCUMENT_DROPDOWNS_STAGE,
-  CHANGE_PASSWORD_AFTER_LOGIN
+  CHANGE_PASSWORD_AFTER_LOGIN,
+  GET_GENERAL_COMPLIANCE_PORTFOLIO
 
 } from "./Endpoint";
 // Login Api
@@ -1212,3 +1213,15 @@ export const changePassword = async (userId, passwords) => {
     throw error;
   }
 };
+
+// Dashboard
+export const fetchGeneralCompaiancePortfolio = async () => {
+  try {
+    const response = await API.get(GET_GENERAL_COMPLIANCE_PORTFOLIO);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all notifications:", error);
+    throw error;
+  }
+};
+
