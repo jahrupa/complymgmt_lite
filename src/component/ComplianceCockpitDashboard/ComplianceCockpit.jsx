@@ -12,10 +12,10 @@ const ComplianceCockpit = () => {
 
   return (
     <div className="compliance-cockpit">
-      <div className="cockpit-header service-tracker-inner-page-header">
+      {/* <div className="cockpit-header service-tracker-inner-page-header">
         <h1 className="cockpit-title">Compliance Cockpit</h1>
         <NavigationTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      </div>
+      </div> */}
 
       <div className="dashboard-grid">
         <div className="left-section">

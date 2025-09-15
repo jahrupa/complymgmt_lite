@@ -2,7 +2,7 @@
 import React from 'react'
 import LaptopMinimalCheck from '../assets/compliance-cockpit.png'
 
-import ComplianceCpckpitDasboard from '../component/ComplianceCpckpitDasboard'
+import ComplianceCpckpitTabs from '../component/ComplianceCpckpitTabs'
 
 const ComplianceMasterDashboard = () => {
     return (
@@ -12,7 +12,7 @@ const ComplianceMasterDashboard = () => {
             </div>
             <div>
                 <div>
-                    <ComplianceCpckpitDasboard />
+                    <ComplianceCpckpitTabs />
                 </div>
                 
             </div>
