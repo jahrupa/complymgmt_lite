@@ -36,16 +36,9 @@ const sampleClients = [
   { name: "SBI General Insurance", score: 99.48, type: "High Performer" }
 ];
 
-const CockpitComplince = ({ data }) => {
-  if (!data || !data.client_info) {
-    return <div>Loading...</div>;
-  }
-  // const [selectedMetric, setSelectedMetric] = useState('overall');
-// Remove or fix the invalid console.log to prevent runtime errors
-// If you want to debug, check if compliance_info exists first:
-// if (data.compliance_info && data.compliance_info.object && data.compliance_info.object.key) {
-  // console.log(Object.keys(data?.compliance_info));
-// }
+const CockpitComplince = ({data}) => {
+  const [selectedMetric, setSelectedMetric] = useState('overall');
+
   // Overall Compliance Chart
   const overallChartOptions = {
     chart: {
@@ -65,7 +58,7 @@ const CockpitComplince = ({ data }) => {
           total: {
             show: true,
             label: 'Overall Score',
-            formatter: () => `${data?.overall_compliance_score}%`
+            formatter: () => `${data.overall_compliance_score}%`
           }
         }
       }
@@ -74,11 +67,11 @@ const CockpitComplince = ({ data }) => {
   };
 
   const overallChartSeries = [
-    data?.overall_license_compliance_score,
-    data?.overall_return_compliance_score,
-    data?.overall_challan_compliance_score,
-    data?.overall_register_compliance_score,
-    data?.overall_compliance_score
+    data.overall_license_compliance_score,
+    data.overall_return_compliance_score,
+    data.overall_challan_compliance_score,
+    data.overall_register_compliance_score,
+    data.overall_compliance_score
   ];
 
   // Completion Status Chart
@@ -119,10 +112,10 @@ const CockpitComplince = ({ data }) => {
     {
       name: 'Completed',
       data: [
-        data?.total_licenses_completed,
-        data?.total_returns_completed,
-        data?.total_registers_completed,
-        data?.total_challans_completed
+        data.total_licenses_completed,
+        data.total_returns_completed,
+        data.total_registers_completed,
+        data.total_challans_completed
       ]
     },
     {
@@ -137,10 +130,10 @@ const CockpitComplince = ({ data }) => {
     {
       name: 'Total',
       data: [
-        data?.total_licenses,
-        data?.total_returns,
-        data?.total_registers,
-        data?.total_challans
+        data.total_licenses,
+        data.total_returns,
+        data.total_registers,
+        data.total_challans
       ]
     }
   ];
@@ -170,7 +163,7 @@ const CockpitComplince = ({ data }) => {
 
   const clientChartSeries = [{
     name: 'Compliance Score',
-    data: sampleClients?.map((client, index) => [index + 1, client?.score])
+    data: sampleClients.map((client, index) => [index + 1, client.score])
   }];
 
   return (
@@ -179,11 +172,11 @@ const CockpitComplince = ({ data }) => {
         <h1>Multi-Client Compliance Analytics</h1>
         <div className="header-stats">
           <div className="header-stat">
-            <span className="stat-value">{data?.total_clients?.toLocaleString()}</span>
+            <span className="stat-value">{data.total_clients.toLocaleString()}</span>
             <span className="stat-label">Total Clients</span>
           </div>
           <div className="header-stat">
-            <span className="stat-value">{data?.overall_compliance_score}%</span>
+            <span className="stat-value">{data.overall_compliance_score}%</span>
             <span className="stat-label">Overall Score</span>
           </div>
         </div>
@@ -198,16 +191,16 @@ const CockpitComplince = ({ data }) => {
               <div className="metric-icon">📋</div>
               <div className="metric-content">
                 <h3>Licenses</h3>
-                <div className="metric-value">{data?.total_licenses}</div>
+                <div className="metric-value">{data.total_licenses}</div>
                 <div className="metric-progress">
                   <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data?.total_licenses_completed / data?.total_licenses) * 100}%` }}
+                    <div 
+                      className="progress-fill" 
+                      style={{width: `${(data.total_licenses_completed / data.total_licenses) * 100}%`}}
                     ></div>
                   </div>
                   <span className="progress-text">
-                    {data?.total_licenses_completed} / {data?.total_licenses} completed
+                    {data.total_licenses_completed} / {data.total_licenses} completed
                   </span>
                 </div>
                 <div className="compliance-score">{data.overall_license_compliance_score}% compliance</div>
@@ -221,9 +214,9 @@ const CockpitComplince = ({ data }) => {
                 <div className="metric-value">{data.total_returns}</div>
                 <div className="metric-progress">
                   <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data.total_returns_completed / data.total_returns) * 100}%` }}
+                    <div 
+                      className="progress-fill" 
+                      style={{width: `${(data.total_returns_completed / data.total_returns) * 100}%`}}
                     ></div>
                   </div>
                   <span className="progress-text">
@@ -241,9 +234,9 @@ const CockpitComplince = ({ data }) => {
                 <div className="metric-value">{data.total_registers}</div>
                 <div className="metric-progress">
                   <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data.total_registers_completed / data.total_registers) * 100}%` }}
+                    <div 
+                      className="progress-fill" 
+                      style={{width: `${(data.total_registers_completed / data.total_registers) * 100}%`}}
                     ></div>
                   </div>
                   <span className="progress-text">
@@ -261,9 +254,9 @@ const CockpitComplince = ({ data }) => {
                 <div className="metric-value">{data.total_challans}</div>
                 <div className="metric-progress">
                   <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data.total_challans_completed / data.total_challans) * 100}%` }}
+                    <div 
+                      className="progress-fill" 
+                      style={{width: `${(data.total_challans_completed / data.total_challans) * 100}%`}}
                     ></div>
                   </div>
                   <span className="progress-text">
@@ -297,14 +290,14 @@ const CockpitComplince = ({ data }) => {
           </div>
 
         </div>
-        <div className="chart-container full-width">
-          <Chart
-            options={clientChartOptions}
-            series={clientChartSeries}
-            type="scatter"
-            height={400}
-          />
-        </div>
+          <div className="chart-container full-width">
+            <Chart
+              options={clientChartOptions}
+              series={clientChartSeries}
+              type="scatter"
+              height={400}
+            />
+          </div>
 
         {/* Top Performers */}
         <div className="performers-section">
@@ -315,16 +308,15 @@ const CockpitComplince = ({ data }) => {
                 <div className="performer-header">
                   <h4>{client.name}</h4>
                   <span className={`performance-badge ${client.type.toLowerCase().replace(' ', '-')}`}>
-                    Complaince Score
-                    {/* {client.type} */}
+                    {client.type}
                   </span>
                 </div>
                 <div className="performer-score">
                   <span className="score-value">{client.score}%</span>
                   <div className="score-bar">
-                    <div
-                      className="score-fill"
-                      style={{ width: `${Math.min(client.score, 100)}%` }}
+                    <div 
+                      className="score-fill" 
+                      style={{width: `${Math.min(client.score, 100)}%`}}
                     ></div>
                   </div>
                 </div>
@@ -342,12 +334,12 @@ const CockpitComplince = ({ data }) => {
               <div className="analytics-content">
                 <h4>Average Completion Rate</h4>
                 <div className="analytics-value">
-                  {((data.total_licenses_completed + data.total_returns_completed + data.total_challans_completed) /
+                  {((data.total_licenses_completed + data.total_returns_completed + data.total_challans_completed) / 
                     (data.total_licenses + data.total_returns + data.total_challans) * 100).toFixed(1)}%
                 </div>
               </div>
             </div>
-
+            
             <div className="analytics-item">
               <div className="analytics-icon">⚠️</div>
               <div className="analytics-content">
@@ -357,7 +349,7 @@ const CockpitComplince = ({ data }) => {
                 </div>
               </div>
             </div>
-
+            
             <div className="analytics-item">
               <div className="analytics-icon">📈</div>
               <div className="analytics-content">
@@ -365,7 +357,7 @@ const CockpitComplince = ({ data }) => {
                 <div className="analytics-value">Challans ({data.overall_challan_compliance_score}%)</div>
               </div>
             </div>
-
+            
             <div className="analytics-item">
               <div className="analytics-icon">🔍</div>
               <div className="analytics-content">
