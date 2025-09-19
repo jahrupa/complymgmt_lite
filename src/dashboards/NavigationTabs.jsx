@@ -11,7 +11,6 @@ import GeneralComplianceDashboard from '../dashboards/GeneralComplianceDashboard
 import { fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio } from '../api/service';
 import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByCompany';
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
-import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
 
 const NavigationTabs = ({selectedCompany}) => {
     const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp

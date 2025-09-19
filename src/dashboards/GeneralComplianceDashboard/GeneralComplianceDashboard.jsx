@@ -1,7 +1,51 @@
+<<<<<<< HEAD
 
+import React from 'react';
+=======
+<<<<<<< HEAD
+>>>>>>> df9eb14 (dashboard for cockpit - wip)
+import Chart from 'react-apexcharts';
+
+=======
+<<<<<<< HEAD:src/component/GeneralComplianceDashboard/GeneralComplianceDashboard.jsx
 import React from 'react';
 import Chart from 'react-apexcharts';
 
+const GeneralComplianceDashboard = () => {
+    const data = {
+        licenses: {
+            active: 265,
+            expired: 21,
+            expiring: 0,
+            inprogress: 51,
+            total: 343
+        },
+        payroll: {
+            completed: 0,
+            in_progress: 0,
+            overdue: 0,
+            pending: 0,
+            total_payroll: 0
+        },
+        registers: {
+            applicable_registers: 5384,
+            available_registers: 0,
+            completed_registers: 0,
+            missing_registers: 918,
+            partial_registers: 4466
+        },
+        returns: {
+            total_returns_applicable: 1175,
+            total_returns_at_risk: 80,
+            total_returns_completed: 1577,
+            total_returns_delayed: 80,
+            total_returns_pending: 9
+        }
+    };
+=======
+import Chart from 'react-apexcharts';
+
+>>>>>>> ea6cf3d (dashboard for cockpit - wip)
 const GeneralComplianceDashboard = ({data}) => {
     
     // const data = {
@@ -34,6 +78,10 @@ const GeneralComplianceDashboard = ({data}) => {
     //         total_returns_pending: 9
     //     }
     // };
+<<<<<<< HEAD
+=======
+>>>>>>> ecfa1ea (dashboard for cockpit - wip):src/dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard.jsx
+>>>>>>> ea6cf3d (dashboard for cockpit - wip)
 
 
   // Payroll display items generated from data
