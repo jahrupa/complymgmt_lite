@@ -140,3 +140,7 @@ export const CHANGE_PASSWORD_AFTER_LOGIN='/api/v1/password/update/temp_password/
 // Dashboard
 
 export const GET_GENERAL_COMPLIANCE_PORTFOLIO='/api/v1/dashboard/view/general/compliance/portfolio'
+export const GET_COMPLIANCE_COCKPIT_BY_COMPANY ='/api/v1/dashboard/view/compliance/cockpit/'
+export const GET_COCKPIT_COMPLIANCE_PORTFOLIO ='/api/v1/dashboard/view/compliance/cockpit/portfolio'
+
+

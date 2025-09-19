@@ -7,7 +7,7 @@ import img5 from '../assets/compliance-cockpit-5.png';
 import img6 from '../assets/compliance-cockpit-6.png';
 import '../style/statsCards.css';
 import { Tabs, Tab, Box } from '@mui/material';
-import GeneralComplianceDashboard from './GeneralComplianceDashboard/GeneralComplianceDashboard';
+import GeneralComplianceDashboard from '../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard';
 
 const ComplianceCpckpitTabs = () => {
   const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp

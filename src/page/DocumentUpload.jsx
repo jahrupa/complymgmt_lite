@@ -849,7 +849,7 @@ const DocumentUpload = () => {
             error={!!errors.document_type_name}
             helperText={errors.document_type_name}
           />
-          <SingleSelectTextField name="stage" label="Stage" value={current?.stage}
+          <SingleSelectTextField name="stage" label="Stage" value={current?.stage_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownStages.find(

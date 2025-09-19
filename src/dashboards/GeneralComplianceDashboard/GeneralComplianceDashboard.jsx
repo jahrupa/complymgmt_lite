@@ -1,44 +1,37 @@
-import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
-import { fetchGeneralCompaiancePortfolio } from '../../api/service';
 
-const GeneralComplianceDashboard = () => {
-    // const[data,setData]=useState([])
-    // useEffect(() => {
-    //   const dashboardData=fetchGeneralCompaiancePortfolio()
-    //   setData(dashboardData)
-    // }, [])
+const GeneralComplianceDashboard = ({data}) => {
     
-    const data = {
-        licenses: {
-            active: 265,
-            expired: 21,
-            expiring: 0,
-            inprogress: 51,
-            total: 343
-        },
-        payroll: {
-            completed: 0,
-            in_progress: 0,
-            overdue: 0,
-            pending: 0,
-            total_payroll: 0
-        },
-        registers: {
-            applicable_registers: 5384,
-            available_registers: 0,
-            completed_registers: 0,
-            missing_registers: 918,
-            partial_registers: 4466
-        },
-        returns: {
-            total_returns_applicable: 1175,
-            total_returns_at_risk: 80,
-            total_returns_completed: 1577,
-            total_returns_delayed: 80,
-            total_returns_pending: 9
-        }
-    };
+    // const data = {
+    //     licenses: {
+    //         active: 265,
+    //         expired: 21,
+    //         expiring: 0,
+    //         inprogress: 51,
+    //         total: 343
+    //     },
+    //     payroll: {
+    //         completed: 0,
+    //         in_progress: 0,
+    //         overdue: 0,
+    //         pending: 0,
+    //         total_payroll: 0
+    //     },
+    //     registers: {
+    //         applicable_registers: 5384,
+    //         available_registers: 0,
+    //         completed_registers: 0,
+    //         missing_registers: 918,
+    //         partial_registers: 4466
+    //     },
+    //     returns: {
+    //         total_returns_applicable: 1175,
+    //         total_returns_at_risk: 80,
+    //         total_returns_completed: 1577,
+    //         total_returns_delayed: 80,
+    //         total_returns_pending: 9
+    //     }
+    // };
 
     // Payroll display items generated from data
     const payrollData = [
@@ -81,37 +74,6 @@ const GeneralComplianceDashboard = () => {
             // title: {
             //     text: `Licenses (Total: ${data.licenses.total})`
             // },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }]
-        }
-    };
-
-    // Payroll Donut Chart
-    const payrollChart = {
-        series: [
-            data.payroll.completed,
-            data.payroll.in_progress,
-            data.payroll.overdue,
-            data.payroll.pending
-        ],
-        options: {
-            chart: {
-                type: 'donut',
-                height: 350
-            },
-            labels: ['Completed', 'In Progress', 'Overdue', 'Pending'],
-            title: {
-                text: `Payroll (Total: ${data.payroll.total_payroll})`
-            },
             responsive: [{
                 breakpoint: 480,
                 options: {
@@ -201,7 +163,7 @@ const GeneralComplianceDashboard = () => {
 
     return (
         <div className='row'>
-            <div className='col-6 mb-4'>
+            <div className='col-12 col-md-6 mb-4'>
                 {/* Licenses Section */}
                 <div className="general-compliance">
                     <h2>Licenses (Total: {data.licenses.total})</h2>
@@ -213,7 +175,7 @@ const GeneralComplianceDashboard = () => {
                     />
                 </div>
             </div>
-            <div className='col-6 mb-4'>
+            <div className='col-12 col-md-6 mb-4'>
                 <div className="general-compliance">
                     <h2>General Compliance</h2>
 
@@ -245,7 +207,7 @@ const GeneralComplianceDashboard = () => {
             </div>
             {/* Payroll Section */}
 
-            <div className='col-6 mb-4'>
+            <div className='col-12 col-md-6 mb-4'>
                 {/* Registers Section */}
                 <div className="general-compliance">
                     <Chart
@@ -256,7 +218,7 @@ const GeneralComplianceDashboard = () => {
                     />
                 </div>
             </div>
-            <div className='col-6 mb-4'>
+            <div className='col-12 col-md-6 mb-4'>
                 {/* Returns Section */}
                 <div className="general-compliance">
                     <Chart
