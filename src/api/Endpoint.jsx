@@ -133,6 +133,11 @@ export const DELETE_NOTIFICATION_BY_ID ='/api/v1/notification/delete/';
 export const UPDATE_NOTIFICATION_BY_ID ='/api/v1/notification/update/';
 export const UPDATE_NOTIFICATION_APPROVAL_STATUS_BY_ID='/api/v1/notification/update/approval_status/';
 export const UPDATE_NOTIFICATION_STATUS_BY_ID='/api/v1/notification/update/status/';
+export const GET_INAPP_NOTIFICATION='/api/v1/in_app/view/inapp_notification_by_userID';
+export const READ_INAPP_NOTIFICATION='/api/v1/in_app/update/read_inapp_notification';
+export const DELETE_INAPP_NOTIFICATION='/api/v1/in_app/delete/remove_inapp_notification';
+export const READ_ALL_INAPP_NOTIFICATION='/api/v1/in_app/update/read_all_inapp_notification';
+export const DELETE_ALL_INAPP_NOTIFICATION='/api/v1/in_app/delete/remove_all_inapp_notification';
 
 // Change Password
 export const CHANGE_PASSWORD_AFTER_LOGIN='/api/v1/password/update/temp_password/';

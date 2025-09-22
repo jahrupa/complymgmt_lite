@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowLeft,
   Bell,
@@ -7,108 +7,51 @@ import {
   Info,
   AlertTriangle,
   Clock,
-  Filter,
   Search,
   MoreVertical,
   Trash2,
-  Eye,
   CheckCircle
 } from 'lucide-react';
-import '../../style/notification.css'
+import '../../style/notification.css';
 import MonthYearCalander from '../MonthYearCalander';
 import { useNavigate } from 'react-router-dom';
-import { AnimatedSearchBar } from '../AnimatedSearchBar';
+import { getInAppNotification, readNotificationById, deleteInAppNotificationById, readAllInAppNotification, deleteAllInAppNotification } from '../../api/service.jsx';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const NotificationPage = ({ onBack }) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState('show');
+  const [openMenuId, setOpenMenuId] = useState(null); // single open menu
+  const menuRefs = useRef({});
   const navigate = useNavigate();
 
-  const allNotifications = [
-    {
-      id: 1,
-      type: 'success',
-      title: 'Payment Received',
-      message: 'Your payment of $299 has been processed successfully. Transaction ID: TXN123456789',
-      time: '2 min ago',
-      timestamp: '2024-01-15 14:30',
-      unread: true,
-      category: 'Payment'
-    },
-    {
-      id: 2,
-      type: 'warning',
-      title: 'Server Maintenance Scheduled',
-      message: 'Scheduled maintenance will begin at 2:00 AM EST. Expected downtime: 2 hours',
-      time: '15 min ago',
-      timestamp: '2024-01-15 14:15',
-      unread: true,
-      category: 'System'
-    },
-    {
-      id: 3,
-      type: 'info',
-      title: 'New Feature Available',
-      message: 'Check out our new dashboard analytics with advanced reporting capabilities',
-      time: '1 hour ago',
-      timestamp: '2024-01-15 13:30',
-      unread: false,
-      category: 'Feature'
-    },
-    {
-      id: 4,
-      type: 'error',
-      title: 'Failed Login Attempt',
-      message: 'Someone tried to access your account from IP: 192.168.1.100',
-      time: '2 hours ago',
-      timestamp: '2024-01-15 12:30',
-      unread: true,
-      category: 'Security'
-    },
-    {
-      id: 5,
-      type: 'success',
-      title: 'Profile Updated',
-      message: 'Your profile information has been successfully updated',
-      time: '3 hours ago',
-      timestamp: '2024-01-15 11:30',
-      unread: false,
-      category: 'Account'
-    },
-    {
-      id: 6,
-      type: 'info',
-      title: 'Weekly Report Ready',
-      message: 'Your weekly analytics report is now available for download',
-      time: '1 day ago',
-      timestamp: '2024-01-14 14:30',
-      unread: false,
-      category: 'Report'
-    },
-    {
-      id: 7,
-      type: 'warning',
-      title: 'Storage Almost Full',
-      message: 'Your storage is 85% full. Consider upgrading your plan',
-      time: '2 days ago',
-      timestamp: '2024-01-13 14:30',
-      unread: false,
-      category: 'Storage'
-    },
-    {
-      id: 8,
-      type: 'success',
-      title: 'Backup Completed',
-      message: 'Your data backup has been completed successfully',
-      time: '3 days ago',
-      timestamp: '2024-01-12 14:30',
-      unread: false,
-      category: 'System'
-    }
-  ];
+  // Toggle menu for a notification
+  const toggleMenu = (id) => {
+    setOpenMenuId(prev => (prev === id ? null : id));
+  };
+
+  // Close menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!openMenuId) return;
+      const el = menuRefs.current[openMenuId];
+      if (el && !el.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openMenuId]);
 
   const getIcon = (type) => {
-    switch (type) {
+    switch (type?.toLowerCase()) {
       case 'success': return Check;
       case 'warning': return AlertTriangle;
       case 'error': return AlertCircle;
@@ -118,7 +61,7 @@ const NotificationPage = ({ onBack }) => {
   };
 
   const getIconColor = (type) => {
-    switch (type) {
+    switch (type?.toLowerCase()) {
       case 'success': return 'success';
       case 'warning': return 'warning';
       case 'error': return 'error';
@@ -127,35 +70,96 @@ const NotificationPage = ({ onBack }) => {
     }
   };
 
+  const unreadCount = allNotifications.filter(n => n.unread).length;
+
   const filteredNotifications = allNotifications.filter(notification => {
-    const matchesFilter = filter === 'all' ||
+    const matchesFilter =
+      filter === 'all' ||
       (filter === 'unread' && notification.unread) ||
       (filter === 'read' && !notification.unread) ||
-      notification.type === filter;
+      notification.type?.toLowerCase() === filter;
 
-    const matchesSearch = notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      notification.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      notification.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      notification.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      notification.body?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      notification.type?.toLowerCase()?.includes(searchTerm.toLowerCase());
 
     return matchesFilter && matchesSearch;
   });
-
-  const unreadCount = allNotifications.filter(n => n.unread).length;
-  const [currentPage, setCurrentPage] = useState('show');
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
     navigate(page === 'show' ? '/notifications_list' : '/create_notification_template');
   };
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getInAppNotification("68c0035161fa8edf2434f835");
+        setAllNotifications(response || []);
+      } catch (err) {
+        setError(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  const handleMarkAsRead = (id) => {
+    try {
+      result = readNotificationById(id);
+      setAllNotifications(prev =>
+        prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
+      );
+      setOpenMenuId(null); // close menu after action
+    } catch (error) {
+      console.log("Failed to read the notification", error);
+    }
+  };
+
+  const handleClearNotification = (id) => {
+    result = deleteInAppNotificationById(id)
+    setAllNotifications(prev => prev.filter(n => n._id !== id));
+    setOpenMenuId(null); // close menu after action
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+     result = readAllInAppNotification();
+      setAllNotifications(prev =>
+        prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
+      );
+      setOpenMenuId(null); // close menu after action
+    } catch (error) {
+      console.log("Failed to read the notification", error);
+    }
+  }
+
+  const handleDeleteAll = async () => {
+    try {
+     result = deleteAllInAppNotification();
+      setAllNotifications(prev =>
+        prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
+      );
+      setOpenMenuId(null); // close menu after action
+    } catch (error) {
+      console.log("Failed to read the notification", error);
+    }
+  }
+
   return (
     <div className="notification-page">
+      {/* Header */}
       <div className="notification-page-header">
         <div className="notification-page-title">
           <button className="back-button" onClick={onBack}>
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1>Incomming Notifications</h1>
+            <h1>Incoming Notifications</h1>
             <p>{unreadCount} unread notifications</p>
           </div>
         </div>
@@ -163,22 +167,22 @@ const NotificationPage = ({ onBack }) => {
         <div className="notification-actions">
           <button className="action-btn secondary" onClick={() => navigate('/create_notification_template')}>
             <CheckCircle size={18} />
-            Create Notifaction
+            Create Notification
           </button>
-          <button className="action-btn secondary">
+          <button className="action-btn secondary" onClick={handleMarkAllAsRead} >
             <CheckCircle size={18} />
             Mark All Read
           </button>
-          <button className="action-btn secondary">
+          <button className="action-btn secondary" onClick={handleDeleteAll}>
             <Trash2 size={18} />
             Clear All
           </button>
         </div>
       </div>
 
+      {/* Filters */}
       <div className="notification-filters">
         <div className="d-flex filter-search justify-content-between">
-          {/* <AnimatedSearchBar/> */}
           <div className="notification-search-container">
             <Search className="notification-search-icon" size={18} />
             <input
@@ -198,25 +202,34 @@ const NotificationPage = ({ onBack }) => {
           {[
             { key: 'all', label: 'All', count: allNotifications.length },
             { key: 'unread', label: 'Unread', count: unreadCount },
-            { key: 'success', label: 'Success', count: allNotifications.filter(n => n.type === 'success').length },
-            { key: 'warning', label: 'Warning', count: allNotifications.filter(n => n.type === 'warning').length },
-            { key: 'error', label: 'Error', count: allNotifications.filter(n => n.type === 'error').length },
-            { key: 'info', label: 'Info', count: allNotifications.filter(n => n.type === 'info').length }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              className={`filter-tab ${filter === tab.key ? 'active' : ''}`}
-              onClick={() => setFilter(tab.key)}
-            >
-              {tab.label}
-              <span className="filter-count">{tab.count}</span>
-            </button>
-          ))}
+            { key: 'success', label: 'Success', count: allNotifications.filter(n => n.type?.toLowerCase() === 'success').length },
+            { key: 'warning', label: 'Warning', count: allNotifications.filter(n => n.type?.toLowerCase() === 'warning').length },
+            { key: 'error', label: 'Error', count: allNotifications.filter(n => n.type?.toLowerCase() === 'error').length },
+            { key: 'info', label: 'Info', count: allNotifications.filter(n => n.type?.toLowerCase() === 'info').length }
+          ].map(tab => {
+            const tabKey = tab.key.toLowerCase();
+            const isActive = filter === tabKey;
+            return (
+              <button
+                key={tab.key}
+                className={`filter-tab ${isActive ? 'active' : ''}`}
+                onClick={() => setFilter(tabKey)}
+              >
+                {tab.label}
+                <span className="filter-count">{tab.count}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
+      {/* Notification List */}
       <div className="notification-list">
-        {filteredNotifications.length === 0 ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="error">{error}</p>
+        ) : filteredNotifications.length === 0 ? (
           <div className="empty-state">
             <Bell size={48} />
             <h3>No notifications found</h3>
@@ -227,8 +240,8 @@ const NotificationPage = ({ onBack }) => {
             const Icon = getIcon(notification.type);
             return (
               <div
-                key={notification.id}
-                className={`notification-card ${notification.unread ? 'unread' : ''}`}
+                key={notification._id}
+                className={`notification-card ${!notification.is_read ? 'unread' : ''}`}
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div className="notification-card-content">
@@ -238,39 +251,58 @@ const NotificationPage = ({ onBack }) => {
 
                   <div className="notification-card-body">
                     <div className="notification-card-header">
-                      <h4 className="notification-card-title">{notification.title}</h4>
+                      <h4 className="notification-card-title">{notification.subject}</h4>
                       <span className={`notification-category ${notification.type}`}>
-                        {notification.category}
+                        {notification.priority}
                       </span>
                     </div>
 
-                    <p className="notification-card-message">{notification.message}</p>
+                    <p className="notification-card-message">{notification.body}</p>
 
                     <div className="notification-card-meta">
                       <div className="notification-card-time">
                         <Clock size={14} />
-                        <span>{notification.time}</span>
-                        <span className="timestamp">({notification.timestamp})</span>
+                        <span>{dayjs(notification.created_at).fromNow()}</span>
+                        <span className="timestamp">({notification.created_at})</span>
                       </div>
-                      {notification.unread && <div className="unread-indicator">New</div>}
+                      {!notification?.is_read && <div className="unread-indicator">New</div>}
                     </div>
                   </div>
 
-                  <div className="notification-card-actions">
-                    <button className="action-button">
-                      <Eye size={16} />
-                    </button>
-                    <button className="action-button">
+                  {/* Action Menu */}
+                  <div
+                    className="notification-card-actions"
+                    style={{ position: 'relative' }}
+                    ref={el => menuRefs.current[notification._id] = el}
+                  >
+                    <button
+                      className="action-button"
+                      onClick={() => toggleMenu(notification._id)}
+                    >
                       <MoreVertical size={16} />
                     </button>
+
+                    {openMenuId === notification._id && (
+                      <div className="notification-menu">
+                        {!notification.is_read && (
+                          <button onClick={() => handleMarkAsRead(notification._id)}>
+                            Read
+                          </button>
+                        )}
+                        <button onClick={() => handleClearNotification(notification._id)}>
+                          Clear
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })
         )}
-
       </div>
+
+      {/* Navigation */}
       <div className="navigation">
         <button
           onClick={() => handleNavigate('show')}
@@ -285,7 +317,6 @@ const NotificationPage = ({ onBack }) => {
           Create New
         </button>
       </div>
-
     </div>
   );
 };

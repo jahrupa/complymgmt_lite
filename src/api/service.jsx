@@ -103,12 +103,14 @@ import {
   GET_DOCUMENT_DROPDOWNS_TYPES,
   GET_DOCUMENT_DROPDOWNS_STAGE,
   CHANGE_PASSWORD_AFTER_LOGIN,
-  GET_GENERAL_COMPLIANCE_PORTFOLIO,
-  GET_COMPLIANCE_COCKPIT_BY_COMPANY,
-  GET_COCKPIT_COMPLIANCE_PORTFOLIO,
-  GET_CLIENT_ONBOARDING_PORTFOLIO
+  GET_INAPP_NOTIFICATION,
+  READ_INAPP_NOTIFICATION,
+  DELETE_INAPP_NOTIFICATION,
+  DELETE_ALL_INAPP_NOTIFICATION,
+  READ_ALL_INAPP_NOTIFICATION
 
 } from "./Endpoint";
+
 // Login Api
 export const loginApi = async (loginPayload) => {
   try {
@@ -1205,6 +1207,58 @@ export const uploadBulkNotification = async (filesArray, id, metadata = {}) => {
     throw error;
   }
 };
+
+export const getInAppNotification = async (userId) => {
+  try {
+    const response = await API.get(GET_INAPP_NOTIFICATION, {
+      params: { user_id: userId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching notification:", error);
+    throw error;
+  }
+}
+
+export const readNotificationById = async (id) => {
+  try {
+    const response = await API.put(`${READ_INAPP_NOTIFICATION}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification", error);
+    throw error;
+  }
+}
+
+export const deleteInAppNotificationById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_INAPP_NOTIFICATION}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing notification", error);
+    throw error;
+  }
+}
+
+export const readAllInAppNotification = async() => {
+  try {
+    const response = await API.put(`${READ_ALL_INAPP_NOTIFICATION}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating notification", error);
+    throw error;
+  }
+}
+
+export const deleteAllInAppNotification = async () => {
+  try {
+    const response = await API.delete(`${DELETE_ALL_INAPP_NOTIFICATION}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing notification", error);
+    throw error;
+  }
+}
 
 // change password
 export const changePassword = async (userId, passwords) => {
