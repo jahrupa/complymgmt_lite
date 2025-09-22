@@ -97,7 +97,7 @@ const NotificationPage = ({ onBack }) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getInAppNotification("68c0035161fa8edf2434f835");
+        const response = await getInAppNotification(localStorage.getItem("user_id") || "");
         setAllNotifications(response || []);
       } catch (err) {
         setError(err.message || 'Something went wrong');
