@@ -1240,9 +1240,12 @@ export const deleteInAppNotificationById = async (id) => {
   }
 }
 
-export const readAllInAppNotification = async() => {
+export const readAllInAppNotification = async(user_id) => {
   try {
-    const response = await API.put(`${READ_ALL_INAPP_NOTIFICATION}`);
+    const response = await API.put(`${READ_ALL_INAPP_NOTIFICATION}`, 
+      {}, 
+      { params: {user_id: user_id} }
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating notification", error);
@@ -1250,9 +1253,11 @@ export const readAllInAppNotification = async() => {
   }
 }
 
-export const deleteAllInAppNotification = async () => {
+export const deleteAllInAppNotification = async (user_id) => {
   try {
-    const response = await API.delete(`${DELETE_ALL_INAPP_NOTIFICATION}`);
+    const response = await API.delete(`${DELETE_ALL_INAPP_NOTIFICATION}`, {
+      params: {user_id: user_id}
+    });
     return response.data;
   } catch (error) {
     console.error("Error clearing notification", error);

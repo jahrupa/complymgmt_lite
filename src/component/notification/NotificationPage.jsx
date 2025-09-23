@@ -128,7 +128,7 @@ const NotificationPage = ({ onBack }) => {
 
   const handleMarkAllAsRead = async () => {
     try {
-     result = readAllInAppNotification();
+     result = readAllInAppNotification(localStorage.getItem("user_id") || "");
       setAllNotifications(prev =>
         prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
       );
@@ -140,7 +140,7 @@ const NotificationPage = ({ onBack }) => {
 
   const handleDeleteAll = async () => {
     try {
-     result = deleteAllInAppNotification();
+     result = deleteAllInAppNotification(localStorage.getItem("user_id") || "");
       setAllNotifications(prev =>
         prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
       );
