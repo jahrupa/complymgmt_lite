@@ -105,7 +105,8 @@ import {
   CHANGE_PASSWORD_AFTER_LOGIN,
   GET_GENERAL_COMPLIANCE_PORTFOLIO,
   GET_COMPLIANCE_COCKPIT_BY_COMPANY,
-  GET_COCKPIT_COMPLIANCE_PORTFOLIO
+  GET_COCKPIT_COMPLIANCE_PORTFOLIO,
+  GET_CLIENT_ONBOARDING_PORTFOLIO
 
 } from "./Endpoint";
 // Login Api
@@ -1237,13 +1238,27 @@ export const fetchGeneralCompaiancePortfolio = async () => {
   }
 };
 
- export const fetchComplainceCockpit = async () => {
+
+ export const fetchCockPitCompliancePortfolio = async () => {
   try {
     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
     return response.data;
   } catch (error) {
-    console.error("Error fetching all Complaince Cockpit", error);
+    console.error("Error fetching all Client", error);
     throw error;
   }
 };
+
+
+ export const fetchClientOnboardingPortfolio = async () => {
+  try {
+    const response = await API.get(GET_CLIENT_ONBOARDING_PORTFOLIO);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+
+
 

@@ -8,11 +8,11 @@ import React, { useEffect, useState } from 'react';
 import '../style/statsCards.css';
 import { Tabs, Tab, Box } from '@mui/material';
 import GeneralComplianceDashboard from '../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard';
-import { fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio } from '../api/service';
+import { fetchCockPitCompliancePortfolio, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio } from '../api/service';
 import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByCompany';
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 
-const NavigationTabs = ({selectedCompany}) => {
+const NavigationTabs = ({ selectedCompany }) => {
     const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
     const [data, setData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
@@ -34,10 +34,10 @@ const NavigationTabs = ({selectedCompany}) => {
 
     useEffect(() => {
         const fetchCockpitData = async () => {
-            const [cockpitByCompanyRes , cockpitRes] = await Promise.allSettled([
-                    // pass selectedCompany state
+            const [cockpitByCompanyRes, cockpitRes] = await Promise.allSettled([
+                // pass selectedCompany state
                 fetchComplainceCockpitByCompany('Kids Clinic India Limited'),
-                fetchComplainceCockpit()
+                fetchCockPitCompliancePortfolio()
             ]);
 
             if (cockpitByCompanyRes.status === 'fulfilled') {
@@ -45,12 +45,12 @@ const NavigationTabs = ({selectedCompany}) => {
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitByCompanyRes.reason);
             }
-              if (cockpitRes.status === 'fulfilled') {
+            if (cockpitRes.status === 'fulfilled') {
                 setCockpitData(cockpitRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitRes.reason);
             }
-            
+
         };
 
         fetchCockpitData();
@@ -119,12 +119,15 @@ const NavigationTabs = ({selectedCompany}) => {
                     <Tab label="Client Onboarding" />
                 </Tabs>
             </Box>
-
             <Box>
                 {/* {activeTab === 0 && renderCards(stats)} */}
-                {activeTab === 0 && <CockpitComplinceByCompany data={cockpitByCompanyData} />}
+                {/* {activeTab === 0 && <CockpitComplinceByCompany data={cockpitByCompanyData} />} */}
+                {activeTab === 0 && (selectedCompany !== ''
+                    ? <CockpitComplinceByCompany data={cockpitByCompanyData} />
+                    : <CockpitComplince data={cockpitData} />)}
+
                 {activeTab === 1 && <GeneralComplianceDashboard data={data} />}
-                {/* {activeTab === 2 && <CockpitComplince data={cockpitData}/>} */}
+                {activeTab === 2 && <CockpitComplince data={cockpitData} />}
 
             </Box>
         </Box>
