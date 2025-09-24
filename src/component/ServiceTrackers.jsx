@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
-import { bulkApproveAllPageData, createServiceTracker, deleteServiceTrackerById, fetchAllGroupHolding, fetchAllModulesName, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, updateServiceTrackerById, updateServiceTrackerByStatusId, updateServiceTrackerApprovalStatusById } from '../api/service';
+import { bulkApproveAllPageData, createServiceTracker, deleteServiceTrackerById, fetchAllServiceTracker, fetchAllSubModuleNameByModuleId, updateServiceTrackerById, updateServiceTrackerByStatusId, updateServiceTrackerApprovalStatusById, fetchAllModule } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 import { AgGridReact } from 'ag-grid-react';
@@ -45,7 +45,7 @@ const ServiceTrackers = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [userId, setUserId] = useState(null)
+    // const [userId, setUserId] = useState(null)
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -54,7 +54,6 @@ const ServiceTrackers = () => {
         severityType: '',
     });
     const [serviceTrackerId, setServiceTrackerId] = useState(null)
-    const [groupHoldingData, setGroupHoldingData] = useState([]);
     const [moduleName, setModuleName] = useState([]);
     const [subModuleName, setSubModuleName] = useState([]);
     const navigate = useNavigate();
@@ -94,7 +93,7 @@ const ServiceTrackers = () => {
                 severityType: 'error',
             });
         }
-        const updatedData = await fetchAllUser();
+        const updatedData = await fetchAllServiceTracker();
         setData(updatedData);
     };
     const handleSubmit = async (e) => {
@@ -114,6 +113,7 @@ const ServiceTrackers = () => {
             let response;
             if (isEditing) {
                 response = await updateServiceTrackerById(current?._id, payload);
+                setIsEditing(false);
             } else {
                 response = await createServiceTracker(payload);
             }
@@ -174,6 +174,7 @@ const ServiceTrackers = () => {
         setIsModalOpen(false);
         setErrors({});
         setCurrent({})
+        setIsEditing(false);
     };
     // Active/InActive status
     const handleToggleChange = async (e, params) => {
@@ -207,22 +208,15 @@ const ServiceTrackers = () => {
             try {
                 const results = await Promise.allSettled([
                     fetchAllServiceTracker(),
-                    fetchAllGroupHolding(),
-                    fetchAllModulesName()
+                    fetchAllModule()
                 ]);
 
-                const [serviceTrackerResult, groupHoldingResult, moduleNameResult] = results;
+                const [serviceTrackerResult, moduleNameResult] = results;
 
                 if (serviceTrackerResult.status === 'fulfilled') {
                     setData(serviceTrackerResult.value);
                 } else {
                     console.error("Failed to fetch service tracker:", serviceTrackerResult.reason);
-                }
-
-                if (groupHoldingResult.status === 'fulfilled') {
-                    setGroupHoldingData(groupHoldingResult.value);
-                } else {
-                    console.error("Failed to fetch group holding:", groupHoldingResult.reason);
                 }
 
                 if (moduleNameResult.status === 'fulfilled') {
@@ -232,7 +226,7 @@ const ServiceTrackers = () => {
                 }
             } catch (error) {
                 console.error("Unexpected error fetching data:", error);
-                toast.error("Failed to load service tracker data");
+                // toast.error("Failed to load service tracker data");
             }
         };
 
@@ -281,15 +275,20 @@ const ServiceTrackers = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = moduleName.find(
-                                (g) => g.name === selectedName
+                                (g) => g.module_name === selectedName
                             );
+                            console.log(selectedName, matchedGroup, 'selectedName')
                             setCurrent((prev) => ({
                                 ...prev,
                                 module_name: selectedName,
                                 module_id: matchedGroup?._id || null,
                             }));
                         }}
-                        names={moduleName}
+                        // names={moduleName}
+                        names={moduleName.map((item) => ({
+                            _id: item._id,
+                            name: item.module_name,
+                        }))}
                         error={!!errors.module_name}
                         helperText={errors.module_name}
                     />
@@ -407,7 +406,7 @@ const ServiceTrackers = () => {
                             setCurrent(params.data);
                             setIsEditing(true);
                             setIsModalOpen(true);
-                            setUserId(params.data._id);
+                            // setUserId(params.data._id);
                         }}>
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>

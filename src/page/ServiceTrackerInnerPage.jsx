@@ -25,6 +25,7 @@ const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
+    // console.log(rowData, 'rowData')
     // console.log(columnDefs, 'columnDefs')
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
@@ -570,19 +571,20 @@ const ServiceTrackerInnerPage = () => {
             default: return { color: 'gray' };
         }
     };
+    
+    // previous code
+    //    useEffect(() => {
+    //         if (formattedTrackerName && current?.sheet_name)  {
+    //             fetchAndSetTrackerData(formattedTrackerName, current.sheet_name);
+    //         }
+    //     }, [formattedTrackerName, current?.sheet_name]);
 
-    // useEffect(() => {
-    //     if (formattedTrackerName) {
-    //         fetchAndSetTrackerData(formattedTrackerName);
-    //     }
-    // }, [formattedTrackerName]);
-
-
+    // last updated code
     useEffect(() => {
-        if (formattedTrackerName && current?.sheet_name) {
+        if ((formattedTrackerName && current?.sheet_name) || rowData.length > 0) {
             fetchAndSetTrackerData(formattedTrackerName, current.sheet_name);
         }
-    }, [formattedTrackerName, current?.sheet_name]);
+    }, [formattedTrackerName, current?.sheet_name, rowData.length > 0]);
 
 
 
@@ -599,7 +601,7 @@ const ServiceTrackerInnerPage = () => {
                 setServiceTrackerSheet(sheets);
 
                 // If no sheet is selected yet, default to the first one
-                if (!current.sheet_name && sheets.length > 0) {
+                if (!current?.sheet_name && sheets?.length > 0) {
                     const firstSheet = sheets[0];
                     setCurrent({
                         sheet_name: firstSheet.name,
