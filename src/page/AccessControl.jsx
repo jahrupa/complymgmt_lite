@@ -361,11 +361,12 @@ const AccessControl = () => {
         }
     }
     const accessControl = [
-        'View',
-        'Create',
-        'Update',
-        'Delete',
+        { id: '1', name: 'View' },
+        { id: '2', name: 'Create' },
+        { id: '3', name: 'Update' },
+        { id: '4', name: 'Delete' },
     ];
+
     const crudTitle = "Add New Access Control"
     const editCrudTitle = "Edit Access Control"
     const handleRoleAccessChange = (newValue) => {
@@ -973,6 +974,25 @@ const AccessControl = () => {
 
                 <div>
                     <MultipleSelectTextFields
+                        label="Access Control"
+                        value={current.access || []}
+                        onChange={(selectedValues) => {
+                            setCurrent((prev) => ({
+                                ...prev,
+                                access: selectedValues,
+                            }));
+                        }}
+
+                        names={accessControl.map((item) => ({
+                            _id: item.id,
+                            name: item.name,
+                            // optionalValue: item.full_name
+                        }))}
+                        error={!!errors.access}
+                        helperText={errors.access}
+                        isRequired={true}
+                    />
+                    {/* <MultipleSelectTextFields
                         label='Access Control'
                         value={current.access}
                         onChange={handleRoleAccessChange}
@@ -980,7 +1000,7 @@ const AccessControl = () => {
                         error={!!errors.access}
                         helperText={errors.access}
                         isRequired={true}
-                    />
+                    /> */}
                 </div>
                 <div className="row row-gap-2">
                     <div className='col-6'>
