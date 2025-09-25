@@ -89,7 +89,7 @@ const GroupCompaniesPage = () => {
     e.preventDefault(); // Prevent default submit behavior
 
     if (!validate()) return; // Don't proceed if validation fails
- const CommonAttributes = {
+    const CommonAttributes = {
       [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
     };
     const payload = {
@@ -257,7 +257,7 @@ const GroupCompaniesPage = () => {
 
         <div className="row row-gap-2 mt-4">
           <div className='col-6'>
-            <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
+            <button type="button" className="btn-sm btn btn-secondary" onClick={() => setIsDeleteModalOpen(false)}><span className='button-style'>Cancel</span></button>
           </div>
           <div className='col-6 d-flex justify-content-end'>
             <button type="submit"
@@ -381,7 +381,12 @@ const GroupCompaniesPage = () => {
 
 
     { field: 'common_attributes.created_at', headerName: 'Created At', filter: true, editable: false, },
+    { field: 'common_attributes.created_by', headerName: 'Created By', filter: true, editable: false, },
     { field: 'common_attributes.updated_at', headerName: 'Updated At', filter: true, editable: false, },
+    { field: 'common_attributes.updated_by', headerName: 'Updated By', filter: true, editable: false, },
+    { field: 'common_attributes.approved_at', headerName: 'Approved At', filter: true, editable: false, },
+    { field: 'common_attributes.approved_by', headerName: 'Approved By', filter: true, editable: false, },
+
     {
       headerName: 'Is Active',
       field: 'common_attributes.is_active',

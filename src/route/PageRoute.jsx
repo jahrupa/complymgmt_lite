@@ -146,12 +146,12 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   //     cleanup();
   //   };
   // }, []);
-
+const pageActiveRoute=localStorage.getItem('active_url')
   return (
     <>
       <Routes>
         {/* Public Route: Login */}
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login setIsAuthenticated={setIsAuthenticated} issnackbarsOpen={issnackbarsOpen}
+        <Route path="/" element={isAuthenticated ? <Navigate to={`${pageActiveRoute?pageActiveRoute:"/dashboard" }`}/> : <Login setIsAuthenticated={setIsAuthenticated} issnackbarsOpen={issnackbarsOpen}
           setIsSnackbarsOpen={setIsSnackbarsOpen} />} />
 
         {/* Protected Routes */}

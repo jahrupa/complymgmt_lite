@@ -24,10 +24,10 @@ import { Cable, ScanEye } from 'lucide-react';
 
 function SideBar({ sidebarOpen, setSidebarOpen }) {
     const location = useLocation();
-    // const [activeItem, setActiveItem] = useState(() => {
-    //     return localStorage.getItem('activeSidebarItem') || 'Dashboard';
-    // });
-    const [activeItem, setActiveItem] = useState('Dashboard');
+    const [activeItem, setActiveItem] = useState(() => {
+        return localStorage.getItem('activeItem');
+    });
+    // const [activeItem, setActiveItem] = useState('Dashboard');
     const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const menuItems = [
@@ -68,6 +68,12 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
     //     }
     // }, [location.pathname]);
 
+    // 2nd method
+    // useEffect(() => {
+    //     localStorage.setItem("activeItem", activeItem);  // ✅ save on every change
+    //     localStorage.setItem('active_url',window.location.pathname)
+    // }, [activeItem]);
+
     return (
         <div>
             <div className={`${sidebarOpen ? "sidebar sidebar-open" : "sidebar sidebar-close"}`}>
@@ -88,7 +94,8 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                         to={`/${link}`}
                                         onClick={() => {
                                             setActiveItem(label);
-                                            localStorage.setItem('activeSidebarItem', label);
+                                            localStorage.setItem("activeItem", label);
+                                            localStorage.setItem('active_url', link)
                                         }}
                                     >
                                         <div
@@ -132,7 +139,9 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                                     to={`/${link}`}
                                                     onClick={() => {
                                                         setActiveItem(label);
-                                                        localStorage.setItem('activeSidebarItem', label);
+                                                        // localStorage.setItem('activeSidebarItem', label);
+                                                        localStorage.setItem("activeItem", label);
+                                                        localStorage.setItem('active_url', link)
                                                     }}
                                                 >
                                                     <div
@@ -175,7 +184,9 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                                     to={`/${link}`}
                                                     onClick={() => {
                                                         setActiveItem(label);
-                                                        localStorage.setItem('activeSidebarItem', label);
+                                                        // localStorage.setItem('activeSidebarItem', label);
+                                                        localStorage.setItem("activeItem", label);
+                                                        localStorage.setItem('active_url', link)
                                                     }}
                                                 >
                                                     <div

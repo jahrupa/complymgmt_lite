@@ -82,7 +82,7 @@ const SubModule = () => {
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message:  error?.response?.data?.message ,
+                message: error?.response?.data?.message,
                 severityType: 'error',
             });
         }
@@ -174,7 +174,7 @@ const SubModule = () => {
         };
         try {
             const response = await updateSubModuleStatusById(params.data._id, newIsActive);
-            const message = response?.message 
+            const message = response?.message
             // Show success snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -290,7 +290,7 @@ const SubModule = () => {
                 return { background: '#e2e3e5', color: '#41464b' }; // gray
         }
     };
-  const getRoleColorForFileStatus = (status) => {
+    const getRoleColorForFileStatus = (status) => {
         switch (status) {
             case 1:
                 return { color: '#4CAF50' }; // green
@@ -366,8 +366,8 @@ const SubModule = () => {
         // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'module_name', headerName: 'Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'sub_module_name', headerName: 'Sub-Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-         {
-            field: 'approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+        {
+            field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
             cellRenderer: (params) => {
                 const { background, color } = getRoleColor(params.value);
                 return (
@@ -390,7 +390,8 @@ const SubModule = () => {
                 );
             }
         },
-         {
+        { field: 'common_attributes.approved_at', headerName: 'Approved At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        {
             field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
             headerName: 'Approval Status',
             editable: false,
@@ -433,8 +434,8 @@ const SubModule = () => {
             }
         },
         { field: 'sub_module_description', headerName: 'Sub-Module Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'sub_module_id', headerName: 'Sub-Module Access', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'sub_module_id', headerName: 'Sub-Module Access', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'location', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
@@ -504,12 +505,12 @@ const SubModule = () => {
 
     //     fetchData();
     // }, []);
-     const onFilterTextBoxChanged = useCallback(() => {
-          gridRef.current.api.setGridOption(
+    const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
             'quickFilterText',
             document.getElementById('filter-text-box').value
-          );
-        }, []);
+        );
+    }, []);
     return (
         <div>
             <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
@@ -535,13 +536,13 @@ const SubModule = () => {
                 </div>
             </div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-                                    <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-                        <SmallSizeModal closeModal={closeModal} crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+            <SmallSizeModal closeModal={closeModal} crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
 
             <div className='table_div p-3'>
                 <div className='d-lg-flex d-md-flex  justify-content-between'>
-                              <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                    
+                    <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+
                     {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div>
                             <button className='crud_btn w-100' onClick={openModal}>
