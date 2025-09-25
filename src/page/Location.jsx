@@ -7,7 +7,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById } from '../api/service';
+import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -414,9 +414,8 @@ const Location = () => {
     };
 
     const handleCheckboxClick = async (rowId) => {
-        const response = await updateCompanyApprovalStatusById(rowId);
+        const response = await updateCompanyLocationApprovalStatusById(rowId);
         const message = response?.message
-
         setIsSnackbarsOpen({
             ...issnackbarsOpen,
             open: true,
