@@ -128,7 +128,7 @@ const NotificationPage = ({ onBack }) => {
 
   const handleMarkAllAsRead = async () => {
     try {
-     result = readAllInAppNotification(localStorage.getItem("user_id") || "");
+      result = readAllInAppNotification(localStorage.getItem("user_id") || "");
       setAllNotifications(prev =>
         prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
       );
@@ -140,7 +140,7 @@ const NotificationPage = ({ onBack }) => {
 
   const handleDeleteAll = async () => {
     try {
-     result = deleteAllInAppNotification(localStorage.getItem("user_id") || "");
+      result = deleteAllInAppNotification(localStorage.getItem("user_id") || "");
       setAllNotifications(prev =>
         prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
       );
@@ -303,18 +303,19 @@ const NotificationPage = ({ onBack }) => {
       </div>
 
       {/* Navigation */}
+
       <div className="navigation">
         <button
           onClick={() => handleNavigate('show')}
           className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
         >
-          Created Notifications
+         Template List
         </button>
         <button
           onClick={() => handleNavigate('create')}
           className={`nav-button ${currentPage === 'create' ? 'active' : ''}`}
         >
-          Create New
+          Create Template
         </button>
       </div>
     </div>

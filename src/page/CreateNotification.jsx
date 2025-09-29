@@ -340,7 +340,7 @@ const CreateNotification = () => {
       "location_name": editForm?.location_name || "",
       "template_id": editForm?.template_id || "",
       "template_name": editForm?.template_name || "",
-      "send_on": selectedDate || "",
+      "send_on": selectedDate ? selectedDate.format("YYYY-MM-DD") : "",
       "send_to": editForm?.send_to || [],
       "cc": editForm?.cc || [],
       "priority": editForm?.priority || ""

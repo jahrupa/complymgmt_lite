@@ -399,7 +399,7 @@ function CreateNotificationTemplate() {
                     onClick={() => handleNavigate('create')}
                     className={`nav-button ${currentPage === 'create' ? 'active' : ''}`}
                 >
-                    Notification List
+                    Template List
                 </button>
             </div>
         </div>
