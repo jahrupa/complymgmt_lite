@@ -28,6 +28,8 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
                 localStorage.setItem('token', token);
                 localStorage.setItem('username', response.data?.username);
                 localStorage.setItem('user_id', response.data?.user_id);
+                localStorage.setItem('is_temp_password', response.data?.is_temp_password);
+
                 // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
                 setIsAuthenticated(true);
                 navigate('/dashboard');

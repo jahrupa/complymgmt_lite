@@ -51,7 +51,6 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
     severityType: '',
   });
   let tokenId = localStorage.getItem('token');
-  // console.log(tokenId, 'tokenId',sessionStorage.getItem('browserSessionActive'),'..........')
   useEffect(() => {
     if (tokenId) {
       setIsAuthenticated(true)
@@ -146,13 +145,30 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   //     cleanup();
   //   };
   // }, []);
-const pageActiveRoute=localStorage.getItem('active_url')
+  const pageActiveRoute = localStorage.getItem('active_url')
   return (
     <>
       <Routes>
         {/* Public Route: Login */}
-        <Route path="/" element={isAuthenticated ? <Navigate to={`${pageActiveRoute?pageActiveRoute:"/dashboard" }`}/> : <Login setIsAuthenticated={setIsAuthenticated} issnackbarsOpen={issnackbarsOpen}
-          setIsSnackbarsOpen={setIsSnackbarsOpen} />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated
+              ? (
+                localStorage.getItem("is_temp_password") === "true"
+                  ? <Navigate to="/password_setting" replace />
+                  : <Navigate to={`${pageActiveRoute || "/dashboard"}`} replace />
+              )
+              : (
+                <Login
+                  setIsAuthenticated={setIsAuthenticated}
+                  issnackbarsOpen={issnackbarsOpen}
+                  setIsSnackbarsOpen={setIsSnackbarsOpen}
+                />
+              )
+          }
+        />
+
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
