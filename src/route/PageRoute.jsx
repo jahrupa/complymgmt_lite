@@ -43,6 +43,7 @@ import ChangePassword from '../page/ChangePassword.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [unreadCountNotification, setUnreadCountNotification] = useState(0);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -172,7 +173,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-          <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}>
+          <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} unreadCountNotification={unreadCountNotification}/>}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
             <Route path="/add_user" element={<AddUser />} />
@@ -201,7 +202,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
-            <Route path="/notification" element={<NotificationPage />} />
+            <Route path="/notification" element={<NotificationPage setUnreadCountNotification={setUnreadCountNotification}/>} />
             <Route path="/create_notification_template" element={<CreateNotificationTemplate />} />
             <Route path="/details/:seriesName/:year" element={<DetailsPage />} />
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />

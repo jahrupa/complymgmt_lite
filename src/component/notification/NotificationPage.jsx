@@ -15,20 +15,35 @@ import {
 import '../../style/notification.css';
 import MonthYearCalander from '../MonthYearCalander';
 import { useNavigate } from 'react-router-dom';
-import { getInAppNotification, readNotificationById, deleteInAppNotificationById, readAllInAppNotification, deleteAllInAppNotification } from '../../api/service.jsx';
+import {
+  getInAppNotification,
+  readNotificationById,
+  deleteInAppNotificationById,
+  readAllInAppNotification,
+  deleteAllInAppNotification
+} from '../../api/service.jsx';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Snackbars from '../Snackbars.jsx';
 
 dayjs.extend(relativeTime);
 
-const NotificationPage = ({ onBack }) => {
+const NotificationPage = ({ onBack, setUnreadCountNotification }) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [allNotifications, setAllNotifications] = useState([]);
+  console.log(allNotifications, 'allNotifications')
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState('show');
   const [openMenuId, setOpenMenuId] = useState(null); // single open menu
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: 'top',
+    horizontal: 'center',
+    message: '',
+    severityType: '',
+  });
   const menuRefs = useRef({});
   const navigate = useNavigate();
 
@@ -70,13 +85,13 @@ const NotificationPage = ({ onBack }) => {
     }
   };
 
-  const unreadCount = allNotifications.filter(n => n.unread).length;
+  const unreadCount = allNotifications.filter(n => !n.is_read).length;
 
   const filteredNotifications = allNotifications.filter(notification => {
     const matchesFilter =
       filter === 'all' ||
-      (filter === 'unread' && notification.unread) ||
-      (filter === 'read' && !notification.unread) ||
+      (filter === 'unread' && !notification.is_read) ||
+      (filter === 'read' && notification.is_read) ||
       notification.type?.toLowerCase() === filter;
 
     const matchesSearch =
@@ -99,6 +114,7 @@ const NotificationPage = ({ onBack }) => {
         setError(null);
         const response = await getInAppNotification(localStorage.getItem("user_id") || "");
         setAllNotifications(response || []);
+        setUnreadCountNotification(response?.length || 0);
       } catch (err) {
         setError(err.message || 'Something went wrong');
       } finally {
@@ -108,50 +124,105 @@ const NotificationPage = ({ onBack }) => {
     fetchNotifications();
   }, []);
 
-  const handleMarkAsRead = (id) => {
+  const handleMarkAsRead = async (id) => {
     try {
-      result = readNotificationById(id);
+      const response = await readNotificationById(id);
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: response?.message,
+        severityType: 'success',
+      });
       setAllNotifications(prev =>
-        prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
+        prev.map(n => n._id === id ? { ...n, is_read: true } : n)
       );
+
+      getInAppNotification(localStorage.getItem("user_id") || "");
       setOpenMenuId(null); // close menu after action
     } catch (error) {
-      console.log("Failed to read the notification", error);
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
     }
   };
 
-  const handleClearNotification = (id) => {
-    result = deleteInAppNotificationById(id)
-    setAllNotifications(prev => prev.filter(n => n._id !== id));
-    setOpenMenuId(null); // close menu after action
+  const handleDeleteNotification = async (id) => {
+    try {
+      const response = await deleteInAppNotificationById(id);
+      setAllNotifications(prev => prev.filter(n => n._id !== id));
+      setOpenMenuId(null); // close menu after action
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: response?.message,
+        severityType: 'success',
+      });
+      getInAppNotification(localStorage.getItem("user_id") || "");
+      const res = await getInAppNotification(localStorage.getItem("user_id") || "");
+      setUnreadCountNotification(res.length || 0);
+    } catch (error) {
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
+    }
   };
 
   const handleMarkAllAsRead = async () => {
     try {
-      result = readAllInAppNotification(localStorage.getItem("user_id") || "");
-      setAllNotifications(prev =>
-        prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
-      );
-      setOpenMenuId(null); // close menu after action
+      const response = await readAllInAppNotification(localStorage.getItem("user_id") || "");
+      setAllNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setOpenMenuId(null);
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: response?.message,
+        severityType: 'success',
+      });
+      getInAppNotification(localStorage.getItem("user_id") || "");
     } catch (error) {
-      console.log("Failed to read the notification", error);
+      console.log("Failed to mark all as read", error);
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
     }
-  }
+  };
 
   const handleDeleteAll = async () => {
     try {
-      result = deleteAllInAppNotification(localStorage.getItem("user_id") || "");
-      setAllNotifications(prev =>
-        prev.map(n => n._id === id ? { ...n, is_read: true, unread: false } : n)
-      );
-      setOpenMenuId(null); // close menu after action
+      const response = await deleteAllInAppNotification(localStorage.getItem("user_id") || "");
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: response?.message,
+        severityType: 'success',
+      });
+      setAllNotifications([]);
+      setOpenMenuId(null);
+      const res = await getInAppNotification(localStorage.getItem("user_id") || "");
+      setUnreadCountNotification(res?.length || 0);
     } catch (error) {
-      console.log("Failed to read the notification", error);
+      console.log("Failed to delete all notifications", error);
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
     }
-  }
+  };
 
   return (
     <div className="notification-page">
+      <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       {/* Header */}
       <div className="notification-page-header">
         <div className="notification-page-title">
@@ -169,7 +240,7 @@ const NotificationPage = ({ onBack }) => {
             <CheckCircle size={18} />
             Create Notification
           </button>
-          <button className="action-btn secondary" onClick={handleMarkAllAsRead} >
+          <button className="action-btn secondary" onClick={handleMarkAllAsRead}>
             <CheckCircle size={18} />
             Mark All Read
           </button>
@@ -284,13 +355,13 @@ const NotificationPage = ({ onBack }) => {
 
                     {openMenuId === notification._id && (
                       <div className="notification-menu">
-                        {!notification.is_read && (
-                          <button onClick={() => handleMarkAsRead(notification._id)}>
-                            Read
-                          </button>
-                        )}
-                        <button onClick={() => handleClearNotification(notification._id)}>
-                          Clear
+                        {/* {!notification.is_read && ( */}
+                        <button onClick={() => handleMarkAsRead(notification._id)} disabled={notification.is_read}>
+                          Read
+                        </button>
+                        {/* )} */}
+                        <button onClick={() => handleDeleteNotification(notification._id)}>
+                          Delete
                         </button>
                       </div>
                     )}
@@ -303,13 +374,12 @@ const NotificationPage = ({ onBack }) => {
       </div>
 
       {/* Navigation */}
-
       <div className="navigation">
         <button
           onClick={() => handleNavigate('show')}
           className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
         >
-         Template List
+          Template List
         </button>
         <button
           onClick={() => handleNavigate('create')}

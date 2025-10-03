@@ -3,7 +3,7 @@ import SideBar from '../component/SideBar'
 import NavBar from '../component/NavBar'
 import NotificationPage from '../component/notification/NotificationPage';
 
-const PageLayout = ({sidebarOpen,setSidebarOpen}) => {
+const PageLayout = ({sidebarOpen,setSidebarOpen,unreadCountNotification}) => {
      const [showNotifications, setShowNotifications] = useState(false);
      if (showNotifications) {
     return <NotificationPage onBack={() => setShowNotifications(false)} />;
@@ -11,7 +11,7 @@ const PageLayout = ({sidebarOpen,setSidebarOpen}) => {
   return (
     <div>
         <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <NavBar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen}/>
+        <NavBar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} unreadCountNotification={unreadCountNotification} />
     </div>
   )
 }
