@@ -1,46 +1,7 @@
-<<<<<<< HEAD
-import Chart from 'react-apexcharts';
 
-=======
-<<<<<<< HEAD:src/component/GeneralComplianceDashboard/GeneralComplianceDashboard.jsx
 import React from 'react';
 import Chart from 'react-apexcharts';
 
-const GeneralComplianceDashboard = () => {
-    const data = {
-        licenses: {
-            active: 265,
-            expired: 21,
-            expiring: 0,
-            inprogress: 51,
-            total: 343
-        },
-        payroll: {
-            completed: 0,
-            in_progress: 0,
-            overdue: 0,
-            pending: 0,
-            total_payroll: 0
-        },
-        registers: {
-            applicable_registers: 5384,
-            available_registers: 0,
-            completed_registers: 0,
-            missing_registers: 918,
-            partial_registers: 4466
-        },
-        returns: {
-            total_returns_applicable: 1175,
-            total_returns_at_risk: 80,
-            total_returns_completed: 1577,
-            total_returns_delayed: 80,
-            total_returns_pending: 9
-        }
-    };
-=======
-import Chart from 'react-apexcharts';
-
->>>>>>> ea6cf3d (dashboard for cockpit - wip)
 const GeneralComplianceDashboard = ({data}) => {
     
     // const data = {
@@ -73,34 +34,31 @@ const GeneralComplianceDashboard = ({data}) => {
     //         total_returns_pending: 9
     //     }
     // };
-<<<<<<< HEAD
-=======
->>>>>>> ecfa1ea (dashboard for cockpit - wip):src/dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard.jsx
->>>>>>> ea6cf3d (dashboard for cockpit - wip)
 
-    // Payroll display items generated from data
-    const payrollData = [
-        {
-            icon: '✔', label: 'Completed',
-            value: data.payroll.completed,
-            status: data.payroll.completed > 0 ? 'normal' : 'warning'
-        },
-        {
-            icon: '↻', label: 'In Progress',
-            value: data.payroll.in_progress,
-            status: data.payroll.in_progress > 0 ? 'progress' : 'normal'
-        },
-        {
-            icon: '⚠', label: 'Overdue',
-            value: data.payroll.overdue,
-            status: data.payroll.overdue > 0 ? 'warning' : 'normal'
-        },
-        {
-            icon: '⏳', label: 'Pending',
-            value: data.payroll.pending,
-            status: data.payroll.pending > 0 ? 'normal' : 'muted'
-        }
-    ];
+
+  // Payroll display items generated from data
+const payrollData = [
+    {
+        icon: '✔', label: 'Completed',
+        value: data.payroll.completed,
+        status: data.payroll.completed > 0 ? 'normal' : 'warning'
+    },
+    {
+        icon: '↻', label: 'In Progress',
+        value: data.payroll.in_progress,
+        status: data.payroll.in_progress > 0 ? 'progress' : 'normal'
+    },
+    {
+        icon: '⚠', label: 'Overdue',
+        value: data.payroll.overdue,
+        status: data.payroll.overdue > 0 ? 'warning' : 'normal'
+    },
+    {
+        icon: '⏳', label: 'Pending',
+        value: data.payroll.pending,
+        status: data.payroll.pending > 0 ? 'normal' : 'muted'
+    }
+];
 
     // Licenses Pie Chart
     const licensesChart = {
@@ -211,7 +169,7 @@ const GeneralComplianceDashboard = ({data}) => {
             <div className='col-12 col-md-6 mb-4'>
                 {/* Licenses Section */}
                 <div className="general-compliance">
-                    <h2>Licenses (Total: {data.licenses.total})</h2>
+                     <h2>Licenses (Total: {data.licenses.total})</h2>
                     <Chart
                         options={licensesChart.options}
                         series={licensesChart.series}
