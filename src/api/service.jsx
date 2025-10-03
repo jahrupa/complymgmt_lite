@@ -1124,7 +1124,6 @@ export const deleteNotificationTemplateById = async (id) => {
   }
 };
 export const updateNotificationTemplateApprovalStatusById = async (id) => {
-export const updateNotificationTemplateApprovalStatusById = async (id) => {
   try {
     const response = await API.put(`${UPDATE_NOTIFICATION_TEMPLATE_APPROVAL_STATUS_BY_ID}${id}`);
     return response.data;
@@ -1320,18 +1319,6 @@ export const fetchGeneralCompaiancePortfolio = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-
-
- export const fetchComplainceCockpitByCompany = async (company_name) => {
-  try {
-    const response = await API.get(`${GET_COMPLIANCE_COCKPIT_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching all Complaince Cockpit By Company:", error);
     throw error;
   }
 };
