@@ -3,8 +3,6 @@ import Chart from 'react-apexcharts';
 import '../../style/clientOnbordingDashboard.css';
 
 const ClientOnbordingDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-
   // Data from the JSON
   const data = {
     "client_by_industry": {
@@ -188,33 +186,33 @@ const ClientOnbordingDashboard = () => {
   const getTopIndustries = () => {
     const industries = Object.entries(data.client_by_industry)
       .filter(([key]) => key !== "")
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10);
-    
+
     return {
       categories: industries.map(([name]) => name.length > 20 ? name.substring(0, 20) + '...' : name),
-      series: industries.map(([,value]) => value)
+      series: industries.map(([, value]) => value)
     };
   };
 
   const getClientSizeData = () => {
     const sizes = Object.entries(data.size_wise_client)
       .filter(([key]) => key !== "" && key !== "_");
-    
+
     return {
       labels: sizes.map(([name]) => name.charAt(0).toUpperCase() + name.slice(1)),
-      series: sizes.map(([,value]) => value)
+      series: sizes.map(([, value]) => value)
     };
   };
 
   const getTopServices = () => {
     const services = Object.entries(data.service_scope_matrix_portfolio)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 15);
-    
+
     return {
       categories: services.map(([name]) => name.length > 15 ? name.substring(0, 15) + '...' : name),
-      series: services.map(([,value]) => value)
+      series: services.map(([, value]) => value)
     };
   };
 
@@ -320,100 +318,57 @@ const ClientOnbordingDashboard = () => {
   const totalIndustries = Object.keys(data.client_by_industry).filter(key => key !== "").length;
 
   return (
-    <div className="client-onboarding">
-      <header className="client-onboarding-header">
-        <h1>Business Analytics client-onboarding</h1>
-        <p>Comprehensive overview of client distribution and service portfolio</p>
-      </header>
-
-      <div className="client-onboarding-nav">
-        <button 
-          className={activeTab === 'overview' ? 'nav-btn active' : 'nav-btn'}
-          onClick={() => setActiveTab('overview')}
-        >
-          Overview
-        </button>
-        <button 
-          className={activeTab === 'industries' ? 'nav-btn active' : 'nav-btn'}
-          onClick={() => setActiveTab('industries')}
-        >
-          Industries
-        </button>
-        <button 
-          className={activeTab === 'services' ? 'nav-btn active' : 'nav-btn'}
-          onClick={() => setActiveTab('services')}
-        >
-          Services
-        </button>
-      </div>
-
-      {activeTab === 'overview' && (
-        <div className="client-onboarding-content">
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-number">{totalClients}</div>
-              <div className="stat-label">Total Clients</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number">{totalIndustries}</div>
-              <div className="stat-label">Industries Served</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number">{totalServices}</div>
-              <div className="stat-label">Service Types</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number">{clientSizeData.series.reduce((sum, val) => sum + val, 0)}</div>
-              <div className="stat-label">Categorized Clients</div>
-            </div>
+    <div className="">
+      <div className="client-onboarding-content">
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-number">{totalClients}</div>
+            <div className="stat-label">Total Clients</div>
           </div>
-
-          <div className="charts-grid">
-            <div className="chart-container">
-              <Chart
-                options={sizeChartOptions}
-                series={clientSizeData.series}
-                type="donut"
-                height={400}
-              />
-            </div>
-            <div className="chart-container">
-              <Chart
-                options={industryChartOptions}
-                series={[{ data: industryData.series }]}
-                type="bar"
-                height={400}
-              />
-            </div>
+          <div className="stat-card">
+            <div className="stat-number">{totalIndustries}</div>
+            <div className="stat-label">Industries Served</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{totalServices}</div>
+            <div className="stat-label">Service Types</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{clientSizeData.series.reduce((sum, val) => sum + val, 0)}</div>
+            <div className="stat-label">Categorized Clients</div>
           </div>
         </div>
-      )}
 
-      {activeTab === 'industries' && (
-        <div className="client-onboarding-content">
-          <div className="chart-container full-width">
+        <div className="charts-grid mb-4">
+          <div className="chart-card">
+            <Chart
+              options={sizeChartOptions}
+              series={clientSizeData.series}
+              type="donut"
+              height={400}
+            />
+          </div>
+          <div className="chart-card">
             <Chart
               options={industryChartOptions}
               series={[{ data: industryData.series }]}
               type="bar"
-              height={600}
+              height={400}
             />
           </div>
         </div>
-      )}
-
-      {activeTab === 'services' && (
-        <div className="client-onboarding-content">
-          <div className="chart-container full-width">
-            <Chart
-              options={servicesChartOptions}
-              series={[{ data: servicesData.series }]}
-              type="bar"
-              height={600}
-            />
-          </div>
+      </div>
+      <div className="client-onboarding-content">
+        <div className="chart-card">
+          <Chart
+            options={servicesChartOptions}
+            series={[{ data: servicesData.series }]}
+            type="bar"
+            height={600}
+          />
         </div>
-      )}
+      </div>
+      {/* )} */}
     </div>
   );
 };

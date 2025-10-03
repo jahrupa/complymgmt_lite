@@ -1,8 +1,8 @@
 .client-onboarding {
-  min-height: 100vh;
+  /* min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
 }
 
 .client-onboarding-header {
@@ -56,8 +56,8 @@
 }
 
 .client-onboarding-content {
-  max-width: 1400px;
-  margin: 0 auto;
+  /* max-width: 1400px;
+  margin: 0 auto; */
 }
 
 .stats-grid {

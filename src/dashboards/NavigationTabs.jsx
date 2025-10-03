@@ -125,7 +125,7 @@ const NavigationTabs = ({selectedCompany}) => {
                 {/* {activeTab === 0 && renderCards(stats)} */}
                 {activeTab === 0 && <CockpitComplinceByCompany data={cockpitByCompanyData} />}
                 {activeTab === 1 && <GeneralComplianceDashboard data={data} />}
-                {/* {/* {activeTab === 2 && <ClientOnbordingDashboard data={cockpitData}/>} */} */}
+                {activeTab === 2 && <ClientOnbordingDashboard data={cockpitData} />}
 
             </Box>
         </Box>

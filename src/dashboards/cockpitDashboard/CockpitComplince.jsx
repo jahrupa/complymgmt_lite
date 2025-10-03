@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 import '../../style/cockpitComplinceByCompany.css';
 
 
 // Sample of the larger dataset
-const data = {
-  "total_clients": 3774,
-  "total_licenses": 343,
-  "total_licenses_completed": 111,
-  "total_licenses_pending": 216,
-  "total_registers": 10254,
-  "total_registers_completed": 0,
-  "total_registers_pending": 6217,
-  "total_returns": 2772,
-  "total_returns_completed": 1497,
-  "total_returns_pending": 78,
-  "total_challans": 1104,
-  "total_challans_completed": 724,
-  "overall_compliance_score": 16.11,
-  "overall_license_compliance_score": 32.36,
-  "overall_register_compliance_score": 0,
-  "overall_return_compliance_score": 54.00,
-  "overall_challan_compliance_score": 65.58
-};
+// const data = {
+//   "total_clients": 3774,
+//   "total_licenses": 343,
+//   "total_licenses_completed": 111,
+//   "total_licenses_pending": 216,
+//   "total_registers": 10254,
+//   "total_registers_completed": 0,
+//   "total_registers_pending": 6217,
+//   "total_returns": 2772,
+//   "total_returns_completed": 1497,
+//   "total_returns_pending": 78,
+//   "total_challans": 1104,
+//   "total_challans_completed": 724,
+//   "overall_compliance_score": 16.11,
+//   "overall_license_compliance_score": 32.36,
+//   "overall_register_compliance_score": 0,
+//   "overall_return_compliance_score": 54.00,
+//   "overall_challan_compliance_score": 65.58
+// };
 
 // Sample client data
 const sampleClients = [
@@ -271,7 +271,7 @@ const CockpitComplince = ({data}) => {
 
         {/* Charts Section */}
         <div className="charts-section">
-          <div className="chart-container">
+          <div className="chart-card">
             <Chart
               options={overallChartOptions}
               series={overallChartSeries}
@@ -280,7 +280,7 @@ const CockpitComplince = ({data}) => {
             />
           </div>
 
-          <div className="chart-container">
+          <div className="chart-card">
             <Chart
               options={completionChartOptions}
               series={completionChartSeries}
@@ -290,14 +290,14 @@ const CockpitComplince = ({data}) => {
           </div>
 
         </div>
-          <div className="chart-container full-width">
-            <Chart
-              options={clientChartOptions}
-              series={clientChartSeries}
-              type="scatter"
-              height={400}
-            />
-          </div>
+        <div className="chart-card">
+          <Chart
+            options={clientChartOptions}
+            series={clientChartSeries}
+            type="scatter"
+            height={400}
+          />
+        </div>
 
         {/* Top Performers */}
         <div className="performers-section">
