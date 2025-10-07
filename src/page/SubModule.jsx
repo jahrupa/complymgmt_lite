@@ -463,7 +463,7 @@ const SubModule = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
     useEffect(() => {
         const fetchData = async () => {

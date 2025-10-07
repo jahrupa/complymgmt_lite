@@ -228,7 +228,7 @@ const RoleManager = () => {
             sub_module_name: '',
             sub_module_id: null,
         });
-    console.log(current, 'current...')
+    // console.log(current, 'current...')
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [groupHoldingName, setGroupHoldingName] = useState([])
@@ -238,7 +238,7 @@ const RoleManager = () => {
     const [SubModuleName, setSubModuleName] = useState([])
     const [rolesName, setRolesName] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false);
-    console.log(isModalOpen,'isModalOpen')
+    // console.log(isModalOpen,'isModalOpen')
     const [userId, setUserId] = useState(null)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -297,7 +297,7 @@ const RoleManager = () => {
 
             // ✅ Get the message from response
             const message = response?.message;
-            console.log(message, 'message')
+            // console.log(message, 'message')
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
             // Refresh data
@@ -658,7 +658,7 @@ const RoleManager = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
     const crudForm = () => {
         return (

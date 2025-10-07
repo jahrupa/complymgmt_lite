@@ -47,7 +47,7 @@ const OutsourcingScope = () => {
   };
 
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    // console.log('Row updated:', event.data);
   };
   const handleFileChange = (e) => {
     const file = e.target.files[0]; // Get the first selected file
@@ -67,7 +67,7 @@ const OutsourcingScope = () => {
 
     // Read second sheet (index 1)
     const sheetName = workbook.SheetNames[0];
-    console.log('Sheet Name:', sheetName);
+    // console.log('Sheet Name:', sheetName);
     if (!sheetName) {
       alert('The workbook does not have a second sheet.');
       return;

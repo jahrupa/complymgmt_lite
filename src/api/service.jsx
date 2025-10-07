@@ -1074,7 +1074,6 @@ export const fetchAllPages = async () => {
 
 // Common API For Approve All
 export const bulkApproveAllPageData = async (page_name) => {
-  console.log(page_name, 'page_name')
   try {
     const response = await API.put(`${APPROVE_ALL_BY_ENTITY_TYPE}${page_name}/update/approve/all`);
     return response.data;

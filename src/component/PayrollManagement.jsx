@@ -105,7 +105,7 @@ const PayrollManagement = () => {
   };
 
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    // console.log('Row updated:', event.data);
   };
 
   const onBtnExport = useCallback(() => {

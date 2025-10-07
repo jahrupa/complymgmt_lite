@@ -51,7 +51,7 @@ export default function SingleSelectTextField({ name, value, onChange, names = [
   const [open, setOpen] = React.useState(false);
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
-console.log(names,'names')
+// console.log(names,'names')
   return (
     <FormControl sx={{ width: '100%' }} className="mb-3" error={error} required={isRequired}>
       <InputLabel id={name}>{label}</InputLabel>

@@ -147,7 +147,7 @@ function CreateNotificationTemplate() {
     };
 
     const currentTypeData = getNotificationTypeData(notification.type);
-    console.log(currentTypeData, 'currentTypeData')
+    // console.log(currentTypeData, 'currentTypeData')
     const toggleInApp = () => {
         setNotification(prev => {
             // if turning off and email is false → keep in_app true

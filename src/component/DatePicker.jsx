@@ -7,7 +7,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 export default function ResponsiveDatePickers({setSelectedDate, selectedDate}) {
  const handleDateChange = (newValue) => {
     setSelectedDate(newValue);
-    console.log('Selected date:', newValue ? newValue.format('YYYY-MM-DD') : null);
   };
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

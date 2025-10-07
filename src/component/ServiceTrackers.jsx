@@ -277,7 +277,7 @@ const ServiceTrackers = () => {
                             const matchedGroup = moduleName.find(
                                 (g) => g.module_name === selectedName
                             );
-                            console.log(selectedName, matchedGroup, 'selectedName')
+                            // console.log(selectedName, matchedGroup, 'selectedName')
                             setCurrent((prev) => ({
                                 ...prev,
                                 module_name: selectedName,
@@ -508,7 +508,7 @@ const ServiceTrackers = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
     const onFilterTextBoxChanged = useCallback(() => {
         gridRef.current.api.setGridOption(

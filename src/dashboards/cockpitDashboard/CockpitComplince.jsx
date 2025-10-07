@@ -45,8 +45,8 @@ const CockpitComplince = ({ data }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuOption, setMenuOption] = useState('card');
-  console.log(menuOption, 'menuOption')
-  console.log(anchorEl, 'anchorEl')
+  // console.log(menuOption, 'menuOption')
+  // console.log(anchorEl, 'anchorEl')
   const gridRef = useRef();
 
   const itemsPerPage = 10; // number of cards per page

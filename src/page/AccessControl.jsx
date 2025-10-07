@@ -50,7 +50,7 @@ const AccessControl = () => {
         is_access_user_type_dropdown: false
 
     });
-    console.log(current?.access_user_type_id, current?.access_user_name, 'access_user_type')
+    // console.log(current?.access_user_type_id, current?.access_user_name, 'access_user_type')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -228,7 +228,7 @@ const AccessControl = () => {
                 ? current.access.map(a => a.toLowerCase())
                 : []
         }
-        console.log(payload, 'payload')
+        // console.log(payload, 'payload')
         if (current?.access_type === "company") {
             payload.entity_id = current?.company_id;
             payload.entity_name = current?.company_name;
@@ -1158,7 +1158,7 @@ const AccessControl = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
     useEffect(() => {
         const formattedTrackerName = current?.service_tracker?.toLowerCase()?.replace(/\s+/g, '_');
