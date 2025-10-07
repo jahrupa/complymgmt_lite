@@ -14,6 +14,7 @@ import { fetchAllCompanies } from '../api/service';
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([])
   const [selectedCompany, setSelectedCompany] = useState(''); // single selected value
+  const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
   useEffect(() => {
     const fetchCompany = async () => {
       try {
@@ -35,7 +36,7 @@ const DashboardPage = () => {
           <span>
             <img src={LaptopMinimalCheck} width={65} />
           </span>
-          <h1 className='mt-1 ps-lg-4 ps-md-4 fw-600'>Compliance Cockpit</h1>
+          <h1 className='mt-1 ps-lg-4 ps-md-4 fw-600'>{activeTab === 0 ? 'Compliance Cockpit' : activeTab === 1 ? 'General Compliance' : activeTab === 2 ? 'Client Onboarding' : ''}</h1>
         </div>
         <div className='w-25'>
           <SingleSelectTextField
@@ -69,7 +70,7 @@ const DashboardPage = () => {
         {/* this is also navigation tab */}
         {/* <ComplianceCpckpitTabs /> */}
 
-        <NavigationTabs selectedCompany={selectedCompany} />
+        <NavigationTabs selectedCompany={selectedCompany} activeTab={activeTab} setActiveTab={setActiveTab} />
         {/* <ComplianceMasterDashboard /> */}
       </div>
       <div>

@@ -13,8 +13,8 @@ import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByComp
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
 
-const NavigationTabs = ({selectedCompany}) => {
-    const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
+const NavigationTabs = ({selectedCompany,activeTab,setActiveTab}) => {
+
     const [data, setData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);

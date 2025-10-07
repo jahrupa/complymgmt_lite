@@ -507,22 +507,6 @@ const Company = () => {
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-
-          {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div>
-              <button className='crud_btn w-100' onClick={openModal}>
-                <span><AddIcon /></span> <span className='button-style'>Add New Company</span>
-              </button>
-            </div>
-            <button className="button approve" onClick={()=>handleApproveAll()}>
-              <span className="icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
-                </svg>
-              </span>
-              <span className="text">Approve All</span>
-            </button>
-          </div> */}
         </div>
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact

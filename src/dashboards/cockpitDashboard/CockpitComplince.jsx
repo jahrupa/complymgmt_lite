@@ -1,6 +1,11 @@
 // import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 import '../../style/cockpitComplinceByCompany.css';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import ClientComplianceTable from './ClientComplianceTable';
+import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Settings2 } from 'lucide-react';
+import { AnimatedSearchBar } from '../../component/AnimatedSearchBar';
 
 
 // Sample of the larger dataset
@@ -25,27 +30,68 @@ import '../../style/cockpitComplinceByCompany.css';
 // };
 
 // Sample client data
-const sampleClients = [
-  { name: "ADP Private Limited", score: 120, type: "High Performer" },
-  { name: "AGD Biomedicals Private Limited", score: 100, type: "Compliant" },
-  { name: "AMH Services Private Limited", score: 0, type: "Needs Attention" },
-  { name: "Aujas Cybersecurity Limited", score: 45.28, type: "Moderate" },
-  { name: "BNP Paribas", score: 375, type: "Excellent" },
-  { name: "Ferrero India Private Limited", score: 113.04, type: "High Performer" },
-  { name: "Qatar Airways", score: 77.78, type: "Good" },
-  { name: "SBI General Insurance", score: 99.48, type: "High Performer" }
-];
+// const sampleClients = [
+//   { name: "ADP Private Limited", average_compliance_score: 120, type: "High Performer" },
+//   { name: "AGD Biomedicals Private Limited", average_compliance_score: 100, type: "Compliant" },
+//   { name: "AMH Services Private Limited", average_compliance_score: 0, type: "Needs Attention" },
+//   { name: "Aujas Cybersecurity Limited", average_compliance_score: 45.28, type: "Moderate" },
+//   { name: "BNP Paribas", average_compliance_score: 375, type: "Excellent" },
+//   { name: "Ferrero India Private Limited", average_compliance_score: 113.04, type: "High Performer" },
+//   { name: "Qatar Airways", average_compliance_score: 77.78, type: "Good" },
+//   { name: "SBI General Insurance", average_compliance_score: 99.48, type: "High Performer" }
+// ];
 
 const CockpitComplince = ({ data }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [menuOption, setMenuOption] = useState('card');
+  console.log(menuOption, 'menuOption')
+  console.log(anchorEl, 'anchorEl')
+  const gridRef = useRef();
+
+  const itemsPerPage = 10; // number of cards per page
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setMenuOption("table"); // force table on mobile
+      }
+    };
+
+    // run on mount
+    handleResize();
+
+    // run on resize
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [window.innerWidth]);
+  const onFilterTextBoxChanged = useCallback(() => {
+    gridRef.current.api.setGridOption(
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
+    );
+  }, []);
   if (!data || !data.client_info) {
     return <div>Loading...</div>;
   }
-  // const [selectedMetric, setSelectedMetric] = useState('overall');
-// Remove or fix the invalid console.log to prevent runtime errors
-// If you want to debug, check if compliance_info exists first:
-// if (data.compliance_info && data.compliance_info.object && data.compliance_info.object.key) {
-  // console.log(Object.keys(data?.compliance_info));
-// }
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const sampleClients = Object.entries(data.compliance_info).map(([name, details]) => ({
+    name,
+    average_compliance_score: details.average_compliance_score || 0,
+    type: Object.keys(details).find((key) => key !== "average_compliance_score") || "general",
+  }));
+
+  // Step 2: Pagination logic
+  const totalPages = Math.ceil(sampleClients.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentClients = sampleClients.slice(startIndex, startIndex + itemsPerPage);
+
   // Overall Compliance Chart
   const overallChartOptions = {
     chart: {
@@ -146,32 +192,36 @@ const CockpitComplince = ({ data }) => {
   ];
 
   // Client Performance Chart
-  const clientChartOptions = {
-    chart: {
-      type: 'scatter',
-      height: 400,
-    },
-    colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-    xaxis: {
-      title: {
-        text: 'Client Index'
-      }
-    },
-    yaxis: {
-      title: {
-        text: 'Compliance Score'
-      }
-    },
-    title: {
-      text: 'Client Performance Distribution',
-      align: 'center'
-    }
-  };
+  // const clientChartOptions = {
+  //   chart: {
+  //     type: 'scatter',
+  //     height: 400,
+  //   },
+  //   colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+  //   xaxis: {
+  //     title: {
+  //       text: 'Client Index'
+  //     }
+  //   },
+  //   yaxis: {
+  //     title: {
+  //       text: 'Compliance Score'
+  //     }
+  //   },
+  //   title: {
+  //     text: 'Client Performance Distribution',
+  //     align: 'center'
+  //   }
+  // };
 
-  const clientChartSeries = [{
-    name: 'Compliance Score',
-    data: sampleClients?.map((client, index) => [index + 1, client?.score])
-  }];
+  // const clientChartSeries = [{
+  //   name: 'Compliance Score',
+  //   data: Object.entries(data?.compliance_info || {}).map(([clientName, clientData]) => ({
+  //     x: clientName,
+  //     y: clientData?.average_compliance_score || 0
+  //   }))
+  // }];
+
 
   return (
     <div className="">
@@ -180,11 +230,11 @@ const CockpitComplince = ({ data }) => {
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-value">{data?.total_clients?.toLocaleString()}</span>
-            <span className="stat-label">Total Clients</span>
+            <span className="stat-label-cock-pit-complince">Total Clients</span>
           </div>
           <div className="header-stat">
             <span className="stat-value">{data?.overall_compliance_score}%</span>
-            <span className="stat-label">Overall Score</span>
+            <span className="stat-label-cock-pit-complince">Overall Score</span>
           </div>
         </div>
       </div>
@@ -297,40 +347,157 @@ const CockpitComplince = ({ data }) => {
           </div>
 
         </div>
-        <div className="chart-card">
+        {/* <div className="chart-card">
           <Chart
             options={clientChartOptions}
             series={clientChartSeries}
             type="scatter"
             height={400}
           />
-        </div>
+        </div> */}
 
         {/* Top Performers */}
+
         <div className="performers-section">
-          <h2>Client Performance Overview</h2>
-          <div className="performers-grid">
-            {sampleClients.map((client, index) => (
-              <div key={index} className={`performer-card ${client.type.toLowerCase().replace(' ', '-')}`}>
-                <div className="performer-header">
-                  <h4>{client.name}</h4>
-                  <span className={`performance-badge ${client.type.toLowerCase().replace(' ', '-')}`}>
-                    Complaince Score
-                    {/* {client.type} */}
-                  </span>
-                </div>
-                <div className="performer-score">
-                  <span className="score-value">{client.score}%</span>
-                  <div className="score-bar">
-                    <div
-                      className="score-fill"
-                      style={{ width: `${Math.min(client.score, 100)}%` }}
-                    ></div>
-                  </div>
-                </div>
+          <div className='d-lg-flex  d-md-flex justify-content-between align-items-center mb-3'>
+            <h2>Client Performance Overview</h2>
+            <div className='d-lg-flex d-md-flex  justify-content-between'>
+
+              {menuOption === 'table' && <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />}
+
+              <div className='client-performance-table-sm'>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}> */}
+                <Tooltip title="Account settings">
+                  <IconButton
+                    onClick={handleClick}
+                    size="small"
+                    sx={{ ml: 0 }}
+                    aria-controls={open ? 'account-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                  >
+                    <Settings2 />
+                  </IconButton>
+                </Tooltip>
+                {/* </Box> */}
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={open}
+                  onClose={handleClose}
+                  onClick={handleClose}
+                  slotProps={{
+                    paper: {
+                      elevation: 0,
+                      sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        '& .MuiAvatar-root': {
+                          width: 32,
+                          height: 32,
+                          ml: -0.5,
+                          mr: 1,
+                        },
+                        '&::before': {
+                          content: '""',
+                          display: 'block',
+                          position: 'absolute',
+                          top: 0,
+                          right: 14,
+                          width: 10,
+                          height: 10,
+                          bgcolor: 'background.paper',
+                          transform: 'translateY(-50%) rotate(45deg)',
+                          zIndex: 0,
+                        },
+                      },
+                    },
+                  }}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                  <MenuItem onClick={() => { handleClose(); setMenuOption('table'); }}>
+                    Table View
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleClose(); setMenuOption('card'); }}>
+                    Card View
+                  </MenuItem>
+                </Menu>
               </div>
-            ))}
+            </div>
+
           </div>
+          {menuOption === 'table' ?
+            <div className="client-performance-table">
+              <ClientComplianceTable data={data} gridRef={gridRef} />
+            </div>
+            :
+            <div className="performers-grid client-performance-table-sm">
+              {currentClients.map((client, index) => {
+                const score = client.average_compliance_score || 0;
+
+                // function to decide className
+                const getClassName = (score) => {
+                  if (score > 300) return "excellent";
+                  if (score > 100 && score < 300) return "high-performer";
+                  if (score > 80 && score <= 100) return "compliant";
+                  if (score >= 50 && score <= 80) return "good";
+                  if (score > 0 && score < 50) return "moderate";
+                  if (score === 0) return "needs-attention";
+                  return ""; // default
+                };
+
+                return (
+                  <div key={index} className={`performer-card ${getClassName(score)}`}>
+                    <div className="performer-header">
+                      <h4>{client.name}</h4>
+                      <span className={`performance-badge ${getClassName(score)}`}>
+                        Compliance Score
+                      </span>
+                    </div>
+                    <div className="performer-score">
+                      <span className="score-value">{score}%</span>
+                      <div className="score-bar">
+                        <div
+                          className="score-fill"
+                          style={{ width: `${Math.min(score, 100)}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>}
+          {/* Pagination Controls */}
+          {menuOption === 'card' && 
+           <div className="justify-content-end d-flex gap-2 mt-3 client-performance-table-sm">
+            <button
+              className='client-performance-table-sm'
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              style={{
+                background: currentPage === 1 ? 'gray' : 'black',
+                color: 'white',
+                borderRadius: '5px',
+              }}>
+              Prev
+            </button>
+            <button
+              className='client-performance-table-sm'
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              style={{
+                background: 'black',
+                color: 'white',
+                borderRadius: '5px',
+              }}
+            >
+              Next
+            </button>
+          </div>
+          }
+         
         </div>
 
         {/* Analytics Summary */}

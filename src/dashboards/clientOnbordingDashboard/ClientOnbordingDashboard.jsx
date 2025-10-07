@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 import '../../style/clientOnbordingDashboard.css';
 
@@ -321,19 +320,19 @@ const ClientOnbordingDashboard = () => {
     <div className="">
       <div className="client-onboarding-content">
         <div className="stats-grid">
-          <div className="stat-card">
+          <div className="stat-card performer-card high-performer">
             <div className="stat-number">{totalClients}</div>
             <div className="stat-label">Total Clients</div>
           </div>
-          <div className="stat-card">
+          <div className="stat-card performer-card compliant">
             <div className="stat-number">{totalIndustries}</div>
             <div className="stat-label">Industries Served</div>
           </div>
-          <div className="stat-card">
+          <div className="stat-card performer-card moderate">
             <div className="stat-number">{totalServices}</div>
             <div className="stat-label">Service Types</div>
           </div>
-          <div className="stat-card">
+          <div className="stat-card performer-card good">
             <div className="stat-number">{clientSizeData.series.reduce((sum, val) => sum + val, 0)}</div>
             <div className="stat-label">Categorized Clients</div>
           </div>

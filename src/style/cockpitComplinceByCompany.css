@@ -121,9 +121,9 @@
     text-align: center;
 }
 
-.stat-label {
+.stat-label-cock-pit-complince {
     font-size: 12px;
-    color: #6b7280;
+    color: white;
     font-weight: 500;
     margin-bottom: 4px;
 }
@@ -321,7 +321,7 @@
     margin-bottom: 4px;
 }
 
-.header-stat .stat-label {
+.header-stat .stat-label-cock-pit-complince {
     font-size: 14px;
     opacity: 0.9;
 }
@@ -626,7 +626,19 @@
     color: #1f2937;
 }
 
+.client-performance-table {
+    display: block;
+}
+
 @media (max-width: 768px) {
+    .client-performance-table-sm {
+        display: none !important;
+    }
+
+    .client-performance-table {
+        display: block !important;
+    }
+
     .dashboard2 {
         padding: 16px;
     }
@@ -664,7 +676,8 @@
     .analytics-grid {
         grid-template-columns: 1fr;
     }
-/* 
+
+    /* 
     .metric-card {
         flex-direction: column;
         text-align: center;
