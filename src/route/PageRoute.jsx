@@ -173,7 +173,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-          <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} unreadCountNotification={unreadCountNotification}/>}>
+          <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} unreadCountNotification={unreadCountNotification} setUnreadCountNotification={setUnreadCountNotification}/>}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
             <Route path="/add_user" element={<AddUser />} />
