@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts';
 
 const GeneralComplianceDashboard = ({ data }) => {
     if (!data || Object.keys(data).length === 0) {
-        return <div>Loading...</div>;
+        return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
     }
     // const data = {
     //     licenses: {

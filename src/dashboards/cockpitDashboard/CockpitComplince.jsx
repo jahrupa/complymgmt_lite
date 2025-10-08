@@ -71,7 +71,7 @@ const CockpitComplince = ({ data }) => {
     );
   }, []);
   if (!data || !data.client_info) {
-    return <div>Loading...</div>;
+    return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
   }
   const open = Boolean(anchorEl);
   const handleClick = (event) => {

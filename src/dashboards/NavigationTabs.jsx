@@ -13,12 +13,12 @@ import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByComp
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
 
-const NavigationTabs = ({selectedCompany,activeTab,setActiveTab}) => {
+const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
 
     const [data, setData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
-
+    console.log(cockpitData, 'cockpitData')
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,6 +27,8 @@ const NavigationTabs = ({selectedCompany,activeTab,setActiveTab}) => {
                 setData(generalDashboardData);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setData(error?.status || []); // Set to empty array on error
+
             }
         };
 
@@ -35,8 +37,8 @@ const NavigationTabs = ({selectedCompany,activeTab,setActiveTab}) => {
 
     useEffect(() => {
         const fetchCockpitData = async () => {
-            const [cockpitByCompanyRes , cockpitRes] = await Promise.allSettled([
-                    // pass selectedCompany state
+            const [cockpitByCompanyRes, cockpitRes] = await Promise.allSettled([
+                // pass selectedCompany state
                 fetchComplainceCockpitByCompany('Kids Clinic India Limited'),
                 fetchComplainceCockpit()
             ]);
@@ -45,13 +47,15 @@ const NavigationTabs = ({selectedCompany,activeTab,setActiveTab}) => {
                 setCockpitByCompanyData(cockpitByCompanyRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitByCompanyRes.reason);
+                setCockpitData(cockpitRes.reason?.status|| []);
             }
-              if (cockpitRes.status === 'fulfilled') {
+            if (cockpitRes.status === 'fulfilled') {
                 setCockpitData(cockpitRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitRes.reason);
+                setCockpitData(cockpitRes.reason?.status|| []);
             }
-            
+
         };
 
         fetchCockpitData();
