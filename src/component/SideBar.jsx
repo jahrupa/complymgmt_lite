@@ -42,7 +42,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
-        { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
+        // { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
     ];
 
     const documentSubItems = [
@@ -118,7 +118,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
 
                         {/* Document Dropdown */}
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
-                            <div
+                            {/* <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
                                 onClick={() => setShowDocumentDropdown(!showDocumentDropdown)}
                             >
@@ -162,7 +162,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                                         );
                                     })}
                                 </div>
-                            )}
+                            )} */}
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
                                 onClick={() => setShowServiceTrackerDropdown?.(prev => !prev)}

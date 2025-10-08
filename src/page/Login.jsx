@@ -7,7 +7,7 @@ import { LOGIN_API } from '../api/Endpoint';
 import Snackbars from '../component/Snackbars';
 
 
-const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
+const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen ,setIsChangePassword}) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
@@ -28,7 +28,8 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen }) => {
                 localStorage.setItem('token', token);
                 localStorage.setItem('username', response.data?.username);
                 localStorage.setItem('user_id', response.data?.user_id);
-                localStorage.setItem('is_temp_password', response.data?.is_temp_password);
+                // localStorage.setItem('is_temp_password', response.data?.is_temp_password);
+                setIsChangePassword(response.data?.is_temp_password);
 
                 // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
                 setIsAuthenticated(true);

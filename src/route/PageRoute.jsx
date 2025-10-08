@@ -43,6 +43,7 @@ import ChangePassword from '../page/ChangePassword.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isChangePassword, setIsChangePassword] = useState(false)
   const [unreadCountNotification, setUnreadCountNotification] = useState(0);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -156,7 +157,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
           element={
             isAuthenticated
               ? (
-                localStorage.getItem("is_temp_password") === "true"
+                isChangePassword === true
                   ? <Navigate to="/password_setting" replace />
                   : <Navigate to={`${pageActiveRoute || "/dashboard"}`} replace />
               )
@@ -165,6 +166,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
                   setIsAuthenticated={setIsAuthenticated}
                   issnackbarsOpen={issnackbarsOpen}
                   setIsSnackbarsOpen={setIsSnackbarsOpen}
+                  setIsChangePassword={setIsChangePassword}
                 />
               )
           }
@@ -172,7 +174,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} isChangePassword={isChangePassword}/>}>
           <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} unreadCountNotification={unreadCountNotification} setUnreadCountNotification={setUnreadCountNotification}/>}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
@@ -209,7 +211,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/notifications_list" element={<NotificationList />} />
             <Route path="/create_notification" element={<CreateNotification />} />
-            <Route path="/password_setting" element={<ChangePassword />} />
+            <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword}/>} />
           </Route>
         </Route>
 

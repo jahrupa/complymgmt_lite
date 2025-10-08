@@ -111,7 +111,8 @@ import {
    GET_COMPLIANCE_COCKPIT_BY_COMPANY,
   GET_COCKPIT_COMPLIANCE_PORTFOLIO,
   GET_GENERAL_COMPLIANCE_PORTFOLIO,
-  GET_CLIENT_ONBOARDING_PORTFOLIO
+  GET_CLIENT_ONBOARDING_PORTFOLIO,
+  CHANGE_TEMPORARY_PASSWORD_STATUS
 
 } from "./Endpoint";
 
@@ -1279,6 +1280,16 @@ export const changePassword = async (userId, passwords) => {
   }
 };
 
+
+export const changeTemporaryPasswordStatus = async (userId) => {
+  try {
+    const response = await API.get(`${CHANGE_TEMPORARY_PASSWORD_STATUS}${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error changing temporary password status:", error);
+    throw error;
+  }
+}
 // Dashboard
 export const fetchGeneralCompaiancePortfolio = async () => {
   try {

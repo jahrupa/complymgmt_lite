@@ -9,8 +9,8 @@
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-const ProtectedRoute = ({ isAuthenticated }) => {
-  const isTempPassword = localStorage.getItem("is_temp_password") === "true";
+const ProtectedRoute = ({ isAuthenticated ,isChangePassword}) => {
+  const isTempPassword = isChangePassword === true;
   const location = useLocation();
 
   // Case 1: Not logged in

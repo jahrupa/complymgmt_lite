@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../style/changePassword.css';
-import { changePassword } from '../api/service';
+import { changePassword, changeTemporaryPasswordStatus } from '../api/service';
 import Snackbars from '../component/Snackbars';
+import { useNavigate } from 'react-router-dom';
 
-function ChangePassword() {
+function ChangePassword({ setIsChangePassword }) {
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -32,6 +33,7 @@ function ChangePassword() {
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('One special character');
     return errors;
   };
+  const navigate = useNavigate();
 
   const getPasswordStrength = (password) => {
     const validationErrors = validatePassword(password);
@@ -54,62 +56,106 @@ function ChangePassword() {
   const togglePasswordVisibility = (field) => {
     setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const payload = {
-      // old_password: formData.currentPassword,
-      newPassword: formData.newPassword,
-      confirmPassword: formData.confirmPassword
+  useEffect(() => {
+    const fetchTempPasswordStatus = async () => {
+      try {
+        const response = await changeTemporaryPasswordStatus(localStorage.getItem("user_id") || currentUserId);
+        if (response && typeof response.is_temp_password !== "undefined") {
+          setIsChangePassword(response.is_temp_password);
+        }
+      } catch (error) {
+        console.error("Error fetching temporary password status:", error);
+      }
     };
-    const response = await changePassword(currentUserId, payload);
-    const message = response?.message
+    fetchTempPasswordStatus();
+  }, []);
+  const validate = () => {
+    const tempErrors = {};
 
+    // Validate current password
+    // if (!formData.currentPassword) {
+    //   tempErrors.currentPassword = 'Current password is required';
+    // }
 
-    const newErrors = {};
-
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = 'Current password is required';
-    }
-
+    // Validate new password
     if (!formData.newPassword) {
-      newErrors.newPassword = 'New password is required';
+      tempErrors.newPassword = 'New password is required';
     } else {
       const passwordErrors = validatePassword(formData.newPassword);
       if (passwordErrors.length > 0) {
-        newErrors.newPassword = 'Password must meet all requirements';
+        tempErrors.newPassword = 'Password must meet all requirements';
       }
     }
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
+    // Ensure new and confirm passwords match
+    // if (formData.newPassword !== formData.confirmPassword) {
+    //   tempErrors.confirmPassword = 'Passwords do not match';
+    // }
 
-    if (formData.currentPassword === formData.newPassword) {
-      newErrors.newPassword = 'New password must be different from current password';
-    }
+    // Prevent using the same password as current
+    // if (
+    //   formData.currentPassword &&
+    //   formData.newPassword &&
+    //   formData.currentPassword === formData.newPassword
+    // ) {
+    //   tempErrors.newPassword = 'New password must be different from current password';
+    // }
 
-    setErrors(newErrors);
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
 
-    if (Object.keys(newErrors).length === 0) {
-      // Simulate API call
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Stop if validation fails
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        newPassword: formData.newPassword,
+        confirmPassword: formData.confirmPassword,
+      };
+
+      const response = await changePassword(currentUserId, payload);
+      const message = response?.message || 'Password changed successfully';
+
+      console.log(response?.message, 'response');
+
+      // Update temp password status
+      const userId = localStorage.getItem('user_id') || currentUserId;
+      const changeTempPasswordStatusResponse = await changeTemporaryPasswordStatus(userId);
+      setIsChangePassword(changeTempPasswordStatusResponse?.is_temp_password || false);
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
       setTimeout(() => {
-        setIsSnackbarsOpen({
-          ...issnackbarsOpen,
-          open: true,
-          message,
-          severityType: 'success',
-        });
-        setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-        setIsSubmitting(false);
-      }, 1000);
-    } else {
+        navigate('/dashboard');
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error changing password:', error);
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message || 'Something went wrong. Please try again.',
+        severityType: 'error',
+      });
+    } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Optional: show password strength dynamically
   const passwordStrength = getPasswordStrength(formData.newPassword);
+
 
   return (
     <div className="change-password-container">
@@ -120,7 +166,7 @@ function ChangePassword() {
           <p>Update your password to keep your account secure</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="password-form">
+        <div className="password-form">
           {/* <div className="form-group">
             <label htmlFor="currentPassword">Current Password</label>
             <div className="password-input-wrapper">
@@ -212,16 +258,16 @@ function ChangePassword() {
           </div>
 
           <div className="form-actions">
-            <button type="button" className="btn-secondary justify-content-center">Cancel</button>
+            <button type="button" className="btn-secondary justify-content-center" onClick={() => { setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setIsSubmitting(false); }}>Cancel</button>
             <button
-              type="submit"
+              onClick={handleSubmit}
               className="btn-primary justify-content-center"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Updating...' : 'Update Password'}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

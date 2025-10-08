@@ -141,6 +141,7 @@ export const DELETE_ALL_INAPP_NOTIFICATION='/api/v1/in_app/delete/remove_all_ina
 
 // Change Password
 export const CHANGE_PASSWORD_AFTER_LOGIN='/api/v1/password/update/temp_password/';
+export const CHANGE_TEMPORARY_PASSWORD_STATUS='/api/v1/view/temporary_password_status/';
 
 // Dashboard
 
