@@ -466,9 +466,9 @@ const Company = () => {
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
 
-  const onRowValueChanged = (event) => {
-    // console.log('Row updated:', event.data);
-  };
+  // const onRowValueChanged = (event) => {
+  //   console.log('Row updated:', event.data);
+  // };
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
@@ -519,7 +519,7 @@ const Company = () => {
             rowSelection="single"
             pagination={true}
             // rowBuffer={rowBuffer}
-            onRowValueChanged={onRowValueChanged}
+            // onRowValueChanged={onRowValueChanged}
 
           />
         </div>
