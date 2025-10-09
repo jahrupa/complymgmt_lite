@@ -226,9 +226,9 @@ const NotificationPage = ({ onBack, setUnreadCountNotification }) => {
       {/* Header */}
       <div className="notification-page-header">
         <div className="notification-page-title">
-          <button className="back-button" onClick={onBack}>
+          {/* <button className="back-button" onClick={onBack}>
             <ArrowLeft size={20} />
-          </button>
+          </button> */}
           <div>
             <h1>Incoming Notifications</h1>
             <p>{unreadCount} unread notifications</p>

@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 import '../style/statsCards.css';
 import { Tabs, Tab, Box } from '@mui/material';
 import GeneralComplianceDashboard from '../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard';
-import { fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio } from '../api/service';
+import { fetchClientOnboardingPortfolio, fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio } from '../api/service';
 import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByCompany';
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
@@ -18,6 +18,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [data, setData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
+    const [clientOnboardingData, setClientOnboardingData] = useState([]);
     console.log(cockpitData, 'cockpitData')
 
     useEffect(() => {
@@ -60,6 +61,26 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
 
         fetchCockpitData();
     }, []);
+
+    
+
+    useEffect(() => {
+        const fetchClientOnboardingPortfolioData = async () => {
+            try {
+                const clientOnboardingPortfolioData = await fetchClientOnboardingPortfolio();
+                setClientOnboardingData(clientOnboardingPortfolioData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setClientOnboardingData(error?.status || []); // Set to empty array on error
+
+            }
+        };
+
+        fetchClientOnboardingPortfolioData();
+    }, []);
+    console.log(data, 'data')
+    console.log(cockpitByCompanyData, 'cockpitByCompanyData')
+    console.log(clientOnboardingData, 'clientOnboardingData')
     // const stats = [
     //     {
     //         title: 'Outsourcing',
@@ -132,7 +153,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     : <CockpitComplince data={cockpitData} />)}
 
                 {activeTab === 1 && <GeneralComplianceDashboard data={data} />}
-                {activeTab === 2 && <ClientOnbordingDashboard data={cockpitData} />}
+                {activeTab === 2 && <ClientOnbordingDashboard data={clientOnboardingData} />}
 
             </Box>
         </Box>

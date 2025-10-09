@@ -30,11 +30,11 @@ function NotFoundPage() {
         </div>
 
         <div className="error-actions">
-          <button onClick={handleGoHome} className="btn-primary">
+          <button onClick={handleGoHome} className="page-not-found-btn-primary">
             <span className="btn-icon">🏠</span>
             Go Home
           </button>
-          <button onClick={handleGoBack} className="btn-secondary">
+          <button onClick={handleGoBack} className="page-not-found-btn-secondary ">
             <span className="btn-icon">←</span>
             Go Back
           </button>

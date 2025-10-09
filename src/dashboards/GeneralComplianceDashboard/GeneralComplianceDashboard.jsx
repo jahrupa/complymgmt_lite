@@ -75,22 +75,31 @@ const GeneralComplianceDashboard = ({ data }) => {
                 height: 350
             },
             labels: ['Active', 'Expired', 'Expiring', 'In Progress'],
-            // title: {
-            //     text: `Licenses (Total: ${data.licenses.total})`
-            // },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
-                    },
-                    legend: {
-                        position: 'bottom'
+            colors: [
+                '#2E7D32', // Active - Green
+                '#D32F2F', // Expired - Red
+                '#F57C00', // Expiring - Orange
+                '#1976D2'  // In Progress - Blue
+            ],
+            legend: {
+                position: 'bottom'
+            },
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
                     }
                 }
-            }]
+            ]
         }
     };
+
 
     // Registers Bar Chart
     const registersChart = {

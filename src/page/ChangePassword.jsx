@@ -258,10 +258,10 @@ function ChangePassword({ setIsChangePassword }) {
           </div>
 
           <div className="form-actions">
-            <button type="button" className="btn-secondary justify-content-center" onClick={() => { setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setIsSubmitting(false); }}>Cancel</button>
+            <button type="button" className="change-password-btn-secondary justify-content-center" onClick={() => { setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setIsSubmitting(false); }}>Cancel</button>
             <button
               onClick={handleSubmit}
-              className="btn-primary justify-content-center"
+              className="change-password-btn-primary justify-content-center"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Updating...' : 'Update Password'}

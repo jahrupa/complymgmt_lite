@@ -4,7 +4,14 @@ import NavBar from '../component/NavBar'
 import NotificationPage from '../component/notification/NotificationPage';
 import { getInAppNotification } from '../api/service';
 
-const PageLayout = ({sidebarOpen,setSidebarOpen,unreadCountNotification,setUnreadCountNotification}) => {
+const PageLayout = ({
+  sidebarOpen,
+  setSidebarOpen,
+  unreadCountNotification,
+  setUnreadCountNotification,
+  setActivePage,
+  activePage
+}) => {
      const [showNotifications, setShowNotifications] = useState(false);
       useEffect(() => {
          const fetchNotifications = async () => {
@@ -21,8 +28,8 @@ const PageLayout = ({sidebarOpen,setSidebarOpen,unreadCountNotification,setUnrea
   }
   return (
     <div>
-        <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <NavBar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} unreadCountNotification={unreadCountNotification} />
+        <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} setActivePage={setActivePage} activePage={activePage} />
+        <NavBar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} unreadCountNotification={unreadCountNotification} setActivePage={setActivePage} activePage={activePage} />
     </div>
   )
 }

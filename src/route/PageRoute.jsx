@@ -52,6 +52,9 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
     message: '',
     severityType: '',
   });
+  const [activePage, setActivePage] = useState(() => {
+    return localStorage.getItem('activeItem') || 'Dashboard';
+  });
   let tokenId = localStorage.getItem('token');
   useEffect(() => {
     if (tokenId) {
@@ -174,8 +177,15 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} isChangePassword={isChangePassword}/>}>
-          <Route element={<PageLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} unreadCountNotification={unreadCountNotification} setUnreadCountNotification={setUnreadCountNotification}/>}>
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} isChangePassword={isChangePassword} />}>
+          <Route element={<PageLayout
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            unreadCountNotification={unreadCountNotification}
+            setUnreadCountNotification={setUnreadCountNotification}
+            setActivePage={setActivePage}
+            activePage={activePage}
+          />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
             <Route path="/add_user" element={<AddUser />} />
@@ -204,14 +214,14 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
-            <Route path="/notification" element={<NotificationPage setUnreadCountNotification={setUnreadCountNotification}/>} />
+            <Route path="/notification" element={<NotificationPage setUnreadCountNotification={setUnreadCountNotification} />} />
             <Route path="/create_notification_template" element={<CreateNotificationTemplate />} />
             <Route path="/details/:seriesName/:year" element={<DetailsPage />} />
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/notifications_list" element={<NotificationList />} />
             <Route path="/create_notification" element={<CreateNotification />} />
-            <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword}/>} />
+            <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
           </Route>
         </Route>
 

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, } from 'react';
 import '../style/sidebar.css';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, } from 'react-router-dom';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import DomainAddOutlinedIcon from '@mui/icons-material/DomainAddOutlined';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
@@ -14,21 +14,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import complyn_mgmt_logo from '../assets/complyn_mgmt_logo.png'
 import DesktopAccessDisabledOutlinedIcon from '@mui/icons-material/DesktopAccessDisabledOutlined';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
-import SummarizeIcon from '@mui/icons-material/Summarize';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import TurnedInIcon from '@mui/icons-material/TurnedIn';
-import { Cable, ScanEye } from 'lucide-react';
+import { ScanEye } from 'lucide-react';
 
-function SideBar({ sidebarOpen, setSidebarOpen }) {
-    const location = useLocation();
-    const [activeItem, setActiveItem] = useState(() => {
-        return localStorage.getItem('activeItem');
-    });
-    // const [activeItem, setActiveItem] = useState('Dashboard');
-    const [showDocumentDropdown, setShowDocumentDropdown] = useState(false);
+function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
+    // const [activePage, setActivePage] = useState(() => {
+    //     return localStorage.getItem('activeItem') || 'Dashboard';
+    // });
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
@@ -45,12 +39,6 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
         // { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
     ];
 
-    const documentSubItems = [
-        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Approved Document', link: 'approved_documents' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Pending Document', link: 'pending_documents' },
-        { icon: (active) => <AttachFileIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tagged Document', link: 'tagged_documents' },
-        { icon: (active) => <TurnedInIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Untagged Document', link: 'untagged_documents' },
-    ];
 
     const serviceTracker = [
         { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
@@ -63,7 +51,7 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
     //     const allItems = [...menuItems, ...documentSubItems, ...serviceTracker];
     //     const match = allItems.find(item => item.link === currentPath);
     //     if (match) {
-    //         setActiveItem(match.label);
+    //         setActivePage(match.label);
     //         localStorage.setItem('activeSidebarItem', match.label);
     //     }
     // }, [location.pathname]);
@@ -87,13 +75,13 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
 
                     <div style={{ paddingTop: 75 }}>
                         {menuItems.map(({ icon, label, link }, i) => {
-                            const isActive = activeItem === label;
+                            const isActive = activePage === label;
                             return (
                                 <div key={i}>
                                     <Link
                                         to={`/${link}`}
                                         onClick={() => {
-                                            setActiveItem(label);
+                                            setActivePage(label);
                                             localStorage.setItem("activeItem", label);
                                             localStorage.setItem('active_url', link)
                                         }}
@@ -118,51 +106,6 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
 
                         {/* Document Dropdown */}
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
-                            {/* <div
-                                className="d-flex align-items-center cursor-pointer mb-4"
-                                onClick={() => setShowDocumentDropdown(!showDocumentDropdown)}
-                            >
-                                <span className='sidebar-close-icon-span'>
-                                    {showDocumentDropdown ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
-                                </span>
-                                <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
-                                    Document Records
-                                </span>
-                            </div>
-                            {showDocumentDropdown && (
-                                <div className='pt-2'>
-                                    {documentSubItems.map(({ icon, label, link }, i) => {
-                                        const isActive = activeItem === label;
-                                        return (
-                                            <div key={i}>
-                                                <Link
-                                                    to={`/${link}`}
-                                                    onClick={() => {
-                                                        setActiveItem(label);
-                                                        // localStorage.setItem('activeSidebarItem', label);
-                                                        localStorage.setItem("activeItem", label);
-                                                        localStorage.setItem('active_url', link)
-                                                    }}
-                                                >
-                                                    <div
-                                                        className='d-flex d-inline-block mb-4'
-                                                        tabIndex="0"
-                                                        data-toggle="tooltip"
-                                                        title={label}
-                                                    >
-                                                        <span className={`sidebar-close-icon-span ${isActive ? 'side-bar-active-tab' : ''}`}>
-                                                            {icon(isActive)}
-                                                        </span>
-                                                        <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
-                                                            {label}
-                                                        </span>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )} */}
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
                                 onClick={() => setShowServiceTrackerDropdown?.(prev => !prev)}
@@ -177,13 +120,13 @@ function SideBar({ sidebarOpen, setSidebarOpen }) {
                             {showServiceTrackerDropdown && (
                                 <div className='pt-2'>
                                     {serviceTracker.map(({ icon, label, link }, i) => {
-                                        const isActive = activeItem === label;
+                                        const isActive = activePage === label;
                                         return (
                                             <div key={i}>
                                                 <Link
                                                     to={`/${link}`}
                                                     onClick={() => {
-                                                        setActiveItem(label);
+                                                        setActivePage(label);
                                                         // localStorage.setItem('activeSidebarItem', label);
                                                         localStorage.setItem("activeItem", label);
                                                         localStorage.setItem('active_url', link)

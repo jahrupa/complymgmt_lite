@@ -134,7 +134,7 @@ const CockpitComplince = ({ data }) => {
       height: 400,
       stacked: true,
     },
-    colors: ['#10b981', '#f59e0b', '#ef4444'],
+    colors: ['#43A047', '#FB8C00', '#1E88E5'],
     plotOptions: {
       bar: {
         horizontal: false,
@@ -242,7 +242,7 @@ const CockpitComplince = ({ data }) => {
       <div className="dashboard2-grid">
         {/* Key Metrics */}
         <div className="metrics-section">
-          <h2>Key Performance Indicators</h2>
+          {/* <h2>Key Performance Indicators</h2> */}
           <div className="metrics-grid">
             <div className="metric-card licenses">
               <div className="metric-icon">📋</div>
