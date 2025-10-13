@@ -5,12 +5,14 @@ import complyn_mgmt_logo from '../assets/complymgmt_logo.png'
 import API from '../api/axios'; // your axios instance
 import { LOGIN_API } from '../api/Endpoint';
 import Snackbars from '../component/Snackbars';
+import { useToken } from '../TokenProvider';
 
 
-const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen ,setIsChangePassword}) => {
+const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsChangePassword }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { setToken } = useToken();
 
     // Login handler
     const handleSubmit = async (e) => {
@@ -30,6 +32,7 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen ,setIsC
                 localStorage.setItem('user_id', response.data?.user_id);
                 // localStorage.setItem('is_temp_password', response.data?.is_temp_password);
                 setIsChangePassword(response.data?.is_temp_password);
+                setToken(token);
 
                 // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
                 setIsAuthenticated(true);

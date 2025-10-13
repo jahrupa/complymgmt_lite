@@ -463,7 +463,7 @@ const NotificationList = () => {
               </p>
               {!searchTerm && filterType === 'all' && filterPriority === 'all' && (
                 <button
-                  onClick={() => navigate('/create_notification')}
+                  onClick={() => navigate('/create_notification_template')}
                   className="create-first-button">
                   <Plus size={20} />
                   Create First Template

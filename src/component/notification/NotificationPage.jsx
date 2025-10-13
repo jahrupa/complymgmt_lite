@@ -28,7 +28,7 @@ import Snackbars from '../Snackbars.jsx';
 
 dayjs.extend(relativeTime);
 
-const NotificationPage = ({ onBack, setUnreadCountNotification }) => {
+const NotificationPage = ({setUnreadCountNotification }) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [allNotifications, setAllNotifications] = useState([]);
@@ -104,7 +104,7 @@ const NotificationPage = ({ onBack, setUnreadCountNotification }) => {
 
   const handleNavigate = (page) => {
     setCurrentPage(page);
-    navigate(page === 'show' ? '/notifications_list' : '/create_notification_template');
+    navigate(page === 'show' ? '' : '/create_notification_template');
   };
 
   useEffect(() => {
@@ -238,7 +238,7 @@ const NotificationPage = ({ onBack, setUnreadCountNotification }) => {
         <div className="notification-actions">
           <button className="action-btn secondary" onClick={() => navigate('/create_notification_template')}>
             <CheckCircle size={18} />
-            Create Notification
+            Create Template
           </button>
           <button className="action-btn secondary" onClick={handleMarkAllAsRead}>
             <CheckCircle size={18} />
@@ -379,7 +379,8 @@ const NotificationPage = ({ onBack, setUnreadCountNotification }) => {
           onClick={() => handleNavigate('show')}
           className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
         >
-          Template List
+          {/* Incoming Notification */}
+          Incoming Notification
         </button>
         <button
           onClick={() => handleNavigate('create')}
