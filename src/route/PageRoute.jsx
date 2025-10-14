@@ -59,6 +59,12 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   useEffect(() => {
     if (tokenId) {
       setIsAuthenticated(true)
+    }else{
+      localStorage.removeItem('activeItem')
+      localStorage.removeItem('active_url')
+      localStorage.removeItem('username')
+      localStorage.removeItem('user_id')
+      setIsAuthenticated(false)
     }
   }, [tokenId])
   // useEffect(() => {

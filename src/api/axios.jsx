@@ -79,8 +79,8 @@ API.interceptors.response.use(
     if (
       response &&
       response.data &&
-      // response.data.message === "Token expired or invalid"
-      response.status === 401 // Unauthorized
+      response.data.message === "Token expired or invalid"
+      // response.status === 401 // Unauthorized
     ) {
       localStorage.removeItem("token");
       window.location.href = "/"; // redirect to login
