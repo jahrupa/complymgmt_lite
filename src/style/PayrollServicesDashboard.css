@@ -1,0 +1,42 @@
+.summary-card-badge-success {
+    background: hsla(159, 64%, 52%, 0.18);
+    color: hsl(159.4, 46.7%, 14.7%);
+    border: 1px solid hsla(159, 64%, 52%, 0.35);
+}
+
+
+.summary-card-badge {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.summary-card-divider {
+    height: 1px;
+    /* background: linear-gradient(90deg, transparent, hsla(220, 70%, 90%, 0.35), transparent); */
+  background: linear-gradient(
+    90deg,
+    rgba(191, 219, 254, 0),
+    rgba(147, 197, 253, 0.7),
+    rgba(191, 219, 254, 0)
+  );
+    backdrop-filter: blur(1px);
+}
+
+.summary-card-footnote {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.summary-card-badge-warning {
+    background: hsla(36, 97%, 62%, 0.18);
+    /* color: hsl(36, 97%, 70%); */
+    color: hsl(159.4, 46.7%, 14.7%);;
+    border: 1px solid hsla(36, 97%, 62%, 0.35);
+}
+.payroll-stat-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}

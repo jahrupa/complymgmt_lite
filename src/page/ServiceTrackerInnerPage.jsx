@@ -25,8 +25,8 @@ const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
-    // console.log(rowData, 'rowData')
-    // console.log(columnDefs, 'columnDefs')
+    //  console.log(rowData, 'rowData')
+    //  console.log(columnDefs, 'columnDefs')
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
     const [isEditing, setIsEditing] = useState(false);
@@ -46,7 +46,7 @@ const ServiceTrackerInnerPage = () => {
         isFilteredData: false,
 
     });
-    console.log(current?.sheet_name?.[0], 'sheet_name');
+     console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
     const gridRef = useRef();
@@ -241,11 +241,11 @@ const ServiceTrackerInnerPage = () => {
     //    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
     //     try {
     //         const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
-    //         console.log("Fetched response:", response);
+    //          console.log("Fetched response:", response);
     //         setRowData(response || []);
 
     //         const dataSample = response?.[0];
-    //         console.log("dataSample:", dataSample);
+    //          console.log("dataSample:", dataSample);
 
     //         if (!dataSample || Object.keys(dataSample).length === 0) {
     //             setColumnDefs([]);
@@ -291,7 +291,7 @@ const ServiceTrackerInnerPage = () => {
     //         };
 
     //         setColumnDefs([...dynamicCols, actionCol]);
-    //         console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
+    //          console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
     //     } catch (error) {
     //         console.error("Error fetching tracker data:", error);
     //         setColumnDefs([]);
@@ -405,7 +405,7 @@ const ServiceTrackerInnerPage = () => {
     };
 
     const onRowValueChanged = (event) => {
-        // console.log('Row updated:', event.data);
+        //  console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {
@@ -638,7 +638,7 @@ const ServiceTrackerInnerPage = () => {
 
 
     const onFilterOpened = (params) => {
-        console.log("Filter opened");
+         console.log("Filter opened");
         const field = params.column.getColId();
 
         const rowData = [];
@@ -651,7 +651,7 @@ const ServiceTrackerInnerPage = () => {
 
         const uniqueValues = [...new Set(rowData)];
 
-        console.log({ [field]: uniqueValues });
+         console.log({ [field]: uniqueValues });
 
         const filterComponent = document.querySelectorAll('.ag-filter')
 

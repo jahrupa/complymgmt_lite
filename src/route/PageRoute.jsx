@@ -70,7 +70,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   // useEffect(() => {
   //   const tabId = Date.now().toString();
   //   const activeTabsKey = 'activeTabs';
-  // console.log(activeTabsKey,'activeTabsKey')
+  //  console.log(activeTabsKey,'activeTabsKey')
   //   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
   //   tabs.push(tabId);
   //   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));

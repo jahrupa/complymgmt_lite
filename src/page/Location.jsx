@@ -35,12 +35,12 @@ const Location = () => {
             state: '',
             location_description: ''
         });
-    // console.log(current, 'company_name')
+    //  console.log(current, 'company_name')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
     const [companyNameData, setCompanyNameData] = useState([])
-    // console.log(companyNameData, 'companyNameData')
+    //  console.log(companyNameData, 'companyNameData')
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -51,7 +51,7 @@ const Location = () => {
     });
     const [locationId, setLocationId] = useState(null);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
-    // console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
+    //  console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
     const [errors, setErrors] = useState({});
 
     const validate = () => {
@@ -299,7 +299,7 @@ const Location = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = companyNameByGroupHoldingId.find((g) => g.company_name === selectedName) || {};
-                            // console.log(matchedGroup, 'matchedGroup')
+                            //  console.log(matchedGroup, 'matchedGroup')
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
@@ -541,7 +541,7 @@ const Location = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+         console.log('Row updated:', event.data);
     };
     const onFilterTextBoxChanged = useCallback(() => {
         gridRef.current.api.setGridOption(

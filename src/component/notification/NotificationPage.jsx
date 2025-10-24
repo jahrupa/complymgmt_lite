@@ -32,7 +32,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [allNotifications, setAllNotifications] = useState([]);
-  console.log(allNotifications, 'allNotifications')
+  //  console.log(allNotifications, 'allNotifications')
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState('show');
@@ -186,7 +186,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
       });
       getInAppNotification(localStorage.getItem("user_id") || "");
     } catch (error) {
-      console.log("Failed to mark all as read", error);
+      //  console.log("Failed to mark all as read", error);
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
@@ -210,7 +210,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
       const res = await getInAppNotification(localStorage.getItem("user_id") || "");
       setUnreadCountNotification(res?.length || 0);
     } catch (error) {
-      console.log("Failed to delete all notifications", error);
+      //  console.log("Failed to delete all notifications", error);
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,

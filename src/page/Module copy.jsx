@@ -94,7 +94,7 @@ const Module = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [moduleId, setModuleId] = useState(null)
-    console.log(moduleId, 'moduleId')
+     console.log(moduleId, 'moduleId')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -522,7 +522,7 @@ const Module = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+         console.log('Row updated:', event.data);
     };
 
     return (

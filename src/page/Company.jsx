@@ -237,7 +237,7 @@ const Company = () => {
             const matchedGroup = groupHoldingName.find(
               (g) => g.name === selectedName
             );
-            // console.log(matchedGroup,'matchedGroup')
+            //  console.log(matchedGroup,'matchedGroup')
             setCurrent((prev) => ({
               ...prev,
               group_name: selectedName,
@@ -467,7 +467,7 @@ const Company = () => {
   };
 
   // const onRowValueChanged = (event) => {
-  //   console.log('Row updated:', event.data);
+  //    console.log('Row updated:', event.data);
   // };
 
   const onFilterTextBoxChanged = useCallback(() => {

@@ -51,7 +51,7 @@ const Onbarding = () => {
   };
 
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    //  console.log('Row updated:', event.data);
   };
 
 

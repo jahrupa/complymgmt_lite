@@ -122,7 +122,7 @@ function ChangePassword({ setIsChangePassword }) {
       const response = await changePassword(currentUserId, payload);
       const message = response?.message || 'Password changed successfully';
 
-      console.log(response?.message, 'response');
+       console.log(response?.message, 'response');
 
       // Update temp password status
       const userId = localStorage.getItem('user_id') || currentUserId;

@@ -5,7 +5,7 @@ import Snackbars from '../component/Snackbars'
 
 function ServiceTrackerAccess() {
     const [selectedCategory, setSelectedCategory] = useState('')
-    // console.log(selectedCategory, 'selectedCategory')
+    //  console.log(selectedCategory, 'selectedCategory')
     const [checkedItems, setCheckedItems] = useState({})
     const [trackerName, setTrackerName] = useState([])
     const [serviceTrackerFields, setServiceTrackerFields] = useState([])
@@ -16,9 +16,9 @@ function ServiceTrackerAccess() {
         message: '',
         severityType: '',
     });
-    // console.log(serviceTrackerFields.data, 'serviceTrackerFields')
-    // console.log(trackerName, 'trackerName')
-    // console.log(checkedItems, 'checkedItems')
+    //  console.log(serviceTrackerFields.data, 'serviceTrackerFields')
+    //  console.log(trackerName, 'trackerName')
+    //  console.log(checkedItems, 'checkedItems')
     const formattedTrackerName = selectedCategory?.toLowerCase().replace(/\s+/g, '_');
 
     useEffect(() => {
@@ -78,7 +78,7 @@ function ServiceTrackerAccess() {
     //         message: result?.message,
     //         severityType: 'success',
     //     });
-    //     console.log("Selected fields to save:", selectedFields);
+    //      console.log("Selected fields to save:", selectedFields);
     // }
 
     const handleSaveTrackerAccess = async () => {
@@ -91,7 +91,7 @@ function ServiceTrackerAccess() {
         };
         try {
             const result = await createServiceTrackerSpecifics(payload);
-            console.log(result,'result')
+             console.log(result,'result')
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,

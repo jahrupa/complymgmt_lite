@@ -305,7 +305,7 @@ const TaggedDocument = () => {
 
             // ✅ Get the message from response
             const message = response?.message;
-            console.log(message, 'message')
+            //  console.log(message, 'message')
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
             // Refresh data
@@ -413,7 +413,7 @@ const TaggedDocument = () => {
 
             // Read second sheet (index 1)
             const sheetName = workbook.SheetNames[0];
-            console.log('Sheet Name:', sheetName);
+            //  console.log('Sheet Name:', sheetName);
             if (!sheetName) {
                 alert('The workbook does not have a second sheet.');
                 return;
@@ -609,7 +609,7 @@ const TaggedDocument = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        //  console.log('Row updated:', event.data);
     };
     const fileUploadForm = () => {
         return (

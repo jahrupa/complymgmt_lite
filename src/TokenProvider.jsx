@@ -5,7 +5,7 @@ const TokenContext = createContext();
 
 export const TokenProvider = ({ children }) => {
   const [token, setToken] = useState(null);
-  console.log(token,'token in provider');
+  //  console.log(token,'token in provider');
   return (
     <TokenContext.Provider value={{ token, setToken }}>
       {children}

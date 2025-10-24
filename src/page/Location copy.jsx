@@ -45,7 +45,7 @@ const Location = () => {
         created_at: '',
         updated_at: ''
     });
-    console.log(current, 'current')
+    //  console.log(current, 'current')
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,7 +54,7 @@ const Location = () => {
     const [locationId, setLocationId] = useState(null);
     const [groupHoldingData, setGroupHoldinData] = useState([]);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([]);
-    console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
+    //  console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCurrent((prev) => ({ ...prev, [name]: value }));
@@ -127,7 +127,7 @@ const Location = () => {
             setData(updatedData);
             setIsDeleteModalOpen(false);
             const message = response?.message;
-            console.log(message, 'message')
+            //  console.log(message, 'message')
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
         } catch (error) {
@@ -226,7 +226,7 @@ const Location = () => {
                 if (current?.groups_holdings_id) {
                     // Set data name list for dropdown (even though it's disabled)
                     setCompanyNameByGroupHoldingId(data);
-                    console.log("first")
+                    //  console.log("first")
                     // Set selected data name in state
                     // setCurrent((prev) => ({
                     //     ...prev,

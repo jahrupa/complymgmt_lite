@@ -19,7 +19,7 @@ const GridExample = () => {
   const { data, loading } = useFetchJson(
     "https://www.ag-grid.com/example-assets/space-mission-data.json",
   );
-  console.log(data, 'data')
+   console.log(data, 'data')
   // Column Definitions: Defines & controls grid columns.
   const [colDefs] = useState([
     {

@@ -5,7 +5,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import Toggle from '../component/Toggle';
-import { uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId, fetchDocumentDropdownTypes, fetchDocumentDropdownStages } from '../api/service';
+import { uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId, fetchDocumentDropdownTypes, fetchDocumentDropdownStages, approveUserAccess } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
@@ -47,7 +47,7 @@ const DocumentUpload = () => {
       stage: '',
       stage_id: null
     });
-  console.log(current, 'current')
+   console.log(current, 'current')
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -199,7 +199,7 @@ const DocumentUpload = () => {
     try {
       // const result = await uploadFile(uploadedFiles);
       const result = await uploadFileGolang(uploadedFiles)
-      // console.log("Files uploaded successfully:", result);
+      //  console.log("Files uploaded successfully:", result);
       setIsFileUploadModalModalOpen(false);
       const message = result?.message || "Status update successfully"
       // Show success snackbar
@@ -463,6 +463,29 @@ const DocumentUpload = () => {
         return { color: '#41464b' }; // gray
     }
   };
+   const handleCheckboxClick = async (id) => {
+          try {
+              const response = await approveUserAccess(id);
+              const message = response?.message
+              // Show success snackbar
+              setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message,
+                  severityType: 'success',
+              });
+          } catch (error) {
+              // Show error snackbar
+              setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: error?.response?.data?.message,
+                  severityType: 'error',
+              });
+          }
+          const updatedData = await fetchAllFiles();
+          setData(updatedData);
+      };
   const colDefs = [
     {
       headerName: 'Actions',
@@ -604,7 +627,7 @@ const DocumentUpload = () => {
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    //  console.log('Row updated:', event.data);
   };
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(

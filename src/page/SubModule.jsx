@@ -37,7 +37,7 @@ const SubModule = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [subModuleId, setSubModuleId] = useState(null)
     const [moduleId, setModuleId] = useState(null)
-    // console.log(moduleId, subModuleId, 'subModuleId')
+    //  console.log(moduleId, subModuleId, 'subModuleId')
     const [errors, setErrors] = useState({});
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -463,7 +463,7 @@ const SubModule = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        // console.log('Row updated:', event.data);
+        //  console.log('Row updated:', event.data);
     };
     useEffect(() => {
         const fetchData = async () => {

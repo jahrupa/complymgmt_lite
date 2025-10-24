@@ -52,7 +52,7 @@ const CreateNotification = () => {
   const [editingId,] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  // console.log(editForm, 'editForm')
+  //  console.log(editForm, 'editForm')
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(null);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -270,7 +270,7 @@ const CreateNotification = () => {
     try {
       // const result = await uploadFile(uploadedFiles);
       const result = await uploadBulkNotification(uploadedFiles, notificationId)
-      // console.log("Files uploaded successfully:", result);
+      //  console.log("Files uploaded successfully:", result);
       setIsFileUploadModalOpen(false);
       const message = result?.message || "Status update successfully"
       // Show success snackbar

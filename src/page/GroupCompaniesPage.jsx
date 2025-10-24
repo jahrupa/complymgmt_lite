@@ -281,7 +281,7 @@ const GroupCompaniesPage = () => {
   };
 
   const handleCheckboxClick = async (rowId) => {
-    console.log("Checkbox clicked with status:", rowId);
+    //  console.log("Checkbox clicked with status:", rowId);
     const response = await updateGroupApprovalStatusById(rowId);
     const message = response?.message
 
@@ -411,7 +411,7 @@ const GroupCompaniesPage = () => {
   };
 
   const onRowValueChanged = (event) => {
-    console.log('Row updated:', event.data);
+    //  console.log('Row updated:', event.data);
   };
 
   const onFilterTextBoxChanged = useCallback(() => {

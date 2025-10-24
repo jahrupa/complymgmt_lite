@@ -41,10 +41,10 @@ const LocationToModule = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [id, setId] = useState(null)
-    // console.log(id, 'id')
+    //  console.log(id, 'id')
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
-    // console.log(companyName, 'companyName')
+    //  console.log(companyName, 'companyName')
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -597,7 +597,7 @@ const LocationToModule = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+         console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {

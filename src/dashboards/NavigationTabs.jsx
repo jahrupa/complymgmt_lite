@@ -12,6 +12,7 @@ import { fetchClientOnboardingPortfolio, fetchComplainceCockpit, fetchComplaince
 import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByCompany';
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
+import PayrollServices from './payrollDashboard/PayrollServices ';
 
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
 
@@ -19,7 +20,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
-    console.log(cockpitData, 'cockpitData')
+     console.log(cockpitData, 'cockpitData')
 
     useEffect(() => {
         const fetchData = async () => {
@@ -27,7 +28,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 const generalDashboardData = await fetchGeneralCompaiancePortfolio();
                 setData(generalDashboardData);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                // console.error('Error fetching data:', error);
                 setData(error?.status || []); // Set to empty array on error
 
             }
@@ -48,13 +49,13 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 setCockpitByCompanyData(cockpitByCompanyRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitByCompanyRes.reason);
-                setCockpitData(cockpitRes.reason?.status|| []);
+                setCockpitByCompanyData(cockpitRes.reason?.status || []);
             }
             if (cockpitRes.status === 'fulfilled') {
                 setCockpitData(cockpitRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitRes.reason);
-                setCockpitData(cockpitRes.reason?.status|| []);
+                setCockpitData(cockpitRes.reason?.status || []);
             }
 
         };
@@ -62,7 +63,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
         fetchCockpitData();
     }, []);
 
-    
+
 
     useEffect(() => {
         const fetchClientOnboardingPortfolioData = async () => {
@@ -78,9 +79,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
 
         fetchClientOnboardingPortfolioData();
     }, []);
-    console.log(data, 'data')
-    console.log(cockpitByCompanyData, 'cockpitByCompanyData')
-    console.log(clientOnboardingData, 'clientOnboardingData')
+    //  console.log(data, 'data')
+    //  console.log(cockpitByCompanyData, 'cockpitByCompanyData')
+    //  console.log(clientOnboardingData, 'clientOnboardingData')
     // const stats = [
     //     {
     //         title: 'Outsourcing',
@@ -143,6 +144,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Cockpit" />
                     <Tab label="General Compliance" />
                     <Tab label="Client Onboarding" />
+                    <Tab label="Payroll Services" />
+
                 </Tabs>
             </Box>
 
@@ -151,10 +154,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 {activeTab === 0 && (selectedCompany !== ''
                     ? <CockpitComplinceByCompany data={cockpitByCompanyData} />
                     : <CockpitComplince data={cockpitData} />)}
-
                 {activeTab === 1 && <GeneralComplianceDashboard data={data} />}
                 {activeTab === 2 && <ClientOnbordingDashboard data={clientOnboardingData} />}
-
+                {activeTab === 3 && <PayrollServices />}
             </Box>
         </Box>
     );

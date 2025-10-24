@@ -86,7 +86,7 @@ const UserRolesPage = () => {
 
       //  Get the message from response
       const message = response?.message;
-      console.log(response, 'response')
+       console.log(response, 'response')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
@@ -518,7 +518,7 @@ const UserRolesPage = () => {
   };
 
   const onRowValueChanged = (event) => {
-    // console.log('Row updated:', event.data);
+    //  console.log('Row updated:', event.data);
   };
 
   const onFilterTextBoxChanged = useCallback(() => {

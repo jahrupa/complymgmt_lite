@@ -30,7 +30,7 @@ function CreateNotificationTemplate() {
             backgroundColor: '#ffffff'
         }
     });
-    // console.log(notification, 'notification')
+    //  console.log(notification, 'notification')
     const [errors, setErrors] = useState({});
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -147,7 +147,7 @@ function CreateNotificationTemplate() {
     };
 
     const currentTypeData = getNotificationTypeData(notification.type);
-    // console.log(currentTypeData, 'currentTypeData')
+    //  console.log(currentTypeData, 'currentTypeData')
     const toggleInApp = () => {
         setNotification(prev => {
             // if turning off and email is false → keep in_app true

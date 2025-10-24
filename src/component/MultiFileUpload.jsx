@@ -10,7 +10,7 @@ function MultiFileUpload({ uploadedFiles, setUploadedFiles }) {
 
     const handleUploadFiles = files => {
         const uploaded = [...uploadedFiles];
-        console.log(uploaded,'uploaded1')
+         console.log(uploaded,'uploaded1')
         let limitExceeded = false;
         files.some((file) => {
             if (uploaded.findIndex((f) => f.name === file.name) === -1) {
