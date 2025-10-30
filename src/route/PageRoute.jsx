@@ -40,6 +40,7 @@ import ServiceTrackerAccess from '../page/ServiceTrackerAccess.jsx';
 import NotificationList from '../page/NotificationList.jsx';
 import CreateNotification from '../page/CreateNotification.jsx';
 import ChangePassword from '../page/ChangePassword.jsx';
+import ForgetPassword from '../page/ForgetPassword.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -233,6 +234,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Catch-all: 404 */}
         <Route path="*" element={<NotFoundPage />} />
+        <Route path="/forget_password" element={<ForgetPassword />} />
+
       </Routes>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
     </>

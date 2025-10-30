@@ -68,12 +68,8 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                     <img src={complyn_mgmt_logo} alt="Avatar" className="avatar_v2 w-75" />
                 </div>
                 <div className='d-lg-flex d-md-flex login_form_v2'>
-
                     <div className=''>
-
-                        <form onSubmit={handleSubmit}>
-
-
+                        {/* <form onSubmit={handleSubmit}> */}
                             <div className="container login_form_container">
                                 <div className='d-flex justify-content-center mb-3 mt-4'>
                                     <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
@@ -100,20 +96,18 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
-                                <div className='mt-2 mb-2'>Forgot password?
+                                <button className='mt-2 mb-2' style={{display:'contents'}} onClick={() => navigate('forget_password')}>Forgot password?
                                     {/* <a href="#">password?</a> */}
-                                </div>
+                                </button>
 
-                                <button type="submit" className='login_btn_style_v2  mt-2 mb-2'><span className='login_btn'>Log in</span></button>
+                                <button className='login_btn_style_v2  mt-2 mb-2' onClick={handleSubmit}><span className='login_btn'>Log in</span></button>
                                 {/* <div className="container" style={{ backgroundColor: '#f1f1f1' }}> */}
                                 {/* </div> */}
                                 {/* <div className='karma-logon-text_v2'>New to complymgmt?<span className='karma_logo_text_span_v2'> Create account</span></div> */}
 
                             </div>
-
-                        </form>
+                        {/* </form> */}
                     </div>
-
                 </div>
 
             </div>

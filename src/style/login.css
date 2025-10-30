@@ -125,7 +125,6 @@ span.psw {
   right: 0;
 }
 
-
 .login_btn_style_v2 {
   border-radius: 7px;
   background-color:#0c0c55;
@@ -152,6 +151,16 @@ span.psw {
   right: -20px;
   transition: 0.5s;
 }
+
+.login_btn_style_v2 .forgot_password:after {
+  content: '\00AB';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
 
 .login_btn_style_v2:hover .login_btn {
   padding-right: 25px;

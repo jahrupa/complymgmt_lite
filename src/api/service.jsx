@@ -112,7 +112,8 @@ import {
   GET_COCKPIT_COMPLIANCE_PORTFOLIO,
   GET_GENERAL_COMPLIANCE_PORTFOLIO,
   GET_CLIENT_ONBOARDING_PORTFOLIO,
-  CHANGE_TEMPORARY_PASSWORD_STATUS
+  CHANGE_TEMPORARY_PASSWORD_STATUS,
+  FORGET_PASSWORD
 
 } from "./Endpoint";
 
@@ -1280,7 +1281,16 @@ export const changePassword = async (userId, passwords) => {
   }
 };
 
-
+// Forget password
+export const forgetPassword = async (email) => {
+  try {
+    const response = await API.post(`${FORGET_PASSWORD}`, { email });
+    return response.data;
+  } catch (error) {
+    console.error("Error in forget password:", error);
+    throw error;
+  }
+}
 export const changeTemporaryPasswordStatus = async (userId) => {
   try {
     const response = await API.get(`${CHANGE_TEMPORARY_PASSWORD_STATUS}${userId}`);
