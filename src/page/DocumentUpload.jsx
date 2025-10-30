@@ -47,7 +47,7 @@ const DocumentUpload = () => {
       stage: '',
       stage_id: null
     });
-   console.log(current, 'current')
+  console.log(current, 'current')
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -150,6 +150,8 @@ const DocumentUpload = () => {
 
   const closeModal = () => {
     setIsFileUploadModalModalOpen(false);
+    setIsDeleteModalOpen(false);
+
   };
   const toggleDrawer = (newOpen) => () => {
     setIsModalOpen(newOpen);
@@ -463,29 +465,29 @@ const DocumentUpload = () => {
         return { color: '#41464b' }; // gray
     }
   };
-   const handleCheckboxClick = async (id) => {
-          try {
-              const response = await approveUserAccess(id);
-              const message = response?.message
-              // Show success snackbar
-              setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message,
-                  severityType: 'success',
-              });
-          } catch (error) {
-              // Show error snackbar
-              setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: error?.response?.data?.message,
-                  severityType: 'error',
-              });
-          }
-          const updatedData = await fetchAllFiles();
-          setData(updatedData);
-      };
+  const handleCheckboxClick = async (id) => {
+    try {
+      const response = await approveUserAccess(id);
+      const message = response?.message
+      // Show success snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message,
+        severityType: 'success',
+      });
+    } catch (error) {
+      // Show error snackbar
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message,
+        severityType: 'error',
+      });
+    }
+    const updatedData = await fetchAllFiles();
+    setData(updatedData);
+  };
   const colDefs = [
     {
       headerName: 'Actions',
@@ -897,7 +899,7 @@ const DocumentUpload = () => {
         </div>
         <div className='d-lg-flex d-md-flex d-flex justify-content-between'>
           <div>
-            <button type='submit' className='btn btn-secondary' onClick={toggleDrawer(false)}>Cancle</button>
+            <button type='submit' className='btn btn-secondary' onClick={toggleDrawer(false)}>Cancel</button>
           </div>
           <div>
             <button type='submit' className='btn btn btn-primary' onClick={handleSubmit}>{isEditing ? 'Save Changes' : 'Save'}</button>
@@ -1025,7 +1027,7 @@ const DocumentUpload = () => {
   };
   return (
     <div>
-      <RightDrawer isPdfView={isPdfView} toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} pdfFile={pdfFile}/>
+      <RightDrawer isPdfView={isPdfView} toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} pdfFile={pdfFile} />
       <h5>Upload Document</h5>
       <div className='row  mb-4 mt-4'>
         <div className='col col-12 col-lg-4 mb-3 col-md-4'>
