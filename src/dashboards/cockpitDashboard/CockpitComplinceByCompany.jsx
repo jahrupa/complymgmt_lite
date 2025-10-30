@@ -3,7 +3,7 @@ import '../../style/cockpitComplinceByCompany.css';
 
 const CockpitComplinceByCompany = ({ data }) => {
   if (!data || !data.compliance_info) {
-    return <div>Loading...</div>;
+    return <div className='no-data'>{data === 403 || data === 500 ? 'No Data Found' : 'Loading...'}</div>;;
   }
   const companyName = Object?.keys(data?.compliance_info)[0];
   const complianceData = data?.compliance_info?.[companyName];

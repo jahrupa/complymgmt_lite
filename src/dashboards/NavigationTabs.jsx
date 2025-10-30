@@ -13,6 +13,9 @@ import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByComp
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
 import PayrollServices from './payrollDashboard/PayrollServices ';
+import ReturnsAndSubmissions from './payrollDashboard/ReturnsAndSubmissions';
+import HelpdeskAndEscalations from './payrollDashboard/HelpdeskAndEscalations';
+import AuditAndVisitDashboard from './Audit/AuditAndVisitDashboard';
 
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
 
@@ -20,7 +23,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
-     console.log(cockpitData, 'cockpitData')
+    console.log(cockpitData, 'cockpitData')
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,7 +43,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     useEffect(() => {
         const fetchCockpitData = async () => {
             const [cockpitByCompanyRes, cockpitRes] = await Promise.allSettled([
-                // pass selectedCompany state
+                // pass selectedCompany state 
                 fetchComplainceCockpitByCompany('Kids Clinic India Limited'),
                 fetchComplainceCockpit()
             ]);
@@ -145,6 +148,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="General Compliance" />
                     <Tab label="Client Onboarding" />
                     <Tab label="Payroll Services" />
+                    <Tab label="Returns & Submissions" />
+                    <Tab label="Helpdesk & Escalations" />
+                    <Tab label="Audit & Visits" />
 
                 </Tabs>
             </Box>
@@ -157,6 +163,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 {activeTab === 1 && <GeneralComplianceDashboard data={data} />}
                 {activeTab === 2 && <ClientOnbordingDashboard data={clientOnboardingData} />}
                 {activeTab === 3 && <PayrollServices />}
+                {activeTab === 4 && <ReturnsAndSubmissions />}
+                {activeTab === 5 && <HelpdeskAndEscalations />}
+                {activeTab === 6 && <AuditAndVisitDashboard />}
             </Box>
         </Box>
     );
