@@ -144,7 +144,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     onChange={handleTabChange}
                     variant="scrollable"
                     scrollButtons="auto" >
-                    <Tab label="Cockpit" />
+                    <Tab label="Compliance Cockpit " />
                     <Tab label="General Compliance" />
                     <Tab label="Client Onboarding" />
                     <Tab label="Payroll Services" />
