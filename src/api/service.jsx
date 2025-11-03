@@ -1284,7 +1284,7 @@ export const changePassword = async (userId, passwords) => {
 // Forget password
 export const forgetPassword = async (email) => {
   try {
-    const response = await API.post(`${FORGET_PASSWORD}`, { email });
+    const response = await API.post(`${FORGET_PASSWORD}`, email);
     return response.data;
   } catch (error) {
     console.error("Error in forget password:", error);

@@ -18,7 +18,7 @@ const ForgetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await forgetPassword(email);
+            const response = await forgetPassword({ Email: email });
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: response.message, severityType: 'success' });
         } catch (error) {
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
