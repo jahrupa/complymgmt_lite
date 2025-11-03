@@ -17,12 +17,32 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const UserRolesPage = () => {
   const [data, setData] = useState([]);
-  const [current, setCurrent] = useState({ user_id: null, full_name: '', username: '', email: '', role_name: '', role_id: null, password: "", status: 'Active', user_description: '', access_modules: [], group_holding_name: "", group_holding_id: null, company_name: "", company_id: null, location_name: "", location_id: "" });
+  const [current, setCurrent] = useState(
+    {
+      user_id: null,
+      user_type: '',
+      full_name: '',
+      username: '',
+      email: '',
+      role_name: '',
+      role_id: null,
+      password: "",
+      status: 'Active',
+      user_description: '',
+      access_modules: [],
+      group_holding_name: "",
+      group_holding_id: null,
+      company_name: "",
+      company_id: null,
+      location_name: "",
+      location_id: ""
+    });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
@@ -39,7 +59,10 @@ const UserRolesPage = () => {
     severityType: '',
   });
   const gridRef = useRef();
-
+  const userType = [
+    { id: 1,  value: 'Internal' },
+    { id: 2, value: 'External' },
+  ];
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -70,9 +93,9 @@ const UserRolesPage = () => {
       UserDescription: current?.user_description,
       "Username": current?.username,
       "Password": current?.password,
-      "UserType": null,
+      "UserType": current?.user_id,
       "CommonAttributes": CommonAttributes,
-      "UserAccessLevel": null
+      "UserRole": current?.role_name,
     }
     try {
       let response;
@@ -86,7 +109,7 @@ const UserRolesPage = () => {
 
       //  Get the message from response
       const message = response?.message;
-       console.log(response, 'response')
+      console.log(response, 'response')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
@@ -205,7 +228,7 @@ const UserRolesPage = () => {
             helperText={errors.full_name}
           />
           <MuiTextField
-            label='email'
+            label='Email'
             type='email'
             isRequired={true}
             fieldName='email'
@@ -234,6 +257,40 @@ const UserRolesPage = () => {
             value={current.username}
             error={!!errors.username}
             helperText={errors.username}
+          />
+        </div>
+        <div className='d-lg-flex d-md-flex justify-content-between  gap-3'>
+          <SingleSelectTextField
+            name="User Type"
+            label="User Type"
+            value={current.user_type}
+            onChange={(e) => {
+              const selectedName = e.target.value;
+              //  console.log(matchedGroup,'matchedGroup')
+               const userId = userType.find((g) => g.value === selectedName) || {};
+              setCurrent((prev) => ({
+                ...prev,
+                user_type: selectedName,
+                user_id: userId.id || null
+              }));
+              setErrors(prevErrors => ({ ...prevErrors, user_type: '' }));
+            }}
+            names={userType?.map((item) => ({
+              _id: item.id,
+              name: item.value,
+            }))}
+            error={!!errors.user_type}
+            helperText={errors.user_type}
+          />
+          <MuiTextField
+            label='Role Name'
+            type='text'
+            isRequired={true}
+            fieldName='role_name'
+            handleChange={handleChange}
+            value={current.role_name}
+            error={!!errors.role_name}
+            helperText={errors.role_name}
           />
         </div>
         <div className=''>
