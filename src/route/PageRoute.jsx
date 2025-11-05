@@ -41,6 +41,8 @@ import NotificationList from '../page/NotificationList.jsx';
 import CreateNotification from '../page/CreateNotification.jsx';
 import ChangePassword from '../page/ChangePassword.jsx';
 import ForgetPassword from '../page/ForgetPassword.jsx';
+import ChangeForgetPassword from '../page/ChangeForgetPassword.jsx';
+import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -235,6 +237,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
         {/* Catch-all: 404 */}
         <Route path="*" element={<NotFoundPage />} />
         <Route path="/forget_password" element={<ForgetPassword />} />
+        <Route path="/reset_password" element={<ChangeForgetPassword setIsChangePassword={setIsChangePassword} />} />
+        <Route path="/reset_password_successful" element={<ResetForgetPasswordSuccessful />} />
 
       </Routes>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
