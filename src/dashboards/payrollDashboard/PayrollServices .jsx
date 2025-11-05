@@ -402,14 +402,14 @@ const PayrollServices = () => {
                     </div>
                     <div className="charts-grid mb-4">
                         <div className="chart-card">
-                            <div className="mb-3 fw-600">Breakdown of Investment declaration status by Count of Employee count</div>
+                            <div className="mb-3 fw-600">Breakdown of Investment declaration status by Company </div>
 
                             <Chart
                                 options={investmentData.options} series={investmentData.series} type="pie" height={380}
                             />
                         </div>
                         <div className="chart-card">
-                            <div className="mb-3 fw-600">Sum Employee Count for each Payroll Service Type</div>
+                            <div className="mb-3 fw-600">Company Count for each Payroll Service Type</div>
 
                             <Chart
                                 options={employeeCountForEachPayroll.options} series={employeeCountForEachPayroll.series} type="bar" height={380}
@@ -424,14 +424,14 @@ const PayrollServices = () => {
 
                     <div className="charts-grid mb-4">
                         <div className="chart-card">
-                            <div className="mb-3 fw-600">System Used by Employer has the highest Employee Count</div>
+                            <div className="mb-3 fw-600">Type of Systems Used by Employer</div>
 
                             <Chart
                                 options={systemUseByEmp.options} series={systemUseByEmp.series} type="bar" height={380}
                             />
                         </div>
                         <div className="chart-card">
-                            <div className="mb-3 fw-600">Distribution of Employee Count across Multiple Entities / Locations (Y/N)</div>
+                            <div className="mb-3 fw-600">Distribution of Company across Multiple Entities / Locations (Y/N)</div>
 
                             <Chart
                                 options={distributionOfEmployee.options} series={distributionOfEmployee.series} type="pie" height={380}
