@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../../style/clientOnbordingDashboard.css";
 import "../../style/PayrollServicesDashboard.css";
 import Chart from 'react-apexcharts';
@@ -6,63 +6,65 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations, fetchInvestmentDeclarationStatusByCompany } from "../../api/service";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const PayrollServices = () => {
     const [investmentData, setInvestmentData] = React.useState({
-        series: [17, 18],
-        options: {
-            chart: {
-                width: 380,
-                type: "pie",
-            },
-            colors: ["#FBDCB8", "#F5D3CC"],
-            fill: {
-                opacity: 1,
-                colors: ["#FBDCB8", "#F5D3CC"],
+        // series: [17, 18],
+        // options: {
+        //     chart: {
+        //         width: 380,
+        //         type: "pie",
+        //     },
+        //     colors: ["#FBDCB8", "#F5D3CC"],
+        //     fill: {
+        //         opacity: 1,
+        //         colors: ["#FBDCB8", "#F5D3CC"],
 
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "none", // 👈 disables the lighten effect
-                    },
-                },
-                active: {
-                    filter: {
-                        type: "none", // 👈 disables click highlight effect
-                    },
-                },
-            },
+        //     },
+        //     states: {
+        //         hover: {
+        //             filter: {
+        //                 type: "none", // 👈 disables the lighten effect
+        //             },
+        //         },
+        //         active: {
+        //             filter: {
+        //                 type: "none", // 👈 disables click highlight effect
+        //             },
+        //         },
+        //     },
 
-            labels: ["Yes", "No"],
-            legend: {
-                position: "bottom", // 👈 moves Yes/No below the chart
-                horizontalAlign: "center",
-                fontSize: "14px",
-                markers: {
-                    radius: 12,
-                },
-                labels: {
-                    colors: "#333",
-                },
-            },
-            responsive: [
-                {
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            width: 250,
-                        },
-                        legend: {
-                            position: "bottom",
-                        },
-                    },
-                },
-            ],
-        },
+        //     labels: ["Yes", "No"],
+        //     legend: {
+        //         position: "bottom", // 👈 moves Yes/No below the chart
+        //         horizontalAlign: "center",
+        //         fontSize: "14px",
+        //         markers: {
+        //             radius: 12,
+        //         },
+        //         labels: {
+        //             colors: "#333",
+        //         },
+        //     },
+        //     responsive: [
+        //         {
+        //             breakpoint: 480,
+        //             options: {
+        //                 chart: {
+        //                     width: 250,
+        //                 },
+        //                 legend: {
+        //                     position: "bottom",
+        //                 },
+        //             },
+        //         },
+        //     ],
+        // },
     });
+    console.log(investmentData, 'investmentData')
     const [distributionOfEmployee, setDistributionOfEmployee] = React.useState({
         series: [17, 18],
         options: {
@@ -139,10 +141,10 @@ const PayrollServices = () => {
     ]
     const columnDefs = useMemo(
         () => [
-            { headerName: "Employee Count (sum)", field: "emp_count", sortable: true, filter: true ,flex:'1'},
-            { headerName: "Company Name", field: "company_name", sortable: true, filter: true ,flex:'1'},
-            { headerName: "Service Month", field: "service_month", sortable: true, filter: true ,flex:'1'},
-            { headerName: "Record", field: "record", sortable: true, filter: true ,flex:'1'},
+            { headerName: "Employee Count (sum)", field: "emp_count", sortable: true, filter: true, flex: '1' },
+            { headerName: "Company Name", field: "company_name", sortable: true, filter: true, flex: '1' },
+            { headerName: "Service Month", field: "service_month", sortable: true, filter: true, flex: '1' },
+            { headerName: "Record", field: "record", sortable: true, filter: true, flex: '1' },
         ],
         []
     );
@@ -346,6 +348,27 @@ const PayrollServices = () => {
 
 
     });
+    useEffect(() => {
+        const fetchClientOnboardingPortfolioData = async () => {
+            try {
+                const clientOnboardingPortfolioData = await fetchInvestmentDeclarationStatusByCompany();
+                setInvestmentData(clientOnboardingPortfolioData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setInvestmentData(error?.status || []); // Set to empty array on error
+            }
+            try {
+                const clientOnboardingPortfolioData = await fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations();
+                setDistributionOfEmployee(clientOnboardingPortfolioData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                setDistributionOfEmployee(error?.status || []); // Set to empty array on error
+            }
+        };
+
+        fetchClientOnboardingPortfolioData();
+    }, []);
+
     return (
         <div>
             {" "}
@@ -438,7 +461,7 @@ const PayrollServices = () => {
                             />
                         </div>
                     </div>
-                    
+
                     <div className="table_div p-3 mb-4">
                         <div className="ag-theme-quartz" style={{ height: '400px', width: '100%', marginTop: '1rem' }}>
                             <div className=" fw-600">

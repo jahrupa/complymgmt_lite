@@ -148,9 +148,13 @@ export const FORGET_PASSWORD='/api/v1/password/update/email_request';
 // Dashboard
 
 export const GET_GENERAL_COMPLIANCE_PORTFOLIO='/api/v1/dashboard/view/general/compliance/portfolio'
+export const GET_GENERAL_COMPLIANCE_BY_COMPANY='/api/v1/dashboard/view/general/compliance/'
 export const GET_COMPLIANCE_COCKPIT_BY_COMPANY ='/api/v1/dashboard/view/compliance/cockpit/'
 export const GET_COCKPIT_COMPLIANCE_PORTFOLIO ='/api/v1/dashboard/view/compliance/cockpit/portfolio'
-export const GET_CLIENT_ONBOARDING_PORTFOLIO ='api/v1/dashboard/view/client/onboarding/portfio'
+export const GET_CLIENT_ONBOARDING_PORTFOLIO ='api/v1/dashboard/view/client/onboarding/portfolio'
+export const GET_CLIENT_ONBOARDING_BY_COMPANY ='/api/v1/dashboard/view/client/onboarding/'
+export const GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY ='/api/v1/payroll_service_dashboard/view/investment_declaration_status'
+export const GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS='/api/v1/payroll_service_dashboard/view/multiple_entities_locations'
 
 
 

@@ -113,7 +113,11 @@ import {
   GET_GENERAL_COMPLIANCE_PORTFOLIO,
   GET_CLIENT_ONBOARDING_PORTFOLIO,
   CHANGE_TEMPORARY_PASSWORD_STATUS,
-  FORGET_PASSWORD
+  FORGET_PASSWORD,
+  GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY,
+  GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS,
+  GET_GENERAL_COMPLIANCE_BY_COMPANY,
+  GET_CLIENT_ONBOARDING_BY_COMPANY
 
 } from "./Endpoint";
 
@@ -1311,6 +1315,16 @@ export const fetchGeneralCompaiancePortfolio = async () => {
   }
 };
 
+export const fetchGeneralComplianceByCompany = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_GENERAL_COMPLIANCE_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all General Compliance By Company:", error);
+    throw error;
+  }
+};
+
  export const fetchComplainceCockpitByCompany = async (company_name) => {
   try {
     const response = await API.get(`${GET_COMPLIANCE_COCKPIT_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
@@ -1343,6 +1357,15 @@ export const fetchGeneralCompaiancePortfolio = async () => {
   }
 };
 
+  export const fetchClientOnboardingByCompany = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_CLIENT_ONBOARDING_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all Client Onboarding By Company", error);
+    throw error;
+  }
+};
  export const fetchComplainceCockpit = async () => {
   try {
     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
@@ -1352,4 +1375,22 @@ export const fetchGeneralCompaiancePortfolio = async () => {
     throw error;
   }
 };
+  export const fetchInvestmentDeclarationStatusByCompany = async () => {
+    try {
+      const response = await API.get(GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Investment Declaration Status By Company", error);
+      throw error;
+    }
+  }
 
+  export const fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations = async () => {
+    try {
+      const response = await API.get(GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Distribution Of Employee Across Multiple Entities Or Locations", error);
+      throw error;
+    }
+  }

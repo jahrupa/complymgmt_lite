@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-// import img1 from '../assets/compliance-cockpit-1.png';
-// import img2 from '../assets/compliance-cockpit-2.png';
-// import img3 from '../assets/compliance-cockpit-3.png';
-// import img4 from '../assets/compliance-cockpit-4.png';
-// import img5 from '../assets/compliance-cockpit-5.png';
-// import img6 from '../assets/compliance-cockpit-6.png';
 import '../style/statsCards.css';
 import { Tabs, Tab, Box } from '@mui/material';
 import GeneralComplianceDashboard from '../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard';
-import { fetchClientOnboardingPortfolio, fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio } from '../api/service';
+import { fetchClientOnboardingByCompany, fetchClientOnboardingPortfolio, fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio, fetchGeneralComplianceByCompany } from '../api/service';
 import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByCompany';
 import CockpitComplince from './cockpitDashboard/CockpitComplince';
 import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
@@ -16,35 +10,40 @@ import PayrollServices from './payrollDashboard/PayrollServices ';
 import ReturnsAndSubmissions from './payrollDashboard/ReturnsAndSubmissions';
 import HelpdeskAndEscalations from './payrollDashboard/HelpdeskAndEscalations';
 import AuditAndVisitDashboard from './Audit/AuditAndVisitDashboard';
+import ClientOnBoardingByCompany from './clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany';
 
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
-
-    const [data, setData] = useState([]);
+    const [generalDashboardData, setGeneralDashboardData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
-    console.log(cockpitData, 'cockpitData')
+    const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
 
+    // general compliance data fetch
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchGeneralDashboardData = async () => {
             try {
-                const generalDashboardData = await fetchGeneralCompaiancePortfolio();
-                setData(generalDashboardData);
+                if (selectedCompany) {
+                    const generalDashboardDataByCompany = await fetchGeneralComplianceByCompany(selectedCompany);
+                    setGeneralDashboardData(generalDashboardDataByCompany);
+                } else {
+                    const generalDashboardData = await fetchGeneralCompaiancePortfolio();
+                    setGeneralDashboardData(generalDashboardData);
+                }
             } catch (error) {
-                // console.error('Error fetching data:', error);
-                setData(error?.status || []); // Set to empty array on error
-
+                setGeneralDashboardData(error?.status || []); // Set to empty array on error
             }
         };
+        fetchGeneralDashboardData();
+    }, [selectedCompany]);
 
-        fetchData();
-    }, []);
 
+    // cockpit data fetch
     useEffect(() => {
         const fetchCockpitData = async () => {
             const [cockpitByCompanyRes, cockpitRes] = await Promise.allSettled([
                 // pass selectedCompany state 
-                fetchComplainceCockpitByCompany('Kids Clinic India Limited'),
+                fetchComplainceCockpitByCompany(selectedCompany),
                 fetchComplainceCockpit()
             ]);
 
@@ -60,55 +59,58 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 console.warn("fetchAll cockpit failed:", cockpitRes.reason);
                 setCockpitData(cockpitRes.reason?.status || []);
             }
-
         };
-
         fetchCockpitData();
-    }, []);
+    }, [selectedCompany]);
 
-
-
+    // client onboarding data fetch
     useEffect(() => {
         const fetchClientOnboardingPortfolioData = async () => {
-            try {
-                const clientOnboardingPortfolioData = await fetchClientOnboardingPortfolio();
-                setClientOnboardingData(clientOnboardingPortfolioData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setClientOnboardingData(error?.status || []); // Set to empty array on error
+            const [clientOnboardingByCompanyRes, clientOnboardingRes] = await Promise.allSettled([
+                // pass selectedCompany state
+                fetchClientOnboardingByCompany(selectedCompany),
+                fetchClientOnboardingPortfolio()
+            ]);
 
+            if (clientOnboardingByCompanyRes.status === 'fulfilled') {
+                setClientOnBoardingByCompanyData(clientOnboardingByCompanyRes.value);
+            } else {
+                console.warn("fetchAll client onboarding failed:", clientOnboardingByCompanyRes.reason);
+                setClientOnBoardingByCompanyData(clientOnboardingRes.reason?.status || []);
+            }
+            if (clientOnboardingRes.status === 'fulfilled') {
+                setClientOnboardingData(clientOnboardingRes.value);
+            } else {
+                console.warn("fetchAll client onboarding failed:", clientOnboardingRes.reason);
+                setClientOnboardingData(clientOnboardingRes.reason?.status || []);
             }
         };
-
         fetchClientOnboardingPortfolioData();
-    }, []);
-    //  console.log(data, 'data')
-    //  console.log(cockpitByCompanyData, 'cockpitByCompanyData')
-    //  console.log(clientOnboardingData, 'clientOnboardingData')
-    // const stats = [
-    //     {
-    //         title: 'Outsourcing',
-    //         icon: img1,
-    //         color: 'green',
-    //         bg_color: '#dcf3f3',
-    //     },
-    //     {
-    //         title: 'Client Onboarding',
-    //         icon: img2,
-    //         color: 'blue',
-    //         bg_color: '#ffecdc',
-    //     },
-    //     {
-    //         title: 'Payroll',
-    //         icon: img3,
-    //         color: 'orange',
-    //         bg_color: '#e7f7f1',
-    //     },
-    // ];
+    }, [selectedCompany]);
 
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
     };
+//    const stats = [
+//         {
+//             title: 'Outsourcing',
+//             icon: '',
+//             color: 'green',
+//             bg_color: '#dcf3f3',
+//         },
+//         {
+//             title: 'Client Onboarding',
+//             icon: 'img2',
+//             color: 'blue',
+//             bg_color: '#ffecdc',
+//         },
+//         {
+//             title: 'Payroll',
+//             icon: 'img3',
+//             color: 'orange',
+//             bg_color: '#e7f7f1',
+//         },
+//     ];
 
     // const renderCards = (data) => {
     //     return (
@@ -138,6 +140,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
 
     return (
         <Box sx={{ width: '100%' }}>
+            {/* {renderCards(stats)} */}
             <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
                 <Tabs
                     value={activeTab}
@@ -151,7 +154,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Returns & Submissions" />
                     <Tab label="Helpdesk & Escalations" />
                     <Tab label="Audit & Visits" />
-
                 </Tabs>
             </Box>
 
@@ -160,8 +162,10 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 {activeTab === 0 && (selectedCompany !== ''
                     ? <CockpitComplinceByCompany data={cockpitByCompanyData} />
                     : <CockpitComplince data={cockpitData} />)}
-                {activeTab === 1 && <GeneralComplianceDashboard data={data} />}
-                {activeTab === 2 && <ClientOnbordingDashboard data={clientOnboardingData} />}
+                {activeTab === 1 && <GeneralComplianceDashboard data={generalDashboardData} />}
+                {activeTab === 2 && (selectedCompany === ''
+                    ? <ClientOnbordingDashboard data={clientOnboardingData} />
+                    : <ClientOnBoardingByCompany locationData={ClientOnBoardingByCompanyData} />)}
                 {activeTab === 3 && <PayrollServices />}
                 {activeTab === 4 && <ReturnsAndSubmissions />}
                 {activeTab === 5 && <HelpdeskAndEscalations />}
