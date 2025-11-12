@@ -117,7 +117,12 @@ import {
   GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY,
   GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS,
   GET_GENERAL_COMPLIANCE_BY_COMPANY,
-  GET_CLIENT_ONBOARDING_BY_COMPANY
+  GET_CLIENT_ONBOARDING_BY_COMPANY,
+  GET_TYPE_OF_SYSTEMS_USED_BY_EMPLOYER,
+  GET_TOTAL_EMPLOYEE_COUNT,
+  GET_PAYROLLS_CLOSED_ON_OR_AHEAD_OF_SLA_PERCENTAGE,
+  GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVED_DATE,
+  GET_EXPLANATION_OF_EMPLOYEE_COUNT,
 
 } from "./Endpoint";
 
@@ -1375,9 +1380,9 @@ export const fetchGeneralComplianceByCompany = async (company_name) => {
     throw error;
   }
 };
-  export const fetchInvestmentDeclarationStatusByCompany = async () => {
+  export const fetchInvestmentDeclarationStatusByCompany = async (company_name) => {
     try {
-      const response = await API.get(GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY);
+      const response = await API.get(`${GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching Investment Declaration Status By Company", error);
@@ -1385,12 +1390,63 @@ export const fetchGeneralComplianceByCompany = async (company_name) => {
     }
   }
 
-  export const fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations = async () => {
+  export const fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations = async (company_name) => {
     try {
-      const response = await API.get(GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS);
+      const response = await API.get(`${GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching Distribution Of Employee Across Multiple Entities Or Locations", error);
+      throw error;
+    }
+  }
+
+  export const fetchTypeOfSystemsUsedByEmployer = async (company_name) => {
+    try {
+      const response = await API.get(`${GET_TYPE_OF_SYSTEMS_USED_BY_EMPLOYER}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Type Of Systems Used By Employer", error);
+      throw error;
+    }
+  }
+
+  export const fetchTotalEmployeeCount = async (company_name) => {
+    try {
+      const response = await API.get(`${GET_TOTAL_EMPLOYEE_COUNT}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Total Employee Count", error);
+      throw error;
+    }
+  }
+
+  export const fetchPayrollsClosedOnOrAheadOfSlaPercentage = async (company_name) => {
+    try {
+      const response = await API.get(`${GET_PAYROLLS_CLOSED_ON_OR_AHEAD_OF_SLA_PERCENTAGE}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Payrolls Closed On Or Ahead Of Sla Percentage", error);
+      throw error;
+    }
+  }
+
+  export const fetchAverageDelayBetweenDataRequestDateAndClientDataReceivedDate = async (company_name) => {
+    try {
+      const response = await API.get(`${GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVED_DATE}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Average Delay Between Data Request Date And Client Data Received Date", error);
+      throw error;
+    }
+  }
+
+
+  export const fetchExplanationOfEmployeeCount = async (company_name) => {
+    try {
+      const response = await API.get(`${GET_EXPLANATION_OF_EMPLOYEE_COUNT}?company_name=${encodeURIComponent(company_name?company_name:'all')}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Explanation Of Employee Count", error);
       throw error;
     }
   }

@@ -166,7 +166,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 {activeTab === 2 && (selectedCompany === ''
                     ? <ClientOnbordingDashboard data={clientOnboardingData} />
                     : <ClientOnBoardingByCompany locationData={ClientOnBoardingByCompanyData} />)}
-                {activeTab === 3 && <PayrollServices />}
+                {activeTab === 3 && <PayrollServices selectedCompany={selectedCompany} />}
                 {activeTab === 4 && <ReturnsAndSubmissions />}
                 {activeTab === 5 && <HelpdeskAndEscalations />}
                 {activeTab === 6 && <AuditAndVisitDashboard />}

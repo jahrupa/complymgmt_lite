@@ -6,76 +6,31 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations, fetchInvestmentDeclarationStatusByCompany } from "../../api/service";
+import { fetchAverageDelayBetweenDataRequestDateAndClientDataReceivedDate, fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations, fetchExplanationOfEmployeeCount, fetchInvestmentDeclarationStatusByCompany, fetchPayrollsClosedOnOrAheadOfSlaPercentage, fetchTotalEmployeeCount, fetchTypeOfSystemsUsedByEmployer } from "../../api/service";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const PayrollServices = () => {
-    const [investmentData, setInvestmentData] = React.useState({
-        // series: [17, 18],
-        // options: {
-        //     chart: {
-        //         width: 380,
-        //         type: "pie",
-        //     },
-        //     colors: ["#FBDCB8", "#F5D3CC"],
-        //     fill: {
-        //         opacity: 1,
-        //         colors: ["#FBDCB8", "#F5D3CC"],
-
-        //     },
-        //     states: {
-        //         hover: {
-        //             filter: {
-        //                 type: "none", // 👈 disables the lighten effect
-        //             },
-        //         },
-        //         active: {
-        //             filter: {
-        //                 type: "none", // 👈 disables click highlight effect
-        //             },
-        //         },
-        //     },
-
-        //     labels: ["Yes", "No"],
-        //     legend: {
-        //         position: "bottom", // 👈 moves Yes/No below the chart
-        //         horizontalAlign: "center",
-        //         fontSize: "14px",
-        //         markers: {
-        //             radius: 12,
-        //         },
-        //         labels: {
-        //             colors: "#333",
-        //         },
-        //     },
-        //     responsive: [
-        //         {
-        //             breakpoint: 480,
-        //             options: {
-        //                 chart: {
-        //                     width: 250,
-        //                 },
-        //                 legend: {
-        //                     position: "bottom",
-        //                 },
-        //             },
-        //         },
-        //     ],
-        // },
+const PayrollServices = ({selectedCompany}) => {
+    const [payrollOverviewData, setPayrollOverviewData] = useState({
+        total_employees: 0,
+        turnaround_health: 0,
+        on_time_delivery: 0,
+        late_percent: 0,
+        compliance_alerts: 0,
     });
-    console.log(investmentData, 'investmentData')
-    const [distributionOfEmployee, setDistributionOfEmployee] = React.useState({
-        series: [17, 18],
+    console.log(payrollOverviewData, 'payrollOverviewData')
+    const [investmentData, setInvestmentData] = useState({});
+    const investmentDataFormate = {
+        series: [investmentData.count_yes || 0, investmentData.count_no || 0, investmentData.count_empty || 0],
         options: {
             chart: {
                 width: 380,
                 type: "pie",
             },
-            colors: ["#cfa4f080", "#e8a8ee"],
+            colors: ["#FBDCB8", "#F5D3CC", "#e8a8ee"],
             fill: {
                 opacity: 1,
-                colors: ["#cfa4f080", "#e8a8ee"],
+                colors: ["#FBDCB8", "#F5D3CC", "#e8a8ee"],
 
             },
             states: {
@@ -91,7 +46,7 @@ const PayrollServices = () => {
                 },
             },
 
-            labels: ["Yes", "No"],
+            labels: ["Yes", "No", "Empty"],
             legend: {
                 position: "bottom", // 👈 moves Yes/No below the chart
                 horizontalAlign: "center",
@@ -117,8 +72,64 @@ const PayrollServices = () => {
                 },
             ],
         },
-    });
+    }
+    const [distributionOfEmployee, setDistributionOfEmployee] = useState({});
+    const distributionOfEmployeeFormate = {
+        series: [distributionOfEmployee.count_yes || 0, distributionOfEmployee.count_no || 0, distributionOfEmployee.count_empty || 0],
+        options: {
+            chart: {
+                width: 380,
+                type: "pie",
+            },
+            colors: ["#cfa4f080", "#e8a8ee", "#edbef1ff"],
+            fill: {
+                opacity: 1,
+                colors: ["#cfa4f080", "#e8a8ee", "#edbef1ff"],
 
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none", // 👈 disables the lighten effect
+                    },
+                },
+                active: {
+                    filter: {
+                        type: "none", // 👈 disables click highlight effect
+                    },
+                },
+            },
+
+            labels: ["Yes", "No", "Empty"],
+            legend: {
+                position: "bottom", // 👈 moves Yes/No below the chart
+                horizontalAlign: "center",
+                fontSize: "14px",
+                markers: {
+                    radius: 12,
+                },
+                labels: {
+                    colors: "#333",
+                },
+            },
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 250,
+                        },
+                        legend: {
+                            position: "bottom",
+                        },
+                    },
+                },
+            ],
+        },
+
+    }
+    const [explanationOfEmployeeCount, setExplanationOfEmployeeCount] = useState([]);
+    console.log(explanationOfEmployeeCount, 'explanationOfEmployeeCount')
     const employeeCountData = [
         {
             "emp_count": 2053,
@@ -141,10 +152,11 @@ const PayrollServices = () => {
     ]
     const columnDefs = useMemo(
         () => [
-            { headerName: "Employee Count (sum)", field: "emp_count", sortable: true, filter: true, flex: '1' },
+            { headerName: "Employee Count (sum)", field: "employee_count", sortable: true, filter: true, flex: '1' },
             { headerName: "Company Name", field: "company_name", sortable: true, filter: true, flex: '1' },
+            { headerName: "Company Common Name", field: "company_common_name", sortable: true, filter: true, flex: '1' },
             { headerName: "Service Month", field: "service_month", sortable: true, filter: true, flex: '1' },
-            { headerName: "Record", field: "record", sortable: true, filter: true, flex: '1' },
+            { headerName: "Service Frequency", field: "service_frequency", sortable: true, filter: true, flex: '1' },
         ],
         []
     );
@@ -243,24 +255,22 @@ const PayrollServices = () => {
     // Extract categories and data
     const systemCategories = employeeCountForSystemUse.map((item) => item.serviceType);
     const systemEmployeeCounts = employeeCountForSystemUse.map((item) => item.employeeCount);
-    const [systemUseByEmp] = useState({
+    const [systemUseByEmp, setSystemUseByEmp] = useState([]);
+    const systemUsedByEmpFormat = {
         series: [
             {
                 name: "Employee Count",
-                data: systemEmployeeCounts, // Y-axis values (Sum of Employee Count)
+                data: systemUseByEmp?.system_used_by_employer?.map((item) => item.count), // Y-axis values (Sum of Employee Count)
             },
         ],
         options: {
             chart: {
                 type: "bar",
-                // height: 350,
                 toolbar: { show: false },
             },
             plotOptions: {
                 bar: {
                     horizontal: false,
-                    // borderRadius: 6,
-                    //   columnWidth: "55%",
                 },
             },
             dataLabels: {
@@ -270,11 +280,7 @@ const PayrollServices = () => {
                 },
             },
             xaxis: {
-                categories: systemCategories, // X-axis categories (Payroll Service Type)
-                title: {
-                    // text: "Payroll Service Type",
-                    // style: { fontWeight: "bold" },
-                },
+                categories: systemUseByEmp?.system_used_by_employer?.map((item) => item.system_used), // X-axis categories (Payroll Service Type)
             },
             yaxis: {
                 title: {
@@ -282,13 +288,12 @@ const PayrollServices = () => {
                     style: { fontWeight: "bold" },
                 },
                 min: 0,
-                // max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
                 tickAmount: 5,
             },
-            colors: ["#3dba11"],
+            colors: ["#f5d3cc"],
             fill: {
                 opacity: 1,
-                colors: ["#3dba11"],
+                colors: ["#f5d3cc"],
             },
             states: {
                 hover: {
@@ -302,31 +307,38 @@ const PayrollServices = () => {
                     },
                 },
             },
-
-            //   title: {
-            //     text: "Sum of Employee Count per Payroll Service Type",
-            //     align: "center",
-            //   },
-            //   grid: {
-            //     borderColor: "#e7e7e7",
-            //     row: {
-            //       colors: ["#f3f3f3", "transparent"],
-            //       opacity: 0.5,
-            //     },
-            //   },
         },
-    });
+    }
 
-
-    const [dataRequestAndClientDataReceived, setDataRequestAndClientDataReceived] = React.useState({
-
+    const [dataRequestAndClientDataReceived, setDataRequestAndClientDataReceived] = React.useState([]);
+    console.log("dataRequestAndClientDataReceived", dataRequestAndClientDataReceived)
+    const dataRequestAndClientDataReceivedFormat = {
         series: [{
-            data: [18, 4, 8, 70, 40, 50, 9, 10, 20, 8]
+            name: "Average Days Delayed",
+            data: dataRequestAndClientDataReceived?.map((item) => item.average_days_delayed || 0) || [],
         }],
         options: {
             chart: {
                 type: 'bar',
                 height: 350
+            },
+            colors: ["#609bf3ff"],
+            fill: {
+                opacity: 1,
+                colors: ["#609bf3ff"],
+
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none", // 👈 disables the lighten effect
+                    },
+                },
+                active: {
+                    filter: {
+                        type: "none", // 👈 disables click highlight effect
+                    },
+                },
             },
             plotOptions: {
                 bar: {
@@ -342,32 +354,80 @@ const PayrollServices = () => {
                 },
             },
             xaxis: {
-                categories: ['Balaji', 'Hotel OM', 'Hotel Tunga', 'siriram Filteration', 'KPR Mill', 'Sri Saravana', 'Sri Venkateswara'],
+                categories: dataRequestAndClientDataReceived?.map((item) => item.company_name || []) || [],
             }
         },
+    }
 
-
-    });
     useEffect(() => {
-        const fetchClientOnboardingPortfolioData = async () => {
-            try {
-                const clientOnboardingPortfolioData = await fetchInvestmentDeclarationStatusByCompany();
-                setInvestmentData(clientOnboardingPortfolioData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setInvestmentData(error?.status || []); // Set to empty array on error
+        const fetchData = async () => {
+            const [investmentRes, distrubutionMultipleLocationsRes, typeOfSystemsRes, payrollOverviewDataR, payrollOverviewDataR2, averageDelayRes, explanationOfEmployeeCountRes] = await Promise.allSettled([
+                fetchInvestmentDeclarationStatusByCompany(selectedCompany),
+                fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations(selectedCompany),
+                fetchTypeOfSystemsUsedByEmployer(selectedCompany),
+                fetchTotalEmployeeCount(selectedCompany),
+                fetchPayrollsClosedOnOrAheadOfSlaPercentage(selectedCompany),
+                fetchAverageDelayBetweenDataRequestDateAndClientDataReceivedDate(selectedCompany),
+                fetchExplanationOfEmployeeCount(selectedCompany),
+            ]);
+            if (investmentRes.status === 'fulfilled') {
+                setInvestmentData(investmentRes.value);
+            } else if (investmentRes.status === 'rejected') {
+                console.warn("fetchAllInvestments failed:", investmentRes.reason);
+                setInvestmentData(investmentRes.reason?.status || []); // Set to empty array on error
             }
-            try {
-                const clientOnboardingPortfolioData = await fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations();
-                setDistributionOfEmployee(clientOnboardingPortfolioData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setDistributionOfEmployee(error?.status || []); // Set to empty array on error
+
+            if (distrubutionMultipleLocationsRes.status === 'fulfilled') {
+                setDistributionOfEmployee(distrubutionMultipleLocationsRes.value);
+            } else if (distrubutionMultipleLocationsRes.status === 'rejected') {
+                console.warn("fetchAllDistributions failed:", distrubutionMultipleLocationsRes.reason);
+                setDistributionOfEmployee(distrubutionMultipleLocationsRes.reason?.status || []); // Set to empty array on error
+            }
+
+            if (typeOfSystemsRes.status === 'fulfilled') {
+                setSystemUseByEmp(typeOfSystemsRes.value || []);
+            } else if (typeOfSystemsRes.status === 'rejected') {
+                console.warn("fetchAllDistributions failed:", typeOfSystemsRes.reason);
+                setSystemUseByEmp(typeOfSystemsRes.reason?.status || []); // Set to empty array on error
+            }
+
+            if (payrollOverviewDataR.status === 'fulfilled') {
+                setPayrollOverviewData((prev) => ({
+                    ...prev,
+                    total_employees: payrollOverviewDataR.value.employee_count,
+                }));
+            } else if (payrollOverviewDataR.status === 'rejected') {
+                console.warn("fetchAllDistributions failed:", payrollOverviewDataR.reason);
+                setPayrollOverviewData(payrollOverviewDataR.reason?.status || []); // Set to empty array on error
+            }
+
+            if (payrollOverviewDataR2.status === 'fulfilled') {
+                setPayrollOverviewData((prev) => ({
+                    ...prev,
+                    late_percent: payrollOverviewDataR2.value.late_percent,
+                    on_time_delivery: payrollOverviewDataR2.value.on_time_delivery_good_percent,
+                }));
+
+            } else if (payrollOverviewDataR2.status === 'rejected') {
+                console.warn("fetchAllDistributions failed:", payrollOverviewDataR2.reason);
+                setPayrollOverviewData(payrollOverviewDataR2.reason?.status || []); // Set to empty array on error
+            }
+
+            if (averageDelayRes.status === 'fulfilled') {
+                setDataRequestAndClientDataReceived(averageDelayRes.value?.top_delays || []);
+            } else if (averageDelayRes.status === 'rejected') {
+                console.warn("fetchAllDistributions failed:", averageDelayRes.reason);
+                setDataRequestAndClientDataReceived(averageDelayRes.reason?.status || []); // Set to empty array on error
+            }
+            if (explanationOfEmployeeCountRes.status === 'fulfilled') {
+                setExplanationOfEmployeeCount(explanationOfEmployeeCountRes.value);
+            } else if (explanationOfEmployeeCountRes.status === 'rejected') {
+                console.warn("fetchAllDistributions failed:", explanationOfEmployeeCountRes.reason);
+                setExplanationOfEmployeeCount(explanationOfEmployeeCountRes.reason?.status || []); // Set to empty array on error
             }
         };
-
-        fetchClientOnboardingPortfolioData();
-    }, []);
+        fetchData();
+    }, [selectedCompany]);
 
     return (
         <div>
@@ -377,9 +437,9 @@ const PayrollServices = () => {
                     <div className="stats-grid">
                         <div className="payroll-stat-card performer-card high-performer">
                             <div className="stat-label">Total Employees</div>
-                            <div className="stat-number">5,738</div>
+                            <div className="stat-number">{payrollOverviewData.total_employees}</div>
                             <span className="summary-card-badge summary-card-badge-success">
-                                36 entities
+                                {systemUseByEmp.total_count ? systemUseByEmp.total_count : 0} entities
                             </span>
                             <div className="summary-card-divider mt-3"></div>
                             <div className="mt-2 summary-card-footnote">
@@ -402,16 +462,16 @@ const PayrollServices = () => {
                         </div>
                         <div className="payroll-stat-card performer-card moderate">
                             <div className="stat-label">On-time Delivery</div>
-                            <div className="stat-number">58%</div>
+                            <div className="stat-number">{payrollOverviewData.on_time_delivery}%</div>
                             <span className="summary-card-badge summary-card-badge-warning">
-                                21 approvals
+                                {payrollOverviewData.late_percent}% Delay
                             </span>
                             <div className="summary-card-divider mt-3"></div>
                             <div className="mt-2 summary-card-footnote">
                                 Payrolls closed on or ahead of SLA
                             </div>
                         </div>
-                        <div className="payroll-stat-card performer-card good">
+                        {/* <div className="payroll-stat-card performer-card good">
                             <div className="stat-label">Compliance Alerts</div>
                             <div className="stat-number">5</div>
                             <span className="summary-card-badge summary-card-badge-warning">
@@ -421,43 +481,33 @@ const PayrollServices = () => {
                             <div className="mt-2 summary-card-footnote">
                                 Entities needing follow-up
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="charts-grid mb-4">
                         <div className="chart-card">
                             <div className="mb-3 fw-600">Breakdown of Investment declaration status by Company </div>
 
                             <Chart
-                                options={investmentData.options} series={investmentData.series} type="pie" height={380}
+                                options={investmentDataFormate.options} series={investmentDataFormate.series} type="pie" height={380}
                             />
                         </div>
-                        <div className="chart-card">
-                            <div className="mb-3 fw-600">Company Count for each Payroll Service Type</div>
-
-                            <Chart
-                                options={employeeCountForEachPayroll.options} series={employeeCountForEachPayroll.series} type="bar" height={380}
-                            />
-                        </div>
+                          <div className="chart-card">
+                        <div className="mb-3 fw-600">Top 5 average delay between data request date and client data received date by company</div>
+                        <Chart options={dataRequestAndClientDataReceivedFormat.options} series={dataRequestAndClientDataReceivedFormat.series} type="bar" height={380} />
                     </div>
-
-                    <div className="chart-card mb-4">
-                        <div className="mb-3 fw-600">Average delay between data request date and client data received date by company</div>
-                        <Chart options={dataRequestAndClientDataReceived.options} series={dataRequestAndClientDataReceived.series} type="bar" height={380} />
                     </div>
-
                     <div className="charts-grid mb-4">
                         <div className="chart-card">
                             <div className="mb-3 fw-600">Type of Systems Used by Employer</div>
-
                             <Chart
-                                options={systemUseByEmp.options} series={systemUseByEmp.series} type="bar" height={380}
+                                options={systemUsedByEmpFormat.options} series={systemUsedByEmpFormat.series} type="bar" height={380}
                             />
                         </div>
                         <div className="chart-card">
                             <div className="mb-3 fw-600">Distribution of Company across Multiple Entities / Locations (Y/N)</div>
 
                             <Chart
-                                options={distributionOfEmployee.options} series={distributionOfEmployee.series} type="pie" height={380}
+                                options={distributionOfEmployeeFormate.options} series={distributionOfEmployeeFormate.series} type="pie" height={380}
                             />
                         </div>
                     </div>
@@ -469,7 +519,7 @@ const PayrollServices = () => {
                             </div>
                             <AgGridReact
                                 theme="legacy"
-                                rowData={employeeCountData}
+                                rowData={explanationOfEmployeeCount}
                                 columnDefs={columnDefs}
                                 pagination={true}
                                 paginationPageSize={5}

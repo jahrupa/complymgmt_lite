@@ -153,8 +153,16 @@ export const GET_COMPLIANCE_COCKPIT_BY_COMPANY ='/api/v1/dashboard/view/complian
 export const GET_COCKPIT_COMPLIANCE_PORTFOLIO ='/api/v1/dashboard/view/compliance/cockpit/portfolio'
 export const GET_CLIENT_ONBOARDING_PORTFOLIO ='api/v1/dashboard/view/client/onboarding/portfolio'
 export const GET_CLIENT_ONBOARDING_BY_COMPANY ='/api/v1/dashboard/view/client/onboarding/'
-export const GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY ='/api/v1/payroll_service_dashboard/view/investment_declaration_status'
-export const GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS='/api/v1/payroll_service_dashboard/view/multiple_entities_locations'
+export const GET_INVESTMENT_DECLARATION_STATUS_BY_COMPANY ='/api/v1/dashboard/view/investment_declaration_status/'
+export const GET_DISTRIBUTION_OF_EMPLOYEE_ACROSS_MULTIPLE_ENTITIES_OR_LOCATIONS='/api/v1/dashboard/view/multiple_entities_locations'
+export const GET_TYPE_OF_SYSTEMS_USED_BY_EMPLOYER ='/api/v1/dashboard/view/system_used_by_employer'
+export const GET_TOTAL_EMPLOYEE_COUNT ='/api/v1/dashboard/view/employee_count'
+export const GET_PAYROLLS_CLOSED_ON_OR_AHEAD_OF_SLA_PERCENTAGE ='/api/v1/dashboard/view/payrolls_closed_on_or_ahead_of_sla_percent'
+export const GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVED_DATE ='/api/v1/dashboard/view/average_delay_between_data_request_date_and_client_data_received_date'
+export const GET_EXPLANATION_OF_EMPLOYEE_COUNT ='/api/v1/dashboard/view/explanation_of_employee_count'
+// export const GET_NUMBER_OF_PAYROLLS_WITH_MORE_THAN_2_DAYS_DELAY ='/api/v1/payroll_service_dashboard/view/number_of_payrolls_with_more_than_2_days_delay'
+
+
 
 
 
