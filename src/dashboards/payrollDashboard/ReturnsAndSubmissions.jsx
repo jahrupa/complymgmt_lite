@@ -625,20 +625,7 @@ const ReturnsAndSubmissions = () => {
                     />
                 </div>
             </div>
-            <div className='charts-grid mb-4'>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
-                    <Chart
-                        options={applicableReturnsByReturnType.options} series={applicableReturnsByReturnType.series} type="bar" height={380}
-                    />
-                </div>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Analysis of applicable return names, identifying the most frequently required returns across companies</div>
-                    <Chart
-                        options={applicableReturnsByReturnName.options} series={applicableReturnsByReturnName.series} type="bar" height={380}
-                    />
-                </div>
-            </div>
+
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Compliance risk distribution by state, identifying regions with elevated compliance risk levels.</div>
