@@ -18,19 +18,18 @@ const PayrollServices = ({selectedCompany}) => {
         late_percent: 0,
         compliance_alerts: 0,
     });
-    console.log(payrollOverviewData, 'payrollOverviewData')
     const [investmentData, setInvestmentData] = useState({});
     const investmentDataFormate = {
         series: [investmentData.count_yes || 0, investmentData.count_no || 0, investmentData.count_empty || 0],
         options: {
             chart: {
                 width: 380,
-                type: "pie",
+                type: "donut",
             },
-            colors: ["#FBDCB8", "#F5D3CC", "#e8a8ee"],
+            colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
             fill: {
                 opacity: 1,
-                colors: ["#FBDCB8", "#F5D3CC", "#e8a8ee"],
+                colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
 
             },
             states: {
@@ -81,10 +80,10 @@ const PayrollServices = ({selectedCompany}) => {
                 width: 380,
                 type: "pie",
             },
-            colors: ["#cfa4f080", "#e8a8ee", "#edbef1ff"],
+            colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
             fill: {
                 opacity: 1,
-                colors: ["#cfa4f080", "#e8a8ee", "#edbef1ff"],
+                colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
 
             },
             states: {
@@ -129,27 +128,6 @@ const PayrollServices = ({selectedCompany}) => {
 
     }
     const [explanationOfEmployeeCount, setExplanationOfEmployeeCount] = useState([]);
-    console.log(explanationOfEmployeeCount, 'explanationOfEmployeeCount')
-    const employeeCountData = [
-        {
-            "emp_count": 2053,
-            "company_name": "ABC Pvt Ltd",
-            "service_month": "January 2025",
-            "record": 1
-        },
-        {
-            "emp_count": 528,
-            "company_name": "XYZ Solutions",
-            "service_month": "February 2025",
-            "record": 1
-        },
-        {
-            "emp_count": 401,
-            "company_name": "TechNova Inc",
-            "service_month": "March 2025",
-            "record": 2
-        }
-    ]
     const columnDefs = useMemo(
         () => [
             { headerName: "Employee Count (sum)", field: "employee_count", sortable: true, filter: true, flex: '1' },
@@ -290,10 +268,10 @@ const PayrollServices = ({selectedCompany}) => {
                 min: 0,
                 tickAmount: 5,
             },
-            colors: ["#f5d3cc"],
+             colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-                colors: ["#f5d3cc"],
+                 colors: ["#2cafc0ff"],
             },
             states: {
                 hover: {
@@ -309,9 +287,7 @@ const PayrollServices = ({selectedCompany}) => {
             },
         },
     }
-
     const [dataRequestAndClientDataReceived, setDataRequestAndClientDataReceived] = React.useState([]);
-    console.log("dataRequestAndClientDataReceived", dataRequestAndClientDataReceived)
     const dataRequestAndClientDataReceivedFormat = {
         series: [{
             name: "Average Days Delayed",
@@ -322,10 +298,10 @@ const PayrollServices = ({selectedCompany}) => {
                 type: 'bar',
                 height: 350
             },
-            colors: ["#609bf3ff"],
+             colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-                colors: ["#609bf3ff"],
+                 colors: ["#2cafc0ff"],
 
             },
             states: {
@@ -483,12 +459,12 @@ const PayrollServices = ({selectedCompany}) => {
                             </div>
                         </div> */}
                     </div>
-                    <div className="charts-grid mb-4">
+                    <div className="charts-section mb-4">
                         <div className="chart-card">
                             <div className="mb-3 fw-600">Breakdown of Investment declaration status by Company </div>
 
                             <Chart
-                                options={investmentDataFormate.options} series={investmentDataFormate.series} type="pie" height={380}
+                                options={investmentDataFormate.options} series={investmentDataFormate.series} type="donut" height={380}
                             />
                         </div>
                           <div className="chart-card">
@@ -496,7 +472,7 @@ const PayrollServices = ({selectedCompany}) => {
                         <Chart options={dataRequestAndClientDataReceivedFormat.options} series={dataRequestAndClientDataReceivedFormat.series} type="bar" height={380} />
                     </div>
                     </div>
-                    <div className="charts-grid mb-4">
+                    <div className="charts-section mb-4">
                         <div className="chart-card">
                             <div className="mb-3 fw-600">Type of Systems Used by Employer</div>
                             <Chart
