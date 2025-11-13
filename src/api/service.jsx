@@ -1300,9 +1300,9 @@ export const forgetPassword = async (email) => {
     throw error;
   }
 }
-export const changeTemporaryPasswordStatus = async (userId) => {
+export const changeTemporaryPasswordStatus = async (user_credential) => {
   try {
-    const response = await API.get(`${CHANGE_TEMPORARY_PASSWORD_STATUS}${userId}`);
+    const response = await API.get(`${CHANGE_TEMPORARY_PASSWORD_STATUS}${user_credential}`);
     return response.data;
   } catch (error) {
     console.error("Error changing temporary password status:", error);

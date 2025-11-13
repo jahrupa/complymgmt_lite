@@ -140,7 +140,7 @@ export const READ_ALL_INAPP_NOTIFICATION='/api/v1/in_app/update/read_all_inapp_n
 export const DELETE_ALL_INAPP_NOTIFICATION='/api/v1/in_app/delete/remove_all_inapp_notification';
 
 // Change Password
-export const CHANGE_PASSWORD_AFTER_LOGIN='/api/v1/password/update/temp_password/';
+export const CHANGE_PASSWORD_AFTER_LOGIN='/api/v1/password/update/password/';
 export const CHANGE_TEMPORARY_PASSWORD_STATUS='/api/v1/view/temporary_password_status/';
 
 // forget password

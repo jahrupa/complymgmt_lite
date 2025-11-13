@@ -62,7 +62,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   useEffect(() => {
     if (tokenId) {
       setIsAuthenticated(true)
-    }else{
+    } else {
       localStorage.removeItem('activeItem')
       localStorage.removeItem('active_url')
       localStorage.removeItem('username')
@@ -236,8 +236,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Catch-all: 404 */}
         <Route path="*" element={<NotFoundPage />} />
-        <Route path="/forget_password" element={<ForgetPassword />} />
         <Route path="/reset_password" element={<ChangeForgetPassword setIsChangePassword={setIsChangePassword} />} />
+        <Route path="/forget_password" element={<ForgetPassword />} />
         <Route path="/reset_password_successful" element={<ResetForgetPasswordSuccessful />} />
 
       </Routes>

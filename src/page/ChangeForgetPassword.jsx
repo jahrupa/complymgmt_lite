@@ -56,27 +56,21 @@ function ChangeForgetPassword({ setIsChangePassword }) {
   const togglePasswordVisibility = (field) => {
     setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
   };
-  useEffect(() => {
-    const fetchTempPasswordStatus = async () => {
-      try {
-        const response = await changeTemporaryPasswordStatus(localStorage.getItem("user_id") || currentUserId);
-        if (response && typeof response.is_temp_password !== "undefined") {
-          setIsChangePassword(response.is_temp_password);
-        }
-      } catch (error) {
-        console.error("Error fetching temporary password status:", error);
-      }
-    };
-    fetchTempPasswordStatus();
-  }, []);
+  // useEffect(() => {
+  //   const fetchTempPasswordStatus = async () => {
+  //     try {
+  //       const response = await changeTemporaryPasswordStatus(localStorage.getItem("user_id") || currentUserId);
+  //       if (response && typeof response.is_temp_password !== "undefined") {
+  //         setIsChangePassword(response.is_temp_password);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching temporary password status:", error);
+  //     }
+  //   };
+  //   fetchTempPasswordStatus();
+  // }, []);
   const validate = () => {
     const tempErrors = {};
-
-    // Validate current password
-    // if (!formData.currentPassword) {
-    //   tempErrors.currentPassword = 'Current password is required';
-    // }
-
     // Validate new password
     if (!formData.newPassword) {
       tempErrors.newPassword = 'New password is required';
@@ -86,20 +80,6 @@ function ChangeForgetPassword({ setIsChangePassword }) {
         tempErrors.newPassword = 'Password must meet all requirements';
       }
     }
-
-    // Ensure new and confirm passwords match
-    // if (formData.newPassword !== formData.confirmPassword) {
-    //   tempErrors.confirmPassword = 'Passwords do not match';
-    // }
-
-    // Prevent using the same password as current
-    // if (
-    //   formData.currentPassword &&
-    //   formData.newPassword &&
-    //   formData.currentPassword === formData.newPassword
-    // ) {
-    //   tempErrors.newPassword = 'New password must be different from current password';
-    // }
 
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
