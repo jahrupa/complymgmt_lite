@@ -13,7 +13,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const PayrollServices = ({selectedCompany}) => {
     const [payrollOverviewData, setPayrollOverviewData] = useState({
         total_employees: 0,
-        turnaround_health: 0,
+        turnaround_health_average_days: 0,
+        turnaround_health_target_days: 0,
         on_time_delivery: 0,
         late_percent: 0,
         compliance_alerts: 0,
@@ -382,6 +383,7 @@ const PayrollServices = ({selectedCompany}) => {
                     ...prev,
                     late_percent: payrollOverviewDataR2.value.late_percent,
                     on_time_delivery: payrollOverviewDataR2.value.on_time_delivery_good_percent,
+                    turnaround_health_average_days: payrollOverviewDataR2.value.average_sla_processing_days,
                 }));
 
             } else if (payrollOverviewDataR2.status === 'rejected') {
@@ -413,7 +415,7 @@ const PayrollServices = ({selectedCompany}) => {
                     <div className="stats-grid">
                         <div className="payroll-stat-card performer-card high-performer">
                             <div className="stat-label">Total Employees</div>
-                            <div className="stat-number">{payrollOverviewData.total_employees}</div>
+                            <div className="stat-number">{payrollOverviewData.total_employees?payrollOverviewData.total_employees:0}</div>
                             <span className="summary-card-badge summary-card-badge-success">
                                 {systemUseByEmp.total_count ? systemUseByEmp.total_count : 0} entities
                             </span>
@@ -425,10 +427,10 @@ const PayrollServices = ({selectedCompany}) => {
                         <div className="payroll-stat-card performer-card compliant">
                             <div className="stat-label">Turnaround Health</div>
                             <div className="stat-number">
-                                2.9 days
+                                {payrollOverviewData.turnaround_health_average_days?payrollOverviewData.turnaround_health_average_days:0} {payrollOverviewData.turnaround_health_average_days?payrollOverviewData.turnaround_health_average_days>1?'days':'day':''} 
                             </div>
                             <span className="summary-card-badge summary-card-badge-warning">
-                                SLA target 2.2d
+                                SLA target {payrollOverviewData?.turnaround_health_target_days?payrollOverviewData.turnaround_health_target_days:0} {payrollOverviewData?.turnaround_health_target_days?payrollOverviewData.turnaround_health_target_days>1?'days':'day':''} 
                             </span>
                             <div className="summary-card-divider mt-3"></div>
                             <div className="mt-2 summary-card-footnote">
@@ -438,26 +440,15 @@ const PayrollServices = ({selectedCompany}) => {
                         </div>
                         <div className="payroll-stat-card performer-card moderate">
                             <div className="stat-label">On-time Delivery</div>
-                            <div className="stat-number">{payrollOverviewData.on_time_delivery}%</div>
+                            <div className="stat-number">{payrollOverviewData.on_time_delivery?payrollOverviewData.on_time_delivery:0}%</div>
                             <span className="summary-card-badge summary-card-badge-warning">
-                                {payrollOverviewData.late_percent}% Delay
+                                {payrollOverviewData.late_percent?payrollOverviewData.late_percent:0}% Delay
                             </span>
                             <div className="summary-card-divider mt-3"></div>
                             <div className="mt-2 summary-card-footnote">
                                 Payrolls closed on or ahead of SLA
                             </div>
                         </div>
-                        {/* <div className="payroll-stat-card performer-card good">
-                            <div className="stat-label">Compliance Alerts</div>
-                            <div className="stat-number">5</div>
-                            <span className="summary-card-badge summary-card-badge-warning">
-                                Focus: Client Dependency
-                            </span>
-                            <div className="summary-card-divider mt-3"></div>
-                            <div className="mt-2 summary-card-footnote">
-                                Entities needing follow-up
-                            </div>
-                        </div> */}
                     </div>
                     <div className="charts-section mb-4">
                         <div className="chart-card">
