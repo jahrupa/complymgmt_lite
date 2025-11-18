@@ -221,7 +221,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
   };
 
   return (
-    <div className="notification-page">
+    <div className="">
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       {/* Header */}
       <div className="notification-page-header">
