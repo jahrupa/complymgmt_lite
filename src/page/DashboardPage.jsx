@@ -36,7 +36,7 @@ const DashboardPage = () => {
           <span>
             <img src={LaptopMinimalCheck} width={65} />
           </span>
-          <h1 className='mt-1 ps-lg-4 ps-md-4 fw-600'>{activeTab === 0 ? 'Compliance Cockpit' : activeTab === 1 ? 'General Compliance' : activeTab === 2 ? 'Client Onboarding' : activeTab === 3 ? 'Payroll' : 'Audit & Visits'}</h1>
+          <h1 className='mt-1 ps-lg-4 ps-md-4 fw-600'>{activeTab === 0 ? 'Compliance Cockpit' : activeTab === 1 ? 'General Compliance' : activeTab === 2 ? 'Client Onboarding' : activeTab === 3 ? 'Payroll' : activeTab === 4 ? 'Audit & Visits' : 'Notices & Inspections'}</h1>
         </div>
         <div className='w-25'>
           <SingleSelectTextField

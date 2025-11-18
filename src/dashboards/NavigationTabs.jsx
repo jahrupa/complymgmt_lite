@@ -11,6 +11,7 @@ import ReturnsAndSubmissions from './payrollDashboard/ReturnsAndSubmissions';
 import HelpdeskAndEscalations from './payrollDashboard/HelpdeskAndEscalations';
 import AuditAndVisitDashboard from './Audit/AuditAndVisitDashboard';
 import ClientOnBoardingByCompany from './clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany';
+import NoticeDashboard from './noticeDashboard/NoticeDashboard';
 
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
@@ -154,9 +155,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Returns & Submissions" />
                     <Tab label="Helpdesk & Escalations" />
                     <Tab label="Audit & Visits" />
+                    <Tab label="Notices & Inspections" />
                 </Tabs>
             </Box>
-
             <Box>
                 {/* {activeTab === 0 && renderCards(stats)} */}
                 {activeTab === 0 && (selectedCompany !== ''
@@ -170,6 +171,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 {activeTab === 4 && <ReturnsAndSubmissions />}
                 {activeTab === 5 && <HelpdeskAndEscalations />}
                 {activeTab === 6 && <AuditAndVisitDashboard />}
+                {activeTab === 7 && <NoticeDashboard />}
             </Box>
         </Box>
     );
