@@ -155,9 +155,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Payroll Services" />
                     <Tab label="Returns & Submissions" />
                     <Tab label="Helpdesk & Escalations" />
-                    <Tab label="General Helpdesk" />
+                    {/* <Tab label="General Helpdesk" />
                     <Tab label="Audit & Visits" />
-                    <Tab label="Notices & Inspections" />
+                    <Tab label="Notices & Inspections" /> */}
                 </Tabs>
             </Box>
             <Box>
