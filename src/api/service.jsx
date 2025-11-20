@@ -123,6 +123,10 @@ import {
   GET_PAYROLLS_CLOSED_ON_OR_AHEAD_OF_SLA_PERCENTAGE,
   GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVED_DATE,
   GET_EXPLANATION_OF_EMPLOYEE_COUNT,
+  GET_TOTAL_COUNT_OF_COMMUNICATION_TYPES,
+  GET_HELPDESK_TICKETS_RAISED_BY_COMPANY,
+  GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE,
+  GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT,
 
 } from "./Endpoint";
 
@@ -1456,6 +1460,49 @@ export const fetchExplanationOfEmployeeCount = async (company_name) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Explanation Of Employee Count", error);
+    throw error;
+  }
+}
+
+// Helpdesk and Escalations
+export const fetchTotalCountOfCommunicationTypes = async (company_name) => {
+  try {
+    const url = `${GET_TOTAL_COUNT_OF_COMMUNICATION_TYPES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Total Count Of Communication Types", error);
+    throw error;
+  }
+}
+
+export const fetchHelpdeskTicketsRaisedByCompany = async (company_name) => {
+  try {
+    const url = `${GET_HELPDESK_TICKETS_RAISED_BY_COMPANY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Helpdesk Tickets Raised By Company", error);
+    throw error;
+  }
+}
+export const fetchHelpdeskStatusBasedOnIssueSubType = async (company_name) => {
+  try {
+    const url = `${GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Helpdesk Status Based On Issue Sub Type", error);
+    throw error;
+  }
+}
+export const fetchTicketsDistributionAssignedToCount = async (company_name) => {
+  try {
+    const url = `${GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Tickets Distribution Assigned To Count", error);
     throw error;
   }
 }

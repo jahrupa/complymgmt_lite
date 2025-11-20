@@ -12,6 +12,7 @@ import HelpdeskAndEscalations from './payrollDashboard/HelpdeskAndEscalations';
 import AuditAndVisitDashboard from './Audit/AuditAndVisitDashboard';
 import ClientOnBoardingByCompany from './clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany';
 import NoticeDashboard from './noticeDashboard/NoticeDashboard';
+import GeneralHelpdesk from './payrollDashboard/GeneralHelpdesk';
 
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
@@ -154,6 +155,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Payroll Services" />
                     <Tab label="Returns & Submissions" />
                     <Tab label="Helpdesk & Escalations" />
+                    <Tab label="General Helpdesk" />
                     <Tab label="Audit & Visits" />
                     <Tab label="Notices & Inspections" />
                 </Tabs>
@@ -169,9 +171,10 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     : <ClientOnBoardingByCompany locationData={ClientOnBoardingByCompanyData} />)}
                 {activeTab === 3 && <PayrollServices selectedCompany={selectedCompany} />}
                 {activeTab === 4 && <ReturnsAndSubmissions />}
-                {activeTab === 5 && <HelpdeskAndEscalations />}
-                {activeTab === 6 && <AuditAndVisitDashboard />}
-                {activeTab === 7 && <NoticeDashboard />}
+                {activeTab === 5 && <HelpdeskAndEscalations selectedCompany={selectedCompany} />}
+                {activeTab === 6 && <GeneralHelpdesk selectedCompany={selectedCompany}/>}
+                {activeTab === 7 && <AuditAndVisitDashboard />}
+                {activeTab === 8 && <NoticeDashboard />}
             </Box>
         </Box>
     );

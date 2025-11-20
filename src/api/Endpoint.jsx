@@ -163,6 +163,14 @@ export const GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVE
 export const GET_EXPLANATION_OF_EMPLOYEE_COUNT ='/api/v1/dashboard/view/payroll/explanation/employee/count'
 // export const GET_NUMBER_OF_PAYROLLS_WITH_MORE_THAN_2_DAYS_DELAY ='/api/v1/payroll_service_dashboard/view/number_of_payrolls_with_more_than_2_days_delay'
 
+// Helpdesk and Escalations
+export const GET_TOTAL_COUNT_OF_COMMUNICATION_TYPES ='/api/v1/dashboard/view/helpdesk/communication/type'
+export const GET_HELPDESK_TICKETS_RAISED_BY_COMPANY ='/api/v1/dashboard/view/helpdesk/tickets/raised'
+export const GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE ='/api/v1/dashboard/view/helpdesk/status'
+export const GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT ='/api/v1/dashboard/view/helpdesk/tickets/distribution'
+// export const GET_HELPDESK_TICKETS_RAISED_BY_CATEGORY ='/api/v1/dashboard/view/helpdesk/tickets/raised/category'
+// export const GET_HELPDESK_TICKETS_RAISED_BY_PRIORITY ='/api/v1/dashboard/view/helpdesk/tickets/raised/priority'
+
 
 
 
