@@ -171,6 +171,33 @@ export const GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT ='/api/v1/dashboard/view
 // export const GET_HELPDESK_TICKETS_RAISED_BY_CATEGORY ='/api/v1/dashboard/view/helpdesk/tickets/raised/category'
 // export const GET_HELPDESK_TICKETS_RAISED_BY_PRIORITY ='/api/v1/dashboard/view/helpdesk/tickets/raised/priority'
 
+// Returns and Submissions
+export const GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME ='/api/v1/dashboard/view/returns/applicability/company'
+export const GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS ='/api/v1/dashboard/view/returns/state/applicable'
+export const GET_FREQUENCY_WISE_RETURNS ='/api/v1/dashboard/view/returns/frequency/distribution/returns'
+export const GET_COMPANIES_PER_RETURNS_NAMES ='/api/v1/dashboard/view/returns/company/per/returns'
+export const GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE ='/api/v1/dashboard/view/returns/compliance/risk/ditribution/state'
+export const GET_COMPLIANCE_STATUS_BASED_ON_RETURNS ='/api/v1/dashboard/view/returns/compliance/status/based/returns'
+export const GET_REMARKS_BASED_ON_COMPANY ='/api/v1/dashboard/view/returns/remarks/based/company'
+
+// Audit & Visits
+export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/type'
+export const GET_AUDIT_PLATFORMS_COUNT_BY_STATE ='/api/v1/dashboard/view/audit/platforms/count'
+export const GET_CHECKLIST_APPROVAL_BY_AUDITOR_NAME ='/api/v1/dashboard/view/audit/checklist/approval/auditor/name'
+export const GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
+export const GET_ESCALATION_TRIGGERED_RATE_BY_STATE ='/api/v1/dashboard/view/audit/escalation/triggered/state_wise'
+export const GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE ='/api/v1/dashboard/view/audit/status/based/storage_mode'
+export const GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE ='/api/v1/dashboard/view/audit/risk/based/service_type'
+
+// Notice & Inspections (need to change form postnman this is auto generated)
+export const GET_NOTICE_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/notice/type'
+export const GET_NOTICE_STATUS_BY_COMPANY ='/api/v1/dashboard/view/notice/status/company'
+export const GET_INSPECTION_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/notice/inspection/findings/severity'
+export const GET_NOTICE_RESPONSE_TIME_BY_STATE ='/api/v1/dashboard/view/notice/response/time/state_wise'
+export const GET_NOTICE_COMPLIANCE_STATUS_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/compliance/status/notice_type'
+export const GET_COMMON_VIOLATIONS_BY_COMPANY ='/api/v1/dashboard/view/notice/common/violations/company'
+export const GET_AVERAGE_NOTICE_RESOLUTION_TIME ='/api/v1/dashboard/view/notice/average/resolution/time'
+
 
 
 

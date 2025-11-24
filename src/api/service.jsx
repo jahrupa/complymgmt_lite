@@ -127,6 +127,20 @@ import {
   GET_HELPDESK_TICKETS_RAISED_BY_COMPANY,
   GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE,
   GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT,
+  GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME,
+  GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS,
+  GET_FREQUENCY_WISE_RETURNS,
+  GET_COMPANIES_PER_RETURNS_NAMES,
+  GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE,
+  GET_COMPLIANCE_STATUS_BASED_ON_RETURNS,
+  GET_REMARKS_BASED_ON_COMPANY,
+  GET_AUDIT_PLATFORMS_COUNT_BY_STATE,
+  GET_AUDIT_BY_SERVICE_TYPE,
+  GET_CHECKLIST_APPROVAL_BY_AUDITOR_NAME,
+  GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY,
+  GET_ESCALATION_TRIGGERED_RATE_BY_STATE,
+  GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE,
+  GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE,
 
 } from "./Endpoint";
 
@@ -1503,6 +1517,154 @@ export const fetchTicketsDistributionAssignedToCount = async (company_name) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Tickets Distribution Assigned To Count", error);
+    throw error;
+  }
+}
+
+// Returns and Submissions
+export const fetchReturnApplicabilityByCompanyCommonName = async (company_name) => {
+  try {
+    const url = `${GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Return Applicability By Company Common Name", error);
+    throw error;
+  }
+}
+export const fetchStateWiseAnalysisOfApplicableReturns = async (company_name) => {
+  try {
+    const url = `${GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching State Wise Analysis Of Applicable Returns", error);
+    throw error;
+  }
+}
+export const fetchFrequencyWiseReturns = async (company_name) => {
+  try {
+    const url = `${GET_FREQUENCY_WISE_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Frequency Wise Returns", error);
+    throw error;
+  }
+}
+export const fetchCompaniesPerReturnsNames = async (company_name) => {
+  try {
+    const url = `${GET_COMPANIES_PER_RETURNS_NAMES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Companies Per Returns Names", error);
+    throw error;
+  }
+}
+export const fetchComplianceRiskDistributionByState = async (company_name) => {
+  try {
+    const url = `${GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Compliance Risk Distribution By State", error);
+    throw error;
+  }
+}
+
+export const fetchComplianceStatusBasedOnReturns = async (company_name) => {
+  try {
+    const url = `${GET_COMPLIANCE_STATUS_BASED_ON_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Compliance Status Based On Returns", error);
+    throw error;
+  }
+}
+export const fetchRemarksBasedOnCompany = async (company_name) => {
+  try {
+    const url = `${GET_REMARKS_BASED_ON_COMPANY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Remarks Based On Company", error);
+    throw error;
+  }
+}
+// Audit and Visits
+
+export const fetchAuditByServiceType = async (service_type) => {
+  try {
+    const url = `${GET_AUDIT_BY_SERVICE_TYPE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Audit By Service Type", error);
+    throw error;
+  }
+}
+export const fetchAuditPlatformsCountByState = async (service_type) => {
+  try {
+    const url = `${GET_AUDIT_PLATFORMS_COUNT_BY_STATE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Audit Platforms Count By State", error);
+    throw error;
+  }
+}
+
+export const fetchAuditStatusByCompany = async (company_name) => {
+  try {
+    const url = `${GET_CHECKLIST_APPROVAL_BY_AUDITOR_NAME}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Audit Status By Company", error);
+    throw error;
+  }
+}
+export const fetchAuditVisitFindingsBySeverity = async (company_name) => {
+  try {
+    const url = `${GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Audit Visit Findings By Severity", error);
+    throw error;
+  }
+}
+export const fetchEscalationTriggeredRateByState = async (company_name) => {
+  try {
+    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Escalation Triggered Rate By State", error);
+    throw error;
+  }
+}
+
+export const fetchAuditStatusBasedOnStorageMode = async (company_name) => {
+  try {
+    const url = `${GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Audit Status Based On Storage Mode", error);
+    throw error;
+  }
+}
+
+export const fetchRiskLevelBasedOnServiceType = async (service_type) => {
+  try {
+    const url = `${GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Risk Level Based On Service Type", error);
     throw error;
   }
 }

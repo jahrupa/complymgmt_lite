@@ -7,90 +7,6 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { fetchTotalCountOfCommunicationTypes } from '../../api/service';
 
 const GeneralHelpdesk = ({ selectedCompany }) => {
-    // const [closedVsOpenCases, setCloseVsOpenCases] = React.useState({
-
-    //     series: [{
-    //         name: 'Closed Cases',
-    //         data: [44, 55, 41, 37, 22, 43, 21]
-    //     }, {
-    //         name: 'Total Open Cases',
-    //         data: [53, 32, 33, 52, 13, 43, 32]
-    //     }],
-    //     options: {
-    //         chart: {
-    //             type: 'bar',
-    //             height: 350,
-    //             stacked: true,
-    //         },
-    //         colors: ["#2cafc0ff", "#5ad5e2"],
-    //         fill: {
-    //             opacity: 1,
-    //             colors: ["#2cafc0ff", "#5ad5e2"],
-    //         },
-    //         states: {
-    //             hover: {
-    //                 filter: {
-    //                     type: "none", // 👈 disables the lighten effect
-    //                 },
-    //             },
-    //             active: {
-    //                 filter: {
-    //                     type: "none", // 👈 disables click highlight effect
-    //                 },
-    //             },
-    //         },
-    //         plotOptions: {
-    //             bar: {
-    //                 horizontal: false,
-    //                 dataLabels: {
-    //                     total: {
-    //                         enabled: true,
-    //                         offsetX: 0,
-    //                         style: {
-    //                             fontSize: '13px',
-    //                             fontWeight: 900
-    //                         }
-    //                     }
-    //                 }
-    //             },
-    //         },
-    //         stroke: {
-    //             width: 1,
-    //             colors: ['#fff']
-    //         },
-    //         title: {
-    //             text: 'Escalation Counts'
-    //         },
-    //         xaxis: {
-    //             categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
-    //             labels: {
-    //                 formatter: function (val) {
-    //                     return val + "K"
-    //                 }
-    //             }
-    //         },
-    //         yaxis: {
-    //             title: {
-    //                 text: undefined
-    //             },
-    //         },
-    //         tooltip: {
-    //             y: {
-    //                 formatter: function (val) {
-    //                     return val + "K"
-    //                 }
-    //             }
-    //         },
-
-    //         legend: {
-    //             position: 'top',
-    //             horizontalAlign: 'left',
-    //             offsetX: 40
-    //         }
-    //     },
-
-
-    // });
     const [closedVsOpenCases, setProportionofcases] = React.useState({
         series: [
             {
@@ -182,10 +98,10 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 width: 380,
                 type: "donut",
             },
-            colors: ["#f5d3cc", "#ffb397", ],
+            colors: ["#f5d3cc", "#ffb397",],
             fill: {
                 opacity: 1,
-                colors: ["#f5d3cc", "#ffb397", ],
+                colors: ["#f5d3cc", "#ffb397",],
             },
             states: {
                 hover: {
@@ -309,105 +225,15 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
 
     });
     const [communicationType, setCommunicationType] = React.useState([]);
-    const communicationTypeFormat = {
-        series: [{
-            name: 'Number of Issues',
-            data: communicationType?.map((item) => item.count || []) || [],
-        }],
-        options: {
-            chart: {
-                type: 'bar',
-                height: 350,
-                stacked: false,
-            },
-            colors: ["#2cafc0ff", "#5ad5e2"],
-            fill: {
-                opacity: 1,
-                colors: ["#2cafc0ff", "#5ad5e2"],
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "none", // 👈 disables the lighten effect
-                    },
-                },
-                active: {
-                    filter: {
-                        type: "none", // 👈 disables click highlight effect
-                    },
-                },
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    dataLabels: {
-                        total: {
-                            enabled: true,
-                            offsetX: 0,
-                            style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
-                },
-            },
-            stroke: {
-                width: 1,
-                colors: ['#fff']
-            },
-            title: {
-                text: 'Number of Issues'
-            },
-            xaxis: {
-                categories: communicationType?.map((item) => item.communication_type || []) || [],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
-            },
-            yaxis: {
-                title: {
-                    text: undefined
-                },
-            },
-            tooltip: {
-                // y: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
-            },
+    const [selectedCharts, setSelectedCharts] = React.useState([]);
 
-            legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
-        },
-    }
-    const columnDefs = useMemo(
-        () => [
-            { headerName: "percentage of claims that have been settled", field: "settled", sortable: true, filter: true, flex: '1' },
-            { headerName: "percentage of claims that are still pending", field: "pending", sortable: true, filter: true, flex: '1' },
-        ],
-        []
-    );
-    const oldClaimData = [
-        {
-            "settled": 2053,
-            "pending": 1
-        },
-        {
-            "settled": 528,
-            "pending": 1
-        },
-        {
-            "settled": 401,
-            "pending": 2
-        }
-    ]
+    const toggleChartSelection = (id) => {
+        setSelectedCharts((prev) =>
+            prev.includes(id)
+                ? prev.filter(item => item !== id)   // remove if existed
+                : [...prev, id]                      // add new ID
+        );
+    };
 
 
     useEffect(() => {
@@ -426,35 +252,88 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
     }, [selectedCompany]);
     return (
         <div>
+            <button
+                className="btn btn-primary mb-3"
+                onClick={() => console.log("Selected Chart IDs:", selectedCharts)}
+            >
+                Save
+            </button>
+
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Comparison of closed vs. open cases for top 5 Assigned users</div>
+                    <input
+                        type="checkbox"
+                        className="chart-select-checkbox"
+                        onChange={() => toggleChartSelection("chart_closed_open")}
+                        checked={selectedCharts.includes("chart_closed_open")}
+                    />
+                    <div className="mb-3 fw-600">
+                        Comparison of closed vs. open cases for top 5 Assigned users
+                    </div>
+
                     <Chart
-                        options={closedVsOpenCases.options} series={closedVsOpenCases.series} type="bar" height={380}
+                        options={closedVsOpenCases.options}
+                        series={closedVsOpenCases.series}
+                        type="bar"
+                        height={380}
                     />
                 </div>
                 <div className="chart-card">
+                    <input
+                        type="checkbox"
+                        onChange={() => toggleChartSelection("chart_assigned_users")}
+                        checked={selectedCharts.includes("chart_assigned_users")}
+                    />
                     <div className="mb-3 fw-600">Top 5 Assigned users</div>
-                     <Chart
-                        options={ExcludingTransfer.options} series={ExcludingTransfer.series} type="bar" height={380}
+
+                    <Chart
+                        options={ExcludingTransfer.options}
+                        series={ExcludingTransfer.series}
+                        type="bar"
+                        height={380}
                     />
                 </div>
             </div>
+
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Documents Pending From Client vs. Karma</div>
+                    <input
+                        type="checkbox"
+                        onChange={() => toggleChartSelection("chart_client_karma")}
+                        checked={selectedCharts.includes("chart_client_karma")}
+                    />
+                    <div className="mb-3 fw-600">
+                        Documents Pending From Client vs. Karma
+                    </div>
+
                     <Chart
-                        options={clientVsGovernmentDelayFlags.options} series={clientVsGovernmentDelayFlags.series} type="donut" height={380}
+                        options={clientVsGovernmentDelayFlags.options}
+                        series={clientVsGovernmentDelayFlags.series}
+                        type="donut"
+                        height={380}
                     />
                 </div>
-                <div className="chart-card">                                                                                                                                                                                                             
-                    <div className="mb-3 fw-600">Open and closed issue status by Issue Category</div>
+
+                <div className="chart-card">
+                    <input
+                        type="checkbox"
+                        onChange={() => toggleChartSelection("chart_issue_status")}
+                        checked={selectedCharts.includes("chart_issue_status")}
+                    />
+                    <div className="mb-3 fw-600">
+                        Open and closed issue status by Issue Category
+                    </div>
+
                     <Chart
-                        options={communicationTypeFormat.options} series={communicationTypeFormat.series} type="bar" height={380}
+                        options={closedVsOpenCases.options}
+                        series={closedVsOpenCases.series}
+                        type="bar"
+                        height={380}
                     />
                 </div>
             </div>
-            
+
+
         </div>
     )
 }

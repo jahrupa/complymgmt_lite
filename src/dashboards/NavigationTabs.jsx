@@ -155,9 +155,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Payroll Services" />
                     <Tab label="Returns & Submissions" />
                     <Tab label="Helpdesk & Escalations" />
-                    {/* <Tab label="General Helpdesk" />
+                    <Tab label="General Helpdesk" />
                     <Tab label="Audit & Visits" />
-                    <Tab label="Notices & Inspections" /> */}
+                    <Tab label="Notices & Inspections" />
                 </Tabs>
             </Box>
             <Box>
@@ -170,11 +170,11 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     ? <ClientOnbordingDashboard data={clientOnboardingData} />
                     : <ClientOnBoardingByCompany locationData={ClientOnBoardingByCompanyData} />)}
                 {activeTab === 3 && <PayrollServices selectedCompany={selectedCompany} />}
-                {activeTab === 4 && <ReturnsAndSubmissions />}
+                {activeTab === 4 && <ReturnsAndSubmissions selectedCompany={selectedCompany} />}
                 {activeTab === 5 && <HelpdeskAndEscalations selectedCompany={selectedCompany} />}
                 {activeTab === 6 && <GeneralHelpdesk selectedCompany={selectedCompany}/>}
-                {activeTab === 7 && <AuditAndVisitDashboard />}
-                {activeTab === 8 && <NoticeDashboard />}
+                {activeTab === 7 && <AuditAndVisitDashboard selectedCompany={selectedCompany}/>}
+                {activeTab === 8 && <NoticeDashboard selectedCompany={selectedCompany}/>}
             </Box>
         </Box>
     );

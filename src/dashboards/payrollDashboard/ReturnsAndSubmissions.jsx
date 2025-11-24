@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts';
-const ReturnsAndSubmissions = () => {
+import { fetchCompaniesPerReturnsNames, fetchComplianceRiskDistributionByState, fetchComplianceStatusBasedOnReturns, fetchFrequencyWiseReturns, fetchRemarksBasedOnCompany, fetchReturnApplicabilityByCompanyCommonName, fetchStateWiseAnalysisOfApplicableReturns } from '../../api/service';
+const ReturnsAndSubmissions = ({ selectedCompany }) => {
     const employeeCountForSystemUse = [
         { serviceType: "SmoothPay", employeeCount: 120 },
         { serviceType: "Opportune", employeeCount: 85 },
@@ -11,25 +12,22 @@ const ReturnsAndSubmissions = () => {
     // Extract categories and data
     const systemCategories = employeeCountForSystemUse.map((item) => item.serviceType);
     const systemEmployeeCounts = employeeCountForSystemUse.map((item) => item.employeeCount);
-    const [comparisonOfReturnApplicability, setComparisonOfReturnApplicability] = useState({
-
+    const [comparisonOfReturnApplicability, setComparisonOfReturnApplicability] = useState([]);
+    const comparisonOfReturnApplicabilityFormat = {
         series: [
             {
                 name: "Distinct Return Obligations",
-                data: systemEmployeeCounts, // Y-axis values (Sum of Employee Count)
+                data: comparisonOfReturnApplicability?.top_counts?.map((item) => item?.count_of_total_returns), // Y-axis values (Sum of Employee Count)
             },
         ],
         options: {
             chart: {
                 type: "bar",
-                // height: 350,
                 toolbar: { show: false },
             },
             plotOptions: {
                 bar: {
                     horizontal: false,
-                    // borderRadius: 6,
-                    //   columnWidth: "55%",
                 },
             },
             dataLabels: {
@@ -39,10 +37,9 @@ const ReturnsAndSubmissions = () => {
                 },
             },
             xaxis: {
-                categories: systemCategories, // X-axis categories (Applicable Returns Count)
+                categories: comparisonOfReturnApplicability?.top_counts?.map((item) => item?.company_common_name || "") || [], // X-axis categories (Applicable Returns Count)
                 title: {
                     text: "Company Common Name",
-                    // style: { fontWeight: "bold" },
                 },
             },
             yaxis: {
@@ -51,7 +48,6 @@ const ReturnsAndSubmissions = () => {
                     style: { fontWeight: "bold" },
                 },
                 min: 0,
-                // max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
                 tickAmount: 5,
             },
             colors: ["#2cafc0ff"],
@@ -71,28 +67,14 @@ const ReturnsAndSubmissions = () => {
                     },
                 },
             },
-
-            //   title: {
-            //     text: "Sum of Employee Count per Payroll Service Type",
-            //     align: "center",
-            //   },
-            //   grid: {
-            //     borderColor: "#e7e7e7",
-            //     row: {
-            //       colors: ["#f3f3f3", "transparent"],
-            //       opacity: 0.5,
-            //     },
-            //   },
         },
-
-
-    });
-    const [applicableReturnsByState, setApplicableReturnsByState] = useState({
-
+    }
+    const [companiesPerReturnsNames, setCompaniesPerReturnsNames] = useState([]);
+    const companiesPerReturnsNamesFormat = {
         series: [
             {
                 name: "Applicable Returns Count",
-                data: systemEmployeeCounts, // Y-axis values (Sum of Employee Count)
+                data: companiesPerReturnsNames?.top_counts?.map((item) => item?.count_companies), // Y-axis values (Sum of Employee Count)
             },
         ],
         options: {
@@ -115,21 +97,19 @@ const ReturnsAndSubmissions = () => {
                 },
             },
             xaxis: {
-                categories: systemCategories, // X-axis categories (Applicable Returns Count)
-                title: {
-                    text: "Applicable Returns Count",
-                    // style: { fontWeight: "bold" },
-                },
+                categories: companiesPerReturnsNames?.top_counts?.map((item) => item?.returns_name), // X-axis categories (Applicable Returns Count)
+                // title: {
+                //     text: "Applicable Returns Count",
+                // },
             },
-            yaxis: {
-                title: {
-                    text: "State",
-                    style: { fontWeight: "bold" },
-                },
-                min: 0,
-                // max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
-                tickAmount: 5,
-            },
+            // yaxis: {
+            //     title: {
+            //         text: "State",
+            //         style: { fontWeight: "bold" },
+            //     },
+            //     min: 0,
+            //     tickAmount: 5,
+            // },
             colors: ["#5ad5e2ff"],
             fill: {
                 opacity: 1,
@@ -160,56 +140,36 @@ const ReturnsAndSubmissions = () => {
             //     },
             //   },
         },
-
-
-    });
-    const [applicableReturnsByLocation, setApplicableReturnsByLocation] = useState({
-
+    }
+    const [applicableReturnsByLocation, setApplicableReturnsByLocation] = useState([]);
+    const applicableReturnsByLocationFormat = {
         series: [
+            // {
+            //     name: '-',
+            //     data: applicableReturnsByLocation?.count_remark?.map((item) => item?.count_ -) || []
+            // },
             {
-                name: "Applicable Returns Count",
-                data: systemEmployeeCounts, // Y-axis values (Sum of Employee Count)
+                name: 'Empty count',
+                data: applicableReturnsByLocation?.map((item) => item?.count_empty) || []
             },
+            {
+                name: 'Count filed on time',
+                data: applicableReturnsByLocation?.map((item) => item?.count_filed_on_time) || []
+            }, {
+                name: 'Count late filing',
+                data: applicableReturnsByLocation?.map((item) => item?.count_late_filing) || []
+            }
         ],
         options: {
             chart: {
-                type: "bar",
-                // height: 350,
-                toolbar: { show: false },
+                type: 'bar',
+                height: 350,
+                stacked: true,
             },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    // borderRadius: 6,
-                    //   columnWidth: "55%",
-                },
-            },
-            dataLabels: {
-                enabled: false,
-                style: {
-                    colors: ["#333"],
-                },
-            },
-            xaxis: {
-                categories: systemCategories, // X-axis categories (Company Common Name)
-                title: {
-                    text: "Applicable Returns Count",
-                    // style: { fontWeight: "bold" },
-                },
-            },
-            yaxis: {
-                title: {
-                    text: "Location Name",
-                    style: { fontWeight: "bold" },
-                },
-                min: 0,
-                // max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
-                tickAmount: 5,
-            },
-            colors: ["#609bf3ff"],
+            colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             fill: {
                 opacity: 1,
-                colors: ["#609bf3ff"],
+                colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             },
             states: {
                 hover: {
@@ -223,22 +183,43 @@ const ReturnsAndSubmissions = () => {
                     },
                 },
             },
-
-            //   title: {
-            //     text: "Sum of Employee Count per Payroll Service Type",
-            //     align: "center",
-            //   },
-            //   grid: {
-            //     borderColor: "#e7e7e7",
-            //     row: {
-            //       colors: ["#f3f3f3", "transparent"],
-            //       opacity: 0.5,
-            //     },
-            //   },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    dataLabels: {
+                        total: {
+                            enabled: true,
+                            offsetX: 0,
+                            style: {
+                                fontSize: '13px',
+                                fontWeight: 900
+                            }
+                        }
+                    }
+                },
+            },
+            stroke: {
+                width: 1,
+                colors: ['#fff']
+            },
+            title: {
+                text: 'Escalation Counts'
+            },
+            xaxis: {
+                categories: applicableReturnsByLocation?.map((item) => item?.return_name) || [], // X-axis categories (Company Common Name)
+            },
+            yaxis: {
+                title: {
+                    text: undefined
+                },
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'left',
+                offsetX: 40
+            }
         },
-
-
-    });
+    }
     const [applicableReturnsByReturnName, setApplicableReturnsByReturnName] = useState({
 
         series: [
@@ -391,11 +372,20 @@ const ReturnsAndSubmissions = () => {
 
 
     });
-    const [ApplicableReturnsCount, setApplicableReturnsCount] = React.useState({
-        series: [44, 55, 41],
+    const [ApplicableReturnsCount, setApplicableReturnsCount] = React.useState([]);
+    const ApplicableReturnsCountFormat = {
+        series: ApplicableReturnsCount?.frequency_returns?.map((item) => item?.count) || [],
         options: {
             chart: {
                 type: 'donut',
+            },
+            // Tooltip customization
+            tooltip: {
+                theme: 'light', // makes all tooltip text black
+                style: {
+                    fontSize: '14px',
+                    color: '#000',
+                }
             },
             states: {
                 hover: {
@@ -409,11 +399,11 @@ const ReturnsAndSubmissions = () => {
                     },
                 },
             },
-            labels: ['Quarterly Return', 'Half Yearly Return', 'Annual Returns'],
-            colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
+            labels: ApplicableReturnsCount?.frequency_returns?.map((item) => item?.frequency) || [],
+            colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             fill: {
                 opacity: 1,
-                colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
+                colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             },
             legend: {
                 position: 'top',
@@ -433,27 +423,44 @@ const ReturnsAndSubmissions = () => {
                 }
             }]
         },
-
-    });
-    const [escalationRaisedCategoriesByCompany, setEscalationRaisedCategoriesByCompany] = React.useState({
-
+        stroke: {
+            width: 1,
+            colors: ['#fff']
+        },
+        dataLabels: {
+            enabled: true,
+            style: {
+                colors: ['#000'], // text black
+            }
+        },
+    }
+    const [escalationRaisedCategoriesByCompany, setEscalationRaisedCategoriesByCompany] = React.useState([]);
+    const escalationRaisedCategoriesByCompanyFormat = {
         series: [{
             name: 'Files Successfully',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            data: escalationRaisedCategoriesByCompany?.count_remark?.map((item) => item?.count_filed_successfully) || [] // Y-axis values (Sum of Employee Count)
         }, {
             name: 'Received late data from KAO',
-            data: [53, 32, 33, 52, 13, 43, 32]
-        }],
+            data: escalationRaisedCategoriesByCompany?.count_remark?.map((item) => item?.count_received_late_data_from_kao) || []
+        },
+        {
+            name: 'count_empty',
+            data: escalationRaisedCategoriesByCompany?.count_remark?.map((item) => item?.count_empty) || []
+        }, {
+            name: 'count_missing_due_date',
+            data: escalationRaisedCategoriesByCompany?.count_remark?.map((item) => item?.count_missing_due_date) || []
+        }
+        ],
         options: {
             chart: {
                 type: 'bar',
                 height: 350,
                 stacked: true,
             },
-            colors: ["#2cafc0ff", "#5ad5e2"],
+            // colors: ["#2cafc0ff", "#5ad5e2"],
             fill: {
                 opacity: 1,
-                colors: ["#2cafc0ff", "#5ad5e2"],
+                // colors: ["#2cafc0ff", "#5ad5e2"],
             },
             states: {
                 hover: {
@@ -490,41 +497,27 @@ const ReturnsAndSubmissions = () => {
                 text: 'Escalation Counts'
             },
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
-                labels: {
-                    formatter: function (val) {
-                        return val + "K"
-                    }
-                }
+                categories: escalationRaisedCategoriesByCompany?.count_remark?.map((item) => item?.company_name) || [], // X-axis categories (Company Common Name)
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val + "K"
-                    }
-                }
-            },
-
             legend: {
                 position: 'top',
                 horizontalAlign: 'left',
                 offsetX: 40
             }
         },
-
-
-    });
-    const [riskDistributionByState, setRiskDistributionByState] = useState({
+    }
+    const [riskDistributionByState, setRiskDistributionByState] = useState([]);
+    const riskDistributionByStateFormat = {
 
         series: [
             {
-                name: "sate",
-                data: systemEmployeeCounts, // Y-axis values (Sum of sate)
+                name: "State",
+                data: riskDistributionByState?.top_counts?.map((item) => item?.count_of_risk), // Y-axis values (Sum of sate)
             },
         ],
         options: {
@@ -547,9 +540,9 @@ const ReturnsAndSubmissions = () => {
                 },
             },
             xaxis: {
-                categories: systemCategories, // X-axis categories (Company Common Name)
+                categories: riskDistributionByState?.top_counts?.map((item) => item?.state), // X-axis categories (Company Common Name)
                 title: {
-                    text: "Risk Level (%)",
+                    text: "Risk Level Count",
                     // style: { fontWeight: "bold" },
                 },
             },
@@ -562,10 +555,10 @@ const ReturnsAndSubmissions = () => {
                 // max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
                 tickAmount: 5,
             },
-            colors: ["#2b7bf3ff"],
+           colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-                colors: ["#2b7bf3ff"],
+               colors: ["#2cafc0ff"],
             },
             states: {
                 hover: {
@@ -592,36 +585,164 @@ const ReturnsAndSubmissions = () => {
             //     },
             //   },
         },
+    };
+    const [stateWiseAnalysisOfApplicableReturns, setStateWiseAnalysisOfApplicableReturns] = useState([]);
+    const applicableReturnsByStateFormat = {
+        series: [
+            {
+                name: "Applicable Returns Count",
+                data: stateWiseAnalysisOfApplicableReturns?.top_counts?.map((item) => item?.count_of_total_applicable_returns), // Y-axis values (Sum of Employee Count)
+            },
+        ],
+        options: {
+            chart: {
+                type: "bar",
+                // height: 350,
+                toolbar: { show: false },
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                },
+            },
+            dataLabels: {
+                enabled: false,
+                style: {
+                    colors: ["#333"],
+                },
+            },
+            xaxis: {
+                categories: stateWiseAnalysisOfApplicableReturns?.top_counts?.map((item) => item?.state), // X-axis categories (Applicable Returns Count)
+                title: {
+                    text: "State",
+                    // style: { fontWeight: "bold" },
+                },
+            },
+            yaxis: {
+                title: {
+                    text: "Applicable Returns Count",
+                    style: { fontWeight: "bold" },
+                },
+                min: 0,
+                tickAmount: 5,
+            },
+            colors: ["#5ad5e2ff"],
+            fill: {
+                opacity: 1,
+                colors: ["#5ad5e2ff"],
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none", // 👈 disables the lighten effect
+                    },
+                },
+                active: {
+                    filter: {
+                        type: "none", // 👈 disables click highlight effect
+                    },
+                },
+            },
 
+            //   title: {
+            //     text: "Sum of Employee Count per Payroll Service Type",
+            //     align: "center",
+            //   },
+            //   grid: {
+            //     borderColor: "#e7e7e7",
+            //     row: {
+            //       colors: ["#f3f3f3", "transparent"],
+            //       opacity: 0.5,
+            //     },
+            //   },
+        },
+    }
 
-    });
+    useEffect(() => {
+        const fetchData = async () => {
+            const [returnApplicabilityRes, stateWiseAnalysisRes, frequencyWiseReturnsRes, companiesPerReturnsNamesRes, complianceRiskDistributionByStateRes, complianceStatusBasedOnReturnsRes, remarksBasedOnCompanyRes] = await Promise.allSettled([
+                fetchReturnApplicabilityByCompanyCommonName(selectedCompany),
+                fetchStateWiseAnalysisOfApplicableReturns(selectedCompany),
+                // need to integrate these two charts
+                fetchFrequencyWiseReturns(selectedCompany),
+                fetchCompaniesPerReturnsNames(selectedCompany),
+                fetchComplianceRiskDistributionByState(selectedCompany),
+                fetchComplianceStatusBasedOnReturns(selectedCompany),
+                fetchRemarksBasedOnCompany(selectedCompany),
+            ]);
+            if (returnApplicabilityRes.status === 'fulfilled') {
+                setComparisonOfReturnApplicability(returnApplicabilityRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", returnApplicabilityRes.reason);
+                setComparisonOfReturnApplicability(returnApplicabilityRes.reason?.status || []);
+            }
+            if (stateWiseAnalysisRes.status === 'fulfilled') {
+                setStateWiseAnalysisOfApplicableReturns(stateWiseAnalysisRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", stateWiseAnalysisRes.reason);
+                setStateWiseAnalysisOfApplicableReturns(stateWiseAnalysisRes.reason?.status || []);
+            }
+            if (frequencyWiseReturnsRes.status === 'fulfilled') {
+                setApplicableReturnsCount(frequencyWiseReturnsRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", frequencyWiseReturnsRes.reason);
+                setApplicableReturnsCount(frequencyWiseReturnsRes.reason?.status || []);
+            }
+            if (companiesPerReturnsNamesRes.status === 'fulfilled') {
+                setCompaniesPerReturnsNames(companiesPerReturnsNamesRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", companiesPerReturnsNamesRes.reason);
+                setCompaniesPerReturnsNames(companiesPerReturnsNamesRes.reason?.status || []);
+            }
+            if (complianceRiskDistributionByStateRes.status === 'fulfilled') {
+                setRiskDistributionByState(complianceRiskDistributionByStateRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", complianceRiskDistributionByStateRes.reason);
+                setRiskDistributionByState(complianceRiskDistributionByStateRes.reason?.status || []);
+            }
+            if (complianceStatusBasedOnReturnsRes.status === 'fulfilled') {
+                setApplicableReturnsByLocation(complianceStatusBasedOnReturnsRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", complianceStatusBasedOnReturnsRes.reason);
+                setApplicableReturnsByLocation(complianceStatusBasedOnReturnsRes.reason?.status || []);
+            }
+            if (remarksBasedOnCompanyRes.status === 'fulfilled') {
+                setEscalationRaisedCategoriesByCompany(remarksBasedOnCompanyRes.value);
+            } else {
+                console.warn("fetchAll communication type failed:", remarksBasedOnCompanyRes.reason);
+                setEscalationRaisedCategoriesByCompany(remarksBasedOnCompanyRes.reason?.status || []);
+            }
+
+        };
+        fetchData();
+    }, [selectedCompany]);
     return (
         <div>
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Comparison of Return Applicability across Companies</div>
+                    <div className="mb-3 fw-600">Top 5 comparison of Return Applicability across Companies</div>
                     <Chart
-                        options={comparisonOfReturnApplicability.options} series={comparisonOfReturnApplicability.series} type="bar" height={380}
+                        options={comparisonOfReturnApplicabilityFormat.options} series={comparisonOfReturnApplicabilityFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Frequency-wise distribution of applicable returns, revealing dominant compliance cycles</div>
                     <Chart
-                        options={ApplicableReturnsCount.options} series={ApplicableReturnsCount.series} type="donut" height={380}
+                        options={ApplicableReturnsCountFormat.options} series={ApplicableReturnsCountFormat.series} type="donut" height={380}
                     />
                 </div>
             </div>
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
+                    <div className="mb-3 fw-600">Top 5 compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
                     <Chart
-                        options={applicableReturnsByLocation.options} series={applicableReturnsByLocation.series} type="bar" height={380}
+                        options={applicableReturnsByLocationFormat.options} series={applicableReturnsByLocationFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Analysis of applicable return names, identifying the most frequently required returns across companies</div>
+                    <div className="mb-3 fw-600">Top 5 analysis of applicable return names, identifying the most frequently required returns across companies</div>
                     <Chart
-                        options={applicableReturnsByState.options} series={applicableReturnsByState.series} type="bar" height={380}
+                        options={companiesPerReturnsNamesFormat.options} series={companiesPerReturnsNamesFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
@@ -630,15 +751,25 @@ const ReturnsAndSubmissions = () => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Compliance risk distribution by state, identifying regions with elevated compliance risk levels.</div>
                     <Chart
-                        options={riskDistributionByState.options} series={riskDistributionByState.series} type="bar" height={380}
+                        options={riskDistributionByStateFormat.options} series={riskDistributionByStateFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Breakdown of escalation raised categories by company, revealing escalation hotspots</div>
+                    <div className="mb-3 fw-600">Top 5 state-wise analysis of applicable returns, showcasing regional concentration of compliance activities.</div>
                     <Chart
-                        options={escalationRaisedCategoriesByCompany.options} series={escalationRaisedCategoriesByCompany.series} type="bar" height={380}
+                        options={applicableReturnsByStateFormat.options} series={applicableReturnsByStateFormat.series} type="bar" height={380}
                     />
                 </div>
+
+            </div>
+            <div className='mb-4'>
+                <div className="chart-card">
+                    <div className="mb-3 fw-600">Breakdown of escalation raised categories by company, revealing escalation hotspots</div>
+                    <Chart
+                        options={escalationRaisedCategoriesByCompanyFormat.options} series={escalationRaisedCategoriesByCompanyFormat.series} type="bar" height={380}
+                    />
+                </div>
+
             </div>
 
         </div>

@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Chart from 'react-apexcharts';
+import { fetchAuditByServiceType, fetchAuditPlatformsCountByState, fetchAuditStatusBasedOnStorageMode, fetchAuditStatusByCompany, fetchAuditVisitFindingsBySeverity, fetchEscalationTriggeredRateByState, fetchRiskLevelBasedOnServiceType } from '../../api/service';
 
-const AuditAndVisitDashboard = () => {
+const AuditAndVisitDashboard = ({selectedCompany}) => {
     const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState({
 
         series: [{
@@ -535,6 +536,25 @@ const AuditAndVisitDashboard = () => {
         }
     });
 
+    useEffect(() => {
+            const fetchData = async () => {
+                const [auditRes, auditPlatformsCountByStateRes, auditStatusByCompanyRes, auditVisitFindingsBySeverityRes, escalationTriggeredRateByStateRes, auditStatusBasedOnStorageModeRes, riskLevelBasedOnServiceTypeRes] = await Promise.allSettled([
+                    fetchAuditByServiceType(selectedCompany),
+                    fetchAuditPlatformsCountByState(selectedCompany),
+                    fetchAuditStatusByCompany(selectedCompany),
+                    fetchAuditVisitFindingsBySeverity(selectedCompany),
+                    fetchEscalationTriggeredRateByState(selectedCompany),
+                    fetchAuditStatusBasedOnStorageMode(selectedCompany),
+                    fetchRiskLevelBasedOnServiceType(selectedCompany),
+                ]);
+                if (auditRes.status === 'fulfilled') {
+                    // Process and set data for AuditCountByServiceType
+                } else {
+                    console.warn("fetchAll audit failed:", auditRes.reason);
+                }
+            };
+            fetchData();
+        }, [selectedCompany]);
     return (
         <div>
             <div className='charts-grid mb-4'>
