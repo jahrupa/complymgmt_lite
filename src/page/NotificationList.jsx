@@ -348,14 +348,13 @@ const NotificationList = () => {
           <p>Manage and monitor all your notification templates</p>
         </div>
         <div className='d-lg-flex d-md-flex gap-2'>
-          <button
+          {/* <button
             onClick={() => navigate('/create_notification')}
             // onClick={() => handleCreateNotification(template)}
             className="create-button"
           >
             Create Notification
-            {/* <ArrowBigLeft /> */}
-          </button>
+          </button> */}
           <button
             onClick={handleApproveAll}
             className="approve-all-button"

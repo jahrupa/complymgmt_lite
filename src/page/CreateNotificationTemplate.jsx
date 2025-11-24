@@ -388,7 +388,7 @@ function CreateNotificationTemplate() {
                     )}
                 </div>
             </div>
-            <div className="navigation">
+            {/* <div className="navigation">
                 <button
                     onClick={() => handleNavigate('show')}
                     className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
@@ -401,7 +401,7 @@ function CreateNotificationTemplate() {
                 >
                     Template List
                 </button>
-            </div>
+            </div> */}
         </div>
     );
 }

@@ -6,7 +6,7 @@
 }
 
 .notification-page-header {
-  display: flex;
+  /* display: flex; */
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
@@ -556,7 +556,7 @@
   padding: 0.5rem 0.75rem 0.5rem 2.5rem;
   border: 1px solid var(--gray-300);
   border-radius: var(--border-radius);
-  width: 256px;
+  width: 243px;
   transition: all 0.2s ease;
 }
 
@@ -588,6 +588,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
   z-index: 100;
+  scroll-behavior: smooth;
 }
 
 .nav-button {
@@ -616,17 +617,25 @@
 }
 
 @media (max-width: 768px) {
-  .navigation {
+   .navigation {
     bottom: 20px;
     left: 20px;
     right: 20px;
     transform: none;
-    justify-content: center;
+    justify-content: flex-start; /* Left align so scrolling makes sense */
+    overflow-x: auto; /* Enable horizontal scroll */
+    white-space: nowrap; /* Prevent buttons from wrapping */
+    gap: 8px;
+    padding: 10px;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
   }
-  
+    .navigation::-webkit-scrollbar {
+    display: none;
+  }
+
   .nav-button {
-    flex: 1;
-    padding: 12px 16px;
+    flex: 0 0 auto; /* Prevent buttons from stretching */
+    padding: 12px 18px;
   }
   .notification-page-title h1 {
     font-size: 1rem;

@@ -25,17 +25,17 @@ import {
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Snackbars from '../Snackbars.jsx';
+import { Box, Tab, Tabs } from '@mui/material';
 
 dayjs.extend(relativeTime);
 
-const NotificationPage = ({setUnreadCountNotification }) => {
+const NotificationPage = ({setUnreadCountNotification}) => {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [allNotifications, setAllNotifications] = useState([]);
   //  console.log(allNotifications, 'allNotifications')
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState('show');
   const [openMenuId, setOpenMenuId] = useState(null); // single open menu
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -102,10 +102,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
     return matchesFilter && matchesSearch;
   });
 
-  const handleNavigate = (page) => {
-    setCurrentPage(page);
-    navigate(page === 'show' ? '' : '/create_notification_template');
-  };
+
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -224,7 +221,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
     <div className="">
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
       {/* Header */}
-      <div className="notification-page-header">
+      <div className="notification-page-header d-lg-flex d-md-flex">
         <div className="notification-page-title">
           {/* <button className="back-button" onClick={onBack}>
             <ArrowLeft size={20} />
@@ -235,11 +232,11 @@ const NotificationPage = ({setUnreadCountNotification }) => {
           </div>
         </div>
 
-        <div className="notification-actions">
-          <button className="action-btn secondary" onClick={() => navigate('/create_notification_template')}>
+        <div className="notification-actions mt-2">
+          {/* <button className="action-btn secondary" onClick={() => navigate('/create_notification_template')}>
             <CheckCircle size={18} />
             Create Template
-          </button>
+          </button> */}
           <button className="action-btn secondary" onClick={handleMarkAllAsRead}>
             <CheckCircle size={18} />
             Mark All Read
@@ -253,7 +250,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
 
       {/* Filters */}
       <div className="notification-filters">
-        <div className="d-flex filter-search justify-content-between">
+        <div className="d-lg-flex d-md-flex filter-search justify-content-between align-items-center">
           <div className="notification-search-container">
             <Search className="notification-search-icon" size={18} />
             <input
@@ -264,7 +261,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
               className="notification-search-input"
             />
           </div>
-          <div>
+          <div className=''>
             <MonthYearCalander />
           </div>
         </div>
@@ -373,22 +370,7 @@ const NotificationPage = ({setUnreadCountNotification }) => {
         )}
       </div>
 
-      {/* Navigation */}
-      <div className="navigation">
-        <button
-          onClick={() => handleNavigate('show')}
-          className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
-        >
-          {/* Incoming Notification */}
-          Incoming Notification
-        </button>
-        <button
-          onClick={() => handleNavigate('create')}
-          className={`nav-button ${currentPage === 'create' ? 'active' : ''}`}
-        >
-          Create Template
-        </button>
-      </div>
+    
     </div>
   );
 };
