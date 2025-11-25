@@ -5,6 +5,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { fetchTotalCountOfCommunicationTypes } from '../../api/service';
+import { ArrowUpRight, X } from 'lucide-react';
 
 const GeneralHelpdesk = ({ selectedCompany }) => {
     const [closedVsOpenCases, setProportionofcases] = React.useState({
@@ -261,12 +262,21 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
 
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <input
-                        type="checkbox"
-                        className="chart-select-checkbox"
-                        onChange={() => toggleChartSelection("chart_closed_open")}
-                        checked={selectedCharts.includes("chart_closed_open")}
-                    />
+                    <div className='d-flex justify-content-end align-items-center'>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("chart_closed_open")}
+                            checked={selectedCharts.includes("chart_closed_open")}
+                        />
+                        <div>
+                            <ArrowUpRight />
+                        </div>
+                        <div>
+                            <X />
+                        </div>
+                    </div>
+
                     <div className="mb-3 fw-600">
                         Comparison of closed vs. open cases for top 5 Assigned users
                     </div>

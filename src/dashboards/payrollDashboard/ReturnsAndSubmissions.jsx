@@ -17,7 +17,7 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
         series: [
             {
                 name: "Distinct Return Obligations",
-                data: comparisonOfReturnApplicability?.top_counts?.map((item) => item?.count_of_total_returns), // Y-axis values (Sum of Employee Count)
+                data: comparisonOfReturnApplicability?.top_counts?.map((item) => item?.count_of_returns), // Y-axis values (Sum of Employee Count)
             },
         ],
         options: {
@@ -37,9 +37,9 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
                 },
             },
             xaxis: {
-                categories: comparisonOfReturnApplicability?.top_counts?.map((item) => item?.company_common_name || "") || [], // X-axis categories (Applicable Returns Count)
+                categories: comparisonOfReturnApplicability?.top_counts?.map((item) => item?.company_name || "") || [], // X-axis categories (Applicable Returns Count)
                 title: {
-                    text: "Company Common Name",
+                    text: "Company Name",
                 },
             },
             yaxis: {
@@ -206,7 +206,7 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
                 text: 'Escalation Counts'
             },
             xaxis: {
-                categories: applicableReturnsByLocation?.map((item) => item?.return_name) || [], // X-axis categories (Company Common Name)
+                categories: applicableReturnsByLocation?.map((item) => item?.return_name) || [], // X-axis categories (Company  Name)
             },
             yaxis: {
                 title: {
@@ -591,7 +591,7 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
         series: [
             {
                 name: "Applicable Returns Count",
-                data: stateWiseAnalysisOfApplicableReturns?.top_counts?.map((item) => item?.count_of_total_applicable_returns), // Y-axis values (Sum of Employee Count)
+                data: stateWiseAnalysisOfApplicableReturns?.top_counts?.map((item) => item?.count_of_applicable_returns), // Y-axis values (Sum of Employee Count)
             },
         ],
         options: {

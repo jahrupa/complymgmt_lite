@@ -514,7 +514,7 @@ const HelpdeskAndEscalations = ({ selectedCompany }) => {
                 }
             },
 
-            labels: helpdeskTicketsRaisedByCompany?.top_company_tickets_count?.map((item) => item.company_common_name || []) || [],
+            labels: helpdeskTicketsRaisedByCompany?.top_company_tickets_count?.map((item) => item.company_name || []) || [],
             legend: {
                 position: "top",
                 horizontalAlign: "center",
@@ -618,28 +618,20 @@ const HelpdeskAndEscalations = ({ selectedCompany }) => {
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Excluding Transfer % compared to Excluding Doc Pending % for recent claim periods in Summary Old Claim Data</div>
-                    {/* <Chart
-                        options={ExcludingTransfer.options} series={ExcludingTransfer.series} type="bar" height={380}
-                    /> */}
-                </div>
-            </div>
-
-            <div className="table_div p-3 mb-4">
-                <div className="ag-theme-quartz" style={{ height: '300px', width: '100%', }}>
-                    <div className=" fw-600">
-                        Settled Claim % vs. Total Pending % over time in Summary Old Claim Data
+                    <div className="ag-theme-quartz" style={{ height: '300px', width: '100%', }}>
+                        <div className=" fw-600 mb-4">
+                            Settled Claim % vs. Total Pending % over time in Summary Old Claim Data
+                        </div>
+                        <AgGridReact
+                            theme="legacy"
+                            rowData={oldClaimData}
+                            columnDefs={columnDefs}
+                            pagination={true}
+                            paginationPageSize={5}
+                        />
                     </div>
-                    <AgGridReact
-                        theme="legacy"
-                        rowData={oldClaimData}
-                        columnDefs={columnDefs}
-                        pagination={true}
-                        paginationPageSize={5}
-                    />
                 </div>
             </div>
-
 
             <div className='charts-grid mb-4'>
                 <div className="chart-card">

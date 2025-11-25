@@ -384,6 +384,7 @@ const PayrollServices = ({selectedCompany}) => {
                     late_percent: payrollOverviewDataR2.value.late_percent,
                     on_time_delivery: payrollOverviewDataR2.value.on_time_delivery_good_percent,
                     turnaround_health_average_days: payrollOverviewDataR2.value.average_sla_processing_days,
+                    turnaround_health_target_days: payrollOverviewDataR2.value.sum_sla_days,
                 }));
 
             } else if (payrollOverviewDataR2.status === 'rejected') {
