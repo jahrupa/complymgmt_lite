@@ -43,11 +43,11 @@
 
 import axios from "axios";
 // import { useToken } from "../TokenProvider";
-const isDev = window.location.hostname === "localhost" || window.location.hostname === "192.168.1.225";
-const baseURL = isDev
-  ? "http://192.168.1.225:3001"
-  : "https://api.complymgmt.ai";
-
+// const isDev = window.location.hostname === "localhost" || window.location.hostname === "192.168.1.225";
+// const baseURL = isDev
+//   ? "http://192.168.1.225:3001"
+//   : "https://api.complymgmt.ai";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 const API = axios.create({
   baseURL,
   headers: {
