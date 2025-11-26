@@ -172,9 +172,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                 {activeTab === 3 && <PayrollServices selectedCompany={selectedCompany} />}
                 {activeTab === 4 && <ReturnsAndSubmissions selectedCompany={selectedCompany} />}
                 {activeTab === 5 && <HelpdeskAndEscalations selectedCompany={selectedCompany} />}
-                {activeTab === 6 && <GeneralHelpdesk selectedCompany={selectedCompany}/>}
+                {/* {activeTab === 6 && <GeneralHelpdesk selectedCompany={selectedCompany}/>}
                 {activeTab === 7 && <AuditAndVisitDashboard selectedCompany={selectedCompany}/>}
-                {activeTab === 8 && <NoticeDashboard selectedCompany={selectedCompany}/>}
+                {activeTab === 8 && <NoticeDashboard selectedCompany={selectedCompany}/>} */}
             </Box>
         </Box>
     );
