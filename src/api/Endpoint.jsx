@@ -187,9 +187,9 @@ export const GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM ='/api/v1/dashboard/view/
 export const GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME ='/api/v1/dashboard/view/audit/checklist/approval/company/name'
 // export const GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
 export const GET_ESCALATION_TRIGGERED_RATE_BY_STATE ='/api/v1/dashboard/view/audit/escalation/triggered/state_wise'
-export const GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE ='/api/v1/dashboard/view/audit/status/based/storage_mode'
 export const GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE ='/api/v1/dashboard/view/audit/risk/based/service_type'
 export const GET_COUNT_OF_AUDIT_STATUS ='/api/v1/dashboard/view/audit/count/status'
+export const GET_COUNT_OF_RISK_LEVEL ='/api/v1/dashboard/view/audit/count/risk/level'
 
 
 // Notice & Inspections (need to change form postnman this is auto generated)

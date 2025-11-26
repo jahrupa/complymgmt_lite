@@ -138,10 +138,11 @@ import {
   GET_AUDIT_BY_SERVICE_TYPE,
   // GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY,
   GET_ESCALATION_TRIGGERED_RATE_BY_STATE,
-  GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE,
+  GET_COUNT_OF_AUDIT_STATUS,
   GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE,
   GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM,
   GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME,
+  GET_COUNT_OF_RISK_LEVEL,
 
 } from "./Endpoint";
 
@@ -1648,9 +1649,9 @@ export const fetchAuditMeetingSLAByResponsibleTeam = async (company_name) => {
   }
 }
 
-export const fetchAuditStatusBasedOnStorageMode = async (company_name) => {
+export const fetchAuditStatusCount = async (company_name) => {
   try {
-    const url = `${GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const url = `${GET_COUNT_OF_AUDIT_STATUS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1659,6 +1660,18 @@ export const fetchAuditStatusBasedOnStorageMode = async (company_name) => {
   }
 }
 
+export const fetchCountOfRiskLevel = async (company_name) => {
+  try {
+    const url = `${GET_COUNT_OF_RISK_LEVEL}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Count Of Risk Level", error);
+    throw error;
+  }
+}
+
+
 export const fetchRiskLevelBasedOnServiceType = async (service_type) => {
   try {
     const url = `${GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
@@ -1666,6 +1679,16 @@ export const fetchRiskLevelBasedOnServiceType = async (service_type) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Risk Level Based On Service Type", error);
+    throw error;
+  }
+}
+export const fetchEscalationTriggeredRateByState = async (state) => {
+  try {
+    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${state ? `?state=${encodeURIComponent(state)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Escalation Triggered Rate By State", error);
     throw error;
   }
 }

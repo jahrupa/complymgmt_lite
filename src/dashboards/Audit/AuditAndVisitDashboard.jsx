@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import Chart from 'react-apexcharts';
-import { fetchAuditByServiceType, fetchAuditMeetingSLAByResponsibleTeam, fetchAuditPlatformsCountByStateSegmented, fetchAuditStatusByCompany, fetchRiskLevelBasedOnServiceType } from '../../api/service';
+import { fetchAuditByServiceType, fetchAuditMeetingSLAByResponsibleTeam, fetchAuditPlatformsCountByStateSegmented, fetchAuditStatusByCompany, fetchAuditStatusCount, fetchCountOfRiskLevel, fetchEscalationTriggeredRateByState, fetchRiskLevelBasedOnServiceType } from '../../api/service';
 
 const AuditAndVisitDashboard = ({ selectedCompany }) => {
     const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState([]);
@@ -74,7 +74,6 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
     const keys = data.length > 0
         ? Object.keys(data[0]).filter(k => k !== "state")
         : [];
-
     // Function to convert any key into readable series name
     const cleanName = (key) => {
         return key
@@ -94,6 +93,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
         name: cleanName(key),
         data: data.map(item => item[key] || 0)
     }));
+
     const AuditCountByStateSegmentedFormat = {
         series: series,
         options: {
@@ -118,6 +118,9 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                         type: "none", // 👈 disables click highlight effect
                     },
                 },
+                toolbar: {
+                    show: false
+                },
             },
             plotOptions: {
                 bar: {
@@ -138,7 +141,6 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 width: 1,
                 colors: ['#fff']
             },
-
             xaxis: {
                 categories: AuditCountByStateSegmented?.top_counts?.map(item => item.state) || [],
             },
@@ -221,11 +223,11 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
             }
         },
     };
-    const [ChecklistApprovalRateByCompanyName, setChecklistApprovalRateByCompanyName] = React.useState([]);
-    const ChecklistApprovalRateByCompanyNameFormat = {
+    const [checklistApprovalRateByCompanyName, setChecklistApprovalRateByCompanyName] = React.useState([]);
+    const checklistApprovalRateByCompanyNameFormat = {
         series: [{
             name: 'Approval Rate',
-            data: ChecklistApprovalRateByCompanyName?.top_counts?.map(item => item.checklist_rate) || []
+            data: checklistApprovalRateByCompanyName?.top_counts?.map(item => item.checklist_rate) || []
         },],
         options: {
             chart: {
@@ -269,7 +271,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 colors: ['#fff']
             },
             xaxis: {
-                categories: ChecklistApprovalRateByCompanyName?.top_counts?.map(item => item.company_name) || [],
+                categories: checklistApprovalRateByCompanyName?.top_counts?.map(item => item.company_name) || [],
             },
             yaxis: {
                 title: {
@@ -283,8 +285,9 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
             }
         },
     };
-    const [DistributionOfKeyObservationsByAuditScope, setDistributionOfKeyObservationsByAuditScope] = React.useState({
-        series: [17, 18, 30, 20, 25],
+    const [riskLevel, setRiskLevel] = React.useState([]);
+    const riskLevelFormat = {
+        series: riskLevel?.map(item => item.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -309,7 +312,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 },
             },
 
-            labels: ["Process", "Compliance", "Financial", "Operational", "IT Security"],
+            labels: riskLevel?.map(item => item.risk_level) || [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
                 horizontalAlign: "center",
@@ -335,25 +338,76 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 },
             ],
         },
-    });
-    const [RiskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] = React.useState([]);
+    }
+    const [countOfAuditStatus, setCountOfAuditStatus] = React.useState([]);
+    const countOfAuditStatusFormated = {
+        series: countOfAuditStatus?.map(item => item.count) || [],
+        options: {
+            chart: {
+                width: 380,
+                type: "donut",
+            },
+            colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+            fill: {
+                opacity: 1,
+                colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none", // 👈 disables the lighten effect
+                    },
+                },
+                active: {
+                    filter: {
+                        type: "none", // 👈 disables click highlight effect
+                    },
+                },
+            },
+
+            labels: countOfAuditStatus?.map(item => item.audit_status) || [],
+            legend: {
+                position: "top", // 👈 moves Yes/No below the chart
+                horizontalAlign: "center",
+                fontSize: "14px",
+                markers: {
+                    radius: 12,
+                },
+                labels: {
+                    colors: "#333",
+                },
+            },
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 250,
+                        },
+                        legend: {
+                            position: "bottom",
+                        },
+                    },
+                },
+            ],
+        },
+    }
+    const [riskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] = React.useState([]);
     const RiskLevelBreakdownByServiceTypeFormat = {
-        series: [{
-            name: 'High',
-            data: [44, 55, 41, 37, 22, 43, 21]
-        },
-        {
-            name: 'Medium',
-            data: [53, 32, 33, 52, 13, 43, 32]
-        },
-        {
-            name: 'Low',
-            data: [12, 17, 11, 9, 15, 11, 20]
-        },
-        {
-            name: 'Empty',
-            data: [12, 17, 11, 9, 15, 11, 20]
-        },
+        series: [
+            {
+                name: 'High',
+                data: riskLevelBreakdownByServiceType?.map(item => item.high) || []
+            },
+            {
+                name: 'Medium',
+                data: riskLevelBreakdownByServiceType?.map(item => item.medium) || []
+            },
+            {
+                name: 'Low',
+                data: riskLevelBreakdownByServiceType?.map(item => item.low) || []
+            },
         ],
         options: {
             chart: {
@@ -391,11 +445,10 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 width: 1,
                 colors: ['#fff']
             },
-            title: {
-                text: 'Risk Level Breakdown',
-            },
+          
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
+                categories: riskLevelBreakdownByServiceType?.map(item => item.service_type) || [],
+
             },
             yaxis: {
                 title: {
@@ -409,16 +462,12 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
             },
         }
     }
-    const [EscalationTriggeredByState, setEscalationTriggeredByState] = React.useState({
+    const [escalationTriggeredRateByState, setEscalationTriggeredRateByState] = React.useState([]);
+    const escalationTriggeredRateByStateFormat = {
         series: [{
-            name: 'Escalation Triggered - Yes',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            name: 'Escalation Count',
+            data: escalationTriggeredRateByState?.top_counts?.map(item => item.count_of_escalation) || []
         },
-        {
-            name: 'Escalation Triggered - No',
-            data: [53, 32, 33, 52, 13, 43, 32]
-        },
-
         ],
         options: {
             chart: {
@@ -457,11 +506,8 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 width: 1,
                 colors: ['#fff']
             },
-            title: {
-                text: 'Escalation Triggered by State',
-            },
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
+                categories: escalationTriggeredRateByState?.top_counts?.map(item => item.state) || [],
             },
             yaxis: {
                 title: {
@@ -474,16 +520,17 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 offsetX: 40,
             },
         }
-    });
-
+    }
     useEffect(() => {
         const fetchData = async () => {
-            const [auditRes, auditSlaRes, auditPlatformsCountByStateSegmentedRes, auditStatusByCompanyRes, riskLevelRes] = await Promise.allSettled([
+            const [auditRes, auditSlaRes, auditPlatformsCountByStateSegmentedRes, auditStatusByCompanyRes, riskLevelRes, auditStatusCountRes, escalationTriggeredRateByStateRes, riskLevelBreakdownByServiceTypeRes] = await Promise.allSettled([
                 fetchAuditByServiceType(selectedCompany),
                 fetchAuditMeetingSLAByResponsibleTeam(selectedCompany),
-                // need to intrgrate in chart
                 fetchAuditPlatformsCountByStateSegmented(selectedCompany),
                 fetchAuditStatusByCompany(selectedCompany),
+                fetchCountOfRiskLevel(selectedCompany),
+                fetchAuditStatusCount(selectedCompany),
+                fetchEscalationTriggeredRateByState(selectedCompany),
                 fetchRiskLevelBasedOnServiceType(selectedCompany),
             ]);
             if (auditRes.status === 'fulfilled') {
@@ -511,10 +558,28 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 setChecklistApprovalRateByCompanyName(auditStatusByCompanyRes.reason?.status || []);
             }
             if (riskLevelRes.status === 'fulfilled') {
-                setRiskLevelBreakdownByServiceType(riskLevelRes.value);
+                setRiskLevel(riskLevelRes.value);
             } else {
                 console.warn("fetchAll audit failed:", riskLevelRes.reason);
-                setRiskLevelBreakdownByServiceType(riskLevelRes.reason?.status || []);
+                setRiskLevel(riskLevelRes.reason?.status || []);
+            }
+            if (auditStatusCountRes.status === 'fulfilled') {
+                setCountOfAuditStatus(auditStatusCountRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", auditStatusCountRes.reason);
+                setCountOfAuditStatus(auditStatusCountRes.reason?.status || []);
+            }
+            if (escalationTriggeredRateByStateRes.status === 'fulfilled') {
+                setEscalationTriggeredRateByState(escalationTriggeredRateByStateRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", escalationTriggeredRateByStateRes.reason);
+                setEscalationTriggeredRateByState(escalationTriggeredRateByStateRes.reason?.status || []);
+            }
+            if (riskLevelBreakdownByServiceTypeRes.status === 'fulfilled') {
+                setRiskLevelBreakdownByServiceType(riskLevelBreakdownByServiceTypeRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", riskLevelBreakdownByServiceTypeRes.reason);
+                setRiskLevelBreakdownByServiceType(riskLevelBreakdownByServiceTypeRes.reason?.status || []);
             }
 
         };
@@ -530,7 +595,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Audit count by State segmented by Audit Platform</div>
+                    <div className="mb-3 fw-600">Top 5 audit count by State segmented by Audit Platform</div>
                     <Chart
                         options={AuditCountByStateSegmentedFormat.options} series={AuditCountByStateSegmentedFormat.series} type="bar" height={380}
                     />
@@ -545,9 +610,9 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Checklist approval rate by Companyt Name </div>
+                    <div className="mb-3 fw-600">Top 5 checklist approval rate by Company Name </div>
                     <Chart
-                        options={ChecklistApprovalRateByCompanyNameFormat.options} series={ChecklistApprovalRateByCompanyNameFormat.series} type="bar" height={380}
+                        options={checklistApprovalRateByCompanyNameFormat.options} series={checklistApprovalRateByCompanyNameFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
@@ -556,15 +621,16 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Distribution of Key Observations by Audit Scope (here we need to show all risk levels sum)</div>
                     <Chart
-                        options={DistributionOfKeyObservationsByAuditScope.options} series={DistributionOfKeyObservationsByAuditScope.series} type="donut" height={380}
+                        options={riskLevelFormat.options} series={riskLevelFormat.series} type="donut" height={380}
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Checklist approval rate by Auditor Name (duplicate chart)</div>
-                    {/* <Chart
-                        options={ChecklistApprovalRateByCompanyName.options} series={ChecklistApprovalRateByCompanyName.series} type="bar" height={380}
-                    /> */}
+                    <div className="mb-3 fw-600">Escalation Triggered (Y/N) rate by State</div>
+                    <Chart
+                        options={escalationTriggeredRateByStateFormat.options} series={escalationTriggeredRateByStateFormat.series} type="bar" height={380}
+                    />
                 </div>
+
             </div>
 
             <div className='charts-grid mb-4'>
@@ -575,9 +641,9 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Escalation Triggered (Y/N) rate by State</div>
+                    <div className="mb-3 fw-600">Proportion of audit status</div>
                     <Chart
-                        options={EscalationTriggeredByState.options} series={EscalationTriggeredByState.series} type="bar" height={380}
+                        options={countOfAuditStatusFormated.options} series={countOfAuditStatusFormated.series} type="donut" height={380}
                     />
                 </div>
             </div>
