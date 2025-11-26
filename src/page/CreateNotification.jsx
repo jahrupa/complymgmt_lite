@@ -109,7 +109,6 @@ const CreateNotification = () => {
     if (!editForm.template_name) newErrors.template_name = 'Template Name is required';
     if (!editForm.priority) newErrors.priority = 'Template Priority is required';
     if (!editForm.send_to || editForm.send_to.length === 0) newErrors.send_to = 'At least one recipient is required';
-    if (!editForm.cc || editForm.cc.length === 0) newErrors.cc = 'At least one CC user is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -792,7 +791,7 @@ const CreateNotification = () => {
 
       // error={!!errors.access}
       // helperText={errors.access}
-      // isRequired={true}
+      // isRequired={false}
       />
       <ResponsiveDatePickers setSelectedDate={setSelectedDate} selectedDate={selectedDate} />
       <div className="row row-gap-2 mt-3">

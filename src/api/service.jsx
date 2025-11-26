@@ -134,13 +134,14 @@ import {
   GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE,
   GET_COMPLIANCE_STATUS_BASED_ON_RETURNS,
   GET_REMARKS_BASED_ON_COMPANY,
-  GET_AUDIT_PLATFORMS_COUNT_BY_STATE,
+  GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED,
   GET_AUDIT_BY_SERVICE_TYPE,
-  GET_CHECKLIST_APPROVAL_BY_AUDITOR_NAME,
-  GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY,
+  // GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY,
   GET_ESCALATION_TRIGGERED_RATE_BY_STATE,
   GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE,
   GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE,
+  GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM,
+  GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME,
 
 } from "./Endpoint";
 
@@ -1605,9 +1606,9 @@ export const fetchAuditByServiceType = async (service_type) => {
     throw error;
   }
 }
-export const fetchAuditPlatformsCountByState = async (service_type) => {
+export const fetchAuditPlatformsCountByStateSegmented = async (service_type) => {
   try {
-    const url = `${GET_AUDIT_PLATFORMS_COUNT_BY_STATE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const url = `${GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1618,7 +1619,7 @@ export const fetchAuditPlatformsCountByState = async (service_type) => {
 
 export const fetchAuditStatusByCompany = async (company_name) => {
   try {
-    const url = `${GET_CHECKLIST_APPROVAL_BY_AUDITOR_NAME}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const url = `${GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1626,23 +1627,23 @@ export const fetchAuditStatusByCompany = async (company_name) => {
     throw error;
   }
 }
-export const fetchAuditVisitFindingsBySeverity = async (company_name) => {
+// export const fetchAuditVisitFindingsBySeverity = async (company_name) => {
+//   try {
+//     const url = `${GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+//     const response = await API.get(url);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching Audit Visit Findings By Severity", error);
+//     throw error;
+//   }
+// }
+export const fetchAuditMeetingSLAByResponsibleTeam = async (company_name) => {
   try {
-    const url = `${GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const url = `${GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
-    console.error("Error fetching Audit Visit Findings By Severity", error);
-    throw error;
-  }
-}
-export const fetchEscalationTriggeredRateByState = async (company_name) => {
-  try {
-    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching Escalation Triggered Rate By State", error);
+    console.error("Error fetching Audit Meeting SLA By Responsible Team", error);
     throw error;
   }
 }

@@ -182,12 +182,15 @@ export const GET_REMARKS_BASED_ON_COMPANY ='/api/v1/dashboard/view/returns/remar
 
 // Audit & Visits
 export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/type'
-export const GET_AUDIT_PLATFORMS_COUNT_BY_STATE ='/api/v1/dashboard/view/audit/platforms/count'
-export const GET_CHECKLIST_APPROVAL_BY_AUDITOR_NAME ='/api/v1/dashboard/view/audit/checklist/approval/auditor/name'
-export const GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
+export const GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED ='/api/v1/dashboard/view/audit/platforms/count'
+export const GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
+export const GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME ='/api/v1/dashboard/view/audit/checklist/approval/company/name'
+// export const GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
 export const GET_ESCALATION_TRIGGERED_RATE_BY_STATE ='/api/v1/dashboard/view/audit/escalation/triggered/state_wise'
 export const GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE ='/api/v1/dashboard/view/audit/status/based/storage_mode'
 export const GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE ='/api/v1/dashboard/view/audit/risk/based/service_type'
+export const GET_COUNT_OF_AUDIT_STATUS ='/api/v1/dashboard/view/audit/count/status'
+
 
 // Notice & Inspections (need to change form postnman this is auto generated)
 export const GET_NOTICE_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/notice/type'

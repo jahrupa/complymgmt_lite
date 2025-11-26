@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import Chart from 'react-apexcharts';
-import { fetchAuditByServiceType, fetchAuditPlatformsCountByState, fetchAuditStatusBasedOnStorageMode, fetchAuditStatusByCompany, fetchAuditVisitFindingsBySeverity, fetchEscalationTriggeredRateByState, fetchRiskLevelBasedOnServiceType } from '../../api/service';
+import { fetchAuditByServiceType, fetchAuditMeetingSLAByResponsibleTeam, fetchAuditPlatformsCountByStateSegmented, fetchAuditStatusByCompany, fetchRiskLevelBasedOnServiceType } from '../../api/service';
 
-const AuditAndVisitDashboard = ({selectedCompany}) => {
-    const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState({
-
+const AuditAndVisitDashboard = ({ selectedCompany }) => {
+    const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState([]);
+    const AuditCountByServiceTypeFormat = {
         series: [{
             name: 'Audit Count',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            data: AuditCountByServiceType?.top_counts?.map(item => item.count) || []
         },],
         options: {
             chart: {
@@ -51,56 +51,51 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 width: 1,
                 colors: ['#fff']
             },
-            title: {
-                text: 'Audit Count',
-            },
+
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
+                categories: AuditCountByServiceType?.top_counts?.map(item => item.service_type) || [],
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
-
             legend: {
                 position: 'top',
                 horizontalAlign: 'left',
                 offsetX: 40
             }
         },
+    };
+    const [AuditCountByStateSegmented, setAuditCountByStateSegmented] = React.useState([]);
+    const data = AuditCountByStateSegmented?.top_count || [];
 
+    // Collect all keys except "state"
+    const keys = data.length > 0
+        ? Object.keys(data[0]).filter(k => k !== "state")
+        : [];
 
-    });
-    const [AuditCountByStateSegmented, setAuditCountByStateSegmented] = React.useState({
+    // Function to convert any key into readable series name
+    const cleanName = (key) => {
+        return key
+            // remove prefix count_
+            .replace(/^count_/, "")
+            // remove suffix _count    
+            .replace(/_count$/, "")
+            // remove any middle count_    
+            .replace(/count_/g, "")
+            // replace _ with space    
+            .replace(/_/g, " ")
+            .toUpperCase();
+    };
 
-        series: [{
-            name: 'Both',
-            data: [44, 55, 41, 37, 22, 43, 21]
-        }, {
-            name: 'Excel',
-            data: [53, 32, 33, 52, 13, 43, 32]
-        }, {
-            name: 'JLL Overview Portal',
-            data: [53, 32, 33, 52, 13, 43, 32]
-        },
-        {
-            name: 'WeChecked',
-            data: [53, 32, 33, 52, 13, 43, 32]
-        }
-        ],
+    // Create dynamic series
+    const series = keys.map(key => ({
+        name: cleanName(key),
+        data: data.map(item => item[key] || 0)
+    }));
+    const AuditCountByStateSegmentedFormat = {
+        series: series,
         options: {
             chart: {
                 type: 'bar',
@@ -126,7 +121,7 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
             },
             plotOptions: {
                 bar: {
-                    horizontal: true,
+                    horizontal: false,
                     dataLabels: {
                         total: {
                             enabled: true,
@@ -143,54 +138,41 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 width: 1,
                 colors: ['#fff']
             },
-            title: {
-                text: 'Escalation Counts'
-            },
+
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
+                categories: AuditCountByStateSegmented?.top_counts?.map(item => item.state) || [],
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
-
             legend: {
                 position: 'top',
                 horizontalAlign: 'left',
                 offsetX: 40
             }
         },
-
-
-    });
-    const [AuditPercentageMeetingSLA, setAuditPercentageMeetingSLA] = React.useState({
-
+    };
+    const [AuditPercentageMeetingSLA, setAuditPercentageMeetingSLA] = React.useState([]);
+    const AuditPercentageMeetingSLAFormat = {
         series: [{
-            name: 'SLA Met Percentage',
-            data: [44, 55, 41,]
+            name: 'SLA Met (Y)',
+            data: AuditPercentageMeetingSLA?.map(item => item.count_y) || []
+        },
+        {
+            name: 'SLA Met (N)',
+            data: AuditPercentageMeetingSLA?.map(item => item.count_n) || []
         },],
         options: {
             chart: {
                 type: 'bar',
                 height: 350,
             },
-            colors: ["#5ad5e2"],
+            colors: ["#5ad5e2", "#f4b841"],
             fill: {
                 opacity: 1,
-                colors: ["#5ad5e2"],
+                colors: ["#5ad5e2", "#f4b841"],
             },
             states: {
                 hover: {
@@ -206,7 +188,7 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
             },
             plotOptions: {
                 bar: {
-                    horizontal: true,
+                    horizontal: false,
                     dataLabels: {
                         total: {
                             enabled: true,
@@ -223,29 +205,14 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 width: 1,
                 colors: ['#fff']
             },
-            title: {
-                text: 'SLA Met Percentage',
-            },
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited',],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
+                categories: AuditPercentageMeetingSLA?.map(item => item.responsible_team) || []
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
 
             legend: {
                 position: 'top',
@@ -253,14 +220,12 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 offsetX: 40
             }
         },
-
-
-    });
-    const [ChecklistApprovalRateByAuditorName, setChecklistApprovalRateByAuditorName] = React.useState({
-
+    };
+    const [ChecklistApprovalRateByCompanyName, setChecklistApprovalRateByCompanyName] = React.useState([]);
+    const ChecklistApprovalRateByCompanyNameFormat = {
         series: [{
-            name: 'Approval Rate (%)',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            name: 'Approval Rate',
+            data: ChecklistApprovalRateByCompanyName?.top_counts?.map(item => item.checklist_rate) || []
         },],
         options: {
             chart: {
@@ -303,39 +268,21 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 width: 1,
                 colors: ['#fff']
             },
-            title: {
-                text: 'Approval Rate (%)',
-            },
             xaxis: {
-                categories: ['Auditor 1', 'Auditor 2', 'Auditor 3', 'Auditor 4', 'Auditor 5', 'Auditor 6', 'Auditor 7'],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
+                categories: ChecklistApprovalRateByCompanyName?.top_counts?.map(item => item.company_name) || [],
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
-
             legend: {
                 position: 'top',
                 horizontalAlign: 'left',
                 offsetX: 40
             }
         },
-
-
-    });
+    };
     const [DistributionOfKeyObservationsByAuditScope, setDistributionOfKeyObservationsByAuditScope] = React.useState({
         series: [17, 18, 30, 20, 25],
         options: {
@@ -389,8 +336,8 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
             ],
         },
     });
-    const [RiskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] = React.useState({
-        
+    const [RiskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] = React.useState([]);
+    const RiskLevelBreakdownByServiceTypeFormat = {
         series: [{
             name: 'High',
             data: [44, 55, 41, 37, 22, 43, 21]
@@ -403,8 +350,11 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
             name: 'Low',
             data: [12, 17, 11, 9, 15, 11, 20]
         },
-
-    ],
+        {
+            name: 'Empty',
+            data: [12, 17, 11, 9, 15, 11, 20]
+        },
+        ],
         options: {
             chart: {
                 type: 'bar',
@@ -457,18 +407,8 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 horizontalAlign: 'left',
                 offsetX: 40,
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     },
-            //     marker: {
-            //         show: true
-            //     }
-            // }
         }
-    });
+    }
     const [EscalationTriggeredByState, setEscalationTriggeredByState] = React.useState({
         series: [{
             name: 'Escalation Triggered - Yes',
@@ -479,7 +419,7 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
             data: [53, 32, 33, 52, 13, 43, 32]
         },
 
-    ],
+        ],
         options: {
             chart: {
                 type: 'bar',
@@ -537,37 +477,62 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
     });
 
     useEffect(() => {
-            const fetchData = async () => {
-                const [auditRes, auditPlatformsCountByStateRes, auditStatusByCompanyRes, auditVisitFindingsBySeverityRes, escalationTriggeredRateByStateRes, auditStatusBasedOnStorageModeRes, riskLevelBasedOnServiceTypeRes] = await Promise.allSettled([
-                    fetchAuditByServiceType(selectedCompany),
-                    fetchAuditPlatformsCountByState(selectedCompany),
-                    fetchAuditStatusByCompany(selectedCompany),
-                    fetchAuditVisitFindingsBySeverity(selectedCompany),
-                    fetchEscalationTriggeredRateByState(selectedCompany),
-                    fetchAuditStatusBasedOnStorageMode(selectedCompany),
-                    fetchRiskLevelBasedOnServiceType(selectedCompany),
-                ]);
-                if (auditRes.status === 'fulfilled') {
-                    // Process and set data for AuditCountByServiceType
-                } else {
-                    console.warn("fetchAll audit failed:", auditRes.reason);
-                }
-            };
-            fetchData();
-        }, [selectedCompany]);
+        const fetchData = async () => {
+            const [auditRes, auditSlaRes, auditPlatformsCountByStateSegmentedRes, auditStatusByCompanyRes, riskLevelRes] = await Promise.allSettled([
+                fetchAuditByServiceType(selectedCompany),
+                fetchAuditMeetingSLAByResponsibleTeam(selectedCompany),
+                // need to intrgrate in chart
+                fetchAuditPlatformsCountByStateSegmented(selectedCompany),
+                fetchAuditStatusByCompany(selectedCompany),
+                fetchRiskLevelBasedOnServiceType(selectedCompany),
+            ]);
+            if (auditRes.status === 'fulfilled') {
+                setAuditCountByServiceType(auditRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", auditRes.reason);
+                setAuditCountByServiceType(auditRes.reason?.status || []);
+            }
+            if (auditSlaRes.status === 'fulfilled') {
+                setAuditPercentageMeetingSLA(auditSlaRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", auditSlaRes.reason);
+                setAuditPercentageMeetingSLA(auditSlaRes.reason?.status || []);
+            }
+            if (auditPlatformsCountByStateSegmentedRes.status === 'fulfilled') {
+                setAuditCountByStateSegmented(auditPlatformsCountByStateSegmentedRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", auditPlatformsCountByStateSegmentedRes.reason);
+                setAuditCountByStateSegmented(auditPlatformsCountByStateSegmentedRes.reason?.status || []);
+            }
+            if (auditStatusByCompanyRes.status === 'fulfilled') {
+                setChecklistApprovalRateByCompanyName(auditStatusByCompanyRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", auditStatusByCompanyRes.reason);
+                setChecklistApprovalRateByCompanyName(auditStatusByCompanyRes.reason?.status || []);
+            }
+            if (riskLevelRes.status === 'fulfilled') {
+                setRiskLevelBreakdownByServiceType(riskLevelRes.value);
+            } else {
+                console.warn("fetchAll audit failed:", riskLevelRes.reason);
+                setRiskLevelBreakdownByServiceType(riskLevelRes.reason?.status || []);
+            }
+
+        };
+        fetchData();
+    }, [selectedCompany]);
     return (
         <div>
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Audit count by Service Type across all companies</div>
+                    <div className="mb-3 fw-600">Top 5 audit count by Service Type across all companies</div>
                     <Chart
-                        options={AuditCountByServiceType.options} series={AuditCountByServiceType.series} type="bar" height={380}
+                        options={AuditCountByServiceTypeFormat.options} series={AuditCountByServiceTypeFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Audit count by State segmented by Audit Platform</div>
                     <Chart
-                        options={AuditCountByStateSegmented.options} series={AuditCountByStateSegmented.series} type="bar" height={380}
+                        options={AuditCountByStateSegmentedFormat.options} series={AuditCountByStateSegmentedFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
@@ -576,29 +541,29 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Percentage of audits meeting SLA by Responsible Team</div>
                     <Chart
-                        options={AuditPercentageMeetingSLA.options} series={AuditPercentageMeetingSLA.series} type="bar" height={380}
+                        options={AuditPercentageMeetingSLAFormat.options} series={AuditPercentageMeetingSLAFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Checklist approval rate by Auditor Name</div>
+                    <div className="mb-3 fw-600">Checklist approval rate by Companyt Name </div>
                     <Chart
-                        options={ChecklistApprovalRateByAuditorName.options} series={ChecklistApprovalRateByAuditorName.series} type="bar" height={380}
+                        options={ChecklistApprovalRateByCompanyNameFormat.options} series={ChecklistApprovalRateByCompanyNameFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
 
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Distribution of Key Observations by Audit Scope</div>
+                    <div className="mb-3 fw-600">Distribution of Key Observations by Audit Scope (here we need to show all risk levels sum)</div>
                     <Chart
                         options={DistributionOfKeyObservationsByAuditScope.options} series={DistributionOfKeyObservationsByAuditScope.series} type="donut" height={380}
                     />
                 </div>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Checklist approval rate by Auditor Name</div>
-                    <Chart
-                        options={ChecklistApprovalRateByAuditorName.options} series={ChecklistApprovalRateByAuditorName.series} type="bar" height={380}
-                    />
+                    <div className="mb-3 fw-600">Checklist approval rate by Auditor Name (duplicate chart)</div>
+                    {/* <Chart
+                        options={ChecklistApprovalRateByCompanyName.options} series={ChecklistApprovalRateByCompanyName.series} type="bar" height={380}
+                    /> */}
                 </div>
             </div>
 
@@ -606,7 +571,7 @@ const AuditAndVisitDashboard = ({selectedCompany}) => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Risk Level breakdown by Service Type</div>
                     <Chart
-                        options={RiskLevelBreakdownByServiceType.options} series={RiskLevelBreakdownByServiceType.series} type="bar" height={380}
+                        options={RiskLevelBreakdownByServiceTypeFormat.options} series={RiskLevelBreakdownByServiceTypeFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
