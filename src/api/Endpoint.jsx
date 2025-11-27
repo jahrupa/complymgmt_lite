@@ -203,7 +203,7 @@ export const GET_COUNT_OF_CLIENT_DOC_SUBMISSION ='/api/v1/dashboard/view/notice/
 export const GET_DISTRIBUTION_OF_RESPONSE_STATUS ='/api/v1/dashboard/view/notice/inspection/response/status/count'
 
 // General Dashboard
-export const GET_STATUS_COUNT_OF_ASSIGNED_INDIVIDUAL ='/api/v1/dashboard/view/general/helpdesk/assigned/status/count';
+export const GET_STATUS_COUNT_OF_OPEN_VS_CLOSED_CASES ='/api/v1/dashboard/view/general/helpdesk/assigned/status/count';
 export const GET_ASSIGNED_INDIVIDUALS_LIST ='/api/v1/dashboard/view/general/helpdesk/assigned/count';
 export const GET_DOCUMENTS_PENDING_FROM ='/api/v1/dashboard/view/general/helpdesk/documents/pending/from';
 export const GET_ISSUE_CATEGORY_BY_STATUS ='/api/v1/dashboard/view/general/helpdesk/status/based/issue/category';

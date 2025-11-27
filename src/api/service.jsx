@@ -151,6 +151,10 @@ import {
   GET_COUNT_OF_ACKNOWLEDGMENT_RATES,
   GET_COUNT_OF_CLIENT_DOC_SUBMISSION,
   GET_DISTRIBUTION_OF_RESPONSE_STATUS,
+  GET_STATUS_COUNT_OF_OPEN_VS_CLOSED_CASES,
+  GET_ASSIGNED_INDIVIDUALS_LIST,
+  GET_DOCUMENTS_PENDING_FROM,
+  GET_ISSUE_CATEGORY_BY_STATUS,
 
 } from "./Endpoint";
 
@@ -1636,16 +1640,7 @@ export const fetchAuditStatusByCompany = async (company_name) => {
     throw error;
   }
 }
-// export const fetchAuditVisitFindingsBySeverity = async (company_name) => {
-//   try {
-//     const url = `${GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-//     const response = await API.get(url);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching Audit Visit Findings By Severity", error);
-//     throw error;
-//   }
-// }
+
 export const fetchAuditMeetingSLAByResponsibleTeam = async (company_name) => {
   try {
     const url = `${GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
@@ -1784,3 +1779,51 @@ export const fetchDistributionOfResponseStatus = async (company_name) => {
     throw error;
   }
 }
+
+// General Helpdesk
+export const fetchStatusCountOfoOpenVsClosedCases = async (company_name) => {
+  try {
+    const url = `${GET_STATUS_COUNT_OF_OPEN_VS_CLOSED_CASES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Status Count Of Assigned Individual", error);
+    throw error;
+  }
+}
+
+export const fetchAssignedIndividualsList = async (company_name) => {
+  try {
+    const url = `${GET_ASSIGNED_INDIVIDUALS_LIST}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Assigned Individuals List", error);
+    throw error;
+  }
+}
+
+export const fetchDocumentsPendingFrom = async (company_name) => {
+  try {
+    const url = `${GET_DOCUMENTS_PENDING_FROM}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Documents Pending From", error);
+    throw error;
+  }
+}
+
+export const fetchIssueCategoryByStatus = async (company_name) => {
+  try {
+    const url = `${GET_ISSUE_CATEGORY_BY_STATUS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Issue Category By Status", error);
+    throw error;
+  }
+}
+
+
+
