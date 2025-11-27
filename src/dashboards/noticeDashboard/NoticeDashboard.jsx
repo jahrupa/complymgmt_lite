@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Chart from 'react-apexcharts';
+import { fetchAnalysisOfApplicableAct, fetchAuthorityDistributionCount, fetchCountOfAcknowledgmentRates, fetchCountOfClientDocSubmission, fetchDistributionOfResponseStatus, fetchNoticesAssignedTo, fetchStateWiseNoticeCount, fetchTypesOfNoticeOrInspection } from '../../api/service';
 
-const NoticeDashboard = () => {
-    const [NoticeDistributionByAuthority, setNoticeDistributionByAuthority] = React.useState({
-
+const NoticeDashboard = ({ selectedCompany }) => {
+    const [NoticeDistributionByAuthority, setNoticeDistributionByAuthority] = React.useState([]);
+    const NoticeDistributionByAuthorityFormat = {
         series: [{
             name: 'Notice Count',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            data: NoticeDistributionByAuthority?.map(item => item.count) || []
         },],
         options: {
             chart: {
@@ -54,39 +55,25 @@ const NoticeDashboard = () => {
                 text: 'Notice Count',
             },
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
+                categories: NoticeDistributionByAuthority?.map(item => item.authority) || []
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
-
             legend: {
                 position: 'top',
                 horizontalAlign: 'left',
                 offsetX: 40
             }
         },
-
-
-    });
-    const [NoticeCountByStateSegmented, setNoticeCountByStateSegmented] = React.useState({
+    }
+    const [stateWiseNoticeCount, setStateWiseNoticeCount] = React.useState([]);
+    const stateWiseNoticeCountFormat = {
         series: [{
             name: 'Notice Count',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            data: stateWiseNoticeCount?.top_counts?.map(item => item.count) || []
         },],
         options: {
             chart: {
@@ -134,50 +121,40 @@ const NoticeDashboard = () => {
                 text: 'Notice Count',
             },
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd', 'Adani Wilmar Ltd', 'Indusind Bank Limited'],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
+                categories: stateWiseNoticeCount?.top_counts?.map(item => item.state) || [],
             },
             yaxis: {
                 title: {
                     text: undefined
                 },
             },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
-
             legend: {
                 position: 'top',
                 horizontalAlign: 'left',
                 offsetX: 40
             }
         },
-
-
-    });
-    const [numberOfNoticesAssignedToEachTeamMember, setNumberOfNoticesAssignedToEachTeamMember] = React.useState({
-
-        series: [{
-            name: 'Number of Notices Assigned',
-            data: [44, 55, 41,]
-        },],
+    }
+    const [noticeTypeBreakdown, setNoticeTypeBreakdown] = React.useState([]);
+    const noticeTypeBreakdownFormat = {
+        series: noticeTypeBreakdown?.map(item => item.count) || [],
         options: {
             chart: {
-                type: 'bar',
-                height: 350,
+                width: 380,
+                type: "donut",
             },
-            colors: ["#5ad5e2"],
+            colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             fill: {
                 opacity: 1,
-                colors: ["#5ad5e2"],
+                colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+
+            },
+            tooltip: {
+                theme: 'light', // makes all tooltip text black
+                style: {
+                    fontSize: '12px',
+                    color: '#000',
+                }
             },
             states: {
                 hover: {
@@ -191,153 +168,49 @@ const NoticeDashboard = () => {
                     },
                 },
             },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    dataLabels: {
-                        total: {
-                            enabled: true,
-                            offsetX: 0,
-                            style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
-                },
-            },
-            stroke: {
-                width: 1,
-                colors: ['#fff']
-            },
-            title: {
-                text: 'Number of Notices Assigned',
-            },
-            xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited',],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
-            },
-            yaxis: {
-                title: {
-                    text: undefined
-                },
-            },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
 
+            labels: noticeTypeBreakdown?.map(item => item.type_of_notice_inspection) || [],
             legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
-        },
-
-
-    });
-    const [acknowledgementRatesByIndividual, setAcknowledgementRatesByIndividual] = React.useState({
-
-        series: [{
-            name: 'Acknowledgement Rates',
-            data: [44, 55, 41,]
-        },],
-        options: {
-            chart: {
-                type: 'bar',
-                height: 350,
+                position: "top", // 👈 moves Yes/No below the chart
+                horizontalAlign: "center",
+                fontSize: "14px",
+                markers: {
+                    radius: 12,
+                },
+                labels: {
+                    colors: "#333",
+                },
             },
-            colors: ["#5ad5e2"],
-            fill: {
-                opacity: 1,
-                colors: ["#5ad5e2"],
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "none", // 👈 disables the lighten effect
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 250,
+                        },
+                        legend: {
+                            position: "bottom",
+                        },
                     },
                 },
-                active: {
-                    filter: {
-                        type: "none", // 👈 disables click highlight effect
-                    },
-                },
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: true,
-                    dataLabels: {
-                        total: {
-                            enabled: true,
-                            offsetX: 0,
-                            style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
-                },
-            },
-            stroke: {
-                width: 1,
-                colors: ['#fff']
-            },
-            title: {
-                text: 'Acknowledgement Rates',
-            },
-            xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited',],
-                // labels: {
-                //     formatter: function (val) {
-                //         return val + "K"
-                //     }
-                // }
-            },
-            yaxis: {
-                title: {
-                    text: undefined
-                },
-            },
-            // tooltip: {
-            //     y: {
-            //         formatter: function (val) {
-            //             return val + "K"
-            //         }
-            //     }
-            // },
-
-            legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
+            ],
         },
-
-
-    });
-    const [ApplicableActsAnalysis, setApplicableActsAnalysis] = React.useState({
-
+    }
+    const [ApplicableActsAnalysis, setApplicableActsAnalysis] = React.useState([]);
+    const ApplicableActsAnalysisFormat = {
         series: [{
             name: 'Applicable Acts Count',
-            data: [44, 55, 41, 37, 22, 43, 21]
+            data: ApplicableActsAnalysis?.top_counts?.map(item => item.count) || []
         },],
         options: {
             chart: {
                 type: 'bar',
                 height: 350,
             },
-            colors: ["#5ad5e2"],
+            colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-                colors: ["#5ad5e2"],
+                colors: ["#2cafc0ff"],
             },
             states: {
                 hover: {
@@ -374,7 +247,137 @@ const NoticeDashboard = () => {
                 text: 'Applicable Acts Count',
             },
             xaxis: {
-                categories: ['Auditor 1', 'Auditor 2', 'Auditor 3', 'Auditor 4', 'Auditor 5', 'Auditor 6', 'Auditor 7'],
+                categories: ApplicableActsAnalysis?.top_counts?.map(item => item.applicable_act) || [],
+            },
+            yaxis: {
+                title: {
+                    text: undefined
+                },
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'left',
+                offsetX: 40
+            }
+        },
+    }
+    const [numberOfNoticesAssignedToEachTeamMember, setNumberOfNoticesAssignedToEachTeamMember] = React.useState([]);
+    const numberOfNoticesAssignedToEachTeamMemberFormat = {
+        series: [{
+            name: 'Number of Notices Assigned',
+            data: numberOfNoticesAssignedToEachTeamMember?.top_counts?.map(item => item.count) || []
+        },],
+        options: {
+            chart: {
+                type: 'bar',
+                height: 350,
+            },
+            colors: ["#2cafc0ff"],
+            fill: {
+                opacity: 1,
+                colors: ["#2cafc0ff"],
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none", // 👈 disables the lighten effect
+                    },
+                },
+                active: {
+                    filter: {
+                        type: "none", // 👈 disables click highlight effect
+                    },
+                },
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    dataLabels: {
+                        total: {
+                            enabled: true,
+                            offsetX: 0,
+                            style: {
+                                fontSize: '13px',
+                                fontWeight: 900
+                            }
+                        }
+                    }
+                },
+            },
+            stroke: {
+                width: 1,
+                colors: ['#fff']
+            },
+            title: {
+                text: 'Number of Notices Assigned',
+            },
+            xaxis: {
+                categories: numberOfNoticesAssignedToEachTeamMember?.top_counts?.map(item => item.assigned_to) || [],
+            },
+            yaxis: {
+                title: {
+                    text: undefined
+                },
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'left',
+                offsetX: 40
+            }
+        },
+    }
+    const [countOfAcknowledgmentRates, setCountOfAcknowledgmentRates] = React.useState([]);
+    const countOfAcknowledgmentRatesFormat = {
+        series: [{
+            name: 'Acknowledgement Rates',
+            data: countOfAcknowledgmentRates?.top_counts?.map(item => item.count) || []
+        },],
+        options: {
+            chart: {
+                type: 'bar',
+                height: 350,
+            },
+            colors: ["#2cafc0ff"],
+            fill: {
+                opacity: 1,
+                colors: ["#2cafc0ff"],
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none", // 👈 disables the lighten effect
+                    },
+                },
+                active: {
+                    filter: {
+                        type: "none", // 👈 disables click highlight effect
+                    },
+                },
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    dataLabels: {
+                        total: {
+                            enabled: true,
+                            offsetX: 0,
+                            style: {
+                                fontSize: '13px',
+                                fontWeight: 900
+                            }
+                        }
+                    }
+                },
+            },
+            stroke: {
+                width: 1,
+                colors: ['#fff']
+            },
+            title: {
+                text: 'Acknowledgement Rates',
+            },
+            xaxis: {
+                categories: countOfAcknowledgmentRates?.top_counts?.map(item => item.acknowledged_by) || [],
                 // labels: {
                 //     formatter: function (val) {
                 //         return val + "K"
@@ -400,11 +403,11 @@ const NoticeDashboard = () => {
                 offsetX: 40
             }
         },
+    }
 
-
-    });
-    const [noticeTypeBreakdown, setNoticeTypeBreakdown] = React.useState({
-        series: [17, 18, 30, 20, 25],
+    const [distributionOfResponseStatus, setDistributionOfResponseStatus] = React.useState([]);
+    const distributionOfResponseStatusFormat = {
+        series: distributionOfResponseStatus?.map(item => item.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -429,7 +432,7 @@ const NoticeDashboard = () => {
                 },
             },
 
-            labels: ["Process", "Compliance", "Financial", "Operational", "IT Security"],
+            labels: distributionOfResponseStatus?.map(item => item.response_status) || [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
                 horizontalAlign: "center",
@@ -455,63 +458,10 @@ const NoticeDashboard = () => {
                 },
             ],
         },
-    });
-    const [responseStatusDistribution, setResponseStatusDistribution] = React.useState({
-        series: [17, 18, 30, ],
-        options: {
-            chart: {
-                width: 380,
-                type: "donut",
-            },
-            colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
-            fill: {
-                opacity: 1,
-                colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
-
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "none", // 👈 disables the lighten effect
-                    },
-                },
-                active: {
-                    filter: {
-                        type: "none", // 👈 disables click highlight effect
-                    },
-                },
-            },
-
-            labels: ["Filed", "IN Progress", "No", ],
-            legend: {
-                position: "top", // 👈 moves Yes/No below the chart
-                horizontalAlign: "center",
-                fontSize: "14px",
-                markers: {
-                    radius: 12,
-                },
-                labels: {
-                    colors: "#333",
-                },
-            },
-            responsive: [
-                {
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            width: 250,
-                        },
-                        legend: {
-                            position: "bottom",
-                        },
-                    },
-                },
-            ],
-        },
-    });
-  
-    const [clientDocumentSubmission, setClientDocumentSubmission] = React.useState({
-        series: [17, 18],
+    }
+    const [clientDocumentSubmission, setClientDocumentSubmission] = React.useState([]);
+    const clientDocumentSubmissionFormat = {
+        series: clientDocumentSubmission?.map(item => item.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -535,7 +485,7 @@ const NoticeDashboard = () => {
                 },
             },
 
-            labels: ["Yes", "No"],
+            labels: clientDocumentSubmission?.map(item => item.doc_submission_by_client) || [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
                 horizontalAlign: "center",
@@ -561,20 +511,85 @@ const NoticeDashboard = () => {
                 },
             ],
         },
-    });
+    }
+    useEffect(() => {
+        const fetchData = async () => {
+            const [noticeDistributionByAuthorityRes, stateWiseNoticeCountRes, typesOfNoticeOrInspectionRes, analysisOfApplicableActRes, noticesAssignedToRes, countOfAcknowledgmentRates, distributionOfResponseStatus, countOfClientDocSubmission] = await Promise.allSettled([
+                fetchAuthorityDistributionCount(selectedCompany),
+                fetchStateWiseNoticeCount(selectedCompany),
+                fetchTypesOfNoticeOrInspection(selectedCompany),
+                fetchAnalysisOfApplicableAct(selectedCompany),
+                fetchNoticesAssignedTo(selectedCompany),
+                fetchCountOfAcknowledgmentRates(selectedCompany),
+                fetchDistributionOfResponseStatus(selectedCompany),
+                fetchCountOfClientDocSubmission(selectedCompany),
+            ]);
+            if (noticeDistributionByAuthorityRes.status === 'fulfilled') {
+                setNoticeDistributionByAuthority(noticeDistributionByAuthorityRes.value);
+            } else {
+                console.warn("fetch notice distribution by authority failed:", noticeDistributionByAuthorityRes.reason);
+                // Optionally set to empty or default data on failure
+                setNoticeDistributionByAuthority(noticeDistributionByAuthorityRes.reason?.status || []);
+            }
+            if (stateWiseNoticeCountRes.status === 'fulfilled') {
+                setStateWiseNoticeCount(stateWiseNoticeCountRes.value);
+            } else {
+                console.warn("fetch state wise notice count failed:", stateWiseNoticeCountRes.reason);
+                // Optionally set to empty or default data on failure
+                setStateWiseNoticeCount(stateWiseNoticeCountRes.reason?.status || []);
+            }
+            if (typesOfNoticeOrInspectionRes.status === 'fulfilled') {
+                setNoticeTypeBreakdown(typesOfNoticeOrInspectionRes.value);
+            } else {
+                console.warn("fetch types of notice or inspection failed:", typesOfNoticeOrInspectionRes.reason);
+                setNoticeTypeBreakdown(typesOfNoticeOrInspectionRes.reason?.status || []);
+            }
+            if (analysisOfApplicableActRes.status === 'fulfilled') {
+                setApplicableActsAnalysis(analysisOfApplicableActRes.value);
+            } else {
+                console.warn("fetch analysis of applicable act failed:", analysisOfApplicableActRes.reason);
+                setApplicableActsAnalysis(analysisOfApplicableActRes.reason?.status || []);
+            }
+            if (noticesAssignedToRes.status === 'fulfilled') {
+                setNumberOfNoticesAssignedToEachTeamMember(noticesAssignedToRes.value);
+            } else {
+                console.warn("fetch notices assigned to failed:", noticesAssignedToRes.reason);
+                setNumberOfNoticesAssignedToEachTeamMember(noticesAssignedToRes.reason?.status || []);
+            }
+            if (countOfAcknowledgmentRates.status === 'fulfilled') {
+                setCountOfAcknowledgmentRates(countOfAcknowledgmentRates.value);
+            } else {
+                console.warn("fetch count of acknowledgment rates failed:", countOfAcknowledgmentRates.reason);
+                setCountOfAcknowledgmentRates(countOfAcknowledgmentRates.reason?.status || []);
+            }
+            if (distributionOfResponseStatus.status === 'fulfilled') {
+                setDistributionOfResponseStatus(distributionOfResponseStatus.value);
+            } else {
+                console.warn("fetch distribution of response status failed:", distributionOfResponseStatus.reason);
+                setDistributionOfResponseStatus(distributionOfResponseStatus.reason?.status || []);
+            }
+            if (countOfClientDocSubmission.status === 'fulfilled') {
+                setClientDocumentSubmission(countOfClientDocSubmission.value);
+            } else {
+                console.warn("fetch count of client document submission failed:", countOfClientDocSubmission.reason);
+                setClientDocumentSubmission(countOfClientDocSubmission.reason?.status || []);
+            }
+        };
+        fetchData();
+    }, [selectedCompany]);
     return (
         <div>
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Distribution of notices across different authorities to identify which regulatory bodies are most active.</div>
                     <Chart
-                        options={NoticeDistributionByAuthority.options} series={NoticeDistributionByAuthority.series} type="bar" height={380}
+                        options={NoticeDistributionByAuthorityFormat.options} series={NoticeDistributionByAuthorityFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">State-wise notice count comparison to highlight regional compliance activity.</div>
                     <Chart
-                        options={NoticeCountByStateSegmented.options} series={NoticeCountByStateSegmented.series} type="bar" height={380}
+                        options={stateWiseNoticeCountFormat.options} series={stateWiseNoticeCountFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
@@ -583,13 +598,13 @@ const NoticeDashboard = () => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Breakdown of notice types to show the most common compliance actions</div>
                     <Chart
-                        options={noticeTypeBreakdown.options} series={noticeTypeBreakdown.series} type="donut" height={380}
+                        options={noticeTypeBreakdownFormat.options} series={noticeTypeBreakdownFormat.series} type="donut" height={380}
                     />
                 </div>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Analysis of applicable acts to reveal legal focus areas</div>
                     <Chart
-                        options={ApplicableActsAnalysis.options} series={ApplicableActsAnalysis.series} type="bar" height={380}
+                        options={ApplicableActsAnalysisFormat.options} series={ApplicableActsAnalysisFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
@@ -598,13 +613,13 @@ const NoticeDashboard = () => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Number of notices assigned to each team member to assess workload distribution</div>
                     <Chart
-                        options={numberOfNoticesAssignedToEachTeamMember.options} series={numberOfNoticesAssignedToEachTeamMember.series} type="bar" height={380}
+                        options={numberOfNoticesAssignedToEachTeamMemberFormat.options} series={numberOfNoticesAssignedToEachTeamMemberFormat.series} type="bar" height={380}
                     />
                 </div>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Comparison of acknowledgement rates by different individuals to evaluate responsiveness.</div>
                     <Chart
-                        options={acknowledgementRatesByIndividual.options} series={acknowledgementRatesByIndividual.series} type="bar" height={380}
+                        options={countOfAcknowledgmentRatesFormat.options} series={countOfAcknowledgmentRatesFormat.series} type="bar" height={380}
                     />
                 </div>
             </div>
@@ -612,13 +627,13 @@ const NoticeDashboard = () => {
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Distribution of response status to track resolution progress</div>
                     <Chart
-                        options={responseStatusDistribution.options} series={responseStatusDistribution.series} type="donut" height={380}
+                        options={distributionOfResponseStatusFormat.options} series={distributionOfResponseStatusFormat.series} type="donut" height={380}
                     />
                 </div>
                 <div className="chart-card">
                     <div className="mb-3 fw-600">Proportion of notices with client document submission (Y/N) to measure client engagement.</div>
                     <Chart
-                        options={clientDocumentSubmission.options} series={clientDocumentSubmission.series} type="donut" height={380}
+                        options={clientDocumentSubmissionFormat.options} series={clientDocumentSubmissionFormat.series} type="donut" height={380}
                     />
                 </div>
             </div>

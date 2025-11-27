@@ -143,6 +143,14 @@ import {
   GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM,
   GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME,
   GET_COUNT_OF_RISK_LEVEL,
+  GET_AUTHORITY_DISTRIBUTION_COUNT,
+  GET_STATE_WISE_NOTICE_COUNT,
+  GET_TYPES_OF_NOTICE_OR_INSPECTION,
+  GET_ANALYSIS_OF_APPLICABLE_ACT,
+  GET_NOTICES_ASSIGNED_TO,
+  GET_COUNT_OF_ACKNOWLEDGMENT_RATES,
+  GET_COUNT_OF_CLIENT_DOC_SUBMISSION,
+  GET_DISTRIBUTION_OF_RESPONSE_STATUS,
 
 } from "./Endpoint";
 
@@ -1689,6 +1697,90 @@ export const fetchEscalationTriggeredRateByState = async (state) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Escalation Triggered Rate By State", error);
+    throw error;
+  }
+}
+
+// Notice & Enspections
+
+export const fetchAuthorityDistributionCount = async (company_name) => {
+  try {
+    const url = `${GET_AUTHORITY_DISTRIBUTION_COUNT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Authority Distribution Count", error);
+    throw error;
+  }
+}
+export const fetchStateWiseNoticeCount = async (state) => {
+  try {
+    const url = `${GET_STATE_WISE_NOTICE_COUNT}${state ? `?state=${encodeURIComponent(state)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching State Wise Notice Count", error);
+    throw error;
+  }
+}
+export const fetchTypesOfNoticeOrInspection = async () => {
+  try {
+    const url = `${GET_TYPES_OF_NOTICE_OR_INSPECTION}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Types Of Notice Or Inspection", error);
+    throw error;
+  }
+}
+export const fetchAnalysisOfApplicableAct = async (company_name) => {
+  try {
+    const url = `${GET_ANALYSIS_OF_APPLICABLE_ACT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Analysis Of Applicable Act", error);
+    throw error;
+  }
+}
+export const fetchNoticesAssignedTo = async (assigned_to) => {
+  try {
+    const url = `${GET_NOTICES_ASSIGNED_TO}${assigned_to ? `?assigned_to=${encodeURIComponent(assigned_to)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Notices Assigned To", error);
+    throw error;
+  }
+}
+export const fetchCountOfAcknowledgmentRates = async (company_name) => {
+  try {
+    const url = `${GET_COUNT_OF_ACKNOWLEDGMENT_RATES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Count Of Acknowledgment Rates", error);
+    throw error;
+  }
+}
+export const fetchCountOfClientDocSubmission = async (company_name) => {
+  try {
+    const url = `${GET_COUNT_OF_CLIENT_DOC_SUBMISSION}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Count Of Client Doc Submission", error);
+    throw error;
+  }
+}
+
+export const fetchDistributionOfResponseStatus = async (company_name) => {
+  try {
+    const url = `${GET_DISTRIBUTION_OF_RESPONSE_STATUS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Distribution Of Response Status", error);
     throw error;
   }
 }

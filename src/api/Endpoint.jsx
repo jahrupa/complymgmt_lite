@@ -193,13 +193,20 @@ export const GET_COUNT_OF_RISK_LEVEL ='/api/v1/dashboard/view/audit/count/risk/l
 
 
 // Notice & Inspections (need to change form postnman this is auto generated)
-export const GET_NOTICE_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/notice/type'
-export const GET_NOTICE_STATUS_BY_COMPANY ='/api/v1/dashboard/view/notice/status/company'
-export const GET_INSPECTION_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/notice/inspection/findings/severity'
-export const GET_NOTICE_RESPONSE_TIME_BY_STATE ='/api/v1/dashboard/view/notice/response/time/state_wise'
-export const GET_NOTICE_COMPLIANCE_STATUS_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/compliance/status/notice_type'
-export const GET_COMMON_VIOLATIONS_BY_COMPANY ='/api/v1/dashboard/view/notice/common/violations/company'
-export const GET_AVERAGE_NOTICE_RESOLUTION_TIME ='/api/v1/dashboard/view/notice/average/resolution/time'
+export const GET_AUTHORITY_DISTRIBUTION_COUNT ='/api/v1/dashboard/view/notice/inspection/authority/distribution/count'
+export const GET_STATE_WISE_NOTICE_COUNT ='/api/v1/dashboard/view/notice/inspection/state/wise/notice/count'
+export const GET_TYPES_OF_NOTICE_OR_INSPECTION ='/api/v1/dashboard/view/notice/inspection/type/notices'
+export const GET_ANALYSIS_OF_APPLICABLE_ACT ='/api/v1/dashboard/view/notice/inspection/analysis/applicable/act'
+export const GET_NOTICES_ASSIGNED_TO ='/api/v1/dashboard/view/notice/inspection/assigned/to'
+export const GET_COUNT_OF_ACKNOWLEDGMENT_RATES ='/api/v1/dashboard/view/notice/inspection/acknowledged/by'
+export const GET_COUNT_OF_CLIENT_DOC_SUBMISSION ='/api/v1/dashboard/view/notice/inspection/document/submission/client'
+export const GET_DISTRIBUTION_OF_RESPONSE_STATUS ='/api/v1/dashboard/view/notice/inspection/response/status/count'
+
+// General Dashboard
+export const GET_STATUS_COUNT_OF_ASSIGNED_INDIVIDUAL ='/api/v1/dashboard/view/general/helpdesk/assigned/status/count';
+export const GET_ASSIGNED_INDIVIDUALS_LIST ='/api/v1/dashboard/view/general/helpdesk/assigned/count';
+export const GET_DOCUMENTS_PENDING_FROM ='/api/v1/dashboard/view/general/helpdesk/documents/pending/from';
+export const GET_ISSUE_CATEGORY_BY_STATUS ='/api/v1/dashboard/view/general/helpdesk/status/based/issue/category';
 
 
 

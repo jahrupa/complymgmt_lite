@@ -174,10 +174,10 @@ const HelpdeskAndEscalations = ({ selectedCompany }) => {
                 width: 380,
                 type: "pie",
             },
-            colors: ["#cfa4f080", "#e8a8ee", "#a16ade80"],
+            colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             fill: {
                 opacity: 1,
-                colors: ["#cfa4f080", "#e8a8ee", "#a16ade80"],
+                colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
             },
             states: {
                 hover: {
@@ -612,7 +612,7 @@ const HelpdeskAndEscalations = ({ selectedCompany }) => {
 
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Analysis of client vs. government delay flags for open tickets in PF_ESIC_Helpdesk</div>
+                    <div className="mb-3 fw-600">Analysis of client vs. government delay flags for open tickets in PF_ESIC_Helpdesk--------(hardcoded)</div>
                     <Chart
                         options={clientVsGovernmentDelayFlags.options} series={clientVsGovernmentDelayFlags.series} type="pie" height={380}
                     />
