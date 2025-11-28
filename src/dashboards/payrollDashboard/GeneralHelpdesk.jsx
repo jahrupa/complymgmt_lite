@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Chart from 'react-apexcharts';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -6,6 +6,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { fetchAssignedIndividualsList, fetchDocumentsPendingFrom, fetchIssueCategoryByStatus, fetchStatusCountOfoOpenVsClosedCases, fetchTotalCountOfCommunicationTypes } from '../../api/service';
 import { ArrowUpRight, X } from 'lucide-react';
+import DashboardDrawerGrid from '../DashboardDrawer';
 
 const GeneralHelpdesk = ({ selectedCompany }) => {
     const [closedVsOpenCases, setClosedVsOpenCases] = React.useState({
@@ -292,16 +293,15 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
         },
     }
     const [openVsCloseIssueCategory, setOpenVsCloseIssueCategory] = React.useState([]);
-    console.log(openVsCloseIssueCategory,'openVsCloseIssueCategory')
     const openVsCloseIssueCategoryFormat = {
-         series:  [{
-                name: "Open Cases",
-                data: openVsCloseIssueCategory?.top_counts?.map((item) => item.count)
-            },
-            {
-                name: "Closed Cases",
-                data: openVsCloseIssueCategory?.top_counts?.map((item) => item.count)
-            },],
+        series: [{
+            name: "Open Cases",
+            data: openVsCloseIssueCategory?.top_counts?.map((item) => item.open)
+        },
+        {
+            name: "Closed Cases",
+            data: openVsCloseIssueCategory?.top_counts?.map((item) => item.closed)
+        },],
         options: {
             chart: {
                 type: "bar",
@@ -344,9 +344,9 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 width: 1,
                 colors: ['#fff']
             },
-           
+
             xaxis: {
-                categories: openVsCloseIssueCategory?.top_counts?.map((item) => item.issue_category ||[]) || [],
+                categories: openVsCloseIssueCategory?.top_counts?.map((item) => item.issue_category || []) || [],
                 labels: {
                     formatter: function (val) {
                         return val + "K"
@@ -374,7 +374,6 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
         },
     }
     const [selectedCharts, setSelectedCharts] = React.useState([]);
-
     const toggleChartSelection = (id) => {
         setSelectedCharts((prev) =>
             prev.includes(id)
@@ -382,7 +381,18 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 : [...prev, id]                      // add new ID
         );
     };
-
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerAnchor, setDrawerAnchor] = React.useState("right");
+    const [drawerTitle, setDrawerTitle] = useState("");
+    const [drawerData, setDrawerData] = useState("");
+    const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const handleOpenDrawer = (anchor, title, data = [],chartXaxisCategory) => {
+        setDrawerAnchor(anchor);
+        setDrawerTitle(title);
+        setDrawerOpen(true);
+        setDrawerData(data);
+        setChartXaxisCategory(chartXaxisCategory);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -446,7 +456,13 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                             onChange={() => toggleChartSelection("gh-1")}
                             checked={selectedCharts.includes("gh-1")}
                         />
-                        <div className='dashboard-icon ms-2'>
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                )
+                            }
+                        >
                             <ArrowUpRight />
                         </div>
                         <div className='dashboard-icon me-2 ms-1'>
@@ -465,14 +481,38 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                         height={380}
                     />
                 </div>
+                <div
+                    className={`chart-card ${selectedCharts.includes("gh-2") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("gh-2")}
+                    style={{ cursor: "pointer" }}
+                >
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("gh-2")}
+                            checked={selectedCharts.includes("gh-2")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "left",
+                                    "Assigned Users",
+                                    assignedUser?.rest_assigned_counts,
+                                    assignedUser?.rest_assigned_counts?.map((item) => item.assigned_to),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
 
-                <div className="chart-card">
-                    <input
-                        type="checkbox"
-                        onChange={() => toggleChartSelection("chart_assigned_users")}
-                        checked={selectedCharts.includes("chart_assigned_users")}
-                    />
-                    <div className="mb-3 fw-600">Top 5 Assigned users</div>
+                    <div className="mb-3 fw-600">
+                        Top 5 Assigned Users
+                    </div>
 
                     <Chart
                         options={assignedUserFormat.options}
@@ -484,14 +524,36 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
             </div>
 
             <div className='charts-grid mb-4'>
-                <div className="chart-card">
-                    <input
-                        type="checkbox"
-                        onChange={() => toggleChartSelection("chart_client_karma")}
-                        checked={selectedCharts.includes("chart_client_karma")}
-                    />
+                <div
+                    className={`chart-card ${selectedCharts.includes("gh-3") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("gh-3")}
+                    style={{ cursor: "pointer" }}
+                >
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("gh-3")}
+                            checked={selectedCharts.includes("gh-3")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Documents Pending From Client vs. Karma",
+                                    documentPendingFrom?.rest_docs_pending,
+                                    documentPendingFrom?.rest_docs_pending?.map((item) => item.documents_pending_from),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
                     <div className="mb-3 fw-600">
-                        Documents Pending From Client vs. Karma
+                        Top 5 documents Pending From Client vs. Karma
                     </div>
 
                     <Chart
@@ -501,15 +563,37 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                         height={380}
                     />
                 </div>
+                <div
+                    className={`chart-card ${selectedCharts.includes("gh-4") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("gh-4")}
+                    style={{ cursor: "pointer" }}
+                >
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("gh-4")}
+                            checked={selectedCharts.includes("gh-4")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "left",
+                                    "Open and Closed Issue Status by Issue Category",
+                                    openVsCloseIssueCategory?.rest_counts,
+                                    openVsCloseIssueCategory?.rest_counts?.map((item) => item.issue_category),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
 
-                <div className="chart-card">
-                    <input
-                        type="checkbox"
-                        onChange={() => toggleChartSelection("chart_issue_status")}
-                        checked={selectedCharts.includes("chart_issue_status")}
-                    />
                     <div className="mb-3 fw-600">
-                        Open and closed issue status by Issue Category
+                        Top 5 open and Closed Issue Status by Issue Category
                     </div>
 
                     <Chart
@@ -520,7 +604,14 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                     />
                 </div>
             </div>
-
+            <DashboardDrawerGrid
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                data={drawerData}        //direct array
+                title={drawerTitle}
+                chartXaxisCategory={chartXaxisCategory}
+            />
 
         </div>
     )

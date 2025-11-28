@@ -1,7 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts';
 import { fetchCompaniesPerReturnsNames, fetchComplianceRiskDistributionByState, fetchComplianceStatusBasedOnReturns, fetchFrequencyWiseReturns, fetchRemarksBasedOnCompany, fetchReturnApplicabilityByCompanyCommonName, fetchStateWiseAnalysisOfApplicableReturns } from '../../api/service';
+import DashboardDrawerGrid from '../DashboardDrawer';
+import { ArrowUpRight, X } from 'lucide-react';
 const ReturnsAndSubmissions = ({ selectedCompany }) => {
+
+    const [selectedCharts, setSelectedCharts] = React.useState([]);
+    const toggleChartSelection = (id) => {
+        setSelectedCharts((prev) =>
+            prev.includes(id)
+                ? prev.filter(item => item !== id)   // remove if existed
+                : [...prev, id]                      // add new ID
+        );
+    };
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerAnchor, setDrawerAnchor] = React.useState("right");
+    const [drawerTitle, setDrawerTitle] = useState("");
+    const [drawerData, setDrawerData] = useState("");
+    const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+        setDrawerAnchor(anchor);
+        setDrawerTitle(title);
+        setDrawerOpen(true);
+        setDrawerData(data);
+        setChartXaxisCategory(chartXaxisCategory);
+    };
+
     const employeeCountForSystemUse = [
         { serviceType: "SmoothPay", employeeCount: 120 },
         { serviceType: "Opportune", employeeCount: 85 },
@@ -555,10 +579,10 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
                 // max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
                 tickAmount: 5,
             },
-           colors: ["#2cafc0ff"],
+            colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-               colors: ["#2cafc0ff"],
+                colors: ["#2cafc0ff"],
             },
             states: {
                 hover: {
@@ -719,7 +743,33 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
     return (
         <div>
             <div className='charts-grid mb-4'>
-                <div className="chart-card">
+
+                <div className={`chart-card ${selectedCharts.includes("ps-1") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ps-1")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ps-1")}
+                            checked={selectedCharts.includes("ps-1")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Average delay between data request date and client data received date by company",
+                                    comparisonOfReturnApplicability?.rest_counts,
+                                    comparisonOfReturnApplicability?.rest_counts?.map((item) => item.company_name),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
                     <div className="mb-3 fw-600">Top 5 comparison of Return Applicability across Companies</div>
                     <Chart
                         options={comparisonOfReturnApplicabilityFormat.options} series={comparisonOfReturnApplicabilityFormat.series} type="bar" height={380}
@@ -734,33 +784,110 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
             </div>
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
-                    <div className="mb-3 fw-600">Top 5 compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
+                    <div className="mb-3 fw-600">Compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
                     <Chart
                         options={applicableReturnsByLocationFormat.options} series={applicableReturnsByLocationFormat.series} type="bar" height={380}
                     />
                 </div>
-                <div className="chart-card">
+
+                <div className={`chart-card ${selectedCharts.includes("ps-4") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ps-4")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ps-4")}
+                            checked={selectedCharts.includes("ps-4")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Analysis of applicable return names, identifying the most frequently required returns across companies",
+                                    companiesPerReturnsNames?.rest_counts,
+                                    companiesPerReturnsNames?.rest_counts?.map((item) => item.returns_name),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
                     <div className="mb-3 fw-600">Top 5 analysis of applicable return names, identifying the most frequently required returns across companies</div>
                     <Chart
                         options={companiesPerReturnsNamesFormat.options} series={companiesPerReturnsNamesFormat.series} type="bar" height={380}
                     />
                 </div>
+
             </div>
 
             <div className='charts-grid mb-4'>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Compliance risk distribution by state, identifying regions with elevated compliance risk levels.</div>
+                <div className={`chart-card ${selectedCharts.includes("ps-5") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ps-5")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ps-5")}
+                            checked={selectedCharts.includes("ps-5")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Compliance risk distribution by state, identifying regions with elevated compliance risk levels",
+                                    riskDistributionByState?.rest_counts,
+                                    riskDistributionByState?.rest_counts?.map((item) => item.state),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                    <div className="mb-3 fw-600">Top 5 compliance risk distribution by state, identifying regions with elevated compliance risk levels.</div>
                     <Chart
                         options={riskDistributionByStateFormat.options} series={riskDistributionByStateFormat.series} type="bar" height={380}
                     />
                 </div>
-                <div className="chart-card">
+
+                <div className={`chart-card ${selectedCharts.includes("ps-6") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ps-6")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ps-6")}
+                            checked={selectedCharts.includes("ps-6")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "State-wise analysis of applicable returns, showcasing regional concentration of compliance activities",
+                                    stateWiseAnalysisOfApplicableReturns?.rest_counts,
+                                    stateWiseAnalysisOfApplicableReturns?.rest_counts?.map((item) => item.state),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
                     <div className="mb-3 fw-600">Top 5 state-wise analysis of applicable returns, showcasing regional concentration of compliance activities.</div>
                     <Chart
                         options={applicableReturnsByStateFormat.options} series={applicableReturnsByStateFormat.series} type="bar" height={380}
                     />
                 </div>
-
             </div>
             <div className='mb-4'>
                 <div className="chart-card">
@@ -771,7 +898,14 @@ const ReturnsAndSubmissions = ({ selectedCompany }) => {
                 </div>
 
             </div>
-
+            <DashboardDrawerGrid
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                data={drawerData}        //direct array
+                title={drawerTitle}
+                chartXaxisCategory={chartXaxisCategory}
+            />
         </div>
     )
 }

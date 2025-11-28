@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts';
 import { fetchAuditByServiceType, fetchAuditMeetingSLAByResponsibleTeam, fetchAuditPlatformsCountByStateSegmented, fetchAuditStatusByCompany, fetchAuditStatusCount, fetchCountOfRiskLevel, fetchEscalationTriggeredRateByState, fetchRiskLevelBasedOnServiceType } from '../../api/service';
+import DashboardDrawerGrid from '../DashboardDrawer';
+import { ArrowUpRight, X } from 'lucide-react';
 
 const AuditAndVisitDashboard = ({ selectedCompany }) => {
     const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState([]);
@@ -68,6 +70,27 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
         },
     };
     const [AuditCountByStateSegmented, setAuditCountByStateSegmented] = React.useState([]);
+
+    const [selectedCharts, setSelectedCharts] = React.useState([]);
+    const toggleChartSelection = (id) => {
+        setSelectedCharts((prev) =>
+            prev.includes(id)
+                ? prev.filter(item => item !== id)   // remove if existed
+                : [...prev, id]                      // add new ID
+        );
+    };
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerAnchor, setDrawerAnchor] = React.useState("right");
+    const [drawerTitle, setDrawerTitle] = useState("");
+    const [drawerData, setDrawerData] = useState("");
+    const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+        setDrawerAnchor(anchor);
+        setDrawerTitle(title);
+        setDrawerOpen(true);
+        setDrawerData(data);
+        setChartXaxisCategory(chartXaxisCategory);
+    };
     const data = AuditCountByStateSegmented?.top_count || [];
 
     // Collect all keys except "state"
@@ -142,7 +165,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 colors: ['#fff']
             },
             xaxis: {
-                categories: AuditCountByStateSegmented?.top_counts?.map(item => item.state) || [],
+                categories: AuditCountByStateSegmented?.top_count?.map(item => item.state) || [],
             },
             yaxis: {
                 title: {
@@ -445,7 +468,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                 width: 1,
                 colors: ['#fff']
             },
-          
+
             xaxis: {
                 categories: riskLevelBreakdownByServiceType?.map(item => item.service_type) || [],
 
@@ -588,14 +611,66 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
     return (
         <div>
             <div className='charts-grid mb-4'>
-                <div className="chart-card">
+                <div className={`chart-card ${selectedCharts.includes("av-1") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("av-1")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("av-1")}
+                            checked={selectedCharts.includes("av-1")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Aaudit count by Service Type across all companies",
+                                    AuditCountByServiceType?.rest_counts,
+                                    AuditCountByServiceType?.rest_counts?.map((item) => item.service_type),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
                     <div className="mb-3 fw-600">Top 5 audit count by Service Type across all companies</div>
                     <Chart
                         options={AuditCountByServiceTypeFormat.options} series={AuditCountByServiceTypeFormat.series} type="bar" height={380}
                     />
                 </div>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Top 5 audit count by State segmented by Audit Platform</div>
+                
+
+                  <div className={`chart-card ${selectedCharts.includes("av-2") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("av-2")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("av-2")}
+                            checked={selectedCharts.includes("av-2")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Audit count by State segmented by Audit Platform",
+                                    AuditCountByStateSegmented?.rest_count,
+                                    AuditCountByStateSegmented?.rest_count?.map((item) => item.state),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                     <div className="mb-3 fw-600">Top 5 audit count by State segmented by Audit Platform</div>
                     <Chart
                         options={AuditCountByStateSegmentedFormat.options} series={AuditCountByStateSegmentedFormat.series} type="bar" height={380}
                     />
@@ -609,7 +684,33 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                         options={AuditPercentageMeetingSLAFormat.options} series={AuditPercentageMeetingSLAFormat.series} type="bar" height={380}
                     />
                 </div>
-                <div className="chart-card">
+
+                  <div className={`chart-card ${selectedCharts.includes("av-4") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("av-4")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("av-4")}
+                            checked={selectedCharts.includes("av-4")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Checklist approval rate by Company Name",
+                                    checklistApprovalRateByCompanyName?.rest_counts,
+                                    checklistApprovalRateByCompanyName?.rest_counts?.map((item) => item.company_name),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
                     <div className="mb-3 fw-600">Top 5 checklist approval rate by Company Name </div>
                     <Chart
                         options={checklistApprovalRateByCompanyNameFormat.options} series={checklistApprovalRateByCompanyNameFormat.series} type="bar" height={380}
@@ -624,13 +725,37 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                         options={riskLevelFormat.options} series={riskLevelFormat.series} type="donut" height={380}
                     />
                 </div>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Escalation Triggered (Y/N) rate by State</div>
+<div className={`chart-card ${selectedCharts.includes("av-4") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("av-4")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("av-4")}
+                            checked={selectedCharts.includes("av-4")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "left",
+                                    "Escalation Triggered (Y/N) rate by State",
+                                    escalationTriggeredRateByState?.rest_counts,
+                                    escalationTriggeredRateByState?.rest_counts?.map((item) => item.state),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                    <div className="mb-3 fw-600">Top 5 Escalation Triggered (Y/N) rate by State</div>
                     <Chart
                         options={escalationTriggeredRateByStateFormat.options} series={escalationTriggeredRateByStateFormat.series} type="bar" height={380}
                     />
                 </div>
-
             </div>
 
             <div className='charts-grid mb-4'>
@@ -647,6 +772,14 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
                     />
                 </div>
             </div>
+            <DashboardDrawerGrid
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                data={drawerData}        //direct array
+                title={drawerTitle}
+                chartXaxisCategory={chartXaxisCategory}
+            />
         </div>
     )
 }

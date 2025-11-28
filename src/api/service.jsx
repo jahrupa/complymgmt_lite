@@ -155,6 +155,9 @@ import {
   GET_ASSIGNED_INDIVIDUALS_LIST,
   GET_DOCUMENTS_PENDING_FROM,
   GET_ISSUE_CATEGORY_BY_STATUS,
+  GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
+  GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
+  GET_TOTAL_DELAY_FLAGS_BY_GOVT,
 
 } from "./Endpoint";
 
@@ -1524,6 +1527,31 @@ export const fetchHelpdeskStatusBasedOnIssueSubType = async (company_name) => {
     throw error;
   }
 }
+
+
+
+export const fetchTotalDelayFlagsByGovt = async (company_name) => {
+  try {
+    const url = `${GET_TOTAL_DELAY_FLAGS_BY_GOVT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Helpdesk Status Based On Issue Sub Type", error);
+    throw error;
+  }
+}
+
+
+export const fetchTotalDelayFlagsByClientAndGovt = async (company_name) => {
+  try {
+    const url = `${GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Total Delay Flags By Client And Govt", error);
+    throw error;
+  }
+}
 export const fetchTicketsDistributionAssignedToCount = async (company_name) => {
   try {
     const url = `${GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
@@ -1535,6 +1563,17 @@ export const fetchTicketsDistributionAssignedToCount = async (company_name) => {
   }
 }
 
+
+export const fetchHelpDeskPendingForSelectedIssueSubtypes = async (company_name) => {
+  try {
+    const url = `${GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
+    const response = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Tickets Distribution Assigned To Count", error);
+    throw error;
+  }
+}
 // Returns and Submissions
 export const fetchReturnApplicabilityByCompanyCommonName = async (company_name) => {
   try {

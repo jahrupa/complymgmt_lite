@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts';
 import { fetchAnalysisOfApplicableAct, fetchAuthorityDistributionCount, fetchCountOfAcknowledgmentRates, fetchCountOfClientDocSubmission, fetchDistributionOfResponseStatus, fetchNoticesAssignedTo, fetchStateWiseNoticeCount, fetchTypesOfNoticeOrInspection } from '../../api/service';
+import DashboardDrawerGrid from '../DashboardDrawer';
+import { ArrowUpRight, X } from 'lucide-react';
 
 const NoticeDashboard = ({ selectedCompany }) => {
     const [NoticeDistributionByAuthority, setNoticeDistributionByAuthority] = React.useState([]);
@@ -512,6 +514,29 @@ const NoticeDashboard = ({ selectedCompany }) => {
             ],
         },
     }
+
+
+    const [selectedCharts, setSelectedCharts] = React.useState([]);
+    const toggleChartSelection = (id) => {
+        setSelectedCharts((prev) =>
+            prev.includes(id)
+                ? prev.filter(item => item !== id)   // remove if existed
+                : [...prev, id]                      // add new ID
+        );
+    };
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerAnchor, setDrawerAnchor] = React.useState("right");
+    const [drawerTitle, setDrawerTitle] = useState("");
+    const [drawerData, setDrawerData] = useState("");
+    const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+        setDrawerAnchor(anchor);
+        setDrawerTitle(title);
+        setDrawerOpen(true);
+        setDrawerData(data);
+        setChartXaxisCategory(chartXaxisCategory);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const [noticeDistributionByAuthorityRes, stateWiseNoticeCountRes, typesOfNoticeOrInspectionRes, analysisOfApplicableActRes, noticesAssignedToRes, countOfAcknowledgmentRates, distributionOfResponseStatus, countOfClientDocSubmission] = await Promise.allSettled([
@@ -586,12 +611,39 @@ const NoticeDashboard = ({ selectedCompany }) => {
                         options={NoticeDistributionByAuthorityFormat.options} series={NoticeDistributionByAuthorityFormat.series} type="bar" height={380}
                     />
                 </div>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">State-wise notice count comparison to highlight regional compliance activity.</div>
+
+                <div className={`chart-card ${selectedCharts.includes("ni-2") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ni-2")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ni-2")}
+                            checked={selectedCharts.includes("ni-2")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "State-wise notice count comparison to highlight regional compliance activity",
+                                    stateWiseNoticeCount?.rest_counts,
+                                    stateWiseNoticeCount?.rest_counts?.map((item) => item.state),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                    <div className="mb-3 fw-600">Top 5 State-wise notice count comparison to highlight regional compliance activity.</div>
                     <Chart
                         options={stateWiseNoticeCountFormat.options} series={stateWiseNoticeCountFormat.series} type="bar" height={380}
                     />
                 </div>
+               
             </div>
 
             <div className='charts-grid mb-4'>
@@ -601,8 +653,34 @@ const NoticeDashboard = ({ selectedCompany }) => {
                         options={noticeTypeBreakdownFormat.options} series={noticeTypeBreakdownFormat.series} type="donut" height={380}
                     />
                 </div>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Analysis of applicable acts to reveal legal focus areas</div>
+
+                  <div className={`chart-card ${selectedCharts.includes("ni-4") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ni-4")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ni-4")}
+                            checked={selectedCharts.includes("ni-4")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Analysis of applicable acts to reveal legal focus areas",
+                                    ApplicableActsAnalysis?.rest_counts,
+                                    ApplicableActsAnalysis?.rest_counts?.map((item) => item.applicable_act),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                    <div className="mb-3 fw-600">Top 5 Analysis of applicable acts to reveal legal focus areas</div>
                     <Chart
                         options={ApplicableActsAnalysisFormat.options} series={ApplicableActsAnalysisFormat.series} type="bar" height={380}
                     />
@@ -610,18 +688,70 @@ const NoticeDashboard = ({ selectedCompany }) => {
             </div>
 
             <div className='charts-grid mb-4'>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Number of notices assigned to each team member to assess workload distribution</div>
+                <div className={`chart-card ${selectedCharts.includes("ni-5") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ni-5")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ni-5")}
+                            checked={selectedCharts.includes("ni-5")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "right",
+                                    "Number of notices assigned to each team member to assess workload distribution",
+                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts,
+                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map((item) => item.assigned_to),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                    <div className="mb-3 fw-600">Top 5 Number of notices assigned to each team member to assess workload distribution</div>
                     <Chart
                         options={numberOfNoticesAssignedToEachTeamMemberFormat.options} series={numberOfNoticesAssignedToEachTeamMemberFormat.series} type="bar" height={380}
                     />
                 </div>
-                <div className="chart-card">
-                    <div className="mb-3 fw-600">Comparison of acknowledgement rates by different individuals to evaluate responsiveness.</div>
+
+                <div className={`chart-card ${selectedCharts.includes("ni-6") ? "selected-card" : ""}`}
+                    onClick={() => toggleChartSelection("ni-6")}
+                    style={{ cursor: "pointer" }}>
+                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            className="chart-select-checkbox"
+                            onChange={() => toggleChartSelection("ni-6")}
+                            checked={selectedCharts.includes("ni-6")}
+                        />
+                        <div className='dashboard-icon ms-2'
+                            onClick={() =>
+                                handleOpenDrawer(
+                                    "left",
+                                    "Comparison of acknowledgement rates by different individuals to evaluate responsiveness",
+                                    countOfAcknowledgmentRates?.rest_counts,
+                                    countOfAcknowledgmentRates?.rest_counts?.map((item) => item.acknowledged_by),
+                                )
+                            }
+                        >
+                            <ArrowUpRight />
+                        </div>
+                        <div className='dashboard-icon me-2 ms-1'>
+                            <X />
+                        </div>
+                    </div>
+                     <div className="mb-3 fw-600">Top 5 comparison of acknowledgement rates by different individuals to evaluate responsiveness.</div>
                     <Chart
                         options={countOfAcknowledgmentRatesFormat.options} series={countOfAcknowledgmentRatesFormat.series} type="bar" height={380}
                     />
                 </div>
+                
             </div>
             <div className='charts-grid mb-4'>
                 <div className="chart-card">
@@ -637,6 +767,14 @@ const NoticeDashboard = ({ selectedCompany }) => {
                     />
                 </div>
             </div>
+            <DashboardDrawerGrid
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                data={drawerData}        //direct array
+                title={drawerTitle}
+                chartXaxisCategory={chartXaxisCategory}
+            />
         </div>
     )
 }

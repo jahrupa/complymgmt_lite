@@ -7,10 +7,12 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { fetchAverageDelayBetweenDataRequestDateAndClientDataReceivedDate, fetchDistributionOfEmployeeAcrossMultipleEntitiesOrLocations, fetchExplanationOfEmployeeCount, fetchInvestmentDeclarationStatusByCompany, fetchPayrollsClosedOnOrAheadOfSlaPercentage, fetchTotalEmployeeCount, fetchTypeOfSystemsUsedByEmployer } from "../../api/service";
+import { ArrowUpRight, X } from "lucide-react";
+import DashboardDrawerGrid from "../DashboardDrawer";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const PayrollServices = ({selectedCompany}) => {
+const PayrollServices = ({ selectedCompany }) => {
     const [payrollOverviewData, setPayrollOverviewData] = useState({
         total_employees: 0,
         turnaround_health_average_days: 0,
@@ -129,6 +131,26 @@ const PayrollServices = ({selectedCompany}) => {
 
     }
     const [explanationOfEmployeeCount, setExplanationOfEmployeeCount] = useState([]);
+    const [selectedCharts, setSelectedCharts] = React.useState([]);
+    const toggleChartSelection = (id) => {
+        setSelectedCharts((prev) =>
+            prev.includes(id)
+                ? prev.filter(item => item !== id)   // remove if existed
+                : [...prev, id]                      // add new ID
+        );
+    };
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerAnchor, setDrawerAnchor] = React.useState("right");
+    const [drawerTitle, setDrawerTitle] = useState("");
+    const [drawerData, setDrawerData] = useState("");
+    const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+        setDrawerAnchor(anchor);
+        setDrawerTitle(title);
+        setDrawerOpen(true);
+        setDrawerData(data);
+        setChartXaxisCategory(chartXaxisCategory);
+    };
     const columnDefs = useMemo(
         () => [
             { headerName: "Employee Count (sum)", field: "employee_count", sortable: true, filter: true, flex: '1' },
@@ -269,10 +291,10 @@ const PayrollServices = ({selectedCompany}) => {
                 min: 0,
                 tickAmount: 5,
             },
-             colors: ["#2cafc0ff"],
+            colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-                 colors: ["#2cafc0ff"],
+                colors: ["#2cafc0ff"],
             },
             states: {
                 hover: {
@@ -292,17 +314,17 @@ const PayrollServices = ({selectedCompany}) => {
     const dataRequestAndClientDataReceivedFormat = {
         series: [{
             name: "Average Days Delayed",
-            data: dataRequestAndClientDataReceived?.map((item) => item.average_days_delayed || 0) || [],
+            data: dataRequestAndClientDataReceived?.top_delays?.map((item) => item.average_days_delayed || 0) || [],
         }],
         options: {
             chart: {
                 type: 'bar',
                 height: 350
             },
-             colors: ["#2cafc0ff"],
+            colors: ["#2cafc0ff"],
             fill: {
                 opacity: 1,
-                 colors: ["#2cafc0ff"],
+                colors: ["#2cafc0ff"],
 
             },
             states: {
@@ -331,7 +353,7 @@ const PayrollServices = ({selectedCompany}) => {
                 },
             },
             xaxis: {
-                categories: dataRequestAndClientDataReceived?.map((item) => item.company_name || []) || [],
+                categories: dataRequestAndClientDataReceived?.top_delays?.map((item) => item.company_name || []) || [],
             }
         },
     }
@@ -393,7 +415,7 @@ const PayrollServices = ({selectedCompany}) => {
             }
 
             if (averageDelayRes.status === 'fulfilled') {
-                setDataRequestAndClientDataReceived(averageDelayRes.value?.top_delays || []);
+                setDataRequestAndClientDataReceived(averageDelayRes.value || []);
             } else if (averageDelayRes.status === 'rejected') {
                 console.warn("fetchAllDistributions failed:", averageDelayRes.reason);
                 setDataRequestAndClientDataReceived(averageDelayRes.reason?.status || []); // Set to empty array on error
@@ -416,7 +438,7 @@ const PayrollServices = ({selectedCompany}) => {
                     <div className="stats-grid">
                         <div className="payroll-stat-card performer-card high-performer">
                             <div className="stat-label">Total Employees</div>
-                            <div className="stat-number">{payrollOverviewData.total_employees?payrollOverviewData.total_employees:0}</div>
+                            <div className="stat-number">{payrollOverviewData.total_employees ? payrollOverviewData.total_employees : 0}</div>
                             <span className="summary-card-badge summary-card-badge-success">
                                 {systemUseByEmp.total_count ? systemUseByEmp.total_count : 0} entities
                             </span>
@@ -428,10 +450,10 @@ const PayrollServices = ({selectedCompany}) => {
                         <div className="payroll-stat-card performer-card compliant">
                             <div className="stat-label">Turnaround Health</div>
                             <div className="stat-number">
-                                {payrollOverviewData.turnaround_health_average_days?payrollOverviewData.turnaround_health_average_days:0} {payrollOverviewData.turnaround_health_average_days?payrollOverviewData.turnaround_health_average_days>1?'days':'day':''} 
+                                {payrollOverviewData.turnaround_health_average_days ? payrollOverviewData.turnaround_health_average_days : 0} {payrollOverviewData.turnaround_health_average_days ? payrollOverviewData.turnaround_health_average_days > 1 ? 'days' : 'day' : ''}
                             </div>
                             <span className="summary-card-badge summary-card-badge-warning">
-                                SLA target {payrollOverviewData?.turnaround_health_target_days?payrollOverviewData.turnaround_health_target_days:0} {payrollOverviewData?.turnaround_health_target_days?payrollOverviewData.turnaround_health_target_days>1?'days':'day':''} 
+                                SLA target {payrollOverviewData?.turnaround_health_target_days ? payrollOverviewData.turnaround_health_target_days : 0} {payrollOverviewData?.turnaround_health_target_days ? payrollOverviewData.turnaround_health_target_days > 1 ? 'days' : 'day' : ''}
                             </span>
                             <div className="summary-card-divider mt-3"></div>
                             <div className="mt-2 summary-card-footnote">
@@ -441,9 +463,9 @@ const PayrollServices = ({selectedCompany}) => {
                         </div>
                         <div className="payroll-stat-card performer-card moderate">
                             <div className="stat-label">On-time Delivery</div>
-                            <div className="stat-number">{payrollOverviewData.on_time_delivery?payrollOverviewData.on_time_delivery:0}%</div>
+                            <div className="stat-number">{payrollOverviewData.on_time_delivery ? payrollOverviewData.on_time_delivery : 0}%</div>
                             <span className="summary-card-badge summary-card-badge-warning">
-                                {payrollOverviewData.late_percent?payrollOverviewData.late_percent:0}% Delay
+                                {payrollOverviewData.late_percent ? payrollOverviewData.late_percent : 0}% Delay
                             </span>
                             <div className="summary-card-divider mt-3"></div>
                             <div className="mt-2 summary-card-footnote">
@@ -459,10 +481,35 @@ const PayrollServices = ({selectedCompany}) => {
                                 options={investmentDataFormate.options} series={investmentDataFormate.series} type="donut" height={380}
                             />
                         </div>
-                          <div className="chart-card">
-                        <div className="mb-3 fw-600">Top 5 average delay between data request date and client data received date by company</div>
-                        <Chart options={dataRequestAndClientDataReceivedFormat.options} series={dataRequestAndClientDataReceivedFormat.series} type="bar" height={380} />
-                    </div>
+                        <div className={`chart-card ${selectedCharts.includes("ps-1") ? "selected-card" : ""}`}
+                            onClick={() => toggleChartSelection("ps-1")}
+                            style={{ cursor: "pointer" }}>
+                            <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                                <input
+                                    type="checkbox"
+                                    className="chart-select-checkbox"
+                                    onChange={() => toggleChartSelection("ps-1")}
+                                    checked={selectedCharts.includes("ps-1")}
+                                />
+                                <div className='dashboard-icon ms-2'
+                                    onClick={() =>
+                                        handleOpenDrawer(
+                                            "left",
+                                            "average delay between data request date and client data received date by company",
+                                            dataRequestAndClientDataReceived?.rest_delays,
+                                            dataRequestAndClientDataReceived?.rest_delays?.map((item) => item.company_name),
+                                        )
+                                    }
+                                >
+                                    <ArrowUpRight />
+                                </div>
+                                <div className='dashboard-icon me-2 ms-1'>
+                                    <X />
+                                </div>
+                            </div>
+                            <div className="mb-3 fw-600">Top 5 average delay between data request date and client data received date by company</div>
+                            <Chart options={dataRequestAndClientDataReceivedFormat.options} series={dataRequestAndClientDataReceivedFormat.series} type="bar" height={380} />
+                        </div>
                     </div>
                     <div className="charts-section mb-4">
                         <div className="chart-card">
@@ -507,6 +554,15 @@ const PayrollServices = ({selectedCompany}) => {
                 </div>
             </div>
             {/* )} */}
+
+            <DashboardDrawerGrid
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                data={drawerData}        //direct array
+                title={drawerTitle}
+                chartXaxisCategory={chartXaxisCategory}
+            />
         </div>
     );
 };

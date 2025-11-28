@@ -168,8 +168,9 @@ export const GET_TOTAL_COUNT_OF_COMMUNICATION_TYPES ='/api/v1/dashboard/view/hel
 export const GET_HELPDESK_TICKETS_RAISED_BY_COMPANY ='/api/v1/dashboard/view/helpdesk/tickets/raised'
 export const GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE ='/api/v1/dashboard/view/helpdesk/status'
 export const GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT ='/api/v1/dashboard/view/helpdesk/tickets/distribution'
-// export const GET_HELPDESK_TICKETS_RAISED_BY_CATEGORY ='/api/v1/dashboard/view/helpdesk/tickets/raised/category'
-// export const GET_HELPDESK_TICKETS_RAISED_BY_PRIORITY ='/api/v1/dashboard/view/helpdesk/tickets/raised/priority'
+export const GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES ='/api/v1/dashboard/view/helpdesk/pending/issue/types'
+export const GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT ='/api/v1/dashboard/view/helpdesk/delay/flag'
+export const GET_TOTAL_DELAY_FLAGS_BY_GOVT ='/api/v1/dashboard/view/helpdesk/govt/delay/flag'
 
 // Returns and Submissions
 export const GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME ='/api/v1/dashboard/view/returns/applicability/company'
