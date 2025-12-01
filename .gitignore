@@ -25,6 +25,6 @@ dist-ssr
 *.sw?
 
 # Environment files
-.env.development
-.env.production
-.env.demo
+.env.dev
+.env.prod
+.env.test

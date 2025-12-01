@@ -4,7 +4,7 @@ import PageRoute from './route/PageRoute';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-// console.log("ENV URL:", import.meta.env.VITE_API_BASE_URL);
+console.log("ENV URL:", import.meta.env.VITE_API_BASE_URL);
   return (
     <Router>
       <PageRoute sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

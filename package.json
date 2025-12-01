@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:test": "vite --config vite.config.test.js",
-    "dev:demo": "vite --config vite.config.demo.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test-mode": "vite --mode test",
+    "prod-mode": "vite --mode prod",
+    "dev-mode": "vite --mode dev"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
