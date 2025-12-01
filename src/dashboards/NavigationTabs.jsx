@@ -14,7 +14,6 @@ import AuditAndVisitDashboard from './Audit/AuditAndVisitDashboard';
 import ClientOnBoardingByCompany from './clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany';
 import NoticeDashboard from './noticeDashboard/NoticeDashboard';
 import GeneralHelpdesk from './payrollDashboard/GeneralHelpdesk';
-import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
@@ -22,8 +21,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     const [cockpitData, setCockpitData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
-    const [current, setCurrent] = useState({});
-    const [allUser, setAllUser] = useState([]);
     const [position, setPosition] = useState({ x: 100, y: 100 });
     const [isDragging, setIsDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -75,7 +72,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     // cockpit data fetch
     useEffect(() => {
         const fetchCockpitData = async () => {
-            const [cockpitByCompanyRes, cockpitRes, allUser] = await Promise.allSettled([
+            const [cockpitByCompanyRes, cockpitRes] = await Promise.allSettled([
                 // pass selectedCompany state 
                 fetchComplainceCockpitByCompany(selectedCompany),
                 fetchComplainceCockpit(),
@@ -93,12 +90,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitRes.reason);
                 setCockpitData(cockpitRes.reason?.status || []);
-            }
-            if (allUser.status === 'fulfilled') {
-                setAllUser(allUser.value);
-            } else {
-                console.warn("fetchAll cockpit failed:", allUser.reason);
-                setAllUser(allUser.reason?.status || []);
             }
         };
         fetchCockpitData();
@@ -199,31 +190,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
                     <Tab label="Notices & Inspections" />
                 </Tabs>
             </Box>
-            <div className='d-flex justify-content-end'>
-                <div className=' w-25'>
-                    <SingleSelectTextField
-                        name="user_name"
-                        label="User Name"
-                        value={current.user_name}
-                        onChange={(e) => {
-                            const selectedName = e.target.value;
-                            const matchedUser = allUser.find(
-                                (item) => item.full_name === selectedName
-                            );
-                            setCurrent((prev) => ({
-                                ...prev,
-                                user_name: selectedName,
-                                user_id: matchedUser?._id || null
-                            }));
-                        }}
-                        names={allUser.map((item) => ({
-                            _id: item._id,
-                            name: item.full_name
-                        }))}
-                    />
-                </div>
-
-            </div>
             <Box>
                 {/* {activeTab === 0 && renderCards(stats)} */}
                 {activeTab === 0 && (selectedCompany !== ''

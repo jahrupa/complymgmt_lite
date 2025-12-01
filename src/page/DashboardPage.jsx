@@ -9,29 +9,55 @@ import ComplianceCpckpitTabs from "../component/ComplianceCpckpitTabs";
 import NavigationTabs from "../dashboards/NavigationTabs";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import { useEffect, useState } from "react";
-import { fetchAllCompanies } from "../api/service";
+import { fetchAllCompanies, fetchAllUser } from "../api/service";
 
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(""); // single selected value
   const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
+  const [current, setCurrent] = useState({});
+  const [allUser, setAllUser] = useState([]);
+  // useEffect(() => {
+  //   const fetchCompany = async () => {
+  //     try {
+  //       const data = await fetchAllCompanies();
+  //       if (data) {
+  //         setCompanyName(data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch company:", error);
+  //     }
+  //   };
+
+  //   fetchCompany();
+  // }, []);
+
   useEffect(() => {
-    const fetchCompany = async () => {
-      try {
-        const data = await fetchAllCompanies();
-        if (data) {
-          setCompanyName(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch company:", error);
+    const fetchCockpitData = async () => {
+      const [cockpitByCompanyRes, allUser] = await Promise.allSettled([
+        // pass selectedCompany state
+        fetchAllCompanies(),
+        fetchAllUser(),
+      ]);
+
+      if (cockpitByCompanyRes.status === "fulfilled") {
+        setCompanyName(cockpitByCompanyRes.value);
+      } else {
+        console.warn("fetchAll cockpit failed:", cockpitByCompanyRes.reason);
+        setCompanyName(cockpitByCompanyRes.reason?.status || []);
+      }
+      if (allUser.status === "fulfilled") {
+        setAllUser(allUser.value);
+      } else {
+        console.warn("fetchAll cockpit failed:", allUser.reason);
+        setAllUser(allUser.reason?.status || []);
       }
     };
-
-    fetchCompany();
+    fetchCockpitData();
   }, []);
   return (
     <div>
-      <div className="dashboard-header-card notification-page-title justify-content-between d-lg-flex d-md-flex">
+      <div className="dashboard-header-card dashboard-page-title justify-content-between d-lg-flex d-md-flex">
         <div className="mb-4 d-flex ">
           <span>
             <img src={LaptopMinimalCheck} width={65} />
@@ -58,19 +84,44 @@ const DashboardPage = () => {
               : ""}
           </h1>
         </div>
-        <div className="w-25">
-          <SingleSelectTextField
-            name="company_name"
-            label="Company Name"
-            value={selectedCompany || ""}
-            onChange={(e) => {
-              setSelectedCompany(e.target.value);
-            }}
-            names={companyName?.map((data) => ({
-              _id: data?._id,
-              name: data?.company_name || "",
-            }))}
-          />
+        <div className="d-lg-flex d-md-flex justify-content-between"
+        >
+          <div className="me-1 ms-1" style={{width:'265px'}}>
+            <SingleSelectTextField
+              name="company_name"
+              label="Company Name"
+              value={selectedCompany || ""}
+              onChange={(e) => {
+                setSelectedCompany(e.target.value);
+              }}
+              names={companyName?.map((data) => ({
+                _id: data?._id,
+                name: data?.company_name || "",
+              }))}
+            />
+          </div>
+            <div className="me-1 ms-1" style={{width:'265px'}}>
+              <SingleSelectTextField
+                name="user_name"
+                label="User Name"
+                value={current.user_name}
+                onChange={(e) => {
+                  const selectedName = e.target.value;
+                  const matchedUser = allUser.find(
+                    (item) => item.full_name === selectedName
+                  );
+                  setCurrent((prev) => ({
+                    ...prev,
+                    user_name: selectedName,
+                    user_id: matchedUser?._id || null,
+                  }));
+                }}
+                names={allUser.map((item) => ({
+                  _id: item._id,
+                  name: item.full_name,
+                }))}
+              />
+            </div>
         </div>
       </div>
 

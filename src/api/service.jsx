@@ -1542,7 +1542,7 @@ export const fetchTotalDelayFlagsByGovt = async (company_name) => {
 }
 
 
-export const fetchTotalDelayFlagsByClientAndGovt = async (company_name) => {
+export const fetchTotalDelayFlagsByClient= async (company_name) => {
   try {
     const url = `${GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);

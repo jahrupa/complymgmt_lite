@@ -1,107 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Chart from 'react-apexcharts';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { fetchAssignedIndividualsList, fetchDocumentsPendingFrom, fetchIssueCategoryByStatus, fetchStatusCountOfoOpenVsClosedCases, fetchTotalCountOfCommunicationTypes } from '../../api/service';
+import { fetchAssignedIndividualsList, fetchDocumentsPendingFrom, fetchIssueCategoryByStatus, fetchStatusCountOfoOpenVsClosedCases } from '../../api/service';
 import { ArrowUpRight, X } from 'lucide-react';
 import DashboardDrawerGrid from '../DashboardDrawer';
 
 const GeneralHelpdesk = ({ selectedCompany }) => {
-    const [closedVsOpenCases, setClosedVsOpenCases] = React.useState({
-        series: [
-            {
-                name: "Open Cases",
-                data: [30, 40, 35, 50, 20]
-            },
-            {
-                name: "Closed Cases",
-                data: [20, 30, 25, 40, 10]
-            }
-        ],
-        options: {
-            chart: {
-                type: "bar",
-                height: 350,
-                stacked: true,
-            },
-            colors: ["#2cafc0ff", "#5ad5e2"],
-            fill: {
-                opacity: 1,
-                colors: ["#2cafc0ff", "#5ad5e2"],
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "none", // 👈 disables the lighten effect
-                    },
-                },
-                active: {
-                    filter: {
-                        type: "none", // 👈 disables click highlight effect
-                    },
-                },
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: true,
-                    dataLabels: {
-                        total: {
-                            enabled: true,
-                            offsetX: 0,
-                            style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
-                },
-            },
-            stroke: {
-                width: 1,
-                colors: ['#fff']
-            },
-            title: {
-                text: 'Proportion of Cases Pending'
-            },
-            xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd'],
-                labels: {
-                    formatter: function (val) {
-                        return val + "K"
-                    }
-                }
-            },
-            yaxis: {
-                title: {
-                    text: undefined
-                },
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val + "K"
-                    }
-                }
-            },
-
-            legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
-        },
-    });
+    const [closedVsOpenCases, setClosedVsOpenCases] = React.useState([]);
     const closedVsOpenCasesFormat = {
         series: [
             {
                 name: "Open Cases",
-                data: [30, 40, 35, 50, 20]
+                data: closedVsOpenCases?.top_assigned?.map((item) => item.count_Open) || [],
             },
             {
                 name: "Closed Cases",
-                data: [20, 30, 25, 40, 10]
+                data: closedVsOpenCases?.top_assigned?.map((item) => item.count_Closed) || [],
             }
         ],
         options: {
@@ -150,7 +67,7 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 text: 'Proportion of Cases Pending'
             },
             xaxis: {
-                categories: ['SBI General Insurance Co Limited', 'Master Builders Solutions India Private Limited', 'Camsdata Technologies India Private Limited', 'Ferrero India Private Limited', 'Viacom 18 Media Pvt Ltd'],
+                categories: closedVsOpenCases?.top_assigned?.map((item) => item.assigned_to) || [],
                 labels: {
                     formatter: function (val) {
                         return val + "K"
@@ -386,7 +303,7 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
-    const handleOpenDrawer = (anchor, title, data = [],chartXaxisCategory) => {
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
@@ -460,6 +377,9 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                             onClick={() =>
                                 handleOpenDrawer(
                                     "right",
+                                    "Comparison of closed vs. open cases",
+                                    closedVsOpenCases?.rest_assigned,
+                                    closedVsOpenCases?.rest_assigned?.map((item) => item.assigned_to),
                                 )
                             }
                         >
@@ -475,8 +395,8 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                     </div>
 
                     <Chart
-                        options={closedVsOpenCases.options}
-                        series={closedVsOpenCases.series}
+                        options={closedVsOpenCasesFormat.options}
+                        series={closedVsOpenCasesFormat.series}
                         type="bar"
                         height={380}
                     />

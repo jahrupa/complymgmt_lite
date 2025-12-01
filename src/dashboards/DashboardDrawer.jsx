@@ -25,7 +25,7 @@ export default function DashboardDrawerGrid({
   const [chartOptions, setChartOptions] = React.useState({});
   const [chartSeries, setChartSeries] = React.useState([]);
   const [error, setError] = React.useState(""); // error state
-  console.log(data,'data')
+  console.log(chartType,'chartType')
   // Set rowData & columnDefs
   React.useEffect(() => {
     try {
@@ -146,7 +146,7 @@ export default function DashboardDrawerGrid({
         {/* HEADER */}
         <div className='d-flex justify-content-between align-items-center mb-2'>
           <h4 className="ms-2 fs-19 fw-600" style={{ color: 'gray' }}>{title}</h4>
-          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={onClose}>
+          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); }}>
             <X />
           </div>
         </div>
