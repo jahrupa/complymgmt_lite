@@ -1,25 +1,35 @@
-import React, { useEffect, useState } from 'react'
-import Chart from 'react-apexcharts';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { fetchAssignedIndividualsList, fetchDocumentsPendingFrom, fetchIssueCategoryByStatus, fetchStatusCountOfoOpenVsClosedCases } from '../../api/service';
-import { ArrowUpRight, X } from 'lucide-react';
-import DashboardDrawerGrid from '../DashboardDrawer';
+import React, { useEffect, useState } from "react";
+import Chart from "react-apexcharts";
+import {
+    fetchAssignedIndividualsList,
+    fetchDocumentsPendingFrom,
+    fetchIssueCategoryByStatus,
+    fetchStatusCountOfoOpenVsClosedCases,
+} from "../../api/service";
+import { ArrowUpRight, X } from "lucide-react";
+import DashboardDrawerGrid from "../DashboardDrawer";
+import Snackbars from "../../component/Snackbars";
 
-const GeneralHelpdesk = ({ selectedCompany }) => {
+const GeneralHelpdesk = ({
+    selectedCompany,
+    current,
+    selectedCharts,
+    setSelectedCharts,
+}) => {
     const [closedVsOpenCases, setClosedVsOpenCases] = React.useState([]);
     const closedVsOpenCasesFormat = {
         series: [
             {
                 name: "Open Cases",
-                data: closedVsOpenCases?.top_assigned?.map((item) => item.count_Open) || [],
+                data:
+                    closedVsOpenCases?.top_assigned?.map((item) => item.count_Open) || [],
             },
             {
                 name: "Closed Cases",
-                data: closedVsOpenCases?.top_assigned?.map((item) => item.count_Closed) || [],
-            }
+                data:
+                    closedVsOpenCases?.top_assigned?.map((item) => item.count_Closed) ||
+                    [],
+            },
         ],
         options: {
             chart: {
@@ -52,57 +62,61 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                             enabled: true,
                             offsetX: 0,
                             style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
+                                fontSize: "13px",
+                                fontWeight: 900,
+                            },
+                        },
+                    },
                 },
             },
             stroke: {
                 width: 1,
-                colors: ['#fff']
+                colors: ["#fff"],
             },
             title: {
-                text: 'Proportion of Cases Pending'
+                text: "Proportion of Cases Pending",
             },
             xaxis: {
-                categories: closedVsOpenCases?.top_assigned?.map((item) => item.assigned_to) || [],
+                categories:
+                    closedVsOpenCases?.top_assigned?.map((item) => item.assigned_to) ||
+                    [],
                 labels: {
                     formatter: function (val) {
-                        return val + "K"
-                    }
-                }
+                        return val + "K";
+                    },
+                },
             },
             yaxis: {
                 title: {
-                    text: undefined
+                    text: undefined,
                 },
             },
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        return val + "K"
-                    }
-                }
+                        return val + "K";
+                    },
+                },
             },
 
             legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
+                position: "top",
+                horizontalAlign: "left",
+                offsetX: 40,
+            },
         },
-    }
+    };
     const [assignedUser, setAssignedUser] = React.useState([]);
     const assignedUserFormat = {
-        series: [{
-            name: 'Count',
-            data: assignedUser?.top_assigned_counts?.map((item) => item.count)
-        }],
+        series: [
+            {
+                name: "Count",
+                data: assignedUser?.top_assigned_counts?.map((item) => item.count),
+            },
+        ],
         options: {
             chart: {
-                type: 'bar',
+                type: "bar",
                 height: 350,
                 stacked: false,
             },
@@ -131,35 +145,39 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                             enabled: true,
                             offsetX: 0,
                             style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
+                                fontSize: "13px",
+                                fontWeight: 900,
+                            },
+                        },
+                    },
                 },
             },
             stroke: {
                 width: 1,
-                colors: ['#fff']
+                colors: ["#fff"],
             },
             xaxis: {
-                categories: assignedUser?.top_assigned_counts?.map((item) => item.assigned_to),
+                categories: assignedUser?.top_assigned_counts?.map(
+                    (item) => item.assigned_to
+                ),
             },
             yaxis: {
                 title: {
-                    text: undefined
+                    text: undefined,
                 },
             },
             legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
+                position: "top",
+                horizontalAlign: "left",
+                offsetX: 40,
+            },
         },
-    }
+    };
     const [documentPendingFrom, setDocumentPendingFrom] = React.useState([]);
     const documentPendingFromFormat = {
-        series: documentPendingFrom?.top_docs_pending?.map((item) => item.count || []) || [],
+        series:
+            documentPendingFrom?.top_docs_pending?.map((item) => item.count || []) ||
+            [],
         options: {
             chart: {
                 width: 380,
@@ -182,7 +200,10 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                     },
                 },
             },
-            labels: documentPendingFrom?.top_docs_pending?.map((item) => item.documents_pending_from || []) || [],
+            labels:
+                documentPendingFrom?.top_docs_pending?.map(
+                    (item) => item.documents_pending_from || []
+                ) || [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
                 horizontalAlign: "center",
@@ -208,17 +229,20 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 },
             ],
         },
-    }
-    const [openVsCloseIssueCategory, setOpenVsCloseIssueCategory] = React.useState([]);
+    };
+    const [openVsCloseIssueCategory, setOpenVsCloseIssueCategory] =
+        React.useState([]);
     const openVsCloseIssueCategoryFormat = {
-        series: [{
-            name: "Open Cases",
-            data: openVsCloseIssueCategory?.top_counts?.map((item) => item.open)
-        },
-        {
-            name: "Closed Cases",
-            data: openVsCloseIssueCategory?.top_counts?.map((item) => item.closed)
-        },],
+        series: [
+            {
+                name: "Open Cases",
+                data: openVsCloseIssueCategory?.top_counts?.map((item) => item.open),
+            },
+            {
+                name: "Closed Cases",
+                data: openVsCloseIssueCategory?.top_counts?.map((item) => item.closed),
+            },
+        ],
         options: {
             chart: {
                 type: "bar",
@@ -250,52 +274,72 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                             enabled: true,
                             offsetX: 0,
                             style: {
-                                fontSize: '13px',
-                                fontWeight: 900
-                            }
-                        }
-                    }
+                                fontSize: "13px",
+                                fontWeight: 900,
+                            },
+                        },
+                    },
                 },
             },
             stroke: {
                 width: 1,
-                colors: ['#fff']
+                colors: ["#fff"],
             },
 
             xaxis: {
-                categories: openVsCloseIssueCategory?.top_counts?.map((item) => item.issue_category || []) || [],
+                categories:
+                    openVsCloseIssueCategory?.top_counts?.map(
+                        (item) => item.issue_category || []
+                    ) || [],
                 labels: {
                     formatter: function (val) {
-                        return val + "K"
-                    }
-                }
+                        return val + "K";
+                    },
+                },
             },
             yaxis: {
                 title: {
-                    text: undefined
+                    text: undefined,
                 },
             },
             tooltip: {
                 y: {
                     formatter: function (val) {
-                        return val + "K"
-                    }
-                }
+                        return val + "K";
+                    },
+                },
             },
 
             legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                offsetX: 40
-            }
+                position: "top",
+                horizontalAlign: "left",
+                offsetX: 40,
+            },
         },
-    }
-    const [selectedCharts, setSelectedCharts] = React.useState([]);
-    const toggleChartSelection = (id) => {
+    };
+    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+        open: false,
+        vertical: "top",
+        horizontal: "center",
+        message: "",
+        severityType: "",
+    });
+    const toggleChartSelection = (chartId) => {
+        if (!current?.user_name) {
+            // alert("First you need to select a user");
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "First you need to select a user",
+                severityType: "warning",
+            });
+            return;
+        }
+
         setSelectedCharts((prev) =>
-            prev.includes(id)
-                ? prev.filter(item => item !== id)   // remove if existed
-                : [...prev, id]                      // add new ID
+            prev.includes(chartId)
+                ? prev.filter((id) => id !== chartId)
+                : [...prev, chartId]
         );
     };
     const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -313,79 +357,109 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const [stausCountres, assignedUser, documentPendingFormRes, openVsCloseIssueCategory] = await Promise.allSettled([
+            const [
+                stausCountres,
+                assignedUser,
+                documentPendingFormRes,
+                openVsCloseIssueCategory,
+            ] = await Promise.allSettled([
                 fetchStatusCountOfoOpenVsClosedCases(selectedCompany),
                 fetchAssignedIndividualsList(selectedCompany),
                 fetchDocumentsPendingFrom(selectedCompany),
                 fetchIssueCategoryByStatus(selectedCompany),
             ]);
 
-            if (stausCountres.status === 'fulfilled') {
+            if (stausCountres.status === "fulfilled") {
                 setClosedVsOpenCases(stausCountres.value);
             } else {
-                console.warn("fetchStatusCountOfoOpenVsClosedCases failed:", stausCountres.reason);
+                console.warn(
+                    "fetchStatusCountOfoOpenVsClosedCases failed:",
+                    stausCountres.reason
+                );
                 setClosedVsOpenCases(stausCountres.reason?.status || []);
             }
 
-            if (assignedUser.status === 'fulfilled') {
+            if (assignedUser.status === "fulfilled") {
                 setAssignedUser(assignedUser.value);
             } else {
-                console.warn("fetchAssignedIndividualsList failed:", assignedUser.reason);
+                console.warn(
+                    "fetchAssignedIndividualsList failed:",
+                    assignedUser.reason
+                );
                 setAssignedUser(assignedUser.reason?.status || []);
             }
 
-            if (documentPendingFormRes.status === 'fulfilled') {
+            if (documentPendingFormRes.status === "fulfilled") {
                 setDocumentPendingFrom(documentPendingFormRes.value);
             } else {
-                console.warn("fetchDocumentsPendingFrom failed:", documentPendingFormRes.reason);
+                console.warn(
+                    "fetchDocumentsPendingFrom failed:",
+                    documentPendingFormRes.reason
+                );
                 setDocumentPendingFrom(documentPendingFormRes.reason?.status || []);
             }
 
-            if (openVsCloseIssueCategory.status === 'fulfilled') {
+            if (openVsCloseIssueCategory.status === "fulfilled") {
                 setOpenVsCloseIssueCategory(openVsCloseIssueCategory.value);
             } else {
-                console.warn("fetchIssueCategoryByStatus failed:", openVsCloseIssueCategory.reason);
-                setOpenVsCloseIssueCategory(openVsCloseIssueCategory.reason?.status || []);
+                console.warn(
+                    "fetchIssueCategoryByStatus failed:",
+                    openVsCloseIssueCategory.reason
+                );
+                setOpenVsCloseIssueCategory(
+                    openVsCloseIssueCategory.reason?.status || []
+                );
             }
-
         };
         fetchData();
     }, [selectedCompany]);
+
+    useEffect(() => {
+        setSelectedCharts([]);
+    }, [current?.user_name]);
     return (
         <div>
-            <button
-                className="btn btn-primary mb-3"
-                onClick={() => console.log("Selected Chart IDs:", selectedCharts)}
-            >
-                Save
-            </button>
-
-            <div className='charts-grid mb-4'>
+            <Snackbars
+                issnackbarsOpen={issnackbarsOpen}
+                setIsSnackbarsOpen={setIsSnackbarsOpen}
+            />
+            <div className="charts-grid mb-4">
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-1") ? "selected-card" : ""}`}
-                    onClick={() => toggleChartSelection("gh-1")}
+                    className={`chart-card ${selectedCharts.includes("gh-1") ? "selected-card" : ""
+                        }`}
+                    onClick={() => {
+                        toggleChartSelection("gh-1");
+                    }}
                     style={{ cursor: "pointer" }}
                 >
-                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className="d-flex justify-content-end align-items-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <input
                             type="checkbox"
                             className="chart-select-checkbox"
                             onChange={() => toggleChartSelection("gh-1")}
                             checked={selectedCharts.includes("gh-1")}
+                            disabled={!current?.user_name} // if user_name empty → disable
                         />
-                        <div className='dashboard-icon ms-2'
+
+                        <div
+                            className="dashboard-icon ms-2"
                             onClick={() =>
                                 handleOpenDrawer(
                                     "right",
                                     "Comparison of closed vs. open cases",
                                     closedVsOpenCases?.rest_assigned,
-                                    closedVsOpenCases?.rest_assigned?.map((item) => item.assigned_to),
+                                    closedVsOpenCases?.rest_assigned?.map(
+                                        (item) => item.assigned_to
+                                    )
                                 )
                             }
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className='dashboard-icon me-2 ms-1'>
+                        <div className="dashboard-icon me-2 ms-1">
                             <X />
                         </div>
                     </div>
@@ -402,37 +476,45 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                     />
                 </div>
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-2") ? "selected-card" : ""}`}
-                    onClick={() => toggleChartSelection("gh-2")}
+                    className={`chart-card ${selectedCharts.includes("gh-2") ? "selected-card" : ""
+                        }`}
+                    onClick={() => {
+                        toggleChartSelection("gh-2");
+                    }}
                     style={{ cursor: "pointer" }}
                 >
-                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className="d-flex justify-content-end align-items-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <input
                             type="checkbox"
                             className="chart-select-checkbox"
                             onChange={() => toggleChartSelection("gh-2")}
                             checked={selectedCharts.includes("gh-2")}
+                            disabled={!current?.user_name}
                         />
-                        <div className='dashboard-icon ms-2'
+                        <div
+                            className="dashboard-icon ms-2"
                             onClick={() =>
                                 handleOpenDrawer(
                                     "left",
                                     "Assigned Users",
                                     assignedUser?.rest_assigned_counts,
-                                    assignedUser?.rest_assigned_counts?.map((item) => item.assigned_to),
+                                    assignedUser?.rest_assigned_counts?.map(
+                                        (item) => item.assigned_to
+                                    )
                                 )
                             }
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className='dashboard-icon me-2 ms-1'>
+                        <div className="dashboard-icon me-2 ms-1">
                             <X />
                         </div>
                     </div>
 
-                    <div className="mb-3 fw-600">
-                        Top 5 Assigned Users
-                    </div>
+                    <div className="mb-3 fw-600">Top 5 Assigned Users</div>
 
                     <Chart
                         options={assignedUserFormat.options}
@@ -443,32 +525,41 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 </div>
             </div>
 
-            <div className='charts-grid mb-4'>
+            <div className="charts-grid mb-4">
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-3") ? "selected-card" : ""}`}
+                    className={`chart-card ${selectedCharts.includes("gh-3") ? "selected-card" : ""
+                        }`}
                     onClick={() => toggleChartSelection("gh-3")}
                     style={{ cursor: "pointer" }}
                 >
-                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className="d-flex justify-content-end align-items-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <input
                             type="checkbox"
                             className="chart-select-checkbox"
                             onChange={() => toggleChartSelection("gh-3")}
                             checked={selectedCharts.includes("gh-3")}
+                            disabled={!current?.user_name}
+
                         />
-                        <div className='dashboard-icon ms-2'
+                        <div
+                            className="dashboard-icon ms-2"
                             onClick={() =>
                                 handleOpenDrawer(
                                     "right",
                                     "Documents Pending From Client vs. Karma",
                                     documentPendingFrom?.rest_docs_pending,
-                                    documentPendingFrom?.rest_docs_pending?.map((item) => item.documents_pending_from),
+                                    documentPendingFrom?.rest_docs_pending?.map(
+                                        (item) => item.documents_pending_from
+                                    )
                                 )
                             }
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className='dashboard-icon me-2 ms-1'>
+                        <div className="dashboard-icon me-2 ms-1">
                             <X />
                         </div>
                     </div>
@@ -484,30 +575,39 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                     />
                 </div>
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-4") ? "selected-card" : ""}`}
+                    className={`chart-card ${selectedCharts.includes("gh-4") ? "selected-card" : ""
+                        }`}
                     onClick={() => toggleChartSelection("gh-4")}
                     style={{ cursor: "pointer" }}
                 >
-                    <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+                    <div
+                        className="d-flex justify-content-end align-items-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <input
                             type="checkbox"
                             className="chart-select-checkbox"
                             onChange={() => toggleChartSelection("gh-4")}
                             checked={selectedCharts.includes("gh-4")}
+                            disabled={!current?.user_name}
+
                         />
-                        <div className='dashboard-icon ms-2'
+                        <div
+                            className="dashboard-icon ms-2"
                             onClick={() =>
                                 handleOpenDrawer(
                                     "left",
                                     "Open and Closed Issue Status by Issue Category",
                                     openVsCloseIssueCategory?.rest_counts,
-                                    openVsCloseIssueCategory?.rest_counts?.map((item) => item.issue_category),
+                                    openVsCloseIssueCategory?.rest_counts?.map(
+                                        (item) => item.issue_category
+                                    )
                                 )
                             }
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className='dashboard-icon me-2 ms-1'>
+                        <div className="dashboard-icon me-2 ms-1">
                             <X />
                         </div>
                     </div>
@@ -528,13 +628,12 @@ const GeneralHelpdesk = ({ selectedCompany }) => {
                 anchor={drawerAnchor}
                 open={drawerOpen}
                 onClose={() => setDrawerOpen(false)}
-                data={drawerData}        //direct array
+                data={drawerData} //direct array
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}
             />
-
         </div>
-    )
-}
+    );
+};
 
-export default GeneralHelpdesk
+export default GeneralHelpdesk;

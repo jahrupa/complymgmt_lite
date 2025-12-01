@@ -1,30 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import '../style/statsCards.css';
-import '../style/dashboard.css';
-import { Tabs, Tab, Box } from '@mui/material';
-import GeneralComplianceDashboard from '../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard';
-import { fetchAllUser, fetchClientOnboardingByCompany, fetchClientOnboardingPortfolio, fetchComplainceCockpit, fetchComplainceCockpitByCompany, fetchGeneralCompaiancePortfolio, fetchGeneralComplianceByCompany } from '../api/service';
-import CockpitComplinceByCompany from './cockpitDashboard/CockpitComplinceByCompany';
-import CockpitComplince from './cockpitDashboard/CockpitComplince';
-import ClientOnbordingDashboard from './clientOnbordingDashboard/ClientOnbordingDashboard';
-import PayrollServices from './payrollDashboard/PayrollServices ';
-import ReturnsAndSubmissions from './payrollDashboard/ReturnsAndSubmissions';
-import HelpdeskAndEscalations from './payrollDashboard/HelpdeskAndEscalations';
-import AuditAndVisitDashboard from './Audit/AuditAndVisitDashboard';
-import ClientOnBoardingByCompany from './clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany';
-import NoticeDashboard from './noticeDashboard/NoticeDashboard';
-import GeneralHelpdesk from './payrollDashboard/GeneralHelpdesk';
+import React, { useEffect, useState } from "react";
+import "../style/statsCards.css";
+import "../style/dashboard.css";
+import { Tabs, Tab, Box } from "@mui/material";
+import GeneralComplianceDashboard from "../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard";
+import {
+    fetchAllUser,
+    fetchClientOnboardingByCompany,
+    fetchClientOnboardingPortfolio,
+    fetchComplainceCockpit,
+    fetchComplainceCockpitByCompany,
+    fetchGeneralCompaiancePortfolio,
+    fetchGeneralComplianceByCompany,
+} from "../api/service";
+import CockpitComplinceByCompany from "./cockpitDashboard/CockpitComplinceByCompany";
+import CockpitComplince from "./cockpitDashboard/CockpitComplince";
+import ClientOnbordingDashboard from "./clientOnbordingDashboard/ClientOnbordingDashboard";
+import PayrollServices from "./payrollDashboard/PayrollServices ";
+import ReturnsAndSubmissions from "./payrollDashboard/ReturnsAndSubmissions";
+import HelpdeskAndEscalations from "./payrollDashboard/HelpdeskAndEscalations";
+import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
+import ClientOnBoardingByCompany from "./clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany";
+import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
+import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";
 
-const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
+const NavigationTabs = ({
+    selectedCompany,
+    activeTab,
+    setActiveTab,
+    current,
+}) => {
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
-    const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
+    const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] =
+        useState([]);
+    const [selectedCharts, setSelectedCharts] = useState([]);
     const [position, setPosition] = useState({ x: 100, y: 100 });
     const [isDragging, setIsDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-
+console.log(selectedCharts,'selectedCharts')
     const startDrag = (e) => {
         setIsDragging(true);
         const clientX = e.clientX || e.touches?.[0].clientX;
@@ -55,7 +70,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
         const fetchGeneralDashboardData = async () => {
             try {
                 if (selectedCompany) {
-                    const generalDashboardDataByCompany = await fetchGeneralComplianceByCompany(selectedCompany);
+                    const generalDashboardDataByCompany =
+                        await fetchGeneralComplianceByCompany(selectedCompany);
                     setGeneralDashboardData(generalDashboardDataByCompany);
                 } else {
                     const generalDashboardData = await fetchGeneralCompaiancePortfolio();
@@ -68,24 +84,23 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
         fetchGeneralDashboardData();
     }, [selectedCompany]);
 
-
     // cockpit data fetch
     useEffect(() => {
         const fetchCockpitData = async () => {
             const [cockpitByCompanyRes, cockpitRes] = await Promise.allSettled([
-                // pass selectedCompany state 
+                // pass selectedCompany state
                 fetchComplainceCockpitByCompany(selectedCompany),
                 fetchComplainceCockpit(),
                 fetchAllUser(),
             ]);
 
-            if (cockpitByCompanyRes.status === 'fulfilled') {
+            if (cockpitByCompanyRes.status === "fulfilled") {
                 setCockpitByCompanyData(cockpitByCompanyRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitByCompanyRes.reason);
                 setCockpitByCompanyData(cockpitRes.reason?.status || []);
             }
-            if (cockpitRes.status === 'fulfilled') {
+            if (cockpitRes.status === "fulfilled") {
                 setCockpitData(cockpitRes.value);
             } else {
                 console.warn("fetchAll cockpit failed:", cockpitRes.reason);
@@ -98,22 +113,31 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     // client onboarding data fetch
     useEffect(() => {
         const fetchClientOnboardingPortfolioData = async () => {
-            const [clientOnboardingByCompanyRes, clientOnboardingRes] = await Promise.allSettled([
-                // pass selectedCompany state
-                fetchClientOnboardingByCompany(selectedCompany),
-                fetchClientOnboardingPortfolio()
-            ]);
+            const [clientOnboardingByCompanyRes, clientOnboardingRes] =
+                await Promise.allSettled([
+                    // pass selectedCompany state
+                    fetchClientOnboardingByCompany(selectedCompany),
+                    fetchClientOnboardingPortfolio(),
+                ]);
 
-            if (clientOnboardingByCompanyRes.status === 'fulfilled') {
+            if (clientOnboardingByCompanyRes.status === "fulfilled") {
                 setClientOnBoardingByCompanyData(clientOnboardingByCompanyRes.value);
             } else {
-                console.warn("fetchAll client onboarding failed:", clientOnboardingByCompanyRes.reason);
-                setClientOnBoardingByCompanyData(clientOnboardingRes.reason?.status || []);
+                console.warn(
+                    "fetchAll client onboarding failed:",
+                    clientOnboardingByCompanyRes.reason
+                );
+                setClientOnBoardingByCompanyData(
+                    clientOnboardingRes.reason?.status || []
+                );
             }
-            if (clientOnboardingRes.status === 'fulfilled') {
+            if (clientOnboardingRes.status === "fulfilled") {
                 setClientOnboardingData(clientOnboardingRes.value);
             } else {
-                console.warn("fetchAll client onboarding failed:", clientOnboardingRes.reason);
+                console.warn(
+                    "fetchAll client onboarding failed:",
+                    clientOnboardingRes.reason
+                );
                 setClientOnboardingData(clientOnboardingRes.reason?.status || []);
             }
         };
@@ -171,14 +195,15 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
     // };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: "100%" }}>
             {/* {renderCards(stats)} */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
+            <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 2 }}>
                 <Tabs
                     value={activeTab}
                     onChange={handleTabChange}
                     variant="scrollable"
-                    scrollButtons="auto" >
+                    scrollButtons="auto"
+                >
                     <Tab label="Compliance Cockpit " />
                     <Tab label="General Compliance" />
                     <Tab label="Client Onboarding" />
@@ -192,19 +217,81 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab }) => {
             </Box>
             <Box>
                 {/* {activeTab === 0 && renderCards(stats)} */}
-                {activeTab === 0 && (selectedCompany !== ''
-                    ? <CockpitComplinceByCompany data={cockpitByCompanyData} />
-                    : <CockpitComplince data={cockpitData} />)}
-                {activeTab === 1 && <GeneralComplianceDashboard data={generalDashboardData} />}
-                {activeTab === 2 && (selectedCompany === ''
-                    ? <ClientOnbordingDashboard data={clientOnboardingData} />
-                    : <ClientOnBoardingByCompany locationData={ClientOnBoardingByCompanyData} />)}
-                {activeTab === 3 && <PayrollServices selectedCompany={selectedCompany} />}
-                {activeTab === 4 && <ReturnsAndSubmissions selectedCompany={selectedCompany} />}
-                {activeTab === 5 && <HelpdeskAndEscalations selectedCompany={selectedCompany} />}
-                {activeTab === 6 && <GeneralHelpdesk selectedCompany={selectedCompany} />}
-                {activeTab === 7 && <AuditAndVisitDashboard selectedCompany={selectedCompany} />}
-                {activeTab === 8 && <NoticeDashboard selectedCompany={selectedCompany} />}
+                {activeTab === 0 &&
+                    (selectedCompany !== "" ? (
+                        <CockpitComplinceByCompany
+                            data={cockpitByCompanyData}
+                            current={current}
+                        />
+                    ) : (
+                        <CockpitComplince data={cockpitData} current={current} />
+                    ))}
+                {activeTab === 1 && (
+                    <GeneralComplianceDashboard
+                        data={generalDashboardData}
+                        current={current}
+                    />
+                )}
+                {activeTab === 2 &&
+                    (selectedCompany === "" ? (
+                        <ClientOnbordingDashboard
+                            data={clientOnboardingData}
+                            current={current}
+                        />
+                    ) : (
+                        <ClientOnBoardingByCompany
+                            locationData={ClientOnBoardingByCompanyData}
+                            current={current}
+                        />
+                    ))}
+                {activeTab === 3 && (
+                    <PayrollServices
+                        selectedCompany={selectedCompany}
+                        current={current}
+                        setSelectedCharts={setSelectedCharts}
+                        selectedCharts={selectedCharts}
+                    />
+                )}
+                {activeTab === 4 && (
+                    <ReturnsAndSubmissions
+                        selectedCompany={selectedCompany}
+                        current={current}
+                        setSelectedCharts={setSelectedCharts}
+                        selectedCharts={selectedCharts}
+                    />
+                )}
+                {activeTab === 5 && (
+                    <HelpdeskAndEscalations
+                        selectedCompany={selectedCompany}
+                        current={current}
+                        setSelectedCharts={setSelectedCharts}
+                        selectedCharts={selectedCharts}
+                    />
+                )}
+                {activeTab === 6 && (
+                    <GeneralHelpdesk
+                        selectedCompany={selectedCompany}
+                        current={current}
+                        setSelectedCharts={setSelectedCharts}
+                        selectedCharts={selectedCharts}
+                    />
+                )}
+                {activeTab === 7 && (
+                    <AuditAndVisitDashboard
+                        selectedCompany={selectedCompany}
+                        current={current}
+                        setSelectedCharts={setSelectedCharts}
+                        selectedCharts={selectedCharts}
+                    />
+                )}
+                {activeTab === 8 && (
+                    <NoticeDashboard
+                        selectedCompany={selectedCompany}
+                        current={current}
+                        setSelectedCharts={setSelectedCharts}
+                        selectedCharts={selectedCharts}
+                    />
+                )}
             </Box>
             <div className="navigation-wrapper">
                 <div

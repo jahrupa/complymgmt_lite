@@ -12,8 +12,14 @@ import {
 } from "../../api/service";
 import DashboardDrawerGrid from "../DashboardDrawer";
 import { ArrowUpRight, X } from "lucide-react";
+import Snackbars from "../../component/Snackbars";
 
-const AuditAndVisitDashboard = ({ selectedCompany }) => {
+const AuditAndVisitDashboard = ({
+  selectedCompany,
+  current,
+  selectedCharts,
+  setSelectedCharts,
+}) => {
   const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState(
     []
   );
@@ -89,13 +95,29 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
   const [AuditCountByStateSegmented, setAuditCountByStateSegmented] =
     React.useState([]);
 
-  const [selectedCharts, setSelectedCharts] = React.useState([]);
-  const toggleChartSelection = (id) => {
-    setSelectedCharts(
-      (prev) =>
-        prev.includes(id)
-          ? prev.filter((item) => item !== id) // remove if existed
-          : [...prev, id] // add new ID
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severityType: "",
+  });
+  const toggleChartSelection = (chartId) => {
+    if (!current?.user_name) {
+      // alert("First you need to select a user");
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: "First you need to select a user",
+        severityType: "warning",
+      });
+      return;
+    }
+
+    setSelectedCharts((prev) =>
+      prev.includes(chartId)
+        ? prev.filter((id) => id !== chartId)
+        : [...prev, chartId]
     );
   };
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -684,13 +706,20 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
     };
     fetchData();
   }, [selectedCompany]);
+
+  useEffect(() => {
+    setSelectedCharts([]);
+  }, [current?.user_name]);
   return (
     <div>
+      <Snackbars
+        issnackbarsOpen={issnackbarsOpen}
+        setIsSnackbarsOpen={setIsSnackbarsOpen}
+      />
       <div className="charts-grid mb-4">
         <div
-          className={`chart-card ${
-            selectedCharts.includes("av-1") ? "selected-card" : ""
-          }`}
+          className={`chart-card ${selectedCharts.includes("av-1") ? "selected-card" : ""
+            }`}
           onClick={() => toggleChartSelection("av-1")}
           style={{ cursor: "pointer" }}
         >
@@ -703,6 +732,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
               className="chart-select-checkbox"
               onChange={() => toggleChartSelection("av-1")}
               checked={selectedCharts.includes("av-1")}
+              disabled={!current?.user_name}
             />
             <div
               className="dashboard-icon ms-2"
@@ -735,9 +765,8 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
         </div>
 
         <div
-          className={`chart-card ${
-            selectedCharts.includes("av-2") ? "selected-card" : ""
-          }`}
+          className={`chart-card ${selectedCharts.includes("av-2") ? "selected-card" : ""
+            }`}
           onClick={() => toggleChartSelection("av-2")}
           style={{ cursor: "pointer" }}
         >
@@ -750,6 +779,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
               className="chart-select-checkbox"
               onChange={() => toggleChartSelection("av-2")}
               checked={selectedCharts.includes("av-2")}
+              disabled={!current?.user_name}
             />
             <div
               className="dashboard-icon ms-2"
@@ -783,7 +813,35 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
       </div>
 
       <div className="charts-grid mb-4">
-        <div className="chart-card">
+        <div className={`chart-card ${selectedCharts.includes("av-3") ? "selected-card" : ""
+          }`}
+          onClick={() => toggleChartSelection("av-3")}
+          style={{ cursor: "pointer" }}>
+          <div
+            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("av-3")}
+              checked={selectedCharts.includes("av-3")}
+              disabled={!current?.user_name}
+            />
+            <div className="dashboard-icon ms-2" onClick={
+              () => setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "No Data available",
+                severityType: "info",
+              })}>
+              <ArrowUpRight />
+            </div>
+            <div className="dashboard-icon me-2 ms-1">
+              <X />
+            </div>
+
+          </div>
           <div className="mb-3 fw-600">
             Percentage of audits meeting SLA by Responsible Team
           </div>
@@ -796,9 +854,8 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
         </div>
 
         <div
-          className={`chart-card ${
-            selectedCharts.includes("av-4") ? "selected-card" : ""
-          }`}
+          className={`chart-card ${selectedCharts.includes("av-4") ? "selected-card" : ""
+            }`}
           onClick={() => toggleChartSelection("av-4")}
           style={{ cursor: "pointer" }}
         >
@@ -811,6 +868,7 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
               className="chart-select-checkbox"
               onChange={() => toggleChartSelection("av-4")}
               checked={selectedCharts.includes("av-4")}
+              disabled={!current?.user_name}
             />
             <div
               className="dashboard-icon ms-2"
@@ -844,7 +902,34 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
       </div>
 
       <div className="charts-grid mb-4">
-        <div className="chart-card">
+        <div className={`chart-card ${selectedCharts.includes("av-5") ? "selected-card" : ""
+          }`}
+          onClick={() => toggleChartSelection("av-5")}
+          style={{ cursor: "pointer" }}>
+          <div
+            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("av-5")}
+              checked={selectedCharts.includes("av-5")}
+              disabled={!current?.user_name}
+            />
+            <div className="dashboard-icon ms-2" onClick={
+              () => setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "No Data available",
+                severityType: "info",
+              })}>
+              <ArrowUpRight />
+            </div>
+            <div className="dashboard-icon me-2 ms-1">
+              <X />
+            </div>
+          </div>
           <div className="mb-3 fw-600">Risk level distribution </div>
           <Chart
             options={riskLevelFormat.options}
@@ -854,10 +939,9 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
           />
         </div>
         <div
-          className={`chart-card ${
-            selectedCharts.includes("av-4") ? "selected-card" : ""
-          }`}
-          onClick={() => toggleChartSelection("av-4")}
+          className={`chart-card ${selectedCharts.includes("av-6") ? "selected-card" : ""
+            }`}
+          onClick={() => toggleChartSelection("av-6")}
           style={{ cursor: "pointer" }}
         >
           <div
@@ -867,8 +951,9 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
             <input
               type="checkbox"
               className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-4")}
-              checked={selectedCharts.includes("av-4")}
+              onChange={() => toggleChartSelection("av-6")}
+              checked={selectedCharts.includes("av-6")}
+              disabled={!current?.user_name}
             />
             <div
               className="dashboard-icon ms-2"
@@ -902,7 +987,36 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
       </div>
 
       <div className="charts-grid mb-4">
-        <div className="chart-card">
+        <div className={`chart-card ${selectedCharts.includes("av-7") ? "selected-card" : ""
+          }`}
+          onClick={() => toggleChartSelection("av-7")}
+          style={{ cursor: "pointer" }}>
+
+          <div
+            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("av-7")}
+              checked={selectedCharts.includes("av-7")}
+              disabled={!current?.user_name}
+            />
+            <div className="dashboard-icon ms-2" onClick={
+              () => setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "No Data available",
+                severityType: "info",
+              })}>
+              <ArrowUpRight />
+            </div>
+            <div className="dashboard-icon me-2 ms-1">
+              <X />
+            </div>
+
+          </div>
           <div className="mb-3 fw-600">
             Risk Level breakdown by Service Type
           </div>
@@ -913,7 +1027,35 @@ const AuditAndVisitDashboard = ({ selectedCompany }) => {
             height={380}
           />
         </div>
-        <div className="chart-card">
+        <div className={`chart-card ${selectedCharts.includes("av-8") ? "selected-card" : ""
+          }`}
+          onClick={() => toggleChartSelection("av-8")}
+          style={{ cursor: "pointer" }}>
+          <div
+            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("av-8")}
+              checked={selectedCharts.includes("av-8")}
+              disabled={!current?.user_name}
+            />
+            <div className="dashboard-icon ms-2" onClick={
+              () => setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "No Data available",
+                severityType: "info",
+              })}>
+              <ArrowUpRight />
+            </div>
+            <div className="dashboard-icon me-2 ms-1">
+              <X />
+            </div>
+
+          </div>
           <div className="mb-3 fw-600">Proportion of audit status</div>
           <Chart
             options={countOfAuditStatusFormated.options}

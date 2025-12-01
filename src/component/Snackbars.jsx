@@ -2,7 +2,7 @@
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadStatus }) {
+export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadStatus,customeMessage }) {
   const { vertical, horizontal, open, message, severityType } = issnackbarsOpen;
 
   const handleClose = (event, reason) => {
@@ -28,7 +28,8 @@ export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadS
           variant="filled"
           sx={{ width: '100%' }}
         >
-          {message}
+          {message || customeMessage || ''}
+
         </Alert>
       </Snackbar>
       : 

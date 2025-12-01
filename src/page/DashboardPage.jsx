@@ -16,22 +16,8 @@ const DashboardPage = () => {
   const [selectedCompany, setSelectedCompany] = useState(""); // single selected value
   const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
   const [current, setCurrent] = useState({});
+  console.log(current,'current')
   const [allUser, setAllUser] = useState([]);
-  // useEffect(() => {
-  //   const fetchCompany = async () => {
-  //     try {
-  //       const data = await fetchAllCompanies();
-  //       if (data) {
-  //         setCompanyName(data);
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to fetch company:", error);
-  //     }
-  //   };
-
-  //   fetchCompany();
-  // }, []);
-
   useEffect(() => {
     const fetchCockpitData = async () => {
       const [cockpitByCompanyRes, allUser] = await Promise.allSettled([
@@ -142,6 +128,7 @@ const DashboardPage = () => {
           selectedCompany={selectedCompany}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          current={current}
         />
         {/* <ComplianceMasterDashboard /> */}
       </div>
