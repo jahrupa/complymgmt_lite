@@ -59,7 +59,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [activePage, setActivePage] = useState(() => {
     return localStorage.getItem('activeItem') || 'Dashboard';
   });
-  let tokenId = localStorage.getItem('token');
+  let tokenId = localStorage.getItem('authToken');
   useEffect(() => {
     if (tokenId) {
       setIsAuthenticated(true)

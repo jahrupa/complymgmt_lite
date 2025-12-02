@@ -17,6 +17,7 @@ import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
+import { decryptData } from './utils/encrypt';
 
 // Register modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -46,7 +47,7 @@ const ServiceTrackerInnerPage = () => {
         isFilteredData: false,
 
     });
-     console.log(current?.sheet_name?.[0], 'sheet_name');
+    console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
     const gridRef = useRef();
@@ -58,9 +59,8 @@ const ServiceTrackerInnerPage = () => {
 
     };
     const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
-    const currentUser = localStorage.getItem('user_id');
+    const currentUser = decryptData(localStorage.getItem('user_id'));
     const navigate = useNavigate();
-
     const defaultColDef = {
         sortable: true,
         filter: true,
@@ -571,7 +571,7 @@ const ServiceTrackerInnerPage = () => {
             default: return { color: 'gray' };
         }
     };
-    
+
     // previous code
     //    useEffect(() => {
     //         if (formattedTrackerName && current?.sheet_name)  {
@@ -638,7 +638,7 @@ const ServiceTrackerInnerPage = () => {
 
 
     const onFilterOpened = (params) => {
-         console.log("Filter opened");
+        console.log("Filter opened");
         const field = params.column.getColId();
 
         const rowData = [];
@@ -651,7 +651,7 @@ const ServiceTrackerInnerPage = () => {
 
         const uniqueValues = [...new Set(rowData)];
 
-         console.log({ [field]: uniqueValues });
+        console.log({ [field]: uniqueValues });
 
         const filterComponent = document.querySelectorAll('.ag-filter')
 

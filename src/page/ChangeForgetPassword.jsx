@@ -3,6 +3,7 @@ import '../style/changePassword.css';
 import { changePassword, changeTemporaryPasswordStatus } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import { useNavigate } from 'react-router-dom';
+import { decryptData } from './utils/encrypt';
 
 function ChangeForgetPassword({ setIsChangePassword }) {
   const [formData, setFormData] = useState({
@@ -42,7 +43,9 @@ function ChangeForgetPassword({ setIsChangePassword }) {
     if (validationErrors.length > 1) return { strength: 'medium', label: 'Medium' };
     return { strength: 'strong', label: 'Strong' };
   };
-  const currentUserId = localStorage.getItem('user_id');
+  // const currentUserId = localStorage.getItem('user_id');
+      const currentUserId = decryptData(localStorage.getItem('user_id'));
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -105,7 +108,7 @@ function ChangeForgetPassword({ setIsChangePassword }) {
        console.log(response?.message, 'response');
 
       // Update temp password status
-      const userId = localStorage.getItem('user_id') || currentUserId;
+      const userId = decryptData(localStorage.getItem('user_id')) || currentUserId;
       const changeTempPasswordStatusResponse = await changeTemporaryPasswordStatus(userId);
       setIsChangePassword(changeTempPasswordStatusResponse?.is_temp_password || false);
       // Show success snackbar

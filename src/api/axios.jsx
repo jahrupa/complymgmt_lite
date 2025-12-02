@@ -42,6 +42,7 @@
 // session expired
 
 import axios from "axios";
+import { decryptData } from "../page/utils/encrypt";
 // import { useToken } from "../TokenProvider";
 // const isDev = window.location.hostname === "localhost" || window.location.hostname === "192.168.1.225";
 // const baseURL = isDev
@@ -60,15 +61,29 @@ const API = axios.create({
 // Request interceptor - set Authorization header
 API.interceptors.request.use(
   (config) => {
-    // const { token} = useToken();
-    const local_token = localStorage.getItem("token");
-    if (local_token) {
-      config.headers.Authorization = `${local_token}`; // Assuming token already has 'Bearer ' prefix
+    const encryptedToken = localStorage.getItem("authToken");
+
+    if (!encryptedToken) {
+      return config; // no token found skip
     }
+
+    let local_token;
+    try {
+      local_token = decryptData(encryptedToken);
+    } catch (e) {
+      console.error("Token decrypt error:", e);
+      return config; // decrypt error occurred, skip
+    }
+
+    if (local_token) {
+      config.headers.Authorization = `Bearer ${local_token}`;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
+
 
 // Response interceptor - handle expired token
 API.interceptors.response.use(
@@ -82,7 +97,7 @@ API.interceptors.response.use(
       response.data.message === "Token expired or invalid"
       // response.status === 401 // Unauthorized
     ) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("authToken");
       window.location.href = "/"; // redirect to login
     }
 
