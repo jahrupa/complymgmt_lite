@@ -44,11 +44,11 @@ const DashboardPage = () => {
   return (
     <div>
       <div className="dashboard-header-card dashboard-page-title justify-content-between d-lg-flex d-md-flex">
-        <div className="mb-4 d-flex ">
+        <div className="mb-4 d-flex align-items-center ">
           <span>
-            <img src={LaptopMinimalCheck} width={65} />
+            <img src={LaptopMinimalCheck} width={55} />
           </span>
-          <h1 className="mt-1 ps-lg-4 ps-md-4 fw-600">
+          <div className="mt-1 ps-lg-4 ps-md-4 fw-600 fs-5">
             {activeTab === 0
               ? "Compliance Cockpit"
               : activeTab === 1
@@ -68,11 +68,11 @@ const DashboardPage = () => {
               : activeTab === 8
               ? "Notices & Inspections"
               : ""}
-          </h1>
+          </div>
         </div>
         <div className="d-lg-flex d-md-flex justify-content-between"
         >
-          <div className="me-1 ms-1" style={{width:'265px'}}>
+          <div className="me-1 ms-1" style={{width:'250px'}}>
             <SingleSelectTextField
               name="company_name"
               label="Company Name"
@@ -86,10 +86,10 @@ const DashboardPage = () => {
               }))}
             />
           </div>
-            <div className="me-1 ms-1" style={{width:'265px'}}>
+            <div className="me-1 ms-1" style={{width:'250px'}}>
               <SingleSelectTextField
                 name="user_name"
-                label="User Name"
+                label="Choose a user to create a widget"
                 value={current.user_name}
                 onChange={(e) => {
                   const selectedName = e.target.value;
