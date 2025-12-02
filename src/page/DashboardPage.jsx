@@ -76,13 +76,13 @@ const DashboardPage = () => {
             <SingleSelectTextField
               name="company_name"
               label="Company Name"
-              value={selectedCompany || ""}
+              value={selectedCompany}
               onChange={(e) => {
                 setSelectedCompany(e.target.value);
               }}
               names={companyName?.map((data) => ({
                 _id: data?._id,
-                name: data?.company_name || "",
+                name: data?.company_name,
               }))}
             />
           </div>
