@@ -734,7 +734,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -758,9 +758,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Top 5 Proportion of cases pending from department vs. pending from
@@ -781,7 +778,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -805,9 +802,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Top 5 Comparison of closed vs. open cases for top 5 Issue Sub-Types
@@ -829,7 +823,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -847,10 +841,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               })}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
-
           </div>
           <div className="mb-3 fw-600">
             Analysis of client delay flags for open tickets in PF_ESIC_Helpdesk
@@ -871,7 +861,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -889,10 +879,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               })}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
-
           </div>
           <div className="mb-3 fw-600">
             Number of tickets by Communication Type in PF_ESIC_Helpdesk
@@ -913,7 +899,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -936,9 +922,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Ticket distribution by Assigned To for top 5 users in
@@ -960,7 +943,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -978,10 +961,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               })}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
-
           </div>
           <div className="mb-3 fw-600">
             Ticket volume by State for PF, ESIC, and LWF categories in
@@ -1003,7 +982,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -1025,9 +1004,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               }
             >
               <ArrowUpRight />
-            </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
             </div>
           </div>
           <div className="mb-3 fw-600">

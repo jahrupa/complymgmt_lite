@@ -297,7 +297,7 @@ const ReturnsAndSubmissions = ({
           onClick={() => toggleChartSelection("rs-1")}
           style={{ cursor: "pointer" }}
         >
-          <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+          <div className='d-flex justify-content-end align-items-center' >
             <input
               type="checkbox"
               className="chart-select-checkbox"
@@ -317,9 +317,6 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
-              <X />
-            </div>
           </div>
 
           <div className="mb-3 fw-600">Top 5 comparison of Return Applicability across Companies</div>
@@ -331,7 +328,7 @@ const ReturnsAndSubmissions = ({
           onClick={() => toggleChartSelection("rs-2")}
           style={{ cursor: "pointer" }}
         >
-          <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+          <div className='d-flex justify-content-end align-items-center' >
             <input
               type="checkbox"
               className="chart-select-checkbox"
@@ -343,9 +340,6 @@ const ReturnsAndSubmissions = ({
               onClick={() => setIsSnackbarsOpen(prev => ({ ...prev, open: true, message: "No Data available", severityType: "info" }))}
             >
               <ArrowUpRight />
-            </div>
-            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
-              <X />
             </div>
           </div>
 
@@ -360,7 +354,7 @@ const ReturnsAndSubmissions = ({
           onClick={() => toggleChartSelection("rs-3")}
           style={{ cursor: "pointer" }}
         >
-          <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+          <div className='d-flex justify-content-end align-items-center' >
             <input
               type="checkbox"
               className="chart-select-checkbox"
@@ -373,9 +367,6 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
-              <X />
-            </div>
           </div>
 
           <div className="mb-3 fw-600">Compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
@@ -387,7 +378,7 @@ const ReturnsAndSubmissions = ({
           onClick={() => toggleChartSelection("rs-4")}
           style={{ cursor: "pointer" }}
         >
-          <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+          <div className='d-flex justify-content-end align-items-center' >
             <input
               type="checkbox"
               className="chart-select-checkbox"
@@ -407,9 +398,6 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
-              <X />
-            </div>
           </div>
 
           <div className="mb-3 fw-600">Top 5 analysis of applicable return names, identifying the most frequently required returns across companies</div>
@@ -423,7 +411,7 @@ const ReturnsAndSubmissions = ({
           onClick={() => toggleChartSelection("rs-5")}
           style={{ cursor: "pointer" }}
         >
-          <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+          <div className='d-flex justify-content-end align-items-center' >
             <input
               type="checkbox"
               className="chart-select-checkbox"
@@ -443,9 +431,6 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
-              <X />
-            </div>
           </div>
 
           <div className="mb-3 fw-600">Top 5 compliance risk distribution by state, identifying regions with elevated compliance risk levels.</div>
@@ -457,7 +442,7 @@ const ReturnsAndSubmissions = ({
           onClick={() => toggleChartSelection("rs-6")}
           style={{ cursor: "pointer" }}
         >
-          <div className='d-flex justify-content-end align-items-center' onClick={(e) => e.stopPropagation()}>
+          <div className='d-flex justify-content-end align-items-center' >
             <input
               type="checkbox"
               className="chart-select-checkbox"
@@ -477,9 +462,6 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
-              <X />
-            </div>
           </div>
 
           <div className="mb-3 fw-600">Top 5 state-wise analysis of applicable returns, showcasing regional concentration of compliance activities.</div>
@@ -495,7 +477,7 @@ const ReturnsAndSubmissions = ({
         >
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -506,9 +488,6 @@ const ReturnsAndSubmissions = ({
             />
             <div className="dashboard-icon ms-2" onClick={() => setIsSnackbarsOpen(prev => ({ ...prev, open: true, message: "No Data available", severityType: "info" }))}>
               <ArrowUpRight />
-            </div>
-            <div className="dashboard-icon me-2 ms-1  hide-chart-widget">
-              <X />
             </div>
           </div>
 

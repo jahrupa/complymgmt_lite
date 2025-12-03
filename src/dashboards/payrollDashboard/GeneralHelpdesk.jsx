@@ -434,7 +434,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -459,9 +459,6 @@ const GeneralHelpdesk = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
-                        </div>
                     </div>
 
                     <div className="mb-3 fw-600">
@@ -485,7 +482,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -509,9 +506,6 @@ const GeneralHelpdesk = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
-                        </div>
                     </div>
 
                     <div className="mb-3 fw-600">Top 5 Assigned Users</div>
@@ -534,7 +528,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -559,9 +553,6 @@ const GeneralHelpdesk = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
-                        </div>
                     </div>
                     <div className="mb-3 fw-600">
                         Top 5 documents Pending From Client vs. Karma
@@ -582,7 +573,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -606,9 +597,6 @@ const GeneralHelpdesk = ({
                             }
                         >
                             <ArrowUpRight />
-                        </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
                         </div>
                     </div>
 

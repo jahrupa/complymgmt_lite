@@ -639,7 +639,7 @@ const PayrollServices = ({
                         >
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                onClick={(e) => e.stopPropagation()}
+                                
                             >
                                 <input
                                     type="checkbox"
@@ -656,9 +656,6 @@ const PayrollServices = ({
                                         severityType: "info",
                                     })}>
                                     <ArrowUpRight />
-                                </div>
-                                <div className="dashboard-icon me-2 ms-1">
-                                    <X />
                                 </div>
                             </div>
                             <div className="mb-3 fw-600">
@@ -679,7 +676,7 @@ const PayrollServices = ({
                         >
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                onClick={(e) => e.stopPropagation()}
+                                
                             >
                                 <input
                                     type="checkbox"
@@ -703,9 +700,6 @@ const PayrollServices = ({
                                 >
                                     <ArrowUpRight />
                                 </div>
-                                <div className="dashboard-icon me-2 ms-1">
-                                    <X />
-                                </div>
                             </div>
                             <div className="mb-3 fw-600">
                                 Top 5 average delay between data request date and client data
@@ -725,7 +719,7 @@ const PayrollServices = ({
                             style={{ cursor: "pointer" }}>
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                onClick={(e) => e.stopPropagation()}
+                                
                             >
                                 <input
                                     type="checkbox"
@@ -743,9 +737,6 @@ const PayrollServices = ({
                                     })}>
                                     <ArrowUpRight />
                                 </div>
-                                <div className="dashboard-icon me-2 ms-1">
-                                    <X />
-                                </div>
                             </div>
                             <div className="mb-3 fw-600">
                                 Type of Systems Used by Employer
@@ -762,7 +753,7 @@ const PayrollServices = ({
                             style={{ cursor: "pointer" }}>
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                onClick={(e) => e.stopPropagation()}
+                                
                             >
                                 <input
                                     type="checkbox"
@@ -779,9 +770,6 @@ const PayrollServices = ({
                                         severityType: "info",
                                     })}>
                                     <ArrowUpRight />
-                                </div>
-                                <div className="dashboard-icon me-2 ms-1">
-                                    <X />
                                 </div>
                             </div>
                             <div className="mb-3 fw-600">
@@ -809,7 +797,7 @@ const PayrollServices = ({
 
                                 <div
                                     className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-                                    onClick={(e) => e.stopPropagation()}
+                                    
                                 >
                                     <input
                                         type="checkbox"
@@ -827,10 +815,6 @@ const PayrollServices = ({
                                         })}>
                                         <ArrowUpRight />
                                     </div>
-                                    <div className="dashboard-icon me-2 ms-1">
-                                        <X />
-                                    </div>
-
                                 </div>
 
                             </div>

@@ -740,7 +740,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -760,9 +760,6 @@ const NoticeDashboard = ({
                                 })}
                         >
                             <ArrowUpRight />
-                        </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
                         </div>
                     </div>
                     <div className="mb-3 fw-600">
@@ -785,7 +782,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -806,9 +803,6 @@ const NoticeDashboard = ({
                             }
                         >
                             <ArrowUpRight />
-                        </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
                         </div>
                     </div>
                     <div className="mb-3 fw-600">
@@ -831,7 +825,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -851,9 +845,6 @@ const NoticeDashboard = ({
                                 })}
                         >
                             <ArrowUpRight />
-                        </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
                         </div>
                     </div>
                     <div className="mb-3 fw-600">
@@ -875,7 +866,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -899,9 +890,6 @@ const NoticeDashboard = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
-                        </div>
                     </div>
                     <div className="mb-3 fw-600">
                         Top 5 Analysis of applicable acts to reveal legal focus areas
@@ -924,7 +912,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -948,9 +936,6 @@ const NoticeDashboard = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1 hide-chart-widget">
-                            <X />
-                        </div>
                     </div>
                     <div className="mb-3 fw-600">
                         Top 5 Number of notices assigned to each team member to assess
@@ -972,7 +957,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -996,9 +981,6 @@ const NoticeDashboard = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1  hide-chart-widget">
-                            <X />
-                        </div>
                     </div>
                     <div className="mb-3 fw-600">
                         Top 5 comparison of acknowledgement rates by different individuals
@@ -1019,7 +1001,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -1040,9 +1022,6 @@ const NoticeDashboard = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
-                        </div>
                     </div>
                     <div className="mb-3 fw-600">
                         Distribution of response status to track resolution progress
@@ -1060,7 +1039,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        onClick={(e) => e.stopPropagation()}
+                        
                     >
                         <input
                             type="checkbox"
@@ -1080,9 +1059,6 @@ const NoticeDashboard = ({
                                 })}
                         >
                             <ArrowUpRight />
-                        </div>
-                        <div className="dashboard-icon me-2 ms-1">
-                            <X />
                         </div>
                     </div>
                     <div className="mb-3 fw-600">

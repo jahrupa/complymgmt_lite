@@ -725,7 +725,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -749,9 +749,6 @@ const AuditAndVisitDashboard = ({
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Top 5 audit count by Service Type across all companies
@@ -772,7 +769,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -796,9 +793,6 @@ const AuditAndVisitDashboard = ({
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Top 5 audit count by State segmented by Audit Platform
@@ -819,7 +813,7 @@ const AuditAndVisitDashboard = ({
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -837,10 +831,6 @@ const AuditAndVisitDashboard = ({
               })}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
-
           </div>
           <div className="mb-3 fw-600">
             Percentage of audits meeting SLA by Responsible Team
@@ -861,7 +851,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -885,9 +875,6 @@ const AuditAndVisitDashboard = ({
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Top 5 checklist approval rate by Company Name{" "}
@@ -908,7 +895,7 @@ const AuditAndVisitDashboard = ({
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -925,9 +912,6 @@ const AuditAndVisitDashboard = ({
                 severityType: "info",
               })}>
               <ArrowUpRight />
-            </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
             </div>
           </div>
           <div className="mb-3 fw-600">Risk level distribution </div>
@@ -946,7 +930,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -970,9 +954,6 @@ const AuditAndVisitDashboard = ({
             >
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
           </div>
           <div className="mb-3 fw-600">
             Top 5 Escalation Triggered (Y/N) rate by State
@@ -994,7 +975,7 @@ const AuditAndVisitDashboard = ({
 
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -1012,10 +993,6 @@ const AuditAndVisitDashboard = ({
               })}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
-
           </div>
           <div className="mb-3 fw-600">
             Risk Level breakdown by Service Type
@@ -1033,7 +1010,7 @@ const AuditAndVisitDashboard = ({
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            onClick={(e) => e.stopPropagation()}
+            
           >
             <input
               type="checkbox"
@@ -1051,10 +1028,6 @@ const AuditAndVisitDashboard = ({
               })}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
-              <X />
-            </div>
-
           </div>
           <div className="mb-3 fw-600">Proportion of audit status</div>
           <Chart
