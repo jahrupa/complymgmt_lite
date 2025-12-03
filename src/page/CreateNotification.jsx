@@ -42,6 +42,7 @@ import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import dayjs from "dayjs";
 import MultiFileUpload from "../component/MultiFileUpload";
 import SmallSizeModal from "../component/SmallSizeModal";
+import { decryptData } from "./utils/encrypt";
 
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -77,6 +78,7 @@ const CreateNotification = () => {
   const gridRef = useRef();
   const crudTitle = "Create Notification Template";
   const editCrudTitle = "Edit Notification Template";
+  const SystemUserId = decryptData(localStorage.getItem("user_id"));
   // ✅ Default column settings
   const defaultColDef = useMemo(
     () => ({
@@ -328,7 +330,7 @@ const CreateNotification = () => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
     const CommonAttributes = {
-      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+      [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
     };
     const payload = {
       "group_holding_id": editForm?.group_holding_id || "",

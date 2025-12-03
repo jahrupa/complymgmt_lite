@@ -18,6 +18,7 @@ import SingleSelectTextField from './MuiInputs/SingleSelectTextField';
 import MuiTextAreaField from './MuiInputs/MuiTextAreaField';
 import { useNavigate } from 'react-router-dom';
 import { AnimatedSearchBar } from './AnimatedSearchBar';
+import { decryptData } from '../page/utils/encrypt';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -57,7 +58,7 @@ const ServiceTrackers = () => {
     const [moduleName, setModuleName] = useState([]);
     const [subModuleName, setSubModuleName] = useState([]);
     const navigate = useNavigate();
-
+    const SystemUserId = decryptData(localStorage.getItem("user_id"));
     // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -100,7 +101,7 @@ const ServiceTrackers = () => {
         e.preventDefault(); // Prevent default submit behavior
         if (!validate()) return; // Don't proceed if validation fails
         const CommonAttributes = {
-            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+            [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
         };
         const payload = {
             "ServiceTrackerName": current?.service_tracker_name,

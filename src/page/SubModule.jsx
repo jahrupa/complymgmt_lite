@@ -27,6 +27,7 @@ import { bulkApproveAllPageData, createsSubModule, deleteSubModuleById, fetchAll
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { decryptData } from './utils/encrypt';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const SubModule = () => {
@@ -49,7 +50,7 @@ const SubModule = () => {
     const [moduleName, setModuleName] = useState([]);
     const crudTitle = "Add New SubModule"
     const editCrudTitle = "Edit SubModule"
-
+   const SystemUserId = decryptData(localStorage.getItem("user_id"));
     // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -95,7 +96,7 @@ const SubModule = () => {
         if (!validate()) return; // Don't proceed if validation fails
 
         const CommonAttributes = {
-            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+            [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
         };
         const payload = {
             "SubModuleName": current.sub_module_name,

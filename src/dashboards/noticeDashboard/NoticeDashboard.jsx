@@ -948,7 +948,7 @@ const NoticeDashboard = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
+                        <div className="dashboard-icon me-2 ms-1 hide-chart-widget">
                             <X />
                         </div>
                     </div>
@@ -996,7 +996,7 @@ const NoticeDashboard = ({
                         >
                             <ArrowUpRight />
                         </div>
-                        <div className="dashboard-icon me-2 ms-1">
+                        <div className="dashboard-icon me-2 ms-1  hide-chart-widget">
                             <X />
                         </div>
                     </div>

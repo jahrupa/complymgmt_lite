@@ -19,6 +19,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { decryptData } from './utils/encrypt';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -46,7 +47,7 @@ const GroupCompaniesPage = () => {
     severityType: '',
   });
   const [groupId, setgroupId] = useState(null)
-
+  const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {
     let tempErrors = {};
     if (!current?.group_name) tempErrors.group_name = "Group Holding Name is required";
@@ -90,7 +91,7 @@ const GroupCompaniesPage = () => {
 
     if (!validate()) return; // Don't proceed if validation fails
     const CommonAttributes = {
-      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+      [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
     };
     const payload = {
       "GroupDescription": current?.group_description,

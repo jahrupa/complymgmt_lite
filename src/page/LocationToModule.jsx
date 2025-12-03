@@ -16,6 +16,7 @@ import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { Link } from 'lucide-react';
+import { decryptData } from './utils/encrypt';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const LocationToModule = () => {
@@ -58,6 +59,7 @@ const LocationToModule = () => {
     const [errors, setErrors] = useState({});
     const crudTitle = "Tag Location To Module"
     const editCrudTitle = "Edit Tagged Location To Module"
+    const SystemUserId = decryptData(localStorage.getItem("user_id"));
     const validate = () => {
         let tempErrors = {};
         if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
@@ -95,7 +97,7 @@ const LocationToModule = () => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
         const CommonAttributes = {
-            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+            [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
         };
         const payload = {
             "CompanyID": current?.company_id,

@@ -6,47 +6,19 @@ import ClientComplianceTable from './ClientComplianceTable';
 import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { Settings2 } from 'lucide-react';
 import { AnimatedSearchBar } from '../../component/AnimatedSearchBar';
+import Snackbars from '../../component/Snackbars';
 
-
-// Sample of the larger dataset
-// const data = {
-//   "total_clients": 3774,
-//   "total_licenses": 343,
-//   "total_licenses_completed": 111,
-//   "total_licenses_pending": 216,
-//   "total_registers": 10254,
-//   "total_registers_completed": 0,
-//   "total_registers_pending": 6217,
-//   "total_returns": 2772,
-//   "total_returns_completed": 1497,
-//   "total_returns_pending": 78,
-//   "total_challans": 1104,
-//   "total_challans_completed": 724,
-//   "overall_compliance_score": 16.11,
-//   "overall_license_compliance_score": 32.36,
-//   "overall_register_compliance_score": 0,
-//   "overall_return_compliance_score": 54.00,
-//   "overall_challan_compliance_score": 65.58
-// };
-
-// Sample client data
-// const sampleClients = [
-//   { name: "ADP Private Limited", average_compliance_score: 120, type: "High Performer" },
-//   { name: "AGD Biomedicals Private Limited", average_compliance_score: 100, type: "Compliant" },
-//   { name: "AMH Services Private Limited", average_compliance_score: 0, type: "Needs Attention" },
-//   { name: "Aujas Cybersecurity Limited", average_compliance_score: 45.28, type: "Moderate" },
-//   { name: "BNP Paribas", average_compliance_score: 375, type: "Excellent" },
-//   { name: "Ferrero India Private Limited", average_compliance_score: 113.04, type: "High Performer" },
-//   { name: "Qatar Airways", average_compliance_score: 77.78, type: "Good" },
-//   { name: "SBI General Insurance", average_compliance_score: 99.48, type: "High Performer" }
-// ];
-
-const CockpitComplince = ({ data }) => {
+const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuOption, setMenuOption] = useState('card');
-  //  console.log(menuOption, 'menuOption')
-  //  console.log(anchorEl, 'anchorEl')
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severityType: "",
+  });
   const gridRef = useRef();
 
   const itemsPerPage = 10; // number of cards per page
@@ -99,6 +71,10 @@ const CockpitComplince = ({ data }) => {
       height: 350,
     },
     colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+    title: {
+      text: 'Overall Compliance Score',
+      align: 'center'
+    },
     plotOptions: {
       radialBar: {
         dataLabels: {
@@ -115,6 +91,7 @@ const CockpitComplince = ({ data }) => {
           }
         }
       }
+
     },
     labels: ['Licenses', 'Returns', 'Challans', 'Registers', 'Overall'],
   };
@@ -190,43 +167,46 @@ const CockpitComplince = ({ data }) => {
       ]
     }
   ];
+  const toggleChartSelection = (chartId) => {
+    if (!current?.user_name) {
+      // alert("First you need to select a user");
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: "First you need to select a user",
+        severityType: "warning",
+      });
+      return;
+    }
 
-  // Client Performance Chart
-  // const clientChartOptions = {
-  //   chart: {
-  //     type: 'scatter',
-  //     height: 400,
-  //   },
-  //   colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-  //   xaxis: {
-  //     title: {
-  //       text: 'Client Index'
-  //     }
-  //   },
-  //   yaxis: {
-  //     title: {
-  //       text: 'Compliance Score'
-  //     }
-  //   },
-  //   title: {
-  //     text: 'Client Performance Distribution',
-  //     align: 'center'
-  //   }
-  // };
-
-  // const clientChartSeries = [{
-  //   name: 'Compliance Score',
-  //   data: Object.entries(data?.compliance_info || {}).map(([clientName, clientData]) => ({
-  //     x: clientName,
-  //     y: clientData?.average_compliance_score || 0
-  //   }))
-  // }];
-
-
+    setSelectedCharts((prev) =>
+      prev.includes(chartId)
+        ? prev.filter((id) => id !== chartId)
+        : [...prev, chartId]
+    );
+  };
   return (
     <div className="">
-      <div className="dashboard2-header">
-        <h1>Multi-Client Compliance Analytics</h1>
+      <Snackbars
+        issnackbarsOpen={issnackbarsOpen}
+        setIsSnackbarsOpen={setIsSnackbarsOpen}
+      />
+      <div className={`dashboard2-header  ${selectedCharts.includes("cc-1") ? "selected-card" : ""
+        }`}
+        onClick={() => {
+          toggleChartSelection("cc-1");
+        }}
+        style={{ cursor: "pointer" }}>
+        <div className='d-lg-flex d-md-flex gap-2 align-items-center'>
+          <input
+            type="checkbox"
+            className="chart-select-checkbox"
+            onChange={() => toggleChartSelection("cc-1")}
+            checked={selectedCharts.includes("cc-1")}
+            disabled={!current?.user_name} // if user_name empty → disable
+          />
+          <h1>Multi-Client Compliance Analytics</h1>
+        </div>
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-value">{data?.total_clients?.toLocaleString()}</span>
@@ -239,13 +219,29 @@ const CockpitComplince = ({ data }) => {
         </div>
       </div>
 
+
+
       <div className="dashboard2-grid">
         {/* Key Metrics */}
         <div className="metrics-section">
           {/* <h2>Key Performance Indicators</h2> */}
           <div className="metrics-grid">
-            <div className="metric-card licenses">
-              <div className="metric-icon">📋</div>
+            <div className={`metric-card ${selectedCharts.includes("cc-2") ? "selected-card " : "license"
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-2");
+              }}
+              style={{ cursor: "pointer" }}>
+              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
+                <div className="metric-icon">📋</div>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-2")}
+                  checked={selectedCharts.includes("cc-2")}
+                  disabled={!current?.user_name}
+                />
+              </div>
               <div className="metric-content">
                 <h3>Licenses</h3>
                 <div className="metric-value">{data?.total_licenses}</div>
@@ -264,8 +260,24 @@ const CockpitComplince = ({ data }) => {
               </div>
             </div>
 
-            <div className="metric-card returns">
-              <div className="metric-icon">📊</div>
+            <div className={`metric-card ${selectedCharts.includes("cc-3") ? "selected-card " : "returns"
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-3");
+              }}
+              style={{ cursor: "pointer" }}>
+              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
+                <div className="metric-icon">📊</div>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-3")}
+                  checked={selectedCharts.includes("cc-3")}
+                  disabled={!current?.user_name}
+                />
+              </div>
+
+
               <div className="metric-content">
                 <h3>Returns</h3>
                 <div className="metric-value">{data.total_returns}</div>
@@ -284,8 +296,23 @@ const CockpitComplince = ({ data }) => {
               </div>
             </div>
 
-            <div className="metric-card registers">
-              <div className="metric-icon">📚</div>
+            <div className={`metric-card ${selectedCharts.includes("cc-4") ? "selected-card " : "registers"
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-4");
+              }}
+              style={{ cursor: "pointer" }}>
+              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
+                <div className="metric-icon">📚</div>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-4")}
+                  checked={selectedCharts.includes("cc-4")}
+                  disabled={!current?.user_name}
+                />
+              </div>
+
               <div className="metric-content">
                 <h3>Registers</h3>
                 <div className="metric-value">{data.total_registers}</div>
@@ -304,8 +331,23 @@ const CockpitComplince = ({ data }) => {
               </div>
             </div>
 
-            <div className="metric-card challans">
-              <div className="metric-icon">💰</div>
+            <div className={`metric-card ${selectedCharts.includes("cc-5") ? "selected-card " : "challans"
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-5");
+              }}
+              style={{ cursor: "pointer" }}>
+              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
+                <div className="metric-icon">💰</div>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-5")}
+                  checked={selectedCharts.includes("cc-5")}
+                  disabled={!current?.user_name}
+                />
+              </div>
+
               <div className="metric-content">
                 <h3>Challans</h3>
                 <div className="metric-value">{data.total_challans}</div>
@@ -328,7 +370,19 @@ const CockpitComplince = ({ data }) => {
 
         {/* Charts Section */}
         <div className="charts-section">
-          <div className="chart-card">
+          <div className={`chart-card ${selectedCharts.includes("cc-6") ? "selected-card" : ""
+            }`}
+            onClick={() => {
+              toggleChartSelection("cc-6");
+            }}
+            style={{ cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("cc-6")}
+              checked={selectedCharts.includes("cc-6")}
+              disabled={!current?.user_name}
+            />
             <Chart
               options={overallChartOptions}
               series={overallChartSeries}
@@ -337,7 +391,19 @@ const CockpitComplince = ({ data }) => {
             />
           </div>
 
-          <div className="chart-card">
+          <div className={`chart-card ${selectedCharts.includes("cc-7") ? "selected-card" : ""
+            }`}
+            onClick={() => {
+              toggleChartSelection("cc-7");
+            }}
+            style={{ cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("cc-7")}
+              checked={selectedCharts.includes("cc-7")}
+              disabled={!current?.user_name}
+            />
             <Chart
               options={completionChartOptions}
               series={completionChartSeries}
@@ -347,20 +413,22 @@ const CockpitComplince = ({ data }) => {
           </div>
 
         </div>
-        {/* <div className="chart-card">
-          <Chart
-            options={clientChartOptions}
-            series={clientChartSeries}
-            type="scatter"
-            height={400}
-          />
-        </div> */}
-
         {/* Top Performers */}
-
-        <div className="performers-section">
+        <div className={`performers-section ${selectedCharts.includes("cc-8") ? "selected-card" : ""
+          }`}
+          onClick={() => {
+            toggleChartSelection("cc-8");
+          }}
+          style={{ cursor: "pointer" }}>
           <div className='d-lg-flex  d-md-flex justify-content-between align-items-center mb-3'>
             <h2>Client Performance Overview</h2>
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("cc-8")}
+              checked={selectedCharts.includes("cc-8")}
+              disabled={!current?.user_name}
+            />
             <div className='d-lg-flex d-md-flex  justify-content-between'>
 
               {menuOption === 'table' && <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />}
@@ -470,44 +538,68 @@ const CockpitComplince = ({ data }) => {
               })}
             </div>}
           {/* Pagination Controls */}
-          {menuOption === 'card' && 
-           <div className="justify-content-end d-flex gap-2 mt-3 client-performance-table-sm">
-            <button
-              className='client-performance-table-sm'
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-              style={{
-                background: currentPage === 1 ? 'gray' : 'black',
-                color: 'white',
-                borderRadius: '5px',
-              }}>
-              Prev
-            </button>
-            <button
-              className='client-performance-table-sm'
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-              style={{
-                background: 'black',
-                color: 'white',
-                borderRadius: '5px',
-              }}
-            >
-              Next
-            </button>
-          </div>
+          {menuOption === 'card' &&
+            <div className="justify-content-end d-flex gap-2 mt-3 client-performance-table-sm">
+              <button
+                className='client-performance-table-sm'
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => p - 1)}
+                style={{
+                  background: currentPage === 1 ? 'gray' : 'black',
+                  color: 'white',
+                  borderRadius: '5px',
+                }}>
+                Prev
+              </button>
+              <button
+                className='client-performance-table-sm'
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => p + 1)}
+                style={{
+                  background: 'black',
+                  color: 'white',
+                  borderRadius: '5px',
+                }}
+              >
+                Next
+              </button>
+            </div>
           }
-         
+
         </div>
 
         {/* Analytics Summary */}
-        <div className="analytics-section">
+        <div className={`analytics-section ${selectedCharts.includes("cc-9") ? "selected-card" : ""
+          }`}
+          onClick={() => {
+            toggleChartSelection("cc-9");
+          }}
+          style={{ cursor: "pointer" }}>
           <h2>Analytics Summary</h2>
+          <input
+            type="checkbox"
+            className="chart-select-checkbox"
+            onChange={() => toggleChartSelection("cc-9")}
+            checked={selectedCharts.includes("cc-9")}
+            disabled={!current?.user_name}
+          />
           <div className="analytics-grid">
-            <div className="analytics-item">
+            <div className={`analytics-item ${selectedCharts.includes("cc-10") ? "selected-card" : ""
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-10");
+              }}
+              style={{ cursor: "pointer" }}>
               <div className="analytics-icon">🎯</div>
               <div className="analytics-content">
                 <h4>Average Completion Rate</h4>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-10")}
+                  checked={selectedCharts.includes("cc-10")}
+                  disabled={!current?.user_name}
+                />
                 <div className="analytics-value">
                   {((data.total_licenses_completed + data.total_returns_completed + data.total_challans_completed) /
                     (data.total_licenses + data.total_returns + data.total_challans) * 100).toFixed(1)}%
@@ -515,28 +607,66 @@ const CockpitComplince = ({ data }) => {
               </div>
             </div>
 
-            <div className="analytics-item">
+            <div className={`analytics-item ${selectedCharts.includes("cc-11") ? "selected-card" : ""
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-11");
+              }}
+              style={{ cursor: "pointer" }}
+            >
               <div className="analytics-icon">⚠️</div>
               <div className="analytics-content">
                 <h4>Items Requiring Attention</h4>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-11")}
+                  checked={selectedCharts.includes("cc-11")}
+                  disabled={!current?.user_name}
+                />
                 <div className="analytics-value">
                   {data.total_licenses_pending + data.total_returns_pending + data.total_registers_pending}
                 </div>
               </div>
             </div>
 
-            <div className="analytics-item">
+            <div className={`analytics-item ${selectedCharts.includes("cc-12") ? "selected-card" : ""
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-12");
+              }}
+              style={{ cursor: "pointer" }}>
               <div className="analytics-icon">📈</div>
               <div className="analytics-content">
                 <h4>Best Performing Area</h4>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-12")}
+                  checked={selectedCharts.includes("cc-12")}
+                  disabled={!current?.user_name}
+                />
                 <div className="analytics-value">Challans ({data.overall_challan_compliance_score}%)</div>
               </div>
             </div>
 
-            <div className="analytics-item">
+            <div className={`analytics-item ${selectedCharts.includes("cc-13") ? "selected-card" : ""
+              }`}
+              onClick={() => {
+                toggleChartSelection("cc-13");
+              }}
+              style={{ cursor: "pointer" }}
+              >
               <div className="analytics-icon">🔍</div>
               <div className="analytics-content">
                 <h4>Needs Improvement</h4>
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection("cc-13")}
+                  checked={selectedCharts.includes("cc-13")}
+                  disabled={!current?.user_name}
+                />
                 <div className="analytics-value">Registers ({data.overall_register_compliance_score}%)</div>
               </div>
             </div>

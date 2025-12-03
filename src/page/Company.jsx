@@ -19,6 +19,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import Toggle from '../component/Toggle';
 import MuiTextAreaField from '../component/MuiInputs/MuiTextAreaField';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { decryptData } from './utils/encrypt';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -33,6 +34,7 @@ const Company = () => {
   const [companyId, setCompanyId] = useState(null)
   const crudTitle = "Add New company"
   const editCrudTitle = "Edit company"
+  const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const gridRef = useRef();
   const [errors, setErrors] = useState({});
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -88,7 +90,7 @@ const Company = () => {
     e.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
     const CommonAttributes = {
-      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+      [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
     };
     const payload = {
       "CompanyName": current?.company_name || '',

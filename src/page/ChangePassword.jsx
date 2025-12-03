@@ -61,7 +61,7 @@ function ChangePassword({ setIsChangePassword }) {
   useEffect(() => {
     const fetchTempPasswordStatus = async () => {
       try {
-        const response = await changeTemporaryPasswordStatus(localStorage.getItem("user_id") || currentUserId);
+        const response = await changeTemporaryPasswordStatus(currentUserId);
         if (response && typeof response.is_temp_password !== "undefined") {
           setIsChangePassword(response.is_temp_password);
         }

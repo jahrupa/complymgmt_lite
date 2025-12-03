@@ -22,7 +22,7 @@ import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 // import { getInAppNotification } from '../api/service.jsx';
 
-function NavBar({ setSidebarOpen, sidebarOpen, unreadCountNotification, setActivePage, activePage }) {
+function NavBar({ setSidebarOpen, sidebarOpen, unreadCountNotification, setActivePage }) {
   const navigate = useNavigate();
   // const [unreadCount, setUnreadCount] = useState(0);
 

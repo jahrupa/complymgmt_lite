@@ -317,7 +317,7 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1'>
+            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
               <X />
             </div>
           </div>
@@ -344,7 +344,7 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1'>
+            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
               <X />
             </div>
           </div>
@@ -373,7 +373,7 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1'>
+            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
               <X />
             </div>
           </div>
@@ -407,7 +407,7 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1'>
+            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
               <X />
             </div>
           </div>
@@ -443,7 +443,7 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1'>
+            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
               <X />
             </div>
           </div>
@@ -477,7 +477,7 @@ const ReturnsAndSubmissions = ({
             >
               <ArrowUpRight />
             </div>
-            <div className='dashboard-icon me-2 ms-1'>
+            <div className='dashboard-icon me-2 ms-1  hide-chart-widget'>
               <X />
             </div>
           </div>
@@ -507,7 +507,7 @@ const ReturnsAndSubmissions = ({
             <div className="dashboard-icon ms-2" onClick={() => setIsSnackbarsOpen(prev => ({ ...prev, open: true, message: "No Data available", severityType: "info" }))}>
               <ArrowUpRight />
             </div>
-            <div className="dashboard-icon me-2 ms-1">
+            <div className="dashboard-icon me-2 ms-1  hide-chart-widget">
               <X />
             </div>
           </div>

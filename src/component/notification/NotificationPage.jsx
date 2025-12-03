@@ -26,6 +26,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Snackbars from '../Snackbars.jsx';
 import { Box, Tab, Tabs } from '@mui/material';
+import { decryptData } from '../../page/utils/encrypt.js';
 
 dayjs.extend(relativeTime);
 
@@ -46,7 +47,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
   });
   const menuRefs = useRef({});
   const navigate = useNavigate();
-
+  const SystemUserId = decryptData(localStorage.getItem("user_id"));
   // Toggle menu for a notification
   const toggleMenu = (id) => {
     setOpenMenuId(prev => (prev === id ? null : id));
@@ -109,7 +110,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getInAppNotification(localStorage.getItem("user_id") || "");
+        const response = await getInAppNotification(SystemUserId || "");
         setAllNotifications(response || []);
         setUnreadCountNotification(response?.length || 0);
       } catch (err) {
@@ -134,7 +135,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         prev.map(n => n._id === id ? { ...n, is_read: true } : n)
       );
 
-      getInAppNotification(localStorage.getItem("user_id") || "");
+      getInAppNotification(SystemUserId || "");
       setOpenMenuId(null); // close menu after action
     } catch (error) {
       setIsSnackbarsOpen({
@@ -157,8 +158,8 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         message: response?.message,
         severityType: 'success',
       });
-      getInAppNotification(localStorage.getItem("user_id") || "");
-      const res = await getInAppNotification(localStorage.getItem("user_id") || "");
+      getInAppNotification(SystemUserId || "");
+      const res = await getInAppNotification(SystemUserId || "");
       setUnreadCountNotification(res.length || 0);
     } catch (error) {
       setIsSnackbarsOpen({
@@ -172,7 +173,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      const response = await readAllInAppNotification(localStorage.getItem("user_id") || "");
+      const response = await readAllInAppNotification(SystemUserId || "");
       setAllNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setOpenMenuId(null);
       setIsSnackbarsOpen({
@@ -181,7 +182,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         message: response?.message,
         severityType: 'success',
       });
-      getInAppNotification(localStorage.getItem("user_id") || "");
+      getInAppNotification(SystemUserId || "");
     } catch (error) {
       //  console.log("Failed to mark all as read", error);
       setIsSnackbarsOpen({
@@ -195,7 +196,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
 
   const handleDeleteAll = async () => {
     try {
-      const response = await deleteAllInAppNotification(localStorage.getItem("user_id") || "");
+      const response = await deleteAllInAppNotification(SystemUserId || "");
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
@@ -204,7 +205,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
       });
       setAllNotifications([]);
       setOpenMenuId(null);
-      const res = await getInAppNotification(localStorage.getItem("user_id") || "");
+      const res = await getInAppNotification(SystemUserId || "");
       setUnreadCountNotification(res?.length || 0);
     } catch (error) {
       //  console.log("Failed to delete all notifications", error);

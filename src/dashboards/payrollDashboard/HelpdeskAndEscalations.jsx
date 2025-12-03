@@ -862,58 +862,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             height={380}
           />
         </div>
-        <div className={`dashboard-table-card d-lg-flex d-md-flex justify-content-between ${selectedCharts.includes("he-4") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("he-4")}
-          style={{ cursor: "pointer", height: "540px" }}>
-          <div
-            className="ag-theme-quartz"
-            style={{ height: "400px", width: "100%", marginTop: "1rem" }}
-          >
-            <div className="d-lg-flex d-md-flex justify-content-lg-between justify-content-md-between align-items-center mb-4">
-              <div className=" fw-600 ">
-                Settled Claim % vs. Total Pending % over time in Summary Old Claim
-                Data
-              </div>
-
-              <div
-                className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("he-4")}
-                  checked={selectedCharts.includes("he-4")}
-                  disabled={!current?.user_name}
-                />
-                <div className="dashboard-icon ms-2" onClick={
-                  () => setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  })}>
-                  <ArrowUpRight />
-                </div>
-                <div className="dashboard-icon me-2 ms-1">
-                  <X />
-                </div>
-
-              </div>
-
-            </div>
-            <AgGridReact
-              theme="legacy"
-              rowData={oldClaimData}
-              columnDefs={columnDefs}
-              pagination={true}
-              paginationPageSize={5}
-            />
-          </div>
-        </div>
-
-
-
       </div>
 
       <div className="charts-grid mb-4">

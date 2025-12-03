@@ -16,7 +16,6 @@ const DashboardPage = () => {
   const [selectedCompany, setSelectedCompany] = useState(""); // single selected value
   const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
   const [current, setCurrent] = useState({});
-  console.log(current,'current')
   const [allUser, setAllUser] = useState([]);
   useEffect(() => {
     const fetchCockpitData = async () => {

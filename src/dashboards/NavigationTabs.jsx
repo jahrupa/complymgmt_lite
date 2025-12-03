@@ -27,7 +27,19 @@ import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
 
 import { decryptData } from "../page/utils/encrypt";
 
+function TabPanel({ children, value, index, keepMounted = true }) {
+    const isActive = value === index;
+
+    return (
+        <div role="tabpanel" hidden={!isActive}>
+            {(keepMounted || isActive) ? children : null}
+        </div>
+    );
+}
+
 const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) => {
+
+    /* STATES */
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
     const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
     const [cockpitData, setCockpitData] = useState([]);
@@ -37,7 +49,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [position, setPosition] = useState({ x: 100, y: 100 });
     const [isDragging, setIsDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    ;
     // Start dragging
     const startDrag = (e) => {
         e.preventDefault();
@@ -90,25 +101,36 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     }, [isDragging, offset]);
 
     const userType = decryptData(localStorage.getItem("user_type"));
+
     const tabsList = [
         {
             label: "Compliance Cockpit",
             content:
                 selectedCompany !== "" ? (
-                    <CockpitComplinceByCompany data={cockpitByCompanyData} current={current} />
+                    <CockpitComplinceByCompany data={cockpitByCompanyData}
+                        current={current}
+                        selectedCharts={selectedCharts}
+                        setSelectedCharts={setSelectedCharts} />
                 ) : (
-                    <CockpitComplince data={cockpitData} current={current} />
+                    <CockpitComplince data={cockpitData}
+                        current={current}
+                        selectedCharts={selectedCharts}
+                        setSelectedCharts={setSelectedCharts}
+                    />
                 )
         },
         {
             label: "General Compliance",
             content: (
-                <GeneralComplianceDashboard data={generalDashboardData} current={current} />
+                <GeneralComplianceDashboard data={generalDashboardData} current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                />
             )
-        },
+        }
     ];
 
-    if (userType === '0') {
+    if (userType === "0") {
         tabsList.push({
             label: "Client Onboarding",
             content:
@@ -196,7 +218,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         setActiveTab(newValue);
     };
 
-    // general compliance data
     useEffect(() => {
         const fetchGeneralDashboardData = async () => {
             try {
@@ -212,7 +233,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         fetchGeneralDashboardData();
     }, [selectedCompany]);
 
-    // cockpit data
     useEffect(() => {
         const fetchCockpitData = async () => {
             const [a, b] = await Promise.allSettled([
@@ -226,7 +246,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         fetchCockpitData();
     }, [selectedCompany]);
 
-    // client onboarding
     useEffect(() => {
         const fetchClientOnboardingPortfolioData = async () => {
             const [a, b] = await Promise.allSettled([
@@ -240,9 +259,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         fetchClientOnboardingPortfolioData();
     }, [selectedCompany]);
 
+
     return (
         <Box sx={{ width: "100%" }}>
-            {/* TABS */}
             <Tabs
                 value={activeTab}
                 onChange={handleTabChange}
@@ -254,27 +273,32 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 ))}
             </Tabs>
 
-            {/* TAB CONTENT */}
             <Box sx={{ marginTop: 2 }}>
-                {tabsList[activeTab]?.content}
+                {tabsList.map((tab, index) => (
+                    <TabPanel key={index} value={activeTab} index={index} keepMounted>
+                        {tab.content}
+                    </TabPanel>
+                ))}
             </Box>
-            <div className="navigation-wrapper">
-                <div
-                    className="dashbord-user-access-btn"
-                    style={{
-                        position: "fixed",
-                        left: position.x,
-                        top: position.y,
-                        cursor: isDragging ? "grabbing" : "grab",
-                        zIndex: 9999,
-                    }}
-                    onMouseDown={startDrag}
-                    onTouchStart={startDrag}
-                >
-                    <button className="btn btn-primary">Create User Widget</button>
-                </div>
-            </div>
 
+            {userType === "0" && (
+                <div className="navigation-wrapper">
+                    <div
+                        className="dashbord-user-access-btn"
+                        style={{
+                            position: "fixed",
+                            left: position.x,
+                            top: position.y,
+                            cursor: isDragging ? "grabbing" : "grab",
+                            zIndex: 9999,
+                        }}
+                        onMouseDown={startDrag}
+                        onTouchStart={startDrag}
+                    >
+                        <button className="btn btn-primary">Create User Widget</button>
+                    </div>
+                </div>
+            )}
         </Box>
     );
 };

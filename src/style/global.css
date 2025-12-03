@@ -415,3 +415,9 @@ body {
   color: lightgray;
   font-size: 19px;
 }
+.chart-select-checkbox{
+  display: none;
+}
+.hide-chart-widget{
+  display: none;
+}

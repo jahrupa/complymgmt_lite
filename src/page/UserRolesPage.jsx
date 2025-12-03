@@ -18,6 +18,7 @@ import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
+import { decryptData } from './utils/encrypt';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -63,6 +64,7 @@ const UserRolesPage = () => {
     { id: 1,  value: 'Internal' },
     { id: 2, value: 'External' },
   ];
+   const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -85,7 +87,7 @@ const UserRolesPage = () => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
     const CommonAttributes = {
-      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+      [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
     };
     const payload = {
       "FullName": current?.full_name,
