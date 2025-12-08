@@ -740,7 +740,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -751,13 +751,16 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={
-                                () => setIsSnackbarsOpen({
+                            onClick={(e) => {
+                                e.stopPropagation();   // prevent parent click from firing
+                                setIsSnackbarsOpen({
                                     ...issnackbarsOpen,
                                     open: true,
                                     message: "No Data available",
                                     severityType: "info",
-                                })}
+                                });
+                            }}
+
                         >
                             <ArrowUpRight />
                         </div>
@@ -782,7 +785,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -793,14 +796,17 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 handleOpenDrawer(
-                                    "left",
-                                    "State-wise notice count comparison to highlight regional compliance activity",
-                                    stateWiseNoticeCount?.rest_counts,
-                                    stateWiseNoticeCount?.rest_counts?.map((item) => item.state)
-                                )
-                            }
+                                    "right",
+                                    "Number of notices assigned...",
+                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts,
+                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
+                                        (item) => item.assigned_to
+                                    )
+                                );
+                            }}
                         >
                             <ArrowUpRight />
                         </div>
@@ -825,7 +831,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -836,13 +842,15 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={
-                                () => setIsSnackbarsOpen({
+                            oonClick={(e) => {
+                                e.stopPropagation();   // prevent parent click from firing
+                                setIsSnackbarsOpen({
                                     ...issnackbarsOpen,
                                     open: true,
                                     message: "No Data available",
                                     severityType: "info",
-                                })}
+                                });
+                            }}
                         >
                             <ArrowUpRight />
                         </div>
@@ -866,7 +874,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -877,7 +885,8 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 handleOpenDrawer(
                                     "left",
                                     "Analysis of applicable acts to reveal legal focus areas",
@@ -886,7 +895,7 @@ const NoticeDashboard = ({
                                         (item) => item.applicable_act
                                     )
                                 )
-                            }
+                            }}
                         >
                             <ArrowUpRight />
                         </div>
@@ -912,7 +921,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -923,7 +932,8 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 handleOpenDrawer(
                                     "right",
                                     "Number of notices assigned to each team member to assess workload distribution",
@@ -932,6 +942,8 @@ const NoticeDashboard = ({
                                         (item) => item.assigned_to
                                     )
                                 )
+                            }
+
                             }
                         >
                             <ArrowUpRight />
@@ -957,7 +969,7 @@ const NoticeDashboard = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -968,7 +980,8 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 handleOpenDrawer(
                                     "right",
                                     "Comparison of acknowledgement rates by different individuals to evaluate responsiveness",
@@ -977,6 +990,8 @@ const NoticeDashboard = ({
                                         (item) => item.acknowledged_by
                                     )
                                 )
+                            }
+
                             }
                         >
                             <ArrowUpRight />
@@ -1001,7 +1016,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -1012,13 +1027,15 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={
-                                () => setIsSnackbarsOpen({
+                            onClick={(e) => {
+                                e.stopPropagation();   // prevent parent click from firing
+                                setIsSnackbarsOpen({
                                     ...issnackbarsOpen,
                                     open: true,
                                     message: "No Data available",
                                     severityType: "info",
-                                })}
+                                });
+                            }}
                         >
                             <ArrowUpRight />
                         </div>
@@ -1039,7 +1056,7 @@ const NoticeDashboard = ({
                     style={{ cursor: "pointer" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -1050,13 +1067,15 @@ const NoticeDashboard = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={
-                                () => setIsSnackbarsOpen({
+                            onClick={(e) => {
+                                e.stopPropagation();   // prevent parent click from firing
+                                setIsSnackbarsOpen({
                                     ...issnackbarsOpen,
                                     open: true,
                                     message: "No Data available",
                                     severityType: "info",
-                                })}
+                                });
+                            }}
                         >
                             <ArrowUpRight />
                         </div>

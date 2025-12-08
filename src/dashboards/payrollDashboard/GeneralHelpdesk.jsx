@@ -22,12 +22,12 @@ const GeneralHelpdesk = ({
             {
                 name: "Open Cases",
                 data:
-                    closedVsOpenCases?.top_assigned?.map((item) => item.count_Open) || [],
+                    closedVsOpenCases?.top_assigned?.map((item) => item.count_open) || [],
             },
             {
                 name: "Closed Cases",
                 data:
-                    closedVsOpenCases?.top_assigned?.map((item) => item.count_Closed) ||
+                    closedVsOpenCases?.top_assigned?.map((item) => item.count_closed) ||
                     [],
             },
         ],
@@ -434,7 +434,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -446,7 +446,8 @@ const GeneralHelpdesk = ({
 
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) => {
+                                e.stopPropagation();   // prevent parent click from firing
                                 handleOpenDrawer(
                                     "right",
                                     "Comparison of closed vs. open cases",
@@ -455,7 +456,7 @@ const GeneralHelpdesk = ({
                                         (item) => item.assigned_to
                                     )
                                 )
-                            }
+                            }}
                         >
                             <ArrowUpRight />
                         </div>
@@ -482,7 +483,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -493,7 +494,8 @@ const GeneralHelpdesk = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) =>{
+                                e.stopPropagation();   // prevent parent click from firing
                                 handleOpenDrawer(
                                     "left",
                                     "Assigned Users",
@@ -502,6 +504,8 @@ const GeneralHelpdesk = ({
                                         (item) => item.assigned_to
                                     )
                                 )
+                            }
+                                
                             }
                         >
                             <ArrowUpRight />
@@ -528,7 +532,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -540,8 +544,9 @@ const GeneralHelpdesk = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
-                                handleOpenDrawer(
+                            onClick={(e) =>{
+                                e.stopPropagation();   // prevent parent click from firing
+                                 handleOpenDrawer(
                                     "right",
                                     "Documents Pending From Client vs. Karma",
                                     documentPendingFrom?.rest_docs_pending,
@@ -549,7 +554,7 @@ const GeneralHelpdesk = ({
                                         (item) => item.documents_pending_from
                                     )
                                 )
-                            }
+                            }}
                         >
                             <ArrowUpRight />
                         </div>
@@ -573,7 +578,7 @@ const GeneralHelpdesk = ({
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
-                        
+
                     >
                         <input
                             type="checkbox"
@@ -585,7 +590,8 @@ const GeneralHelpdesk = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={() =>
+                            onClick={(e) =>{
+                                e.stopPropagation();   // prevent parent click from firing
                                 handleOpenDrawer(
                                     "left",
                                     "Open and Closed Issue Status by Issue Category",
@@ -594,7 +600,7 @@ const GeneralHelpdesk = ({
                                         (item) => item.issue_category
                                     )
                                 )
-                            }
+                            }}
                         >
                             <ArrowUpRight />
                         </div>

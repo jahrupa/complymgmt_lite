@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Chart from 'react-apexcharts';
 import {
   fetchCompaniesPerReturnsNames,
@@ -12,6 +12,12 @@ import {
 import DashboardDrawerGrid from '../DashboardDrawer';
 import { ArrowUpRight, X } from 'lucide-react';
 import Snackbars from '../../component/Snackbars';
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import { decryptData } from '../../page/utils/encrypt';
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ReturnsAndSubmissions = ({
   selectedCompany,
@@ -62,10 +68,10 @@ const ReturnsAndSubmissions = ({
   const [companiesPerReturnsNames, setCompaniesPerReturnsNames] = useState({});
   const [applicableReturnsRaw, setApplicableReturnsRaw] = useState(null); // may be object { count_remark: [...] } or array
   const [ApplicableReturnsCount, setApplicableReturnsCount] = useState({});
-  const [escalationRaisedCategoriesByCompany, setEscalationRaisedCategoriesByCompany] = useState({});
+  const [escalationRaisedCategoriesByCompany, setEscalationRaisedCategoriesByCompany] = useState([]);
   const [riskDistributionByState, setRiskDistributionByState] = useState({});
   const [stateWiseAnalysisOfApplicableReturns, setStateWiseAnalysisOfApplicableReturns] = useState({});
-
+console.log(riskDistributionByState,'riskDistributionByState')
   // --- Helper to normalize "maybe object-maybe-array" responses ---
   const ensureArray = (val, fallback = []) => {
     if (!val) return fallback;
@@ -158,33 +164,6 @@ const ReturnsAndSubmissions = ({
     }
   };
 
-  // escalationRaisedCategoriesByCompany may be object with count_remark
-  const escalationByCompanyArray = ensureArray(escalationRaisedCategoriesByCompany, []);
-  const escalationRaisedCategoriesByCompanyFormat = {
-    series: [
-      { name: 'Files Successfully', data: escalationByCompanyArray.map((i) => i?.count_filed_successfully || 0) },
-      { name: 'Received late data from KAO', data: escalationByCompanyArray.map((i) => i?.count_received_late_data_from_kao || 0) },
-      { name: 'Empty', data: escalationByCompanyArray.map((i) => i?.count_empty || 0) },
-      { name: 'Missing due date', data: escalationByCompanyArray.map((i) => i?.count_missing_due_date || 0) }
-    ],
-    options: {
-      chart: { type: 'bar', height: 350, stacked: true },
-      fill: { opacity: 1 },
-      states: { hover: { filter: { type: "none" } }, active: { filter: { type: "none" } } },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          dataLabels: { total: { enabled: true, offsetX: 0, style: { fontSize: '13px', fontWeight: 900 } } }
-        }
-      },
-      stroke: { width: 1, colors: ['#fff'] },
-      title: { text: 'Escalation Counts' },
-      xaxis: { categories: escalationByCompanyArray.map((i) => i?.company_name || "") },
-      yaxis: { title: { text: undefined } },
-      legend: { position: 'top', horizontalAlign: 'left', offsetX: 40 }
-    }
-  };
-
   const riskDistributionByStateFormat = {
     series: [{ name: "State", data: riskDistributionByState?.top_counts?.map((i) => i?.count_of_risk) || [] }],
     options: {
@@ -212,7 +191,7 @@ const ReturnsAndSubmissions = ({
       states: { hover: { filter: { type: "none" } }, active: { filter: { type: "none" } } },
     }
   };
-
+  const userType = decryptData(localStorage.getItem("user_type"));
   // --- Fetch ---
   useEffect(() => {
     const fetchData = async () => {
@@ -287,15 +266,42 @@ const ReturnsAndSubmissions = ({
     setSelectedCharts([]);
   }, [current?.user_name]);
 
+  const columnDefs = useMemo(() => {
+    const firstRemark = escalationRaisedCategoriesByCompany?.count_remark?.[0];
+    if (!firstRemark) return [];
+
+    return Object.keys(firstRemark).map((key) => ({
+      headerName: key
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase()),
+      field: key,
+      sortable: true,
+      filter: true,
+      flex: 1,
+      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    }));
+  }, [escalationRaisedCategoriesByCompany]);
+
+
+  const canSelect = userType === '0';
+
+  const cardClass = (id, defaultClass = "") =>
+    canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+
+
+  const handleSelect = (id) => {
+    if (canSelect) toggleChartSelection(id);
+  };
+
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
 
       <div className='charts-grid mb-4'>
         <div
-          className={`chart-card ${selectedCharts.includes("rs-1") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("rs-1")}
-          style={{ cursor: "pointer" }}
+          className={`chart-card ${cardClass("rs-1") ? "selected-card" : ""}`}
+          onClick={canSelect ? () => handleSelect("rs-1") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div className='d-flex justify-content-end align-items-center' >
             <input
@@ -324,9 +330,9 @@ const ReturnsAndSubmissions = ({
         </div>
 
         <div
-          className={`chart-card ${selectedCharts.includes("rs-2") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("rs-2")}
-          style={{ cursor: "pointer" }}
+          className={`chart-card ${cardClass("rs-2") ? "selected-card" : ""}`}
+          onClick={canSelect ? () => handleSelect("rs-2") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div className='d-flex justify-content-end align-items-center' >
             <input
@@ -350,9 +356,9 @@ const ReturnsAndSubmissions = ({
 
       <div className='charts-grid mb-4'>
         <div
-          className={`chart-card ${selectedCharts.includes("rs-3") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("rs-3")}
-          style={{ cursor: "pointer" }}
+          className={`chart-card ${cardClass("rs-3") ? "selected-card" : ""}`}
+          onClick={canSelect ? () => handleSelect("rs-3") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div className='d-flex justify-content-end align-items-center' >
             <input
@@ -374,9 +380,9 @@ const ReturnsAndSubmissions = ({
         </div>
 
         <div
-          className={`chart-card ${selectedCharts.includes("rs-4") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("rs-4")}
-          style={{ cursor: "pointer" }}
+          className={`chart-card ${cardClass("rs-4") ? "selected-card" : ""}`}
+          onClick={canSelect ? () => handleSelect("rs-4") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div className='d-flex justify-content-end align-items-center' >
             <input
@@ -407,9 +413,9 @@ const ReturnsAndSubmissions = ({
 
       <div className='charts-grid mb-4'>
         <div
-          className={`chart-card ${selectedCharts.includes("rs-5") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("rs-5")}
-          style={{ cursor: "pointer" }}
+          className={`chart-card ${cardClass("rs-5") ? "selected-card" : ""}`}
+          onClick={canSelect ? () => handleSelect("rs-5") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div className='d-flex justify-content-end align-items-center' >
             <input
@@ -438,9 +444,9 @@ const ReturnsAndSubmissions = ({
         </div>
 
         <div
-          className={`chart-card ${selectedCharts.includes("rs-6") ? "selected-card" : ""}`}
-          onClick={() => toggleChartSelection("rs-6")}
-          style={{ cursor: "pointer" }}
+          className={`chart-card ${cardClass("rs-6") ? "selected-card" : ""}`}
+          onClick={canSelect ? () => handleSelect("rs-6") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div className='d-flex justify-content-end align-items-center' >
             <input
@@ -471,13 +477,13 @@ const ReturnsAndSubmissions = ({
 
       <div className='mb-4'>
         <div
-          className={`chart-card ${selectedCharts.includes("rs-7") ? "selected-card" : ""}`}
-          style={{ cursor: "pointer" }}
-          onClick={() => toggleChartSelection("rs-7")}
+          className={`chart-card ${cardClass("rs-7") ? "selected-card" : ""}`}
+          style={{ cursor: canSelect ? "pointer" : "default", height: '515px' }}
+          onClick={canSelect ? () => handleSelect("rs-7") : undefined}
         >
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -486,13 +492,24 @@ const ReturnsAndSubmissions = ({
               checked={selectedCharts.includes("rs-7")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={() => setIsSnackbarsOpen(prev => ({ ...prev, open: true, message: "No Data available", severityType: "info" }))}>
-              <ArrowUpRight />
+            <div
+              className="ag-theme-quartz"
+              style={{ height: "400px", width: "100%", marginTop: "1rem" }}
+            >
+              <div className="d-lg-flex d-md-flex justify-content-lg-between justify-content-md-between align-items-center">
+                <div className="mb-3 fw-600">Breakdown of escalation raised categories by company, revealing escalation hotspots</div>
+              </div>
+              <AgGridReact
+                theme="legacy"
+                rowData={escalationRaisedCategoriesByCompany?.count_remark || []}
+                columnDefs={columnDefs}
+                pagination={true}
+                paginationPageSize={5}
+              />
+
             </div>
           </div>
 
-          <div className="mb-3 fw-600">Breakdown of escalation raised categories by company, revealing escalation hotspots</div>
-          <Chart options={escalationRaisedCategoriesByCompanyFormat.options} series={escalationRaisedCategoriesByCompanyFormat.series} type="bar" height={380} />
         </div>
       </div>
 

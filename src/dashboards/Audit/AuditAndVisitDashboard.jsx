@@ -725,7 +725,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -736,7 +736,8 @@ const AuditAndVisitDashboard = ({
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
                 handleOpenDrawer(
                   "right",
                   "Aaudit count by Service Type across all companies",
@@ -745,6 +746,8 @@ const AuditAndVisitDashboard = ({
                     (item) => item.service_type
                   )
                 )
+              }
+
               }
             >
               <ArrowUpRight />
@@ -769,7 +772,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -780,7 +783,8 @@ const AuditAndVisitDashboard = ({
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 handleOpenDrawer(
                   "right",
                   "Audit count by State segmented by Audit Platform",
@@ -789,7 +793,7 @@ const AuditAndVisitDashboard = ({
                     (item) => item.state
                   )
                 )
-              }
+              }}
             >
               <ArrowUpRight />
             </div>
@@ -813,7 +817,7 @@ const AuditAndVisitDashboard = ({
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -822,13 +826,17 @@ const AuditAndVisitDashboard = ({
               checked={selectedCharts.includes("av-3")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>
@@ -851,7 +859,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -862,7 +870,8 @@ const AuditAndVisitDashboard = ({
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 handleOpenDrawer(
                   "right",
                   "Checklist approval rate by Company Name",
@@ -871,7 +880,7 @@ const AuditAndVisitDashboard = ({
                     (item) => item.company_name
                   )
                 )
-              }
+              }}
             >
               <ArrowUpRight />
             </div>
@@ -895,7 +904,7 @@ const AuditAndVisitDashboard = ({
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -904,13 +913,17 @@ const AuditAndVisitDashboard = ({
               checked={selectedCharts.includes("av-5")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>
@@ -930,7 +943,7 @@ const AuditAndVisitDashboard = ({
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -941,7 +954,8 @@ const AuditAndVisitDashboard = ({
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 handleOpenDrawer(
                   "left",
                   "Escalation Triggered (Y/N) rate by State",
@@ -950,6 +964,8 @@ const AuditAndVisitDashboard = ({
                     (item) => item.state
                   )
                 )
+              }
+
               }
             >
               <ArrowUpRight />
@@ -975,7 +991,7 @@ const AuditAndVisitDashboard = ({
 
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -984,13 +1000,17 @@ const AuditAndVisitDashboard = ({
               checked={selectedCharts.includes("av-7")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>
@@ -1010,7 +1030,7 @@ const AuditAndVisitDashboard = ({
           style={{ cursor: "pointer" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -1019,13 +1039,17 @@ const AuditAndVisitDashboard = ({
               checked={selectedCharts.includes("av-8")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>

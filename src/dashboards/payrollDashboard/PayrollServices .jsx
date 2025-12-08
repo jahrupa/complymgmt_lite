@@ -18,6 +18,7 @@ import {
 import { ArrowUpRight, X } from "lucide-react";
 import DashboardDrawerGrid from "../DashboardDrawer";
 import Snackbars from "../../component/Snackbars";
+import { decryptData } from "../../page/utils/encrypt";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -159,30 +160,13 @@ const PayrollServices = ({
         message: "",
         severityType: "",
     });
-    // const [selectedCharts, setSelectedCharts] = React.useState([]);
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            // alert("First you need to select a user");
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "First you need to select a user",
-                severityType: "warning",
-            });
-            return;
-        }
 
-        setSelectedCharts((prev) =>
-            prev.includes(chartId)
-                ? prev.filter((id) => id !== chartId)
-                : [...prev, chartId]
-        );
-    };
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [drawerAnchor, setDrawerAnchor] = React.useState("right");
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const userType = decryptData(localStorage.getItem("user_type"));
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
@@ -198,6 +182,7 @@ const PayrollServices = ({
                 sortable: true,
                 filter: true,
                 flex: "1",
+                headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
             },
             {
                 headerName: "Company Name",
@@ -205,6 +190,7 @@ const PayrollServices = ({
                 sortable: true,
                 filter: true,
                 flex: "1",
+                headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
             },
             {
                 headerName: "Company Common Name",
@@ -212,6 +198,7 @@ const PayrollServices = ({
                 sortable: true,
                 filter: true,
                 flex: "1",
+                headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
             },
             {
                 headerName: "Service Month",
@@ -219,6 +206,7 @@ const PayrollServices = ({
                 sortable: true,
                 filter: true,
                 flex: "1",
+                headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
             },
             {
                 headerName: "Service Frequency",
@@ -226,113 +214,12 @@ const PayrollServices = ({
                 sortable: true,
                 filter: true,
                 flex: "1",
+                headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
             },
         ],
         []
     );
 
-    const employeeCountForEachPayrollData = [
-        { serviceType: "In-house", employeeCount: 1120 },
-        { serviceType: "Outsourced", employeeCount: 85 },
-        { serviceType: "Hybrid", employeeCount: 60 },
-        { serviceType: "Contract", employeeCount: 45 },
-    ];
-
-    // Extract categories and data
-    const categories = employeeCountForEachPayrollData.map(
-        (item) => item.serviceType
-    );
-    const employeeCounts = employeeCountForEachPayrollData.map(
-        (item) => item.employeeCount
-    );
-
-    const [employeeCountForEachPayroll] = useState({
-        series: [
-            {
-                name: "Employee Count",
-                data: employeeCounts, // Y-axis values (Sum of Employee Count)
-            },
-        ],
-        options: {
-            chart: {
-                type: "bar",
-                height: 380,
-                toolbar: { show: false },
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    // borderRadius: 6,
-                    //   columnWidth: "55%",
-                },
-            },
-            dataLabels: {
-                enabled: false,
-                style: {
-                    colors: ["#333"],
-                },
-            },
-            xaxis: {
-                categories: categories, // X-axis categories (Payroll Service Type)
-                title: {
-                    text: "Payroll Service Type",
-                    style: { fontWeight: "bold" },
-                },
-            },
-            yaxis: {
-                title: {
-                    text: "Sum of Employee Count",
-                    style: { fontWeight: "bold" },
-                },
-                min: 0,
-                max: Math.ceil(Math.max(...employeeCounts) / 10) * 10, // auto-adjust up to K
-                tickAmount: 5,
-            },
-            colors: ["#f5d3cc"],
-            fill: {
-                opacity: 1,
-                colors: ["#f5d3cc"],
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "none", // 👈 disables the lighten effect
-                    },
-                },
-                active: {
-                    filter: {
-                        type: "none", // 👈 disables click highlight effect
-                    },
-                },
-            },
-
-            //   title: {
-            //     text: "Sum of Employee Count per Payroll Service Type",
-            //     align: "center",
-            //   },
-            //   grid: {
-            //     borderColor: "#e7e7e7",
-            //     row: {
-            //       colors: ["#f3f3f3", "transparent"],
-            //       opacity: 0.5,
-            //     },
-            //   },
-        },
-    });
-    const employeeCountForSystemUse = [
-        { serviceType: "SmoothPay", employeeCount: 120 },
-        { serviceType: "Opportune", employeeCount: 85 },
-        { serviceType: "ZingHR", employeeCount: 60 },
-        { serviceType: "Greyt HR", employeeCount: 45 },
-    ];
-
-    // Extract categories and data
-    const systemCategories = employeeCountForSystemUse.map(
-        (item) => item.serviceType
-    );
-    const systemEmployeeCounts = employeeCountForSystemUse.map(
-        (item) => item.employeeCount
-    );
     const [systemUseByEmp, setSystemUseByEmp] = useState([]);
     const systemUsedByEmpFormat = {
         series: [
@@ -556,6 +443,31 @@ const PayrollServices = ({
     useEffect(() => {
         setSelectedCharts([]);
     }, [current?.user_name]);
+    const toggleChartSelection = (chartId) => {
+        if (!current?.user_name) {
+            // alert("First you need to select a user");
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "First you need to select a user",
+                severityType: "warning",
+            });
+            return;
+        }
+
+        setSelectedCharts((prev) =>
+            prev.includes(chartId)
+                ? prev.filter((id) => id !== chartId)
+                : [...prev, chartId]
+        );
+    };
+    const canSelect = userType === '0';
+    const cardClass = (id, defaultClass = "") =>
+        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+
+    const handleSelect = (id) => {
+        if (canSelect) toggleChartSelection(id);
+    };
 
     return (
         <div>
@@ -567,7 +479,18 @@ const PayrollServices = ({
             <div className="">
                 <div className="client-onboarding-content">
                     <div className="stats-grid">
-                        <div className="payroll-stat-card performer-card high-performer">
+                        <div
+                            className={`payroll-stat-card performer-card high-performer ${cardClass("ps-1", "returns")}`}
+                            onClick={canSelect ? () => handleSelect("ps-1") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ps-1")}
+                                checked={selectedCharts.includes("ps-1")}
+                                disabled={!current?.user_name}
+                            />
                             <div className="stat-label">Total Employees</div>
                             <div className="stat-number">
                                 {payrollOverviewData.total_employees
@@ -583,7 +506,16 @@ const PayrollServices = ({
                                 Managed across all payroll platforms
                             </div>
                         </div>
-                        <div className="payroll-stat-card performer-card compliant">
+                        <div className={`payroll-stat-card performer-card high-performer ${cardClass("ps-2", "compliant")}`}
+                            onClick={canSelect ? () => handleSelect("ps-2") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}>
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ps-2")}
+                                checked={selectedCharts.includes("ps-2")}
+                                disabled={!current?.user_name}
+                            />
                             <div className="stat-label">Turnaround Health</div>
                             <div className="stat-number">
                                 {payrollOverviewData.turnaround_health_average_days
@@ -611,7 +543,16 @@ const PayrollServices = ({
                                 Average actual processing time
                             </div>
                         </div>
-                        <div className="payroll-stat-card performer-card moderate">
+                        <div className={`payroll-stat-card performer-card high-performer ${cardClass("ps-3", "moderate")}`}
+                            onClick={canSelect ? () => handleSelect("ps-3") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}>
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ps-3")}
+                                checked={selectedCharts.includes("ps-3")}
+                                disabled={!current?.user_name}
+                            />
                             <div className="stat-label">On-time Delivery</div>
                             <div className="stat-number">
                                 {payrollOverviewData.on_time_delivery
@@ -633,19 +574,19 @@ const PayrollServices = ({
                     </div>
                     <div className="charts-section mb-4">
                         <div
-                            className={`chart-card ${selectedCharts.includes("ps-1") ? "selected-card" : ""}`}
-                            onClick={() => toggleChartSelection("ps-1")}
-                            style={{ cursor: "pointer" }}
+                            className={`chart-card ${cardClass("ps-4", "returns")}`}
+                            onClick={canSelect ? () => handleSelect("ps-4") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
                         >
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                
+
                             >
                                 <input
                                     type="checkbox"
                                     className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-1")}
-                                    checked={selectedCharts.includes("ps-1")}
+                                    onChange={() => toggleChartSelection("ps-4")}
+                                    checked={selectedCharts.includes("ps-4")}
                                     disabled={!current?.user_name}
                                 />
                                 <div className="dashboard-icon ms-2" onClick={
@@ -669,20 +610,19 @@ const PayrollServices = ({
                             />
                         </div>
                         <div
-                            className={`chart-card ${selectedCharts.includes("ps-2") ? "selected-card" : ""
-                                }`}
-                            onClick={() => toggleChartSelection("ps-2")}
-                            style={{ cursor: "pointer" }}
+                            className={`chart-card ${cardClass("ps-5", "returns")}`}
+                            onClick={canSelect ? () => handleSelect("ps-5") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
                         >
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                
+
                             >
                                 <input
                                     type="checkbox"
                                     className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-2")}
-                                    checked={selectedCharts.includes("ps-2")}
+                                    onChange={() => toggleChartSelection("ps-5")}
+                                    checked={selectedCharts.includes("ps-5")}
                                     disabled={!current?.user_name}
                                 />
                                 <div
@@ -714,18 +654,18 @@ const PayrollServices = ({
                         </div>
                     </div>
                     <div className="charts-section mb-4">
-                        <div className={`chart-card ${selectedCharts.includes("ps-3") ? "selected-card" : ""}`}
-                            onClick={() => toggleChartSelection("ps-3")}
-                            style={{ cursor: "pointer" }}>
+                        <div className={`chart-card ${cardClass("ps-6", "returns")}`}
+                            onClick={canSelect ? () => handleSelect("ps-6") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}>
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                
+
                             >
                                 <input
                                     type="checkbox"
                                     className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-3")}
-                                    checked={selectedCharts.includes("ps-3")}
+                                    onChange={() => toggleChartSelection("ps-6")}
+                                    checked={selectedCharts.includes("ps-6")}
                                     disabled={!current?.user_name}
                                 />
                                 <div className="dashboard-icon ms-2" onClick={
@@ -748,18 +688,18 @@ const PayrollServices = ({
                                 height={380}
                             />
                         </div>
-                        <div className={`chart-card ${selectedCharts.includes("ps-4") ? "selected-card" : ""}`}
-                            onClick={() => toggleChartSelection("ps-4")}
-                            style={{ cursor: "pointer" }}>
+                        <div className={`chart-card ${cardClass("ps-7", "returns")}`}
+                            onClick={canSelect ? () => handleSelect("ps-7") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}>
                             <div
                                 className="d-flex justify-content-end align-items-center"
-                                
+
                             >
                                 <input
                                     type="checkbox"
                                     className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-4")}
-                                    checked={selectedCharts.includes("ps-4")}
+                                    onChange={() => toggleChartSelection("ps-7")}
+                                    checked={selectedCharts.includes("ps-7")}
                                     disabled={!current?.user_name}
                                 />
                                 <div className="dashboard-icon ms-2" onClick={
@@ -785,9 +725,9 @@ const PayrollServices = ({
                             />
                         </div>
                     </div>
-                    <div className={`dashboard-table-card d-lg-flex d-md-flex justify-content-between ${selectedCharts.includes("ps-5") ? "selected-card" : ""}`}
-                        onClick={() => toggleChartSelection("ps-5")}
-                        style={{ cursor: "pointer", height: "520px" }}>
+                    <div className={`dashboard-table-card d-lg-flex d-md-flex justify-content-between ${cardClass("ps-8") ? "selected-card" : ""}`}
+                        onClick={canSelect ? () => handleSelect("ps-8") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default", height: "520px" }}>
                         <div
                             className="ag-theme-quartz"
                             style={{ height: "400px", width: "100%", marginTop: "1rem" }}
@@ -797,24 +737,16 @@ const PayrollServices = ({
 
                                 <div
                                     className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-                                    
+
                                 >
                                     <input
                                         type="checkbox"
                                         className="chart-select-checkbox"
-                                        onChange={() => toggleChartSelection("ps-5")}
-                                        checked={selectedCharts.includes("ps-5")}
+                                        onChange={() => toggleChartSelection("ps-8")}
+                                        checked={selectedCharts.includes("ps-8")}
                                         disabled={!current?.user_name}
                                     />
-                                    <div className="dashboard-icon ms-2" onClick={
-                                        () => setIsSnackbarsOpen({
-                                            ...issnackbarsOpen,
-                                            open: true,
-                                            message: "No Data available",
-                                            severityType: "info",
-                                        })}>
-                                        <ArrowUpRight />
-                                    </div>
+
                                 </div>
 
                             </div>

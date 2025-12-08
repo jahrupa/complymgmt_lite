@@ -7,6 +7,7 @@ import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import { Settings2 } from 'lucide-react';
 import { AnimatedSearchBar } from '../../component/AnimatedSearchBar';
 import Snackbars from '../../component/Snackbars';
+import { decryptData } from '../../page/utils/encrypt';
 
 const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +21,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
     severityType: "",
   });
   const gridRef = useRef();
-
+  const userType = decryptData(localStorage.getItem("user_type"));
   const itemsPerPage = 10; // number of cards per page
   useEffect(() => {
     const handleResize = () => {
@@ -185,28 +186,44 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
         : [...prev, chartId]
     );
   };
+
+  const canSelect = userType === '0';
+
+  const cardClass = (id, defaultClass = "") =>
+    canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+
+
+  const handleSelect = (id) => {
+    if (canSelect) toggleChartSelection(id);
+  };
+
   return (
     <div className="">
       <Snackbars
         issnackbarsOpen={issnackbarsOpen}
         setIsSnackbarsOpen={setIsSnackbarsOpen}
       />
-      <div className={`dashboard2-header  ${selectedCharts.includes("cc-1") ? "selected-card" : ""
-        }`}
-        onClick={() => {
-          toggleChartSelection("cc-1");
-        }}
-        style={{ cursor: "pointer" }}>
-        <div className='d-lg-flex d-md-flex gap-2 align-items-center'>
-          <input
-            type="checkbox"
-            className="chart-select-checkbox"
-            onChange={() => toggleChartSelection("cc-1")}
-            checked={selectedCharts.includes("cc-1")}
-            disabled={!current?.user_name} // if user_name empty → disable
-          />
+      <div
+        className={`dashboard2-header ${cardClass("cc-1")}`}
+        onClick={canSelect ? () => handleSelect("cc-1") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+
+        <div
+          className="d-lg-flex d-md-flex gap-2 align-items-center"
+
+        >
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-1")}
+              checked={selectedCharts.includes("cc-1")}
+            />
+          )}
           <h1>Multi-Client Compliance Analytics</h1>
         </div>
+
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-value">{data?.total_clients?.toLocaleString()}</span>
@@ -222,457 +239,518 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
 
 
       <div className="dashboard2-grid">
-        {/* Key Metrics */}
-        <div className="metrics-section">
-          {/* <h2>Key Performance Indicators</h2> */}
-          <div className="metrics-grid">
-            <div className={`metric-card ${selectedCharts.includes("cc-2") ? "selected-card " : "license"
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-2");
-              }}
-              style={{ cursor: "pointer" }}>
-              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
-                <div className="metric-icon">📋</div>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-2")}
-                  checked={selectedCharts.includes("cc-2")}
-                  disabled={!current?.user_name}
-                />
-              </div>
-              <div className="metric-content">
-                <h3>Licenses</h3>
-                <div className="metric-value">{data?.total_licenses}</div>
-                <div className="metric-progress">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data?.total_licenses_completed / data?.total_licenses) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="progress-text">
-                    {data?.total_licenses_completed} / {data?.total_licenses} completed
-                  </span>
-                </div>
-                <div className="compliance-score">{data.overall_license_compliance_score}% compliance</div>
-              </div>
-            </div>
 
-            <div className={`metric-card ${selectedCharts.includes("cc-3") ? "selected-card " : "returns"
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-3");
-              }}
-              style={{ cursor: "pointer" }}>
-              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
-                <div className="metric-icon">📊</div>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-3")}
-                  checked={selectedCharts.includes("cc-3")}
-                  disabled={!current?.user_name}
-                />
-              </div>
+  {/* Key Metrics */}
+  <div className="metrics-section">
+    <div className="metrics-grid">
 
+      {/* CC-2 - Licenses */}
+      <div
+        className={`metric-card ${cardClass("cc-2", "license")}`}
+        onClick={canSelect ? () => handleSelect("cc-2") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="d-lg-flex d-md-flex justify-content-between">
+          <div className="metric-icon">📋</div>
 
-              <div className="metric-content">
-                <h3>Returns</h3>
-                <div className="metric-value">{data.total_returns}</div>
-                <div className="metric-progress">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data.total_returns_completed / data.total_returns) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="progress-text">
-                    {data.total_returns_completed} / {data.total_returns} completed
-                  </span>
-                </div>
-                <div className="compliance-score">{data.overall_return_compliance_score}% compliance</div>
-              </div>
-            </div>
-
-            <div className={`metric-card ${selectedCharts.includes("cc-4") ? "selected-card " : "registers"
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-4");
-              }}
-              style={{ cursor: "pointer" }}>
-              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
-                <div className="metric-icon">📚</div>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-4")}
-                  checked={selectedCharts.includes("cc-4")}
-                  disabled={!current?.user_name}
-                />
-              </div>
-
-              <div className="metric-content">
-                <h3>Registers</h3>
-                <div className="metric-value">{data.total_registers}</div>
-                <div className="metric-progress">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data.total_registers_completed / data.total_registers) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="progress-text">
-                    {data.total_registers_completed} / {data.total_registers} completed
-                  </span>
-                </div>
-                <div className="compliance-score">{data.overall_register_compliance_score}% compliance</div>
-              </div>
-            </div>
-
-            <div className={`metric-card ${selectedCharts.includes("cc-5") ? "selected-card " : "challans"
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-5");
-              }}
-              style={{ cursor: "pointer" }}>
-              <div className='d-lg-flex d-md-flex justify-content-between' onClick={(e) => e.stopPropagation()}>
-                <div className="metric-icon">💰</div>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-5")}
-                  checked={selectedCharts.includes("cc-5")}
-                  disabled={!current?.user_name}
-                />
-              </div>
-
-              <div className="metric-content">
-                <h3>Challans</h3>
-                <div className="metric-value">{data.total_challans}</div>
-                <div className="metric-progress">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(data.total_challans_completed / data.total_challans) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="progress-text">
-                    {data.total_challans_completed} / {data.total_challans} completed
-                  </span>
-                </div>
-                <div className="compliance-score">{data.overall_challan_compliance_score}% compliance</div>
-              </div>
-            </div>
-          </div>
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-2")}
+              checked={selectedCharts.includes("cc-2")}
+            />
+          )}
         </div>
 
-        {/* Charts Section */}
-        <div className="charts-section">
-          <div className={`chart-card ${selectedCharts.includes("cc-6") ? "selected-card" : ""
-            }`}
-            onClick={() => {
-              toggleChartSelection("cc-6");
-            }}
-            style={{ cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("cc-6")}
-              checked={selectedCharts.includes("cc-6")}
-              disabled={!current?.user_name}
-            />
-            <Chart
-              options={overallChartOptions}
-              series={overallChartSeries}
-              type="radialBar"
-              height={350}
-            />
-          </div>
-
-          <div className={`chart-card ${selectedCharts.includes("cc-7") ? "selected-card" : ""
-            }`}
-            onClick={() => {
-              toggleChartSelection("cc-7");
-            }}
-            style={{ cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("cc-7")}
-              checked={selectedCharts.includes("cc-7")}
-              disabled={!current?.user_name}
-            />
-            <Chart
-              options={completionChartOptions}
-              series={completionChartSeries}
-              type="bar"
-              height={400}
-            />
-          </div>
-
-        </div>
-        {/* Top Performers */}
-        <div className={`performers-section ${selectedCharts.includes("cc-8") ? "selected-card" : ""
-          }`}
-          onClick={() => {
-            toggleChartSelection("cc-8");
-          }}
-          style={{ cursor: "pointer" }}>
-          <div className='d-lg-flex  d-md-flex justify-content-between align-items-center mb-3'>
-            <h2>Client Performance Overview</h2>
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("cc-8")}
-              checked={selectedCharts.includes("cc-8")}
-              disabled={!current?.user_name}
-            />
-            <div className='d-lg-flex d-md-flex  justify-content-between'>
-
-              {menuOption === 'table' && <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />}
-
-              <div className='client-performance-table-sm'>
-                {/* <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}> */}
-                <Tooltip title="Account settings">
-                  <IconButton
-                    onClick={handleClick}
-                    size="small"
-                    sx={{ ml: 0 }}
-                    aria-controls={open ? 'account-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? 'true' : undefined}
-                  >
-                    <Settings2 />
-                  </IconButton>
-                </Tooltip>
-                {/* </Box> */}
-                <Menu
-                  anchorEl={anchorEl}
-                  id="account-menu"
-                  open={open}
-                  onClose={handleClose}
-                  onClick={handleClose}
-                  slotProps={{
-                    paper: {
-                      elevation: 0,
-                      sx: {
-                        overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-                        mt: 1.5,
-                        '& .MuiAvatar-root': {
-                          width: 32,
-                          height: 32,
-                          ml: -0.5,
-                          mr: 1,
-                        },
-                        '&::before': {
-                          content: '""',
-                          display: 'block',
-                          position: 'absolute',
-                          top: 0,
-                          right: 14,
-                          width: 10,
-                          height: 10,
-                          bgcolor: 'background.paper',
-                          transform: 'translateY(-50%) rotate(45deg)',
-                          zIndex: 0,
-                        },
-                      },
-                    },
-                  }}
-                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                >
-                  <MenuItem onClick={() => { handleClose(); setMenuOption('table'); }}>
-                    Table View
-                  </MenuItem>
-                  <MenuItem onClick={() => { handleClose(); setMenuOption('card'); }}>
-                    Card View
-                  </MenuItem>
-                </Menu>
-              </div>
-            </div>
-
-          </div>
-          {menuOption === 'table' ?
-            <div className="client-performance-table">
-              <ClientComplianceTable data={data} gridRef={gridRef} />
-            </div>
-            :
-            <div className="performers-grid client-performance-table-sm">
-              {currentClients.map((client, index) => {
-                const score = client.average_compliance_score || 0;
-
-                // function to decide className
-                const getClassName = (score) => {
-                  if (score > 300) return "excellent";
-                  if (score > 100 && score < 300) return "high-performer";
-                  if (score > 80 && score <= 100) return "compliant";
-                  if (score >= 50 && score <= 80) return "good";
-                  if (score > 0 && score < 50) return "moderate";
-                  if (score === 0) return "needs-attention";
-                  return ""; // default
-                };
-
-                return (
-                  <div key={index} className={`performer-card ${getClassName(score)}`}>
-                    <div className="performer-header">
-                      <h4>{client.name}</h4>
-                      <span className={`performance-badge ${getClassName(score)}`}>
-                        Compliance Score
-                      </span>
-                    </div>
-                    <div className="performer-score">
-                      <span className="score-value">{score}%</span>
-                      <div className="score-bar">
-                        <div
-                          className="score-fill"
-                          style={{ width: `${Math.min(score, 100)}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>}
-          {/* Pagination Controls */}
-          {menuOption === 'card' &&
-            <div className="justify-content-end d-flex gap-2 mt-3 client-performance-table-sm">
-              <button
-                className='client-performance-table-sm'
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
+        <div className="metric-content">
+          <h3>Licenses</h3>
+          <div className="metric-value">{data?.total_licenses}</div>
+          <div className="metric-progress">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
                 style={{
-                  background: currentPage === 1 ? 'gray' : 'black',
-                  color: 'white',
-                  borderRadius: '5px',
-                }}>
-                Prev
-              </button>
-              <button
-                className='client-performance-table-sm'
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
-                style={{
-                  background: 'black',
-                  color: 'white',
-                  borderRadius: '5px',
+                  width: `${(data?.total_licenses_completed /
+                    data?.total_licenses) * 100}%`,
                 }}
-              >
-                Next
-              </button>
+              ></div>
             </div>
-          }
-
-        </div>
-
-        {/* Analytics Summary */}
-        <div className={`analytics-section ${selectedCharts.includes("cc-9") ? "selected-card" : ""
-          }`}
-          onClick={() => {
-            toggleChartSelection("cc-9");
-          }}
-          style={{ cursor: "pointer" }}>
-          <h2>Analytics Summary</h2>
-          <input
-            type="checkbox"
-            className="chart-select-checkbox"
-            onChange={() => toggleChartSelection("cc-9")}
-            checked={selectedCharts.includes("cc-9")}
-            disabled={!current?.user_name}
-          />
-          <div className="analytics-grid">
-            <div className={`analytics-item ${selectedCharts.includes("cc-10") ? "selected-card" : ""
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-10");
-              }}
-              style={{ cursor: "pointer" }}>
-              <div className="analytics-icon">🎯</div>
-              <div className="analytics-content">
-                <h4>Average Completion Rate</h4>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-10")}
-                  checked={selectedCharts.includes("cc-10")}
-                  disabled={!current?.user_name}
-                />
-                <div className="analytics-value">
-                  {((data.total_licenses_completed + data.total_returns_completed + data.total_challans_completed) /
-                    (data.total_licenses + data.total_returns + data.total_challans) * 100).toFixed(1)}%
-                </div>
-              </div>
-            </div>
-
-            <div className={`analytics-item ${selectedCharts.includes("cc-11") ? "selected-card" : ""
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-11");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <div className="analytics-icon">⚠️</div>
-              <div className="analytics-content">
-                <h4>Items Requiring Attention</h4>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-11")}
-                  checked={selectedCharts.includes("cc-11")}
-                  disabled={!current?.user_name}
-                />
-                <div className="analytics-value">
-                  {data.total_licenses_pending + data.total_returns_pending + data.total_registers_pending}
-                </div>
-              </div>
-            </div>
-
-            <div className={`analytics-item ${selectedCharts.includes("cc-12") ? "selected-card" : ""
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-12");
-              }}
-              style={{ cursor: "pointer" }}>
-              <div className="analytics-icon">📈</div>
-              <div className="analytics-content">
-                <h4>Best Performing Area</h4>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-12")}
-                  checked={selectedCharts.includes("cc-12")}
-                  disabled={!current?.user_name}
-                />
-                <div className="analytics-value">Challans ({data.overall_challan_compliance_score}%)</div>
-              </div>
-            </div>
-
-            <div className={`analytics-item ${selectedCharts.includes("cc-13") ? "selected-card" : ""
-              }`}
-              onClick={() => {
-                toggleChartSelection("cc-13");
-              }}
-              style={{ cursor: "pointer" }}
-              >
-              <div className="analytics-icon">🔍</div>
-              <div className="analytics-content">
-                <h4>Needs Improvement</h4>
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => toggleChartSelection("cc-13")}
-                  checked={selectedCharts.includes("cc-13")}
-                  disabled={!current?.user_name}
-                />
-                <div className="analytics-value">Registers ({data.overall_register_compliance_score}%)</div>
-              </div>
-            </div>
+            <span className="progress-text">
+              {data?.total_licenses_completed} / {data?.total_licenses} completed
+            </span>
+          </div>
+          <div className="compliance-score">
+            {data.overall_license_compliance_score}% compliance
           </div>
         </div>
       </div>
+
+      {/* CC-3 - Returns */}
+      <div
+        className={`metric-card ${cardClass("cc-3", "returns")}`}
+        onClick={canSelect ? () => handleSelect("cc-3") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="d-lg-flex d-md-flex justify-content-between">
+          <div className="metric-icon">📊</div>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-3")}
+              checked={selectedCharts.includes("cc-3")}
+            />
+          )}
+        </div>
+
+        <div className="metric-content">
+          <h3>Returns</h3>
+          <div className="metric-value">{data.total_returns}</div>
+          <div className="metric-progress">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${(data.total_returns_completed /
+                    data.total_returns) * 100}%`,
+                }}
+              ></div>
+            </div>
+            <span className="progress-text">
+              {data.total_returns_completed} / {data.total_returns} completed
+            </span>
+          </div>
+          <div className="compliance-score">
+            {data.overall_return_compliance_score}% compliance
+          </div>
+        </div>
+      </div>
+
+      {/* CC-4 - Registers */}
+      <div
+        className={`metric-card ${cardClass("cc-4", "registers")}`}
+        onClick={canSelect ? () => handleSelect("cc-4") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="d-lg-flex d-md-flex justify-content-between">
+          <div className="metric-icon">📚</div>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-4")}
+              checked={selectedCharts.includes("cc-4")}
+            />
+          )}
+        </div>
+
+        <div className="metric-content">
+          <h3>Registers</h3>
+          <div className="metric-value">{data.total_registers}</div>
+          <div className="metric-progress">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${(data.total_registers_completed /
+                    data.total_registers) * 100}%`,
+                }}
+              ></div>
+            </div>
+            <span className="progress-text">
+              {data.total_registers_completed} / {data.total_registers} completed
+            </span>
+          </div>
+          <div className="compliance-score">
+            {data.overall_register_compliance_score}% compliance
+          </div>
+        </div>
+      </div>
+
+      {/* CC-5 - Challans */}
+      <div
+        className={`metric-card ${cardClass("cc-5", "challans")}`}
+        onClick={canSelect ? () => handleSelect("cc-5") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="d-lg-flex d-md-flex justify-content-between">
+          <div className="metric-icon">💰</div>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-5")}
+              checked={selectedCharts.includes("cc-5")}
+            />
+          )}
+        </div>
+
+        <div className="metric-content">
+          <h3>Challans</h3>
+          <div className="metric-value">{data.total_challans}</div>
+          <div className="metric-progress">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${(data.total_challans_completed /
+                    data.total_challans) * 100}%`,
+                }}
+              ></div>
+            </div>
+            <span className="progress-text">
+              {data.total_challans_completed} / {data.total_challans} completed
+            </span>
+          </div>
+          <div className="compliance-score">
+            {data.overall_challan_compliance_score}% compliance
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {/* Charts Section */}
+  <div className="charts-section">
+
+    {/* CC-6 */}
+    <div
+      className={`chart-card ${cardClass("cc-6")}`}
+      onClick={canSelect ? () => handleSelect("cc-6") : undefined}
+      style={{ cursor: canSelect ? "pointer" : "default" }}
+    >
+      {canSelect && (
+        <input
+          type="checkbox"
+          className="chart-select-checkbox"
+          onChange={() => handleSelect("cc-6")}
+          checked={selectedCharts.includes("cc-6")}
+        />
+      )}
+      <Chart
+        options={overallChartOptions}
+        series={overallChartSeries}
+        type="radialBar"
+        height={350}
+      />
+    </div>
+
+    {/* CC-7 */}
+    <div
+      className={`chart-card ${cardClass("cc-7")}`}
+      onClick={canSelect ? () => handleSelect("cc-7") : undefined}
+      style={{ cursor: canSelect ? "pointer" : "default" }}
+    >
+      {canSelect && (
+        <input
+          type="checkbox"
+          className="chart-select-checkbox"
+          onChange={() => handleSelect("cc-7")}
+          checked={selectedCharts.includes("cc-7")}
+        />
+      )}
+      <Chart
+        options={completionChartOptions}
+        series={completionChartSeries}
+        type="bar"
+        height={400}
+      />
+    </div>
+
+  </div>
+
+  {/* CC-8 - Performers Section */}
+ {/* -------------------- CC-8 CLIENT PERFORMANCE OVERVIEW -------------------- */}
+  <div
+    className={`performers-section ${cardClass("cc-8")}`}
+    onClick={canSelect ? () => handleSelect("cc-8") : undefined}
+    style={{ cursor: canSelect ? "pointer" : "default" }}
+  >
+    <div className="d-lg-flex  d-md-flex justify-content-between align-items-center mb-3">
+      <h2>Client Performance Overview</h2>
+
+      {canSelect && (
+        <input
+          type="checkbox"
+          className="chart-select-checkbox"
+          onChange={() => handleSelect("cc-8")}
+          checked={selectedCharts.includes("cc-8")}
+        />
+      )}
+
+      <div className='d-lg-flex d-md-flex  justify-content-between'>
+
+        {menuOption === 'table' && (
+          <AnimatedSearchBar
+            placeholder="Search..."
+            type="text"
+            id="filter-text-box"
+            onInput={onFilterTextBoxChanged}
+          />
+        )}
+
+        {/* SETTINGS MENU UNCHANGED */}
+        <div className='client-performance-table-sm'>
+          <Tooltip title="Account settings">
+            <IconButton
+              onClick={handleClick}
+              size="small"
+              sx={{ ml: 0 }}
+              aria-controls={open ? 'account-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+            >
+              <Settings2 />
+            </IconButton>
+          </Tooltip>
+
+          <Menu
+            anchorEl={anchorEl}
+            id="account-menu"
+            open={open}
+            onClose={handleClose}
+            onClick={handleClose}
+            slotProps={{
+              paper: {
+                elevation: 0,
+                sx: {
+                  overflow: 'visible',
+                  filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                  mt: 1.5,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
+            <MenuItem onClick={() => { handleClose(); setMenuOption('table'); }}>
+              Table View
+            </MenuItem>
+            <MenuItem onClick={() => { handleClose(); setMenuOption('card'); }}>
+              Card View
+            </MenuItem>
+          </Menu>
+        </div>
+
+      </div>
+
+    </div>
+
+    {/* TABLE VIEW */}
+    {menuOption === 'table' ? (
+      <div className="client-performance-table">
+        <ClientComplianceTable data={data} gridRef={gridRef} />
+      </div>
+    ) : (
+      /* CARD VIEW */
+      <div className="performers-grid client-performance-table-sm">
+        {currentClients.map((client, index) => {
+          const score = client.average_compliance_score || 0;
+
+          const getClassName = (score) => {
+            if (score > 300) return "excellent";
+            if (score > 100 && score < 300) return "high-performer";
+            if (score > 80 && score <= 100) return "compliant";
+            if (score >= 50 && score <= 80) return "good";
+            if (score > 0 && score < 50) return "moderate";
+            if (score === 0) return "needs-attention";
+            return "";
+          };
+
+          return (
+            <div key={index} className={`performer-card ${getClassName(score)}`}>
+              <div className="performer-header">
+                <h4>{client.name}</h4>
+                <span className={`performance-badge ${getClassName(score)}`}>
+                  Compliance Score
+                </span>
+              </div>
+
+              <div className="performer-score">
+                <span className="score-value">{score}%</span>
+                <div className="score-bar">
+                  <div
+                    className="score-fill"
+                    style={{ width: `${Math.min(score, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    )}
+
+    {/* PAGINATION */}
+    {menuOption === 'card' && (
+      <div className="justify-content-end d-flex gap-2 mt-3 client-performance-table-sm">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+          style={{
+            background: currentPage === 1 ? 'gray' : 'black',
+            color: 'white',
+            borderRadius: '5px',
+          }}
+        >
+          Prev
+        </button>
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+          style={{
+            background: 'black',
+            color: 'white',
+            borderRadius: '5px',
+          }}
+        >
+          Next
+        </button>
+      </div>
+    )}
+
+  </div>
+
+  {/* CC-9 Analytics Summary */}
+  <div
+    className={`analytics-section ${cardClass("cc-9")}`}
+    onClick={canSelect ? () => handleSelect("cc-9") : undefined}
+    style={{ cursor: canSelect ? "pointer" : "default" }}
+  >
+    <h2>Analytics Summary</h2>
+
+    {canSelect && (
+      <input
+        type="checkbox"
+        className="chart-select-checkbox"
+        onChange={() => handleSelect("cc-9")}
+        checked={selectedCharts.includes("cc-9")}
+      />
+    )}
+
+    <div className="analytics-grid">
+
+      {/* CC-10 */}
+      <div
+        className={`analytics-item ${cardClass("cc-10")}`}
+        onClick={canSelect ? () => handleSelect("cc-10") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="analytics-icon">🎯</div>
+        <div className="analytics-content">
+          <h4>Average Completion Rate</h4>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-10")}
+              checked={selectedCharts.includes("cc-10")}
+            />
+          )}
+
+          <div className="analytics-value">
+            {(
+              ((data.total_licenses_completed +
+                data.total_returns_completed +
+                data.total_challans_completed) /
+                (data.total_licenses +
+                  data.total_returns +
+                  data.total_challans)) *
+              100
+            ).toFixed(1)}
+            %
+          </div>
+        </div>
+      </div>
+
+      {/* CC-11 */}
+      <div
+        className={`analytics-item ${cardClass("cc-11")}`}
+        onClick={canSelect ? () => handleSelect("cc-11") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="analytics-icon">⚠️</div>
+        <div className="analytics-content">
+          <h4>Total Pending</h4>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-11")}
+              checked={selectedCharts.includes("cc-11")}
+            />
+          )}
+
+          <div className="analytics-value">
+            {data.total_licenses_pending +
+              data.total_returns_pending +
+              data.total_registers_pending}
+          </div>
+        </div>
+      </div>
+
+      {/* CC-12 */}
+      <div
+        className={`analytics-item ${cardClass("cc-12")}`}
+        onClick={canSelect ? () => handleSelect("cc-12") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="analytics-icon">📈</div>
+        <div className="analytics-content">
+          <h4>Challan Compliance Score</h4>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-12")}
+              checked={selectedCharts.includes("cc-12")}
+            />
+          )}
+
+          <div className="analytics-value">
+            Challans ({data.overall_challan_compliance_score}%)
+          </div>
+        </div>
+      </div>
+
+      {/* CC-13 */}
+      <div
+        className={`analytics-item ${cardClass("cc-13")}`}
+        onClick={canSelect ? () => handleSelect("cc-13") : undefined}
+        style={{ cursor: canSelect ? "pointer" : "default" }}
+      >
+        <div className="analytics-icon">🔍</div>
+        <div className="analytics-content">
+          <h4>Register Compliance Score</h4>
+
+          {canSelect && (
+            <input
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => handleSelect("cc-13")}
+              checked={selectedCharts.includes("cc-13")}
+            />
+          )}
+
+          <div className="analytics-value">
+            Registers ({data.overall_register_compliance_score}%)
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
     </div>
   );
 };

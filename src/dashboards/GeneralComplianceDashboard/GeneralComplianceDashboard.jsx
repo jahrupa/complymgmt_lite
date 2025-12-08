@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
+import { decryptData } from '../../page/utils/encrypt';
 
 const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -182,6 +183,8 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
             }
         }
     };
+    const userType = decryptData(localStorage.getItem("user_type"));
+
     const toggleChartSelection = (chartId) => {
         if (!current?.user_name) {
             // alert("First you need to select a user");
@@ -200,6 +203,17 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 : [...prev, chartId]
         );
     };
+
+    const canSelect = userType === '0';
+
+    const cardClass = (id, defaultClass = "") =>
+        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+
+
+    const handleSelect = (id) => {
+        if (canSelect) toggleChartSelection(id);
+    };
+
     return (
         <>
             <Snackbars
@@ -209,12 +223,12 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
             <div className='row'>
                 <div className='col-12 col-md-6 mb-4'>
                     {/* Licenses Section */}
-                    <div className={`general-compliance ${selectedCharts.includes("gc-1") ? "selected-card" : ""
-                        }`}
-                        onClick={() => {
-                            toggleChartSelection("gc-1");
-                        }}
-                        style={{ cursor: "pointer" }}>
+                    <div
+                        className={`general-compliance ${cardClass("gc-1")}`}
+                        onClick={canSelect ? () => handleSelect("gc-1") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                    >
+
                         <h2>Licenses (Total: {data.licenses.total})</h2>
                         <input
                             type="checkbox"
@@ -232,12 +246,12 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                     </div>
                 </div>
                 <div className='col-12 col-md-6 mb-4'>
-                    <div className={`general-compliance ${selectedCharts.includes("gc-2") ? "selected-card" : ""
-                        }`}
-                        onClick={() => {
-                            toggleChartSelection("gc-2");
-                        }}
-                        style={{ cursor: "pointer" }}>
+                    <div
+                        className={`general-compliance ${cardClass("gc-2")}`}
+                        onClick={canSelect ? () => handleSelect("gc-2") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                    >
+
                         <h2>General Compliance</h2>
                         <input
                             type="checkbox"
@@ -268,13 +282,11 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
 
                 <div className='col-12 col-md-6 mb-4'>
                     {/* Registers Section */}
-                    <div className={`general-compliance ${selectedCharts.includes("gc-3") ? "selected-card" : ""
-                        }`}
-                        onClick={() => {
-                            toggleChartSelection("gc-3");
-                        }}
-                        style={{ cursor: "pointer" }}>
-
+                    <div
+                        className={`general-compliance ${cardClass("gc-3")}`}
+                        onClick={canSelect ? () => handleSelect("gc-3") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                    >
                         <input
                             type="checkbox"
                             className="chart-select-checkbox"
@@ -292,13 +304,11 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 </div>
                 <div className='col-12 col-md-6 mb-4'>
                     {/* Returns Section */}
-                    <div className={`general-compliance ${selectedCharts.includes("gc-4") ? "selected-card" : ""
-                        }`}
-                        onClick={() => {
-                            toggleChartSelection("gc-4");
-                        }}
-
-                        style={{ cursor: "pointer" }}>
+                    <div
+                        className={`general-compliance ${cardClass("gc-4")}`}
+                        onClick={canSelect ? () => handleSelect("gc-4") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                    >
                         <input
                             type="checkbox"
                             className="chart-select-checkbox"

@@ -16,6 +16,7 @@ import {
 import DashboardDrawerGrid from "../DashboardDrawer";
 import { ArrowUpRight, X } from "lucide-react";
 import Snackbars from "../../component/Snackbars";
+import { decryptData } from "../../page/utils/encrypt";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 const HelpdeskAndEscalations = ({ selectedCompany, current,
@@ -566,24 +567,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     severityType: "",
   });
 
-  const toggleChartSelection = (chartId) => {
-    if (!current?.user_name) {
-      // alert("First you need to select a user");
-      setIsSnackbarsOpen({
-        ...issnackbarsOpen,
-        open: true,
-        message: "First you need to select a user",
-        severityType: "warning",
-      });
-      return;
-    }
 
-    setSelectedCharts((prev) =>
-      prev.includes(chartId)
-        ? prev.filter((id) => id !== chartId)
-        : [...prev, chartId]
-    );
-  };
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
@@ -630,6 +614,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       pending: 2,
     },
   ];
+  const userType = decryptData(localStorage.getItem("user_type"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -719,6 +704,35 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   useEffect(() => {
     setSelectedCharts([]);
   }, [current?.user_name]);
+
+  const toggleChartSelection = (chartId) => {
+    if (!current?.user_name) {
+      // alert("First you need to select a user");
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: "First you need to select a user",
+        severityType: "warning",
+      });
+      return;
+    }
+
+    setSelectedCharts((prev) =>
+      prev.includes(chartId)
+        ? prev.filter((id) => id !== chartId)
+        : [...prev, chartId]
+    );
+  };
+
+  const canSelect = userType === '0';
+
+  const cardClass = (id, defaultClass = "") =>
+    canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+
+
+  const handleSelect = (id) => {
+    if (canSelect) toggleChartSelection(id);
+  };
   return (
     <div>
       <Snackbars
@@ -727,14 +741,14 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       />
       <div className="charts-grid mb-4">
         <div
-          className={`chart-card ${selectedCharts.includes("he-1") ? "selected-card" : ""
+          className={`chart-card ${cardClass("he-1") ? "selected-card" : ""
             }`}
-          onClick={() => toggleChartSelection("he-1")}
-          style={{ cursor: "pointer" }}
+          onClick={canSelect ? () => handleSelect("he-1") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -745,7 +759,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
                 handleOpenDrawer(
                   "right",
                   "Proportion of cases pending from department vs. pending from client for selected Issue Sub-Types in PF_ESIC_Helpdesk",
@@ -754,6 +769,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     (item) => item.pending_from
                   )
                 )
+              }
+
               }
             >
               <ArrowUpRight />
@@ -771,14 +788,14 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
           />
         </div>
         <div
-          className={`chart-card ${selectedCharts.includes("he-2") ? "selected-card" : ""
+          className={`chart-card ${cardClass("he-2") ? "selected-card" : ""
             }`}
-          onClick={() => toggleChartSelection("he-2")}
-          style={{ cursor: "pointer" }}
+          onClick={canSelect ? () => handleSelect("he-2") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -789,7 +806,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
                 handleOpenDrawer(
                   "left",
                   "Comparison of closed vs. open cases for top 5 Issue Sub-Types in PF_ESIC_Helpdesk",
@@ -798,6 +816,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     (item) => item.issue_sub_type
                   )
                 )
+              }
+
               }
             >
               <ArrowUpRight />
@@ -817,13 +837,13 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${selectedCharts.includes("he-3") ? "selected-card" : ""
+        <div className={`chart-card ${cardClass("he-3") ? "selected-card" : ""
           }`}
-          onClick={() => toggleChartSelection("he-3")}
-          style={{ cursor: "pointer" }}>
+          onClick={canSelect ? () => handleSelect("he-3") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
@@ -832,13 +852,17 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               checked={selectedCharts.includes("he-3")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>
@@ -855,28 +879,32 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${selectedCharts.includes("he-5") ? "selected-card" : ""
+        <div className={`chart-card ${cardClass("he-4") ? "selected-card" : ""
           }`}
-          onClick={() => toggleChartSelection("he-5")}
-          style={{ cursor: "pointer" }}>
+          onClick={canSelect ? () => handleSelect("he-4") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
               className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-5")}
-              checked={selectedCharts.includes("he-5")}
+              onChange={() => toggleChartSelection("he-4")}
+              checked={selectedCharts.includes("he-4")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>
@@ -892,24 +920,25 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         </div>
 
         <div
-          className={`chart-card ${selectedCharts.includes("he-6") ? "selected-card" : ""
+          className={`chart-card ${cardClass("he-5") ? "selected-card" : ""
             }`}
-          onClick={() => toggleChartSelection("he-6")}
-          style={{ cursor: "pointer" }}
+          onClick={canSelect ? () => handleSelect("he-5") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
               className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-6")}
-              checked={selectedCharts.includes("he-6")}
+              onChange={() => toggleChartSelection("he-5")}
+              checked={selectedCharts.includes("he-5")}
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 handleOpenDrawer(
                   "left",
                   "Companies by total helpdesk tickets raised in PF_ESIC_Helpdesk",
@@ -918,7 +947,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     (item) => item.assigned_to
                   )
                 )
-              }
+              }}
             >
               <ArrowUpRight />
             </div>
@@ -937,28 +966,32 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${selectedCharts.includes("he-7") ? "selected-card" : ""
+        <div className={`chart-card ${cardClass("he-6") ? "selected-card" : ""
           }`}
-          onClick={() => toggleChartSelection("he-7")}
-          style={{ cursor: "pointer" }}>
+          onClick={canSelect ? () => handleSelect("he-6") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}>
           <div
             className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
               className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-7")}
-              checked={selectedCharts.includes("he-7")}
+              onChange={() => toggleChartSelection("he-6")}
+              checked={selectedCharts.includes("he-6")}
               disabled={!current?.user_name}
             />
-            <div className="dashboard-icon ms-2" onClick={
-              () => setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "No Data available",
-                severityType: "info",
-              })}>
+            <div className="dashboard-icon ms-2"
+              onClick={(e) => {
+                e.stopPropagation();   // prevent parent click from firing
+                setIsSnackbarsOpen({
+                  ...issnackbarsOpen,
+                  open: true,
+                  message: "No Data available",
+                  severityType: "info",
+                });
+              }}
+            >
               <ArrowUpRight />
             </div>
           </div>
@@ -975,24 +1008,25 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         </div>
 
         <div
-          className={`chart-card ${selectedCharts.includes("he-8") ? "selected-card" : ""
+          className={`chart-card ${cardClass("he-7") ? "selected-card" : ""
             }`}
-          onClick={() => toggleChartSelection("he-8")}
-          style={{ cursor: "pointer" }}
+          onClick={canSelect ? () => handleSelect("he-7") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
           <div
             className="d-flex justify-content-end align-items-center"
-            
+
           >
             <input
               type="checkbox"
               className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-8")}
-              checked={selectedCharts.includes("he-8")}
+              onChange={() => toggleChartSelection("he-7")}
+              checked={selectedCharts.includes("he-7")}
             />
             <div
               className="dashboard-icon ms-2"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 handleOpenDrawer(
                   "left",
                   "Companies by total helpdesk tickets raised in PF_ESIC_Helpdesk",
@@ -1001,7 +1035,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     (item) => item.company_name
                   )
                 )
-              }
+              }}
             >
               <ArrowUpRight />
             </div>
