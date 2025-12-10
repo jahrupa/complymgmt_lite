@@ -166,7 +166,7 @@ const PayrollServices = ({
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
-    const userType = decryptData(localStorage.getItem("user_type"));
+    const userRole = decryptData(localStorage.getItem("user_role"));
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
@@ -461,7 +461,7 @@ const PayrollServices = ({
                 : [...prev, chartId]
         );
     };
-    const canSelect = userType === '0';
+    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
     const cardClass = (id, defaultClass = "") =>
         canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
 

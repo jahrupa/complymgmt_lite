@@ -614,7 +614,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       pending: 2,
     },
   ];
-  const userType = decryptData(localStorage.getItem("user_type"));
+    const userRole = decryptData(localStorage.getItem("user_role"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -724,7 +724,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     );
   };
 
-  const canSelect = userType === '0';
+  const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
 
   const cardClass = (id, defaultClass = "") =>
     canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;

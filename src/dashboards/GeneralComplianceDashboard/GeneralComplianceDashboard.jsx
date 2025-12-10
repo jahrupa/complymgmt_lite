@@ -183,7 +183,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
             }
         }
     };
-    const userType = decryptData(localStorage.getItem("user_type"));
+  const userRole = decryptData(localStorage.getItem("user_role"));
 
     const toggleChartSelection = (chartId) => {
         if (!current?.user_name) {
@@ -204,7 +204,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         );
     };
 
-    const canSelect = userType === '0';
+    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
 
     const cardClass = (id, defaultClass = "") =>
         canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;

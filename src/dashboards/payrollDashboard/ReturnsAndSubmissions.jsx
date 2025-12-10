@@ -71,7 +71,6 @@ const ReturnsAndSubmissions = ({
   const [escalationRaisedCategoriesByCompany, setEscalationRaisedCategoriesByCompany] = useState([]);
   const [riskDistributionByState, setRiskDistributionByState] = useState({});
   const [stateWiseAnalysisOfApplicableReturns, setStateWiseAnalysisOfApplicableReturns] = useState({});
-console.log(riskDistributionByState,'riskDistributionByState')
   // --- Helper to normalize "maybe object-maybe-array" responses ---
   const ensureArray = (val, fallback = []) => {
     if (!val) return fallback;
@@ -191,7 +190,7 @@ console.log(riskDistributionByState,'riskDistributionByState')
       states: { hover: { filter: { type: "none" } }, active: { filter: { type: "none" } } },
     }
   };
-  const userType = decryptData(localStorage.getItem("user_type"));
+    const userRole = decryptData(localStorage.getItem("user_role"));
   // --- Fetch ---
   useEffect(() => {
     const fetchData = async () => {
@@ -283,7 +282,7 @@ console.log(riskDistributionByState,'riskDistributionByState')
   }, [escalationRaisedCategoriesByCompany]);
 
 
-  const canSelect = userType === '0';
+  const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
 
   const cardClass = (id, defaultClass = "") =>
     canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;

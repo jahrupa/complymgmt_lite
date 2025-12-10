@@ -13,6 +13,7 @@ import {
 import DashboardDrawerGrid from "../DashboardDrawer";
 import { ArrowUpRight, X } from "lucide-react";
 import Snackbars from "../../component/Snackbars";
+import { decryptData } from "../../page/utils/encrypt";
 
 const NoticeDashboard = ({
     selectedCompany,
@@ -576,25 +577,6 @@ const NoticeDashboard = ({
         message: "",
         severityType: "",
     });
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            // alert("First you need to select a user");
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "First you need to select a user",
-                severityType: "warning",
-            });
-            return;
-        }
-
-        setSelectedCharts((prev) =>
-            prev.includes(chartId)
-                ? prev.filter((id) => id !== chartId)
-                : [...prev, chartId]
-        );
-    };
-
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [drawerAnchor, setDrawerAnchor] = React.useState("right");
     const [drawerTitle, setDrawerTitle] = useState("");
@@ -607,6 +589,7 @@ const NoticeDashboard = ({
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
     };
+    const userRole = decryptData(localStorage.getItem("user_role"));
 
     useEffect(() => {
         const fetchData = async () => {
@@ -727,6 +710,31 @@ const NoticeDashboard = ({
         setSelectedCharts([]);
     }, [current?.user_name]);
 
+    const toggleChartSelection = (chartId) => {
+        if (!current?.user_name) {
+            // alert("First you need to select a user");
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "First you need to select a user",
+                severityType: "warning",
+            });
+            return;
+        }
+
+        setSelectedCharts((prev) =>
+            prev.includes(chartId)
+                ? prev.filter((id) => id !== chartId)
+                : [...prev, chartId]
+        );
+    };
+    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
+    const cardClass = (id, defaultClass = "") =>
+        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+
+    const handleSelect = (id) => {
+        if (canSelect) toggleChartSelection(id);
+    };
     return (
         <div>
             <Snackbars
@@ -734,10 +742,10 @@ const NoticeDashboard = ({
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <div className="charts-grid mb-4">
-                <div className={`chart-card ${selectedCharts.includes("ni-1") ? "selected-card" : ""
+                <div className={`chart-card ${cardClass("ni-1") ? "selected-card" : ""
                     }`}
-                    onClick={() => toggleChartSelection("ni-1")}
-                    style={{ cursor: "pointer" }}>
+                    onClick={canSelect ? () => handleSelect("ni-1") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
 
@@ -778,10 +786,10 @@ const NoticeDashboard = ({
                 </div>
 
                 <div
-                    className={`chart-card ${selectedCharts.includes("ni-2") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("ni-2") ? "selected-card" : ""
                         }`}
-                    onClick={() => toggleChartSelection("ni-2")}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("ni-2") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -825,10 +833,10 @@ const NoticeDashboard = ({
             </div>
 
             <div className="charts-grid mb-4">
-                <div className={`chart-card ${selectedCharts.includes("ni-3") ? "selected-card" : ""
+                <div className={`chart-card ${cardClass("ni-3") ? "selected-card" : ""
                     }`}
-                    onClick={() => toggleChartSelection("ni-3")}
-                    style={{ cursor: "pointer" }}>
+                    onClick={canSelect ? () => handleSelect("ni-3") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
 
@@ -867,10 +875,10 @@ const NoticeDashboard = ({
                 </div>
 
                 <div
-                    className={`chart-card ${selectedCharts.includes("ni-4") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("ni-4") ? "selected-card" : ""
                         }`}
-                    onClick={() => toggleChartSelection("ni-4")}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("ni-4") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -914,10 +922,10 @@ const NoticeDashboard = ({
 
             <div className="charts-grid mb-4">
                 <div
-                    className={`chart-card ${selectedCharts.includes("ni-5") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("ni-5") ? "selected-card" : ""
                         }`}
-                    onClick={() => toggleChartSelection("ni-5")}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("ni-5") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -962,10 +970,10 @@ const NoticeDashboard = ({
                 </div>
 
                 <div
-                    className={`chart-card ${selectedCharts.includes("ni-6") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("ni-6") ? "selected-card" : ""
                         }`}
-                    onClick={() => toggleChartSelection("ni-6")}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("ni-6") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -1010,10 +1018,10 @@ const NoticeDashboard = ({
                 </div>
             </div>
             <div className="charts-grid mb-4">
-                <div className={`chart-card ${selectedCharts.includes("ni-7") ? "selected-card" : ""
+                <div className={`chart-card ${cardClass("ni-7") ? "selected-card" : ""
                     }`}
-                    onClick={() => toggleChartSelection("ni-7")}
-                    style={{ cursor: "pointer" }}>
+                    onClick={canSelect ? () => handleSelect("ni-7") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
 
@@ -1050,10 +1058,10 @@ const NoticeDashboard = ({
                         height={380}
                     />
                 </div>
-                <div c className={`chart-card ${selectedCharts.includes("ni-8") ? "selected-card" : ""
+                <div c className={`chart-card ${cardClass("ni-8") ? "selected-card" : ""
                     }`}
-                    onClick={() => toggleChartSelection("ni-8")}
-                    style={{ cursor: "pointer" }}>
+                    onClick={canSelect ? () => handleSelect("ni-8") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
 

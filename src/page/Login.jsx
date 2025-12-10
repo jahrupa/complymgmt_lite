@@ -33,7 +33,8 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                 // localStorage.setItem('token', token);
                 localStorage.setItem('username', response.data?.username);
                 localStorage.setItem('user_id', encryptData(response.data?.user_id));
-               localStorage.setItem("user_type", encryptData(String(response.data?.user_type)));
+                localStorage.setItem("user_type", encryptData(String(response.data?.user_type)));
+                localStorage.setItem('user_role', encryptData(response.data?.user_role));
 
                 setIsChangePassword(response.data?.is_temp_password);
                 setToken(token);

@@ -9,6 +9,7 @@ import {
 import { ArrowUpRight, X } from "lucide-react";
 import DashboardDrawerGrid from "../DashboardDrawer";
 import Snackbars from "../../component/Snackbars";
+import { decryptData } from "../../page/utils/encrypt";
 
 const GeneralHelpdesk = ({
     selectedCompany,
@@ -324,29 +325,13 @@ const GeneralHelpdesk = ({
         message: "",
         severityType: "",
     });
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            // alert("First you need to select a user");
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "First you need to select a user",
-                severityType: "warning",
-            });
-            return;
-        }
 
-        setSelectedCharts((prev) =>
-            prev.includes(chartId)
-                ? prev.filter((id) => id !== chartId)
-                : [...prev, chartId]
-        );
-    };
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [drawerAnchor, setDrawerAnchor] = React.useState("right");
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+      const userRole = decryptData(localStorage.getItem("user_role"));
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
@@ -354,7 +339,6 @@ const GeneralHelpdesk = ({
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
     };
-
     useEffect(() => {
         const fetchData = async () => {
             const [
@@ -417,6 +401,32 @@ const GeneralHelpdesk = ({
     useEffect(() => {
         setSelectedCharts([]);
     }, [current?.user_name]);
+
+    const toggleChartSelection = (chartId) => {
+        if (!current?.user_name) {
+            // alert("First you need to select a user");
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: "First you need to select a user",
+                severityType: "warning",
+            });
+            return;
+        }
+
+        setSelectedCharts((prev) =>
+            prev.includes(chartId)
+                ? prev.filter((id) => id !== chartId)
+                : [...prev, chartId]
+        );
+    };
+
+    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
+    const cardClass = (id, defaultClass = "") =>
+        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
+    const handleSelect = (id) => {
+        if (canSelect) toggleChartSelection(id);
+    };
     return (
         <div>
             <Snackbars
@@ -425,13 +435,10 @@ const GeneralHelpdesk = ({
             />
             <div className="charts-grid mb-4">
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-1") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("gh-1") ? "selected-card" : ""
                         }`}
-                    onClick={() => {
-                        toggleChartSelection("gh-1");
-                    }}
-                    style={{ cursor: "pointer" }}
-                >
+                    onClick={canSelect ? () => handleSelect("gh-1") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}>
                     <div
                         className="d-flex justify-content-end align-items-center"
 
@@ -474,12 +481,10 @@ const GeneralHelpdesk = ({
                     />
                 </div>
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-2") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("gh-2") ? "selected-card" : ""
                         }`}
-                    onClick={() => {
-                        toggleChartSelection("gh-2");
-                    }}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("gh-2") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -494,7 +499,7 @@ const GeneralHelpdesk = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={(e) =>{
+                            onClick={(e) => {
                                 e.stopPropagation();   // prevent parent click from firing
                                 handleOpenDrawer(
                                     "left",
@@ -505,7 +510,7 @@ const GeneralHelpdesk = ({
                                     )
                                 )
                             }
-                                
+
                             }
                         >
                             <ArrowUpRight />
@@ -525,10 +530,10 @@ const GeneralHelpdesk = ({
 
             <div className="charts-grid mb-4">
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-3") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("gh-3") ? "selected-card" : ""
                         }`}
-                    onClick={() => toggleChartSelection("gh-3")}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("gh-3") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -544,9 +549,9 @@ const GeneralHelpdesk = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={(e) =>{
+                            onClick={(e) => {
                                 e.stopPropagation();   // prevent parent click from firing
-                                 handleOpenDrawer(
+                                handleOpenDrawer(
                                     "right",
                                     "Documents Pending From Client vs. Karma",
                                     documentPendingFrom?.rest_docs_pending,
@@ -571,10 +576,10 @@ const GeneralHelpdesk = ({
                     />
                 </div>
                 <div
-                    className={`chart-card ${selectedCharts.includes("gh-4") ? "selected-card" : ""
+                    className={`chart-card ${cardClass("gh-4") ? "selected-card" : ""
                         }`}
-                    onClick={() => toggleChartSelection("gh-4")}
-                    style={{ cursor: "pointer" }}
+                    onClick={canSelect ? () => handleSelect("gh-4") : undefined}
+                    style={{ cursor: canSelect ? "pointer" : "default" }}
                 >
                     <div
                         className="d-flex justify-content-end align-items-center"
@@ -590,7 +595,7 @@ const GeneralHelpdesk = ({
                         />
                         <div
                             className="dashboard-icon ms-2"
-                            onClick={(e) =>{
+                            onClick={(e) => {
                                 e.stopPropagation();   // prevent parent click from firing
                                 handleOpenDrawer(
                                     "left",
