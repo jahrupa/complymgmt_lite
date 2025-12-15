@@ -4,7 +4,7 @@ import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
 
-const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts }) => {
+const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -183,7 +183,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
             }
         }
     };
-  const userRole = decryptData(localStorage.getItem("user_role"));
+    const userRole = decryptData(localStorage.getItem("user_role"));
 
     const toggleChartSelection = (chartId) => {
         if (!current?.user_name) {
@@ -221,109 +221,117 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <div className='row'>
-                <div className='col-12 col-md-6 mb-4'>
-                    {/* Licenses Section */}
-                    <div
-                        className={`general-compliance ${cardClass("gc-1")}`}
-                        onClick={canSelect ? () => handleSelect("gc-1") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
-                    >
+                {shouldShow("gc-1") && (
+                    <div className='col-12 col-md-6 mb-4'>
+                        {/* Licenses Section */}
+                        <div
+                            className={`general-compliance ${cardClass("gc-1")}`}
+                            onClick={canSelect ? () => handleSelect("gc-1") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
 
-                        <h2>Licenses (Total: {data.licenses.total})</h2>
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("gc-1")}
-                            checked={selectedCharts.includes("gc-1")}
-                            disabled={!current?.user_name}
-                        />
-                        <Chart
-                            options={licensesChart.options}
-                            series={licensesChart.series}
-                            type="pie"
-                            height={290}
-                        />
-                    </div>
-                </div>
-                <div className='col-12 col-md-6 mb-4'>
-                    <div
-                        className={`general-compliance ${cardClass("gc-2")}`}
-                        onClick={canSelect ? () => handleSelect("gc-2") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
-                    >
-
-                        <h2>General Compliance</h2>
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("gc-2")}
-                            checked={selectedCharts.includes("gc-2")}
-                            disabled={!current?.user_name}
-                        />
-                        <div className="compliance-items">
-                            {payrollData?.map((item, index) => (
-                                <div key={index} className={`compliance-item ${item.status}`}>
-                                    <div className="compliance-icon">{item.icon}</div>
-                                    <span className="compliance-label">{item.label}</span>
-                                    <span className="compliance-value">{item.value}</span>
-                                    {item.status === 'progress' && (
-                                        <div className="progress-indicator">
-                                            <div className="progress-bar-small">
-                                                <div className="progress-fill-small" style={{ width: '75%' }}></div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                            <h2>Licenses (Total: {data.licenses.total})</h2>
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("gc-1")}
+                                checked={selectedCharts.includes("gc-1")}
+                                disabled={!current?.user_name}
+                            />
+                            <Chart
+                                options={licensesChart.options}
+                                series={licensesChart.series}
+                                type="pie"
+                                height={290}
+                            />
                         </div>
                     </div>
-                </div>
-                {/* Payroll Section */}
+                )}
+                {shouldShow("gc-2") && (
+                    <div className='col-12 col-md-6 mb-4'>
+                        <div
+                            className={`general-compliance ${cardClass("gc-2")}`}
+                            onClick={canSelect ? () => handleSelect("gc-2") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
 
-                <div className='col-12 col-md-6 mb-4'>
-                    {/* Registers Section */}
-                    <div
-                        className={`general-compliance ${cardClass("gc-3")}`}
-                        onClick={canSelect ? () => handleSelect("gc-3") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("gc-3")}
-                            checked={selectedCharts.includes("gc-3")}
-                            disabled={!current?.user_name}
-                        />
-                        <Chart
-                            options={registersChart.options}
-                            series={registersChart.series}
-                            type="bar"
-                            height={350}
-                        />
+                            <h2>General Compliance</h2>
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("gc-2")}
+                                checked={selectedCharts.includes("gc-2")}
+                                disabled={!current?.user_name}
+                            />
+                            <div className="compliance-items">
+                                {payrollData?.map((item, index) => (
+                                    <div key={index} className={`compliance-item ${item.status}`}>
+                                        <div className="compliance-icon">{item.icon}</div>
+                                        <span className="compliance-label">{item.label}</span>
+                                        <span className="compliance-value">{item.value}</span>
+                                        {item.status === 'progress' && (
+                                            <div className="progress-indicator">
+                                                <div className="progress-bar-small">
+                                                    <div className="progress-fill-small" style={{ width: '75%' }}></div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className='col-12 col-md-6 mb-4'>
-                    {/* Returns Section */}
-                    <div
-                        className={`general-compliance ${cardClass("gc-4")}`}
-                        onClick={canSelect ? () => handleSelect("gc-4") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("gc-4")}
-                            checked={selectedCharts.includes("gc-4")}
-                            disabled={!current?.user_name}
-                        />
-                        <Chart
-                            options={returnsChart.options}
-                            series={returnsChart.series}
-                            type="radialBar"
-                            height={350}
-                        />
+                )}
+
+                {/* Payroll Section */}
+                {shouldShow("gc-3") && (
+                    <div className='col-12 col-md-6 mb-4'>
+                        {/* Registers Section */}
+                        <div
+                            className={`general-compliance ${cardClass("gc-3")}`}
+                            onClick={canSelect ? () => handleSelect("gc-3") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("gc-3")}
+                                checked={selectedCharts.includes("gc-3")}
+                                disabled={!current?.user_name}
+                            />
+                            <Chart
+                                options={registersChart.options}
+                                series={registersChart.series}
+                                type="bar"
+                                height={350}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
+                {shouldShow("gc-4") && (
+                    <div className='col-12 col-md-6 mb-4'>
+                        {/* Returns Section */}
+                        <div
+                            className={`general-compliance ${cardClass("gc-4")}`}
+                            onClick={canSelect ? () => handleSelect("gc-4") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("gc-4")}
+                                checked={selectedCharts.includes("gc-4")}
+                                disabled={!current?.user_name}
+                            />
+                            <Chart
+                                options={returnsChart.options}
+                                series={returnsChart.series}
+                                type="radialBar"
+                                height={350}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
         </>
 

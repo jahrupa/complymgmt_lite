@@ -5,6 +5,8 @@ import { Tabs, Tab, Box } from "@mui/material";
 
 import GeneralComplianceDashboard from "../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard";
 import {
+    createOrUpdateWidgetMapping,
+    fetchAllWidgetMappings,
     fetchClientOnboardingByCompany,
     fetchClientOnboardingPortfolio,
     fetchComplainceCockpit,
@@ -26,6 +28,7 @@ import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
 
 import { decryptData } from "../page/utils/encrypt";
+import Snackbars from "../component/Snackbars";
 
 function TabPanel({ children, value, index, keepMounted = true }) {
     const isActive = value === index;
@@ -46,9 +49,22 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
-    const [position, setPosition] = useState({ x: 100, y: 100 });
+    const [widgetsList, setWidgetsList] = useState([]);
+    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+        open: false,
+        vertical: "top",
+        horizontal: "center",
+        message: "",
+        severityType: "",
+    });
+    const [position, setPosition] = useState({
+        x: window.innerWidth / 2 - 75,   // center horizontally
+        y: window.innerHeight - 80       // bottom with 80px padding
+    });
+
     const [isDragging, setIsDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
+
     // Start dragging
     const startDrag = (e) => {
         e.preventDefault();
@@ -101,7 +117,14 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     }, [isDragging, offset]);
 
     const userType = decryptData(localStorage.getItem("user_type"));
+    const userId = decryptData(localStorage.getItem("user_id"));
 
+    const shouldShow = (id) => {
+        return Array.isArray(widgetsList) &&
+            widgetsList.flat().some(
+                item => item?.widget_id?.toUpperCase() === id.toUpperCase()
+            );
+    };
     const tabsList = [
         {
             label: "Compliance Cockpit",
@@ -116,6 +139,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         current={current}
                         selectedCharts={selectedCharts}
                         setSelectedCharts={setSelectedCharts}
+                        shouldShow={shouldShow}
+
                     />
                 )
         },
@@ -125,6 +150,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 <GeneralComplianceDashboard data={generalDashboardData} current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+
                 />
             )
         }
@@ -154,6 +181,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
                 />
             )
         },
@@ -165,6 +193,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
                 />
             )
         },
@@ -176,6 +205,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+
                 />
             )
         },
@@ -187,6 +218,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    widgetsList={widgetsList}
                 />
             )
         },
@@ -198,6 +230,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
                 />
             )
         },
@@ -209,6 +242,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    widgetsList={widgetsList}
                 />
             )
         }
@@ -228,6 +263,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 }
             } catch (error) {
                 setGeneralDashboardData([]);
+                console.log(error);
             }
         };
         fetchGeneralDashboardData();
@@ -259,9 +295,47 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         fetchClientOnboardingPortfolioData();
     }, [selectedCompany]);
 
+    useEffect(() => {
+        const fetchWidgetsListData = async () => {
+            const [a] = await Promise.allSettled([
+                fetchAllWidgetMappings(),
+            ]);
+            setWidgetsList(a.status === "fulfilled" ? a.value?.map((item) => item?.widgets) : []);
+        };
+        fetchWidgetsListData();
+    }, [selectedCompany]);
 
+    const handleSubmit = async (updatedFormData) => {
+        if (!updatedFormData) return;
+
+        const payload = {
+            user_id: userId,
+            widget_ids: selectedCharts.map(id => id.toUpperCase())
+        };
+        try {
+            const response = await createOrUpdateWidgetMapping(payload);
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: response?.message || "Mapping updated successfully",
+                severityType: 'success'
+            });
+
+        } catch (error) {
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message || "Error updating mapping",
+                severityType: 'error'
+            });
+        }
+    };
     return (
         <Box sx={{ width: "100%" }}>
+            <Snackbars
+                issnackbarsOpen={issnackbarsOpen}
+                setIsSnackbarsOpen={setIsSnackbarsOpen}
+            />
             <Tabs
                 value={activeTab}
                 onChange={handleTabChange}
@@ -295,7 +369,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         onMouseDown={startDrag}
                         onTouchStart={startDrag}
                     >
-                        <button className="btn btn-primary">Create User Widget</button>
+                        <button className="btn btn-primary" disabled={selectedCharts?.length === 0} onClick={handleSubmit}>Create User Widget</button>
                     </div>
                 </div>
             )}

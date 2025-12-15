@@ -158,6 +158,10 @@ import {
   GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
   GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
   GET_TOTAL_DELAY_FLAGS_BY_GOVT,
+  GET_ALL_WIDGET_MAPPINGS,
+  CREATE_OR_UPDATE_WIDGET_MAPPING,
+  DELETE_WIDGET_MAPPING_BY_ID,
+  GET_WIDGETS_BY_USER_ID,
 
 } from "./Endpoint";
 
@@ -1864,5 +1868,45 @@ export const fetchIssueCategoryByStatus = async (company_name) => {
   }
 }
 
+// Dashboaed Widgets 
 
+export const fetchAllWidgetMappings = async () => {
+  try {
+    const response = await API.get(GET_ALL_WIDGET_MAPPINGS);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all widget mappings:", error);
+    throw error;
+  }
+};
+
+export const createOrUpdateWidgetMapping = async (widgetData) => {
+  try {
+    const response = await API.post(CREATE_OR_UPDATE_WIDGET_MAPPING, widgetData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating or updating widget mapping:", error);
+    throw error;
+  }
+};
+
+export const deleteWidgetMappingById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_WIDGET_MAPPING_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting widget mapping by ID:", error);
+    throw error;
+  }
+};
+
+export const fetchWidgetMappingById = async (id) => {
+  try {
+    const response = await API.get(`${GET_WIDGETS_BY_USER_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching widget mapping by ID:", error);
+    throw error;
+  }
+};
 

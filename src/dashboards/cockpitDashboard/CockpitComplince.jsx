@@ -3,13 +3,13 @@ import Chart from 'react-apexcharts';
 import '../../style/cockpitComplinceByCompany.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ClientComplianceTable from './ClientComplianceTable';
-import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { Settings2 } from 'lucide-react';
 import { AnimatedSearchBar } from '../../component/AnimatedSearchBar';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
 
-const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) => {
+const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current, shouldShow }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuOption, setMenuOption] = useState('card');
@@ -200,91 +200,93 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
         issnackbarsOpen={issnackbarsOpen}
         setIsSnackbarsOpen={setIsSnackbarsOpen}
       />
-      <div
-        className={`dashboard2-header ${cardClass("cc-1")}`}
-        onClick={canSelect ? () => handleSelect("cc-1") : undefined}
-        style={{ cursor: canSelect ? "pointer" : "default" }}
-      >
-
+      {shouldShow("cc-1") && (
         <div
-          className="d-lg-flex d-md-flex gap-2 align-items-center"
-
+          className={`dashboard2-header ${cardClass("cc-1")}`}
+          onClick={canSelect ? () => handleSelect("cc-1") : undefined}
+          style={{ cursor: canSelect ? "pointer" : "default" }}
         >
-          {canSelect && (
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => handleSelect("cc-1")}
-              checked={selectedCharts.includes("cc-1")}
-            />
-          )}
-          <h1>Multi-Client Compliance Analytics</h1>
-        </div>
 
-        <div className="header-stats">
-          <div className="header-stat">
-            <span className="stat-value">{data?.total_clients?.toLocaleString()}</span>
-            <span className="stat-label-cock-pit-complince">Total Clients</span>
+          <div
+            className="d-lg-flex d-md-flex gap-2 align-items-center"
+
+          >
+            {canSelect && (
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => handleSelect("cc-1")}
+                checked={selectedCharts.includes("cc-1")}
+              />
+            )}
+            <h1>Multi-Client Compliance Analytics</h1>
           </div>
-          <div className="header-stat">
-            <span className="stat-value">{data?.overall_compliance_score}%</span>
-            <span className="stat-label-cock-pit-complince">Overall Score</span>
+
+          <div className="header-stats">
+            <div className="header-stat">
+              <span className="stat-value">{data?.total_clients?.toLocaleString()}</span>
+              <span className="stat-label-cock-pit-complince">Total Clients</span>
+            </div>
+            <div className="header-stat">
+              <span className="stat-value">{data?.overall_compliance_score}%</span>
+              <span className="stat-label-cock-pit-complince">Overall Score</span>
+            </div>
           </div>
         </div>
-      </div>
-
-
+      )}
 
       <div className="dashboard2-grid">
-
         {/* Key Metrics */}
         <div className="metrics-section">
           <div className="metrics-grid">
 
             {/* CC-2 - Licenses */}
-            <div
-              className={`metric-card ${cardClass("cc-2", "license")}`}
-              onClick={canSelect ? () => handleSelect("cc-2") : undefined}
-              style={{ cursor: canSelect ? "pointer" : "default" }}
-            >
-              <div className="d-lg-flex d-md-flex justify-content-between">
-                <div className="metric-icon">📋</div>
+            {shouldShow("cc-2") && (
+              <div
+                className={`metric-card ${cardClass("cc-2", "license")}`}
+                onClick={canSelect ? () => handleSelect("cc-2") : undefined}
+                style={{ cursor: canSelect ? "pointer" : "default" }}
+              >
+                <div className="d-lg-flex d-md-flex justify-content-between">
+                  <div className="metric-icon">📋</div>
 
-                {canSelect && (
-                  <input
-                    type="checkbox"
-                    className="chart-select-checkbox"
-                    onChange={() => handleSelect("cc-2")}
-                    checked={selectedCharts.includes("cc-2")}
-                  />
-                )}
-              </div>
+                  {canSelect && (
+                    <input
+                      type="checkbox"
+                      className="chart-select-checkbox"
+                      onChange={() => handleSelect("cc-2")}
+                      checked={selectedCharts.includes("cc-2")}
+                    />
+                  )}
+                </div>
 
-              <div className="metric-content">
-                <h3>Licenses</h3>
-                <div className="metric-value">{data?.total_licenses}</div>
-                <div className="metric-progress">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${(data?.total_licenses_completed /
-                          data?.total_licenses) * 100}%`,
-                      }}
-                    ></div>
+                <div className="metric-content">
+                  <h3>Licenses</h3>
+                  <div className="metric-value">{data?.total_licenses}</div>
+                  <div className="metric-progress">
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${(data?.total_licenses_completed /
+                            data?.total_licenses) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <span className="progress-text">
+                      {data?.total_licenses_completed} / {data?.total_licenses} completed
+                    </span>
                   </div>
-                  <span className="progress-text">
-                    {data?.total_licenses_completed} / {data?.total_licenses} completed
-                  </span>
-                </div>
-                <div className="compliance-score">
-                  {data.overall_license_compliance_score}% compliance
+                  <div className="compliance-score">
+                    {data.overall_license_compliance_score}% compliance
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* CC-3 - Returns */}
-            <div
+            {shouldShow("cc-3") && (
+ <div
               className={`metric-card ${cardClass("cc-3", "returns")}`}
               onClick={canSelect ? () => handleSelect("cc-3") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -324,9 +326,11 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                 </div>
               </div>
             </div>
+            )}
 
             {/* CC-4 - Registers */}
-            <div
+            {shouldShow("cc-4") && (
+                <div
               className={`metric-card ${cardClass("cc-4", "registers")}`}
               onClick={canSelect ? () => handleSelect("cc-4") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -366,9 +370,11 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                 </div>
               </div>
             </div>
-
+            )}
+          
             {/* CC-5 - Challans */}
-            <div
+            {shouldShow("cc-5") && (
+<div
               className={`metric-card ${cardClass("cc-5", "challans")}`}
               onClick={canSelect ? () => handleSelect("cc-5") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -408,15 +414,15 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                 </div>
               </div>
             </div>
-
+            )}
           </div>
         </div>
 
         {/* Charts Section */}
         <div className="charts-section">
-
           {/* CC-6 */}
-          <div
+          {shouldShow("cc-6") && (
+  <div
             className={`chart-card ${cardClass("cc-6")}`}
             onClick={canSelect ? () => handleSelect("cc-6") : undefined}
             style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -436,9 +442,10 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
               height={350}
             />
           </div>
-
+          )}
           {/* CC-7 */}
-          <div
+          {shouldShow("cc-7") && (
+  <div
             className={`chart-card ${cardClass("cc-7")}`}
             onClick={canSelect ? () => handleSelect("cc-7") : undefined}
             style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -458,12 +465,13 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
               height={400}
             />
           </div>
-
+          )}
         </div>
 
         {/* CC-8 - Performers Section */}
         {/* -------------------- CC-8 CLIENT PERFORMANCE OVERVIEW -------------------- */}
-        <div
+        {shouldShow("cc-8") && (
+ <div
           className={`performers-section ${cardClass("cc-8")}`}
           onClick={canSelect ? () => handleSelect("cc-8") : undefined}
           style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -613,9 +621,10 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
           )}
 
         </div>
-
+        )}
         {/* CC-9 Analytics Summary */}
-        <div
+        {shouldShow("cc-9") && (
+ <div
           className={`analytics-section ${cardClass("cc-9")}`}
           onClick={canSelect ? () => handleSelect("cc-9") : undefined}
           style={{ cursor: canSelect ? "pointer" : "default" }}
@@ -636,7 +645,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
             {/* CC-10 */}
             <div
               className={`analytics-item ${cardClass("cc-10")}`}
-              onClick={canSelect ? () => handleSelect("cc-10") : undefined}
+              onClick={canSelect ? () => handleSelect("") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
             >
               <div className="analytics-icon">🎯</div>
@@ -647,8 +656,8 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                   <input
                     type="checkbox"
                     className="chart-select-checkbox"
-                    onChange={() => handleSelect("cc-10")}
-                    checked={selectedCharts.includes("cc-10")}
+                    onChange={() => handleSelect("")}
+                    checked={selectedCharts.includes("")}
                   />
                 )}
 
@@ -670,7 +679,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
             {/* CC-11 */}
             <div
               className={`analytics-item ${cardClass("cc-11")}`}
-              onClick={canSelect ? () => handleSelect("cc-11") : undefined}
+              onClick={canSelect ? () => handleSelect("") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
             >
               <div className="analytics-icon">⚠️</div>
@@ -681,8 +690,8 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                   <input
                     type="checkbox"
                     className="chart-select-checkbox"
-                    onChange={() => handleSelect("cc-11")}
-                    checked={selectedCharts.includes("cc-11")}
+                    onChange={() => handleSelect("")}
+                    checked={selectedCharts.includes("")}
                   />
                 )}
 
@@ -697,7 +706,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
             {/* CC-12 */}
             <div
               className={`analytics-item ${cardClass("cc-12")}`}
-              onClick={canSelect ? () => handleSelect("cc-12") : undefined}
+              onClick={canSelect ? () => handleSelect("") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
             >
               <div className="analytics-icon">📈</div>
@@ -708,8 +717,8 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                   <input
                     type="checkbox"
                     className="chart-select-checkbox"
-                    onChange={() => handleSelect("cc-12")}
-                    checked={selectedCharts.includes("cc-12")}
+                    onChange={() => handleSelect("")}
+                    checked={selectedCharts.includes("")}
                   />
                 )}
 
@@ -722,7 +731,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
             {/* CC-13 */}
             <div
               className={`analytics-item ${cardClass("cc-13")}`}
-              onClick={canSelect ? () => handleSelect("cc-13") : undefined}
+              onClick={canSelect ? () => handleSelect("") : undefined}
               style={{ cursor: canSelect ? "pointer" : "default" }}
             >
               <div className="analytics-icon">🔍</div>
@@ -733,8 +742,8 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
                   <input
                     type="checkbox"
                     className="chart-select-checkbox"
-                    onChange={() => handleSelect("cc-13")}
-                    checked={selectedCharts.includes("cc-13")}
+                    onChange={() => handleSelect("")}
+                    checked={selectedCharts.includes("")}
                   />
                 )}
 
@@ -745,6 +754,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current }) 
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

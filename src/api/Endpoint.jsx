@@ -209,6 +209,12 @@ export const GET_ASSIGNED_INDIVIDUALS_LIST ='/api/v1/dashboard/view/general/help
 export const GET_DOCUMENTS_PENDING_FROM ='/api/v1/dashboard/view/general/helpdesk/documents/pending/from';
 export const GET_ISSUE_CATEGORY_BY_STATUS ='/api/v1/dashboard/view/general/helpdesk/status/based/issue/category';
 
+// Dashboard Widget Mappings
+export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
+export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';
+export const DELETE_WIDGET_MAPPING_BY_ID ='/api/v1/widget-mapping/delete?user_id=';
+export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget-mapping/get?user_id=';
+
 
 
 

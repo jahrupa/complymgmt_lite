@@ -14,12 +14,14 @@ import DashboardDrawerGrid from "../DashboardDrawer";
 import { ArrowUpRight, X } from "lucide-react";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
+import MenuPopup from "../../component/MenuPopup";
 
 const NoticeDashboard = ({
     selectedCompany,
     current,
     selectedCharts,
     setSelectedCharts,
+    shouldShow,
 }) => {
     const [NoticeDistributionByAuthority, setNoticeDistributionByAuthority] =
         React.useState([]);
@@ -735,6 +737,7 @@ const NoticeDashboard = ({
     const handleSelect = (id) => {
         if (canSelect) toggleChartSelection(id);
     };
+
     return (
         <div>
             <Snackbars
@@ -742,363 +745,431 @@ const NoticeDashboard = ({
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <div className="charts-grid mb-4">
-                <div className={`chart-card ${cardClass("ni-1") ? "selected-card" : ""
-                    }`}
-                    onClick={canSelect ? () => handleSelect("ni-1") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}>
+                {shouldShow("ni-1") && (
                     <div
-                        className="d-flex justify-content-end align-items-center"
-
+                        className={`chart-card ${cardClass("ni-1") ? "selected-card" : ""}`}
+                        onClick={canSelect ? () => handleSelect("ni-1") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
                     >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-2")}
-                            checked={selectedCharts.includes("ni-2")}
-                            disabled={!current?.user_name}
+                        <div className="d-flex justify-content-end align-items-center">
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-1")}
+                                checked={selectedCharts.includes("ni-1")}
+                                disabled={!current?.user_name}
+                            />
+
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsSnackbarsOpen({
+                                        ...issnackbarsOpen,
+                                        open: true,
+                                        message: "No Data available",
+                                        severityType: "info",
+                                    });
+                                }}
+                            >
+                                <ArrowUpRight />
+                            </div>
+                        </div>
+
+                        <div className="mb-3 fw-600">
+                            Distribution of notices across different authorities...
+                        </div>
+
+                        <Chart
+                            options={NoticeDistributionByAuthorityFormat.options}
+                            series={NoticeDistributionByAuthorityFormat.series}
+                            type="bar"
+                            height={380}
                         />
+                    </div>
+                )}
+
+
+                {shouldShow("ni-2") && (
+                    <div
+                        className={`chart-card ${cardClass("ni-2") ? "selected-card" : ""
+                            }`}
+                        onClick={canSelect ? () => handleSelect("ni-2") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                    >
                         <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();   // prevent parent click from firing
-                                setIsSnackbarsOpen({
-                                    ...issnackbarsOpen,
-                                    open: true,
-                                    message: "No Data available",
-                                    severityType: "info",
-                                });
-                            }}
+                            className="d-flex justify-content-end align-items-center"
 
                         >
-                            <ArrowUpRight />
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-2")}
+                                checked={selectedCharts.includes("ni-2")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "right",
+                                        "Number of notices assigned...",
+                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts,
+                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
+                                            (item) => item.assigned_to
+                                        )
+                                    );
+                                }}
+                            >
+                                <ArrowUpRight />
+                            </div>
                         </div>
-                    </div>
-                    <div className="mb-3 fw-600">
-                        Distribution of notices across different authorities to identify
-                        which regulatory bodies are most active.
-                    </div>
-                    <Chart
-                        options={NoticeDistributionByAuthorityFormat.options}
-                        series={NoticeDistributionByAuthorityFormat.series}
-                        type="bar"
-                        height={380}
-                    />
-                </div>
-
-                <div
-                    className={`chart-card ${cardClass("ni-2") ? "selected-card" : ""
-                        }`}
-                    onClick={canSelect ? () => handleSelect("ni-2") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}
-                >
-                    <div
-                        className="d-flex justify-content-end align-items-center"
-
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-2")}
-                            checked={selectedCharts.includes("ni-2")}
-                            disabled={!current?.user_name}
+                        <div className="mb-3 fw-600">
+                            Top 5 State-wise notice count comparison to highlight regional
+                            compliance activity.
+                        </div>
+                        <Chart
+                            options={stateWiseNoticeCountFormat.options}
+                            series={stateWiseNoticeCountFormat.series}
+                            type="bar"
+                            height={380}
                         />
-                        <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenDrawer(
-                                    "right",
-                                    "Number of notices assigned...",
-                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts,
-                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
-                                        (item) => item.assigned_to
-                                    )
-                                );
-                            }}
-                        >
-                            <ArrowUpRight />
-                        </div>
                     </div>
-                    <div className="mb-3 fw-600">
-                        Top 5 State-wise notice count comparison to highlight regional
-                        compliance activity.
-                    </div>
-                    <Chart
-                        options={stateWiseNoticeCountFormat.options}
-                        series={stateWiseNoticeCountFormat.series}
-                        type="bar"
-                        height={380}
-                    />
-                </div>
+                )}
+
             </div>
 
             <div className="charts-grid mb-4">
-                <div className={`chart-card ${cardClass("ni-3") ? "selected-card" : ""
-                    }`}
-                    onClick={canSelect ? () => handleSelect("ni-3") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}>
-                    <div
-                        className="d-flex justify-content-end align-items-center"
-
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-3")}
-                            checked={selectedCharts.includes("ni-3")}
-                            disabled={!current?.user_name}
-                        />
-                        <div
-                            className="dashboard-icon ms-2"
-                            oonClick={(e) => {
-                                e.stopPropagation();   // prevent parent click from firing
-                                setIsSnackbarsOpen({
-                                    ...issnackbarsOpen,
-                                    open: true,
-                                    message: "No Data available",
-                                    severityType: "info",
-                                });
-                            }}
-                        >
-                            <ArrowUpRight />
-                        </div>
-                    </div>
-                    <div className="mb-3 fw-600">
-                        Breakdown of notice types to show the most common compliance actions
-                    </div>
-                    <Chart
-                        options={noticeTypeBreakdownFormat.options}
-                        series={noticeTypeBreakdownFormat.series}
-                        type="donut"
-                        height={380}
-                    />
-                </div>
-
-                <div
-                    className={`chart-card ${cardClass("ni-4") ? "selected-card" : ""
+                {shouldShow("ni-3") && (
+                    <div className={`chart-card ${cardClass("ni-3") ? "selected-card" : ""
                         }`}
-                    onClick={canSelect ? () => handleSelect("ni-4") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}
-                >
-                    <div
-                        className="d-flex justify-content-end align-items-center"
-
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-4")}
-                            checked={selectedCharts.includes("ni-4")}
-                            disabled={!current?.user_name}
-                        />
+                        onClick={canSelect ? () => handleSelect("ni-3") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}>
                         <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenDrawer(
-                                    "left",
-                                    "Analysis of applicable acts to reveal legal focus areas",
-                                    ApplicableActsAnalysis?.rest_counts,
-                                    ApplicableActsAnalysis?.rest_counts?.map(
-                                        (item) => item.applicable_act
-                                    )
-                                )
-                            }}
+                            className="d-flex justify-content-end align-items-center"
+
                         >
-                            <ArrowUpRight />
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-3")}
+                                checked={selectedCharts.includes("ni-3")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                oonClick={(e) => {
+                                    e.stopPropagation();   // prevent parent click from firing
+                                    setIsSnackbarsOpen({
+                                        ...issnackbarsOpen,
+                                        open: true,
+                                        message: "No Data available",
+                                        severityType: "info",
+                                    });
+                                }}
+                            >
+                                <ArrowUpRight />
+                            </div>
                         </div>
+                        <div className="mb-3 fw-600">
+                            Breakdown of notice types to show the most common compliance actions
+                        </div>
+                        <Chart
+                            options={noticeTypeBreakdownFormat.options}
+                            series={noticeTypeBreakdownFormat.series}
+                            type="donut"
+                            height={380}
+                        />
                     </div>
-                    <div className="mb-3 fw-600">
-                        Top 5 Analysis of applicable acts to reveal legal focus areas
+
+                )}
+
+                {shouldShow("ni-4") && (
+                    <div
+                        className={`chart-card ${cardClass("ni-4") ? "selected-card" : ""
+                            }`}
+                        onClick={canSelect ? () => handleSelect("ni-4") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                    >
+                        <div
+                            className="d-flex justify-content-end align-items-center"
+
+                        >
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-4")}
+                                checked={selectedCharts.includes("ni-4")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "left",
+                                        "Analysis of applicable acts to reveal legal focus areas",
+                                        ApplicableActsAnalysis?.rest_counts,
+                                        ApplicableActsAnalysis?.rest_counts?.map(
+                                            (item) => item.applicable_act
+                                        )
+                                    )
+                                }}
+                            >
+                                <ArrowUpRight />
+                            </div>
+                        </div>
+                        <div className="mb-3 fw-600">
+                            Top 5 Analysis of applicable acts to reveal legal focus areas
+                        </div>
+                        <Chart
+                            options={ApplicableActsAnalysisFormat.options}
+                            series={ApplicableActsAnalysisFormat.series}
+                            type="bar"
+                            height={380}
+                        />
                     </div>
-                    <Chart
-                        options={ApplicableActsAnalysisFormat.options}
-                        series={ApplicableActsAnalysisFormat.series}
-                        type="bar"
-                        height={380}
-                    />
-                </div>
+
+                )}
+
             </div>
 
             <div className="charts-grid mb-4">
-                <div
-                    className={`chart-card ${cardClass("ni-5") ? "selected-card" : ""
-                        }`}
-                    onClick={canSelect ? () => handleSelect("ni-5") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}
-                >
+                {shouldShow("ni-5") && (
                     <div
-                        className="d-flex justify-content-end align-items-center"
-
+                        className={`chart-card ${cardClass("ni-5") ? "selected-card" : ""
+                            }`}
+                        onClick={canSelect ? () => handleSelect("ni-5") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
                     >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-5")}
-                            checked={selectedCharts.includes("ni-5")}
-                            disabled={!current?.user_name}
-                        />
                         <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenDrawer(
-                                    "right",
-                                    "Number of notices assigned to each team member to assess workload distribution",
-                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts,
-                                    numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
-                                        (item) => item.assigned_to
-                                    )
-                                )
-                            }
+                            className="d-flex justify-content-end align-items-center"
 
-                            }
                         >
-                            <ArrowUpRight />
-                        </div>
-                    </div>
-                    <div className="mb-3 fw-600">
-                        Top 5 Number of notices assigned to each team member to assess
-                        workload distribution
-                    </div>
-                    <Chart
-                        options={numberOfNoticesAssignedToEachTeamMemberFormat.options}
-                        series={numberOfNoticesAssignedToEachTeamMemberFormat.series}
-                        type="bar"
-                        height={380}
-                    />
-                </div>
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-5")}
+                                checked={selectedCharts.includes("ni-5")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "right",
+                                        "Number of notices assigned to each team member to assess workload distribution",
+                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts,
+                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
+                                            (item) => item.assigned_to
+                                        )
+                                    )
+                                }
 
-                <div
-                    className={`chart-card ${cardClass("ni-6") ? "selected-card" : ""
-                        }`}
-                    onClick={canSelect ? () => handleSelect("ni-6") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}
-                >
+                                }
+                            >
+                                <ArrowUpRight />
+                            </div>
+                        </div>
+                        <div className="mb-3 fw-600">
+                            Top 5 Number of notices assigned to each team member to assess
+                            workload distribution
+                        </div>
+                        <Chart
+                            options={numberOfNoticesAssignedToEachTeamMemberFormat.options}
+                            series={numberOfNoticesAssignedToEachTeamMemberFormat.series}
+                            type="bar"
+                            height={380}
+                        />
+                    </div>
+                )}
+                {shouldShow("ni-6") && (
                     <div
-                        className="d-flex justify-content-end align-items-center"
-
+                        className={`chart-card ${cardClass("ni-6") ? "selected-card" : ""
+                            }`}
+                        onClick={canSelect ? () => handleSelect("ni-6") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}
                     >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-6")}
-                            checked={selectedCharts.includes("ni-6")}
-                            disabled={!current?.user_name}
-                        />
                         <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenDrawer(
-                                    "right",
-                                    "Comparison of acknowledgement rates by different individuals to evaluate responsiveness",
-                                    countOfAcknowledgmentRates?.rest_counts,
-                                    countOfAcknowledgmentRates?.rest_counts?.map(
-                                        (item) => item.acknowledged_by
-                                    )
-                                )
-                            }
+                            className="d-flex justify-content-end align-items-center"
 
-                            }
                         >
-                            <ArrowUpRight />
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-6")}
+                                checked={selectedCharts.includes("ni-6")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "right",
+                                        "Comparison of acknowledgement rates by different individuals to evaluate responsiveness",
+                                        countOfAcknowledgmentRates?.rest_counts,
+                                        countOfAcknowledgmentRates?.rest_counts?.map(
+                                            (item) => item.acknowledged_by
+                                        )
+                                    )
+                                }
+
+                                }
+                            >
+                                <ArrowUpRight />
+                            </div> <div
+                                className={`chart-card ${cardClass("ni-6") ? "selected-card" : ""
+                                    }`}
+                                onClick={canSelect ? () => handleSelect("ni-6") : undefined}
+                                style={{ cursor: canSelect ? "pointer" : "default" }}
+                            >
+                                <div
+                                    className="d-flex justify-content-end align-items-center"
+
+                                >
+                                    <input
+                                        type="checkbox"
+                                        className="chart-select-checkbox"
+                                        onChange={() => toggleChartSelection("ni-6")}
+                                        checked={selectedCharts.includes("ni-6")}
+                                        disabled={!current?.user_name}
+                                    />
+                                    <div
+                                        className="dashboard-icon ms-2"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleOpenDrawer(
+                                                "right",
+                                                "Comparison of acknowledgement rates by different individuals to evaluate responsiveness",
+                                                countOfAcknowledgmentRates?.rest_counts,
+                                                countOfAcknowledgmentRates?.rest_counts?.map(
+                                                    (item) => item.acknowledged_by
+                                                )
+                                            )
+                                        }
+
+                                        }
+                                    >
+                                        <ArrowUpRight />
+                                    </div>
+                                </div>
+                                <div className="mb-3 fw-600">
+                                    Top 5 comparison of acknowledgement rates by different individuals
+                                    to evaluate responsiveness.
+                                </div>
+                                <Chart
+                                    options={countOfAcknowledgmentRatesFormat.options}
+                                    series={countOfAcknowledgmentRatesFormat.series}
+                                    type="bar"
+                                    height={380}
+                                />
+                            </div>
                         </div>
+                        <div className="mb-3 fw-600">
+                            Top 5 comparison of acknowledgement rates by different individuals
+                            to evaluate responsiveness.
+                        </div>
+                        <Chart
+                            options={countOfAcknowledgmentRatesFormat.options}
+                            series={countOfAcknowledgmentRatesFormat.series}
+                            type="bar"
+                            height={380}
+                        />
                     </div>
-                    <div className="mb-3 fw-600">
-                        Top 5 comparison of acknowledgement rates by different individuals
-                        to evaluate responsiveness.
-                    </div>
-                    <Chart
-                        options={countOfAcknowledgmentRatesFormat.options}
-                        series={countOfAcknowledgmentRatesFormat.series}
-                        type="bar"
-                        height={380}
-                    />
-                </div>
+                )}
+
+
             </div>
             <div className="charts-grid mb-4">
-                <div className={`chart-card ${cardClass("ni-7") ? "selected-card" : ""
-                    }`}
-                    onClick={canSelect ? () => handleSelect("ni-7") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}>
-                    <div
-                        className="d-flex justify-content-end align-items-center"
-
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-7")}
-                            checked={selectedCharts.includes("ni-7")}
-                            disabled={!current?.user_name}
-                        />
+                {shouldShow("ni-7") && (
+                    <div className={`chart-card ${cardClass("ni-7") ? "selected-card" : ""
+                        }`}
+                        onClick={canSelect ? () => handleSelect("ni-7") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}>
                         <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();   // prevent parent click from firing
-                                setIsSnackbarsOpen({
-                                    ...issnackbarsOpen,
-                                    open: true,
-                                    message: "No Data available",
-                                    severityType: "info",
-                                });
-                            }}
-                        >
-                            <ArrowUpRight />
-                        </div>
-                    </div>
-                    <div className="mb-3 fw-600">
-                        Distribution of response status to track resolution progress
-                    </div>
-                    <Chart
-                        options={distributionOfResponseStatusFormat.options}
-                        series={distributionOfResponseStatusFormat.series}
-                        type="donut"
-                        height={380}
-                    />
-                </div>
-                <div c className={`chart-card ${cardClass("ni-8") ? "selected-card" : ""
-                    }`}
-                    onClick={canSelect ? () => handleSelect("ni-8") : undefined}
-                    style={{ cursor: canSelect ? "pointer" : "default" }}>
-                    <div
-                        className="d-flex justify-content-end align-items-center"
+                            className="d-flex justify-content-end align-items-center"
 
-                    >
-                        <input
-                            type="checkbox"
-                            className="chart-select-checkbox"
-                            onChange={() => toggleChartSelection("ni-8")}
-                            checked={selectedCharts.includes("ni-8")}
-                            disabled={!current?.user_name}
-                        />
-                        <div
-                            className="dashboard-icon ms-2"
-                            onClick={(e) => {
-                                e.stopPropagation();   // prevent parent click from firing
-                                setIsSnackbarsOpen({
-                                    ...issnackbarsOpen,
-                                    open: true,
-                                    message: "No Data available",
-                                    severityType: "info",
-                                });
-                            }}
                         >
-                            <ArrowUpRight />
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-7")}
+                                checked={selectedCharts.includes("ni-7")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();   // prevent parent click from firing
+                                    setIsSnackbarsOpen({
+                                        ...issnackbarsOpen,
+                                        open: true,
+                                        message: "No Data available",
+                                        severityType: "info",
+                                    });
+                                }}
+                            >
+                                <ArrowUpRight />
+                            </div>
                         </div>
+                        <div className="mb-3 fw-600">
+                            Distribution of response status to track resolution progress
+                        </div>
+                        <Chart
+                            options={distributionOfResponseStatusFormat.options}
+                            series={distributionOfResponseStatusFormat.series}
+                            type="donut"
+                            height={380}
+                        />
                     </div>
-                    <div className="mb-3 fw-600">
-                        Proportion of notices with client document submission (Y/N) to
-                        measure client engagement.
+                )}
+                {shouldShow("ni-8") && (
+                    <div className={`chart-card ${cardClass("ni-8") ? "selected-card" : ""
+                        }`}
+                        onClick={canSelect ? () => handleSelect("ni-8") : undefined}
+                        style={{ cursor: canSelect ? "pointer" : "default" }}>
+                        <div
+                            className="d-flex justify-content-end align-items-center"
+
+                        >
+                            <input
+                                type="checkbox"
+                                className="chart-select-checkbox"
+                                onChange={() => toggleChartSelection("ni-8")}
+                                checked={selectedCharts.includes("ni-8")}
+                                disabled={!current?.user_name}
+                            />
+                            <div
+                                className="dashboard-icon ms-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();   // prevent parent click from firing
+                                    setIsSnackbarsOpen({
+                                        ...issnackbarsOpen,
+                                        open: true,
+                                        message: "No Data available",
+                                        severityType: "info",
+                                    });
+                                }}
+                            >
+                                <ArrowUpRight />
+                            </div>
+                        </div>
+                        <div className="mb-3 fw-600">
+                            Proportion of notices with client document submission (Y/N) to
+                            measure client engagement.
+                        </div>
+                        <Chart
+                            options={clientDocumentSubmissionFormat.options}
+                            series={clientDocumentSubmissionFormat.series}
+                            type="donut"
+                            height={380}
+                        />
                     </div>
-                    <Chart
-                        options={clientDocumentSubmissionFormat.options}
-                        series={clientDocumentSubmissionFormat.series}
-                        type="donut"
-                        height={380}
-                    />
-                </div>
+                )}
+
             </div>
             <DashboardDrawerGrid
                 anchor={drawerAnchor}

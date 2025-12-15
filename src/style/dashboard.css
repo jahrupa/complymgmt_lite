@@ -147,7 +147,7 @@
         scrollbar-width: none;
     }
 
-    .dashbord-user-access-btn::-webkit-scrollbar {
+    /* .dashbord-user-access-btn::-webkit-scrollbar {
         display: none;
-    }
+    } */
 }

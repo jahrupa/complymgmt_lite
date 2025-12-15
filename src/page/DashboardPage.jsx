@@ -17,29 +17,37 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
   const [current, setCurrent] = useState({});
   const [allUser, setAllUser] = useState([]);
-  useEffect(() => {
-    const fetchCockpitData = async () => {
-      const [cockpitByCompanyRes, allUser] = await Promise.allSettled([
-        // pass selectedCompany state
-        fetchAllCompanies(),
-        fetchAllUser(),
-      ]);
+ useEffect(() => {
+  const fetchCockpitData = async () => {
+    const [cockpitByCompanyRes, allUserRes] = await Promise.allSettled([
+      fetchAllCompanies(),
+      fetchAllUser(),
+    ]);
 
-      if (cockpitByCompanyRes.status === "fulfilled") {
-        setCompanyName(cockpitByCompanyRes.value);
-      } else {
-        console.warn("fetchAll cockpit failed:", cockpitByCompanyRes.reason);
-        setCompanyName(cockpitByCompanyRes.reason?.status || []);
-      }
-      if (allUser.status === "fulfilled") {
-        setAllUser(allUser.value);
-      } else {
-        console.warn("fetchAll cockpit failed:", allUser.reason);
-        setAllUser(allUser.reason?.status || []);
-      }
-    };
-    fetchCockpitData();
-  }, []);
+    // -------------------------
+    // SAFE COMPANY RESPONSE
+    // -------------------------
+    if (cockpitByCompanyRes.status === "fulfilled" && Array.isArray(cockpitByCompanyRes.value)) {
+      setCompanyName(cockpitByCompanyRes.value);
+    } else {
+      console.warn("fetchAll Companies failed:", cockpitByCompanyRes.reason);
+      setCompanyName([]); // ALWAYS SET EMPTY ARRAY ON FAIL
+    }
+
+    // -------------------------
+    // SAFE USER RESPONSE
+    // -------------------------
+    if (allUserRes.status === "fulfilled" && Array.isArray(allUserRes.value)) {
+      setAllUser(allUserRes.value);
+    } else {
+      console.warn("fetchAll Users failed:", allUserRes.reason);
+      setAllUser([]); // ALWAYS SET EMPTY ARRAY ON FAIL
+    }
+  };
+
+  fetchCockpitData();
+}, []);
+
   return (
     <div>
       <div className="dashboard-header-card dashboard-page-title justify-content-between d-lg-flex d-md-flex">
@@ -51,27 +59,27 @@ const DashboardPage = () => {
             {activeTab === 0
               ? "Compliance Cockpit"
               : activeTab === 1
-              ? "General Compliance"
-              : activeTab === 2
-              ? "Client Onboarding"
-              : activeTab === 3
-              ? "Payroll"
-              : activeTab === 4
-              ? "Payroll - Returns & Submissions"
-              : activeTab === 5
-              ? "Payroll - Helpdesk & Escalations"
-              : activeTab === 6
-              ? "Payroll - General Helpdesk"
-              : activeTab === 7
-              ? "Audit & Visits"
-              : activeTab === 8
-              ? "Notices & Inspections"
-              : ""}
+                ? "General Compliance"
+                : activeTab === 2
+                  ? "Client Onboarding"
+                  : activeTab === 3
+                    ? "Payroll"
+                    : activeTab === 4
+                      ? "Payroll - Returns & Submissions"
+                      : activeTab === 5
+                        ? "Payroll - Helpdesk & Escalations"
+                        : activeTab === 6
+                          ? "Payroll - General Helpdesk"
+                          : activeTab === 7
+                            ? "Audit & Visits"
+                            : activeTab === 8
+                              ? "Notices & Inspections"
+                              : ""}
           </div>
         </div>
         <div className="d-lg-flex d-md-flex justify-content-between"
         >
-          <div className="me-1 ms-1" style={{width:'250px'}}>
+          <div className="me-1 ms-1" style={{ width: '250px' }}>
             <SingleSelectTextField
               name="company_name"
               label="Company Name"
@@ -85,28 +93,28 @@ const DashboardPage = () => {
               }))}
             />
           </div>
-            <div className="me-1 ms-1" style={{width:'250px'}}>
-              <SingleSelectTextField
-                name="user_name"
-                label="Choose a user to create a widget"
-                value={current.user_name}
-                onChange={(e) => {
-                  const selectedName = e.target.value;
-                  const matchedUser = allUser.find(
-                    (item) => item.full_name === selectedName
-                  );
-                  setCurrent((prev) => ({
-                    ...prev,
-                    user_name: selectedName,
-                    user_id: matchedUser?._id || null,
-                  }));
-                }}
-                names={allUser.map((item) => ({
-                  _id: item._id,
-                  name: item.full_name,
-                }))}
-              />
-            </div>
+          <div className="me-1 ms-1" style={{ width: '250px' }}>
+            <SingleSelectTextField
+              name="user_name"
+              label="Choose a user to create a widget"
+              value={current.user_name}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+                const matchedUser = allUser.find(
+                  (item) => item.full_name === selectedName
+                );
+                setCurrent((prev) => ({
+                  ...prev,
+                  user_name: selectedName,
+                  user_id: matchedUser?._id || null,
+                }));
+              }}
+              names={allUser?.map((item) => ({
+                _id: item._id,
+                name: item.full_name,
+              }))}
+            />
+          </div>
         </div>
       </div>
 

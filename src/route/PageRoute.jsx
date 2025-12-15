@@ -44,6 +44,7 @@ import ForgetPassword from '../page/ForgetPassword.jsx';
 import ChangeForgetPassword from '../page/ChangeForgetPassword.jsx';
 import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful.jsx';
 import NotificationMainPage from '../component/notification/NotificationMainPage.jsx';
+import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -71,95 +72,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
       setIsAuthenticated(false)
     }
   }, [tokenId])
-  // useEffect(() => {
-  //   const tabId = Date.now().toString();
-  //   const activeTabsKey = 'activeTabs';
-  //  console.log(activeTabsKey,'activeTabsKey')
-  //   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-  //   tabs.push(tabId);
-  //   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
-
-  //   // Set session active
-  //   sessionStorage.setItem('browserSessionActive', 'true');
-
-  //   // ✅ Check token & session to set auth
-  //   const token = localStorage.getItem('token');
-  //   const sessionActive = sessionStorage.getItem('browserSessionActive');
-
-  //   if (token && sessionActive === 'true') {
-  //     setIsAuthenticated(true);
-  //   }
-
-  //   const cleanup = () => {
-  //     let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-  //     tabs = tabs.filter(id => id !== tabId);
-  //     localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
-
-  //     const isSessionStillActive = sessionStorage.getItem('browserSessionActive');
-
-  //     if (tabs.length === 0 && !isSessionStillActive) {
-  //       localStorage.removeItem('token');
-  //     }
-  //   };
-
-  //   window.addEventListener('beforeunload', cleanup);
-
-  //   return () => {
-  //     window.removeEventListener('beforeunload', cleanup);
-  //     cleanup();
-  //   };
-  // }, []);
-
-
-  // 2nd ---------------------------------------------------------------
-  // useEffect(() => {
-  //   const tabId = Date.now().toString();
-  //   const activeTabsKey = 'activeTabs';
-
-  //   // Add this tab to activeTabs
-  //   let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-  //   tabs.push(tabId);
-  //   localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
-
-  //   sessionStorage.setItem('browserSessionActive', 'true');
-
-  //   const token = localStorage.getItem('token');
-  //   const sessionActive = sessionStorage.getItem('browserSessionActive');
-
-  //   if (token && sessionActive === 'true') {
-  //     setIsAuthenticated(true);
-  //   }
-
-  //   const cleanup = () => {
-  //     let tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-  //     tabs = tabs.filter(id => id !== tabId);
-  //     localStorage.setItem(activeTabsKey, JSON.stringify(tabs));
-  //   };
-
-  //   // 👇 Handle cleanup on unload
-  //   window.addEventListener('beforeunload', cleanup);
-
-  //   // 👇 Listen for changes in localStorage
-  //   const onStorage = (event) => {
-  //     if (event.key === activeTabsKey) {
-  //       const tabs = JSON.parse(localStorage.getItem(activeTabsKey)) || [];
-  //       const sessionActive = sessionStorage.getItem('browserSessionActive');
-
-  //       // Token clear only if NO tabs left and this tab also has no session
-  //       if (tabs.length === 0 && !sessionActive) {
-  //         localStorage.removeItem('token');
-  //       }
-  //     }
-  //   };
-
-  //   window.addEventListener('storage', onStorage);
-
-  //   return () => {
-  //     window.removeEventListener('beforeunload', cleanup);
-  //     window.removeEventListener('storage', onStorage);
-  //     cleanup();
-  //   };
-  // }, []);
+  
   const pageActiveRoute = localStorage.getItem('active_url')
   return (
     <>
@@ -197,6 +110,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             activePage={activePage}
           />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/widget_mappings" element={<WidgetMappings />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
             <Route path="/add_user" element={<AddUser />} />
             <Route path="/company" element={<Company />} />
@@ -233,8 +147,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
               <Route path="template_list" element={<NotificationList />} />
               <Route path="create_notification" element={<CreateNotification />} />
             </Route>
-            {/* notification sub-routes end*/}
 
+            {/* notification sub-routes end*/}
             <Route path="/details/:seriesName/:year" element={<DetailsPage />} />
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
@@ -247,7 +161,6 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
         <Route path="/reset_password" element={<ChangeForgetPassword setIsChangePassword={setIsChangePassword} />} />
         <Route path="/forget_password" element={<ForgetPassword />} />
         <Route path="/reset_password_successful" element={<ResetForgetPasswordSuccessful />} />
-
       </Routes>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
     </>

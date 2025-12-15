@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
@@ -21,7 +21,9 @@ import { decryptData } from "../../page/utils/encrypt";
 ModuleRegistry.registerModules([AllCommunityModule]);
 const HelpdeskAndEscalations = ({ selectedCompany, current,
   selectedCharts,
-  setSelectedCharts, }) => {
+  setSelectedCharts,
+  shouldShow,
+}) => {
   const [closedVsOpenCases, setCloseVsOpenCases] = React.useState([]);
   const closeVsOpenIssueFormat = {
     series: [
@@ -566,8 +568,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     message: "",
     severityType: "",
   });
-
-
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
@@ -581,40 +581,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     setChartXaxisCategory(chartXaxisCategory);
   };
 
-  const columnDefs = useMemo(
-    () => [
-      {
-        headerName: "percentage of claims that have been settled",
-        field: "settled",
-        sortable: true,
-        filter: true,
-        flex: "1",
-      },
-      {
-        headerName: "percentage of claims that are still pending",
-        field: "pending",
-        sortable: true,
-        filter: true,
-        flex: "1",
-      },
-    ],
-    []
-  );
-  const oldClaimData = [
-    {
-      settled: 2053,
-      pending: 1,
-    },
-    {
-      settled: 528,
-      pending: 1,
-    },
-    {
-      settled: 401,
-      pending: 2,
-    },
-  ];
-    const userRole = decryptData(localStorage.getItem("user_role"));
+  const userRole = decryptData(localStorage.getItem("user_role"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -740,316 +707,329 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         setIsSnackbarsOpen={setIsSnackbarsOpen}
       />
       <div className="charts-grid mb-4">
-        <div
-          className={`chart-card ${cardClass("he-1") ? "selected-card" : ""
-            }`}
-          onClick={canSelect ? () => handleSelect("he-1") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
+        {shouldShow("he-1") && (
           <div
-            className="d-flex justify-content-end align-items-center"
-
+            className={`chart-card ${cardClass("he-1") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("he-1") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-1")}
-              checked={selectedCharts.includes("he-1")}
-              disabled={!current?.user_name}
-            />
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                handleOpenDrawer(
-                  "right",
-                  "Proportion of cases pending from department vs. pending from client for selected Issue Sub-Types in PF_ESIC_Helpdesk",
-                  ProportionOfCases?.rest_count,
-                  ProportionOfCases?.rest_count?.map(
-                    (item) => item.pending_from
-                  )
-                )
-              }
+              className="d-flex justify-content-end align-items-center"
 
-              }
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-1")}
+                checked={selectedCharts.includes("he-1")}
+                disabled={!current?.user_name}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  handleOpenDrawer(
+                    "right",
+                    "Proportion of cases pending from department vs. pending from client for selected Issue Sub-Types in PF_ESIC_Helpdesk",
+                    ProportionOfCases?.rest_count,
+                    ProportionOfCases?.rest_count?.map(
+                      (item) => item.pending_from
+                    )
+                  )
+                }
+
+                }
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Top 5 Proportion of cases pending from department vs. pending from
+              client for selected Issue Sub-Types in PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={ProportionOfCasesFormat.options}
+              series={ProportionOfCasesFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Top 5 Proportion of cases pending from department vs. pending from
-            client for selected Issue Sub-Types in PF_ESIC_Helpdesk
-          </div>
-          <Chart
-            options={ProportionOfCasesFormat.options}
-            series={ProportionOfCasesFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
-        <div
-          className={`chart-card ${cardClass("he-2") ? "selected-card" : ""
-            }`}
-          onClick={canSelect ? () => handleSelect("he-2") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
+        )}
+        {shouldShow("he-2") && (
           <div
-            className="d-flex justify-content-end align-items-center"
-
+            className={`chart-card ${cardClass("he-2") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("he-2") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-2")}
-              checked={selectedCharts.includes("he-2")}
-              disabled={!current?.user_name}
-            />
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                handleOpenDrawer(
-                  "left",
-                  "Comparison of closed vs. open cases for top 5 Issue Sub-Types in PF_ESIC_Helpdesk",
-                  closedVsOpenCases?.rest_issue_sub_type_status,
-                  closedVsOpenCases?.rest_issue_sub_type_status?.map(
-                    (item) => item.issue_sub_type
-                  )
-                )
-              }
+              className="d-flex justify-content-end align-items-center"
 
-              }
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-2")}
+                checked={selectedCharts.includes("he-2")}
+                disabled={!current?.user_name}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  handleOpenDrawer(
+                    "left",
+                    "Comparison of closed vs. open cases for top 5 Issue Sub-Types in PF_ESIC_Helpdesk",
+                    closedVsOpenCases?.rest_issue_sub_type_status,
+                    closedVsOpenCases?.rest_issue_sub_type_status?.map(
+                      (item) => item.issue_sub_type
+                    )
+                  )
+                }
+
+                }
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Top 5 Comparison of closed vs. open cases for top 5 Issue Sub-Types
+              in PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={closeVsOpenIssueFormat.options}
+              series={closeVsOpenIssueFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Top 5 Comparison of closed vs. open cases for top 5 Issue Sub-Types
-            in PF_ESIC_Helpdesk
-          </div>
-          <Chart
-            options={closeVsOpenIssueFormat.options}
-            series={closeVsOpenIssueFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
+        )}
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${cardClass("he-3") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("he-3") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+        {shouldShow("he-3") && (
+          <div className={`chart-card ${cardClass("he-3") ? "selected-card" : ""
+            }`}
+            onClick={canSelect ? () => handleSelect("he-3") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
+            <div
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
 
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-3")}
-              checked={selectedCharts.includes("he-3")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-3")}
+                checked={selectedCharts.includes("he-3")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Analysis of client delay flags for open tickets in PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={clientDelayFlagsFormat.options}
+              series={clientDelayFlagsFormat.series}
+              type="donut"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Analysis of client delay flags for open tickets in PF_ESIC_Helpdesk
-          </div>
-          <Chart
-            options={clientDelayFlagsFormat.options}
-            series={clientDelayFlagsFormat.series}
-            type="donut"
-            height={380}
-          />
-        </div>
+        )}
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${cardClass("he-4") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("he-4") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-4")}
-              checked={selectedCharts.includes("he-4")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-          <div className="mb-3 fw-600">
-            Number of tickets by Communication Type in PF_ESIC_Helpdesk
-          </div>
-          <Chart
-            options={communicationTypeFormat.options}
-            series={communicationTypeFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
-
-        <div
-          className={`chart-card ${cardClass("he-5") ? "selected-card" : ""
+        {shouldShow("he-4") && (
+          <div className={`chart-card ${cardClass("he-4") ? "selected-card" : ""
             }`}
-          onClick={canSelect ? () => handleSelect("he-5") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div
-            className="d-flex justify-content-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-5")}
-              checked={selectedCharts.includes("he-5")}
-            />
+            onClick={canSelect ? () => handleSelect("he-4") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDrawer(
-                  "left",
-                  "Companies by total helpdesk tickets raised in PF_ESIC_Helpdesk",
-                  ticketDistribution?.rest_assigned_to_counts,
-                  ticketDistribution?.rest_assigned_to_counts?.map(
-                    (item) => item.assigned_to
-                  )
-                )
-              }}
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-4")}
+                checked={selectedCharts.includes("he-4")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Number of tickets by Communication Type in PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={communicationTypeFormat.options}
+              series={communicationTypeFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Ticket distribution by Assigned To for top 5 users in
-            PF_ESIC_Helpdesk
+        )}
+        {shouldShow("he-5") && (
+          <div
+            className={`chart-card ${cardClass("he-5") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("he-5") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div
+              className="d-flex justify-content-end align-items-center"
+
+            >
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-5")}
+                checked={selectedCharts.includes("he-5")}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "left",
+                    "Companies by total helpdesk tickets raised in PF_ESIC_Helpdesk",
+                    ticketDistribution?.rest_assigned_to_counts,
+                    ticketDistribution?.rest_assigned_to_counts?.map(
+                      (item) => item.assigned_to
+                    )
+                  )
+                }}
+              >
+                <ArrowUpRight />
+              </div>
+            </div>
+            <div className="mb-3 fw-600">
+              Ticket distribution by Assigned To for top 5 users in
+              PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={ticketDistributionFormat.options}
+              series={ticketDistributionFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <Chart
-            options={ticketDistributionFormat.options}
-            series={ticketDistributionFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
+        )}
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${cardClass("he-6") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("he-6") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-6")}
-              checked={selectedCharts.includes("he-6")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-          <div className="mb-3 fw-600">
-            Ticket volume by State for PF, ESIC, and LWF categories in
-            PF_ESIC_Helpdesk
-          </div>
-          <Chart
-            options={governmentDelayFlagsFormat.options}
-            series={governmentDelayFlagsFormat.series}
-            type="donut"
-            height={380}
-          />
-        </div>
-
-        <div
-          className={`chart-card ${cardClass("he-7") ? "selected-card" : ""
+        {shouldShow("he-6") && (
+          <div className={`chart-card ${cardClass("he-6") ? "selected-card" : ""
             }`}
-          onClick={canSelect ? () => handleSelect("he-7") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div
-            className="d-flex justify-content-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("he-7")}
-              checked={selectedCharts.includes("he-7")}
-            />
+            onClick={canSelect ? () => handleSelect("he-6") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDrawer(
-                  "left",
-                  "Companies by total helpdesk tickets raised in PF_ESIC_Helpdesk",
-                  helpdeskTicketsRaisedByCompany?.rest_company_tickets_count,
-                  helpdeskTicketsRaisedByCompany?.rest_company_tickets_count?.map(
-                    (item) => item.company_name
-                  )
-                )
-              }}
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-6")}
+                checked={selectedCharts.includes("he-6")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Ticket volume by State for PF, ESIC, and LWF categories in
+              PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={governmentDelayFlagsFormat.options}
+              series={governmentDelayFlagsFormat.series}
+              type="donut"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Top 5 companies by total helpdesk tickets raised in PF_ESIC_Helpdesk
+        )}
+        {shouldShow("he-7") && (
+          <div
+            className={`chart-card ${cardClass("he-7") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("he-7") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div
+              className="d-flex justify-content-end align-items-center"
+
+            >
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("he-7")}
+                checked={selectedCharts.includes("he-7")}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "left",
+                    "Companies by total helpdesk tickets raised in PF_ESIC_Helpdesk",
+                    helpdeskTicketsRaisedByCompany?.rest_company_tickets_count,
+                    helpdeskTicketsRaisedByCompany?.rest_company_tickets_count?.map(
+                      (item) => item.company_name
+                    )
+                  )
+                }}
+              >
+                <ArrowUpRight />
+              </div>
+            </div>
+            <div className="mb-3 fw-600">
+              Top 5 companies by total helpdesk tickets raised in PF_ESIC_Helpdesk
+            </div>
+            <Chart
+              options={helpdeskTicketsRaisedByCompanyFormat.options}
+              series={helpdeskTicketsRaisedByCompanyFormat.series}
+              type="donut"
+              height={380}
+            />
           </div>
-          <Chart
-            options={helpdeskTicketsRaisedByCompanyFormat.options}
-            series={helpdeskTicketsRaisedByCompanyFormat.series}
-            type="donut"
-            height={380}
-          />
-        </div>
+        )}
+
       </div>
       <DashboardDrawerGrid
         anchor={drawerAnchor}

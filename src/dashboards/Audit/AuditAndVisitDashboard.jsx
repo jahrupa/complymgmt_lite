@@ -20,6 +20,7 @@ const AuditAndVisitDashboard = ({
   current,
   selectedCharts,
   setSelectedCharts,
+  shouldShow,
 }) => {
   const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState(
     []
@@ -595,7 +596,7 @@ const AuditAndVisitDashboard = ({
       },
     },
   };
-    const userRole = decryptData(localStorage.getItem("user_role"));
+  const userRole = decryptData(localStorage.getItem("user_role"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -729,349 +730,370 @@ const AuditAndVisitDashboard = ({
         setIsSnackbarsOpen={setIsSnackbarsOpen}
       />
       <div className="charts-grid mb-4">
-        <div
-          className={`chart-card ${cardClass("av-1") ? "selected-card" : ""
-            }`}
-          onClick={canSelect ? () => handleSelect("av-1") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
+        {shouldShow("av-1") && (
           <div
-            className="d-flex justify-content-end align-items-center"
-
+            className={`chart-card ${cardClass("av-1") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("av-1") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-1")}
-              checked={selectedCharts.includes("av-1")}
-              disabled={!current?.user_name}
-            />
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                handleOpenDrawer(
-                  "right",
-                  "Aaudit count by Service Type across all companies",
-                  AuditCountByServiceType?.rest_counts,
-                  AuditCountByServiceType?.rest_counts?.map(
-                    (item) => item.service_type
-                  )
-                )
-              }
+              className="d-flex justify-content-end align-items-center"
 
-              }
             >
-              <ArrowUpRight />
-            </div>
-          </div>
-          <div className="mb-3 fw-600">
-            Top 5 audit count by Service Type across all companies
-          </div>
-          <Chart
-            options={AuditCountByServiceTypeFormat.options}
-            series={AuditCountByServiceTypeFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-1")}
+                checked={selectedCharts.includes("av-1")}
+                disabled={!current?.user_name}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  handleOpenDrawer(
+                    "right",
+                    "Aaudit count by Service Type across all companies",
+                    AuditCountByServiceType?.rest_counts,
+                    AuditCountByServiceType?.rest_counts?.map(
+                      (item) => item.service_type
+                    )
+                  )
+                }
 
-        <div
-          className={`chart-card ${cardClass("av-2") ? "selected-card" : ""
-            }`}
-          onClick={canSelect ? () => handleSelect("av-2") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
+                }
+              >
+                <ArrowUpRight />
+              </div>
+            </div>
+            <div className="mb-3 fw-600">
+              Top 5 audit count by Service Type across all companies
+            </div>
+            <Chart
+              options={AuditCountByServiceTypeFormat.options}
+              series={AuditCountByServiceTypeFormat.series}
+              type="bar"
+              height={380}
+            />
+          </div>
+
+        )}
+
+        {shouldShow("av-2") && (
           <div
-            className="d-flex justify-content-end align-items-center"
-
+            className={`chart-card ${cardClass("av-2") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("av-2") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-2")}
-              checked={selectedCharts.includes("av-2")}
-              disabled={!current?.user_name}
-            />
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDrawer(
-                  "right",
-                  "Audit count by State segmented by Audit Platform",
-                  AuditCountByStateSegmented?.rest_count,
-                  AuditCountByStateSegmented?.rest_count?.map(
-                    (item) => item.state
-                  )
-                )
-              }}
+              className="d-flex justify-content-end align-items-center"
+
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-2")}
+                checked={selectedCharts.includes("av-2")}
+                disabled={!current?.user_name}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "right",
+                    "Audit count by State segmented by Audit Platform",
+                    AuditCountByStateSegmented?.rest_count,
+                    AuditCountByStateSegmented?.rest_count?.map(
+                      (item) => item.state
+                    )
+                  )
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Top 5 audit count by State segmented by Audit Platform
+            </div>
+            <Chart
+              options={AuditCountByStateSegmentedFormat.options}
+              series={AuditCountByStateSegmentedFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Top 5 audit count by State segmented by Audit Platform
-          </div>
-          <Chart
-            options={AuditCountByStateSegmentedFormat.options}
-            series={AuditCountByStateSegmentedFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
+        )}
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${cardClass("av-3") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("av-3") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-3")}
-              checked={selectedCharts.includes("av-3")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-          <div className="mb-3 fw-600">
-            Percentage of audits meeting SLA by Responsible Team
-          </div>
-          <Chart
-            options={AuditPercentageMeetingSLAFormat.options}
-            series={AuditPercentageMeetingSLAFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
-
-        <div
-          className={`chart-card ${cardClass("av-4") ? "selected-card" : ""
+        {shouldShow("av-3") && (
+          <div className={`chart-card ${cardClass("av-3") ? "selected-card" : ""
             }`}
-          onClick={canSelect ? () => handleSelect("av-4") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div
-            className="d-flex justify-content-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-4")}
-              checked={selectedCharts.includes("av-4")}
-              disabled={!current?.user_name}
-            />
+            onClick={canSelect ? () => handleSelect("av-3") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDrawer(
-                  "right",
-                  "Checklist approval rate by Company Name",
-                  checklistApprovalRateByCompanyName?.rest_counts,
-                  checklistApprovalRateByCompanyName?.rest_counts?.map(
-                    (item) => item.company_name
-                  )
-                )
-              }}
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-3")}
+                checked={selectedCharts.includes("av-3")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Percentage of audits meeting SLA by Responsible Team
+            </div>
+            <Chart
+              options={AuditPercentageMeetingSLAFormat.options}
+              series={AuditPercentageMeetingSLAFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Top 5 checklist approval rate by Company Name{" "}
+        )}
+
+        {shouldShow("av-4") && (
+          <div
+            className={`chart-card ${cardClass("av-4") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("av-4") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div
+              className="d-flex justify-content-end align-items-center"
+
+            >
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-4")}
+                checked={selectedCharts.includes("av-4")}
+                disabled={!current?.user_name}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "right",
+                    "Checklist approval rate by Company Name",
+                    checklistApprovalRateByCompanyName?.rest_counts,
+                    checklistApprovalRateByCompanyName?.rest_counts?.map(
+                      (item) => item.company_name
+                    )
+                  )
+                }}
+              >
+                <ArrowUpRight />
+              </div>
+            </div>
+            <div className="mb-3 fw-600">
+              Top 5 checklist approval rate by Company Name{" "}
+            </div>
+            <Chart
+              options={checklistApprovalRateByCompanyNameFormat.options}
+              series={checklistApprovalRateByCompanyNameFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <Chart
-            options={checklistApprovalRateByCompanyNameFormat.options}
-            series={checklistApprovalRateByCompanyNameFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
+        )}
+
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${cardClass("av-5") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("av-5") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-5")}
-              checked={selectedCharts.includes("av-5")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-          <div className="mb-3 fw-600">Risk level distribution </div>
-          <Chart
-            options={riskLevelFormat.options}
-            series={riskLevelFormat.series}
-            type="donut"
-            height={380}
-          />
-        </div>
-        <div
-          className={`chart-card ${cardClass("av-6") ? "selected-card" : ""
+        {shouldShow("av-5") && (
+          <div className={`chart-card ${cardClass("av-5") ? "selected-card" : ""
             }`}
-          onClick={canSelect ? () => handleSelect("av-6") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div
-            className="d-flex justify-content-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-6")}
-              checked={selectedCharts.includes("av-6")}
-              disabled={!current?.user_name}
-            />
+            onClick={canSelect ? () => handleSelect("av-5") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
             <div
-              className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDrawer(
-                  "left",
-                  "Escalation Triggered (Y/N) rate by State",
-                  escalationTriggeredRateByState?.rest_counts,
-                  escalationTriggeredRateByState?.rest_counts?.map(
-                    (item) => item.state
-                  )
-                )
-              }
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
 
-              }
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-5")}
+                checked={selectedCharts.includes("av-5")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">Risk level distribution </div>
+            <Chart
+              options={riskLevelFormat.options}
+              series={riskLevelFormat.series}
+              type="donut"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Top 5 Escalation Triggered (Y/N) rate by State
+        )}
+        {shouldShow("av-6") && (
+
+          <div
+            className={`chart-card ${cardClass("av-6") ? "selected-card" : ""
+              }`}
+            onClick={canSelect ? () => handleSelect("av-6") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div
+              className="d-flex justify-content-end align-items-center"
+
+            >
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-6")}
+                checked={selectedCharts.includes("av-6")}
+                disabled={!current?.user_name}
+              />
+              <div
+                className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "left",
+                    "Escalation Triggered (Y/N) rate by State",
+                    escalationTriggeredRateByState?.rest_counts,
+                    escalationTriggeredRateByState?.rest_counts?.map(
+                      (item) => item.state
+                    )
+                  )
+                }
+
+                }
+              >
+                <ArrowUpRight />
+              </div>
+            </div>
+            <div className="mb-3 fw-600">
+              Top 5 Escalation Triggered (Y/N) rate by State
+            </div>
+            <Chart
+              options={escalationTriggeredRateByStateFormat.options}
+              series={escalationTriggeredRateByStateFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <Chart
-            options={escalationTriggeredRateByStateFormat.options}
-            series={escalationTriggeredRateByStateFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
+        )}
+
       </div>
 
       <div className="charts-grid mb-4">
-        <div className={`chart-card ${cardClass("av-7") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("av-7") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+        {shouldShow("av-7") && (
+          <div className={`chart-card ${cardClass("av-7") ? "selected-card" : ""
+            }`}
+            onClick={canSelect ? () => handleSelect("av-7") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
+            <div
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
 
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-7")}
-              checked={selectedCharts.includes("av-7")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-7")}
+                checked={selectedCharts.includes("av-7")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">
+              Risk Level breakdown by Service Type
+            </div>
+            <Chart
+              options={RiskLevelBreakdownByServiceTypeFormat.options}
+              series={RiskLevelBreakdownByServiceTypeFormat.series}
+              type="bar"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">
-            Risk Level breakdown by Service Type
-          </div>
-          <Chart
-            options={RiskLevelBreakdownByServiceTypeFormat.options}
-            series={RiskLevelBreakdownByServiceTypeFormat.series}
-            type="bar"
-            height={380}
-          />
-        </div>
-        <div className={`chart-card ${cardClass("av-8") ? "selected-card" : ""
-          }`}
-          onClick={canSelect ? () => handleSelect("av-8") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}>
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
+        )}
+        {shouldShow("av-8") && (
+          <div className={`chart-card ${cardClass("av-8") ? "selected-card" : ""
+            }`}
+            onClick={canSelect ? () => handleSelect("av-8") : undefined}
+            style={{ cursor: canSelect ? "pointer" : "default" }}>
+            <div
+              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
 
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("av-8")}
-              checked={selectedCharts.includes("av-8")}
-              disabled={!current?.user_name}
-            />
-            <div className="dashboard-icon ms-2"
-              onClick={(e) => {
-                e.stopPropagation();   // prevent parent click from firing
-                setIsSnackbarsOpen({
-                  ...issnackbarsOpen,
-                  open: true,
-                  message: "No Data available",
-                  severityType: "info",
-                });
-              }}
             >
-              <ArrowUpRight />
+              <input
+                type="checkbox"
+                className="chart-select-checkbox"
+                onChange={() => toggleChartSelection("av-8")}
+                checked={selectedCharts.includes("av-8")}
+                disabled={!current?.user_name}
+              />
+              <div className="dashboard-icon ms-2"
+                onClick={(e) => {
+                  e.stopPropagation();   // prevent parent click from firing
+                  setIsSnackbarsOpen({
+                    ...issnackbarsOpen,
+                    open: true,
+                    message: "No Data available",
+                    severityType: "info",
+                  });
+                }}
+              >
+                <ArrowUpRight />
+              </div>
             </div>
+            <div className="mb-3 fw-600">Proportion of audit status</div>
+            <Chart
+              options={countOfAuditStatusFormated.options}
+              series={countOfAuditStatusFormated.series}
+              type="donut"
+              height={380}
+            />
           </div>
-          <div className="mb-3 fw-600">Proportion of audit status</div>
-          <Chart
-            options={countOfAuditStatusFormated.options}
-            series={countOfAuditStatusFormated.series}
-            type="donut"
-            height={380}
-          />
-        </div>
+        )}
+
       </div>
       <DashboardDrawerGrid
         anchor={drawerAnchor}

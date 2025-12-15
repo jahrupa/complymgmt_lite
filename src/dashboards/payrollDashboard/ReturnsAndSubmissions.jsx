@@ -24,6 +24,7 @@ const ReturnsAndSubmissions = ({
   current,
   selectedCharts,
   setSelectedCharts,
+  shouldShow,
 }) => {
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -190,7 +191,7 @@ const ReturnsAndSubmissions = ({
       states: { hover: { filter: { type: "none" } }, active: { filter: { type: "none" } } },
     }
   };
-    const userRole = decryptData(localStorage.getItem("user_role"));
+  const userRole = decryptData(localStorage.getItem("user_role"));
   // --- Fetch ---
   useEffect(() => {
     const fetchData = async () => {
@@ -291,226 +292,179 @@ const ReturnsAndSubmissions = ({
   const handleSelect = (id) => {
     if (canSelect) toggleChartSelection(id);
   };
+  const returnSubmissionCharts = [
+    {
+      id: "rs-1",
+      title: "Top 5 comparison of Return Applicability across Companies",
+      type: "bar",
+      format: comparisonOfReturnApplicabilityFormat,
+      drawer: {
+        side: "right",
+        title: "Average delay between data request and received date",
+        data: comparisonOfReturnApplicability?.rest_counts || [],
+        categories: comparisonOfReturnApplicability?.rest_counts?.map(i => i.company_name) || []
+      }
+    },
+    {
+      id: "rs-2",
+      title: "Frequency-wise distribution of applicable returns",
+      type: "donut",
+      format: ApplicableReturnsCountFormat,
+      drawer: null
+    },
+    {
+      id: "rs-3",
+      title: "Compliance status comparison across different return types",
+      type: "bar",
+      format: applicableReturnsByLocationFormat,
+      drawer: null
+    },
+    {
+      id: "rs-4",
+      title: "Top 5 applicable return names across companies",
+      type: "bar",
+      format: companiesPerReturnsNamesFormat,
+      drawer: {
+        side: "right",
+        title: "Applicable returns by company",
+        data: companiesPerReturnsNames?.rest_counts || [],
+        categories: companiesPerReturnsNames?.rest_counts?.map(i => i.returns_name) || []
+      }
+    },
+    {
+      id: "rs-5",
+      title: "Compliance risk distribution by state",
+      type: "bar",
+      format: riskDistributionByStateFormat,
+      drawer: {
+        side: "right",
+        title: "Risk distribution by state",
+        data: riskDistributionByState?.rest_counts || [],
+        categories: riskDistributionByState?.rest_counts?.map(i => i.state) || []
+      }
+    },
+    {
+      id: "rs-6",
+      title: "State-wise analysis of applicable returns",
+      type: "bar",
+      format: applicableReturnsByStateFormat,
+      drawer: {
+        side: "right",
+        title: "State-wise analysis of applicable returns",
+        data: stateWiseAnalysisOfApplicableReturns?.rest_counts || [],
+        categories: stateWiseAnalysisOfApplicableReturns?.rest_counts?.map(i => i.state) || []
+      }
+    },
+    {
+      id: "rs-7",
+      type: "ag-grid",
+      title: "Breakdown of escalation raised categories by company",
+      rowData: escalationRaisedCategoriesByCompany?.count_remark || [],
+      columnDefs: columnDefs
+    }
+  ];
 
   return (
     <div>
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+      <div className="charts-grid mb-4">
+        {returnSubmissionCharts.map((chart) => {
+          if (!shouldShow(chart.id)) return null; // hide chart
+          // AG GRID CHART
+          if (chart.type === "ag-grid") {
+            return (
+              <div
+                key={chart.id}
+                className={`chart-card ${cardClass(chart.id) ? "selected-card" : ""}`}
+                style={{ cursor: canSelect ? "pointer" : "default", height: "515px" }}
+                onClick={canSelect ? () => handleSelect(chart.id) : undefined}
+              >
+                <div className="d-flex justify-content-end align-items-center">
+                  <input
+                    type="checkbox"
+                    className="chart-select-checkbox"
+                    onChange={() => toggleChartSelection(chart.id)}
+                    checked={selectedCharts.includes(chart.id)}
+                  />
+                </div>
 
-      <div className='charts-grid mb-4'>
-        <div
-          className={`chart-card ${cardClass("rs-1") ? "selected-card" : ""}`}
-          onClick={canSelect ? () => handleSelect("rs-1") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className='d-flex justify-content-end align-items-center' >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-1")}
-              checked={selectedCharts.includes("rs-1")}
-            />
-            <div
-              className='dashboard-icon ms-2'
-              onClick={() =>
-                handleOpenDrawer(
-                  "right",
-                  "Average delay between data request date and client data received date by company",
-                  comparisonOfReturnApplicability?.rest_counts || [],
-                  comparisonOfReturnApplicability?.rest_counts?.map((item) => item.company_name) || []
-                )
-              }
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-
-          <div className="mb-3 fw-600">Top 5 comparison of Return Applicability across Companies</div>
-          <Chart options={comparisonOfReturnApplicabilityFormat.options} series={comparisonOfReturnApplicabilityFormat.series} type="bar" height={380} />
-        </div>
-
-        <div
-          className={`chart-card ${cardClass("rs-2") ? "selected-card" : ""}`}
-          onClick={canSelect ? () => handleSelect("rs-2") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className='d-flex justify-content-end align-items-center' >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-2")}
-              checked={selectedCharts.includes("rs-2")}
-            />
-            <div
-              className='dashboard-icon ms-2'
-              onClick={() => setIsSnackbarsOpen(prev => ({ ...prev, open: true, message: "No Data available", severityType: "info" }))}
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-
-          <div className="mb-3 fw-600">Frequency-wise distribution of applicable returns, revealing dominant compliance cycles</div>
-          <Chart options={ApplicableReturnsCountFormat.options} series={ApplicableReturnsCountFormat.series} type="donut" height={380} />
-        </div>
-      </div>
-
-      <div className='charts-grid mb-4'>
-        <div
-          className={`chart-card ${cardClass("rs-3") ? "selected-card" : ""}`}
-          onClick={canSelect ? () => handleSelect("rs-3") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className='d-flex justify-content-end align-items-center' >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-3")}
-              checked={selectedCharts.includes("rs-3")}
-            />
-            <div
-              className='dashboard-icon ms-2'
-              onClick={() => setIsSnackbarsOpen(prev => ({ ...prev, open: true, message: "No Data available", severityType: "info" }))}
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-
-          <div className="mb-3 fw-600">Compliance status comparison across different return types, highlighting returns with the highest completion rates.</div>
-          <Chart options={applicableReturnsByLocationFormat.options} series={applicableReturnsByLocationFormat.series} type="bar" height={380} />
-        </div>
-
-        <div
-          className={`chart-card ${cardClass("rs-4") ? "selected-card" : ""}`}
-          onClick={canSelect ? () => handleSelect("rs-4") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className='d-flex justify-content-end align-items-center' >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-4")}
-              checked={selectedCharts.includes("rs-4")}
-            />
-            <div
-              className='dashboard-icon ms-2'
-              onClick={() =>
-                handleOpenDrawer(
-                  "right",
-                  "Analysis of applicable return names, identifying the most frequently required returns across companies",
-                  companiesPerReturnsNames?.rest_counts || [],
-                  companiesPerReturnsNames?.rest_counts?.map((item) => item?.returns_name) || []
-                )
-              }
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-
-          <div className="mb-3 fw-600">Top 5 analysis of applicable return names, identifying the most frequently required returns across companies</div>
-          <Chart options={companiesPerReturnsNamesFormat.options} series={companiesPerReturnsNamesFormat.series} type="bar" height={380} />
-        </div>
-      </div>
-
-      <div className='charts-grid mb-4'>
-        <div
-          className={`chart-card ${cardClass("rs-5") ? "selected-card" : ""}`}
-          onClick={canSelect ? () => handleSelect("rs-5") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className='d-flex justify-content-end align-items-center' >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-5")}
-              checked={selectedCharts.includes("rs-5")}
-            />
-            <div
-              className='dashboard-icon ms-2'
-              onClick={() =>
-                handleOpenDrawer(
-                  "right",
-                  "Compliance risk distribution by state, identifying regions with elevated compliance risk levels",
-                  riskDistributionByState?.rest_counts || [],
-                  riskDistributionByState?.rest_counts?.map((item) => item?.state) || []
-                )
-              }
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-
-          <div className="mb-3 fw-600">Top 5 compliance risk distribution by state, identifying regions with elevated compliance risk levels.</div>
-          <Chart options={riskDistributionByStateFormat.options} series={riskDistributionByStateFormat.series} type="bar" height={380} />
-        </div>
-
-        <div
-          className={`chart-card ${cardClass("rs-6") ? "selected-card" : ""}`}
-          onClick={canSelect ? () => handleSelect("rs-6") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className='d-flex justify-content-end align-items-center' >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-6")}
-              checked={selectedCharts.includes("rs-6")}
-            />
-            <div
-              className='dashboard-icon ms-2'
-              onClick={() =>
-                handleOpenDrawer(
-                  "right",
-                  "State-wise analysis of applicable returns, showcasing regional concentration of compliance activities",
-                  stateWiseAnalysisOfApplicableReturns?.rest_counts || [],
-                  stateWiseAnalysisOfApplicableReturns?.rest_counts?.map((item) => item?.state) || []
-                )
-              }
-            >
-              <ArrowUpRight />
-            </div>
-          </div>
-
-          <div className="mb-3 fw-600">Top 5 state-wise analysis of applicable returns, showcasing regional concentration of compliance activities.</div>
-          <Chart options={applicableReturnsByStateFormat.options} series={applicableReturnsByStateFormat.series} type="bar" height={380} />
-        </div>
-      </div>
-
-      <div className='mb-4'>
-        <div
-          className={`chart-card ${cardClass("rs-7") ? "selected-card" : ""}`}
-          style={{ cursor: canSelect ? "pointer" : "default", height: '515px' }}
-          onClick={canSelect ? () => handleSelect("rs-7") : undefined}
-        >
-          <div
-            className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-          >
-            <input
-              type="checkbox"
-              className="chart-select-checkbox"
-              onChange={() => toggleChartSelection("rs-7")}
-              checked={selectedCharts.includes("rs-7")}
-              disabled={!current?.user_name}
-            />
-            <div
-              className="ag-theme-quartz"
-              style={{ height: "400px", width: "100%", marginTop: "1rem" }}
-            >
-              <div className="d-lg-flex d-md-flex justify-content-lg-between justify-content-md-between align-items-center">
-                <div className="mb-3 fw-600">Breakdown of escalation raised categories by company, revealing escalation hotspots</div>
+                <div className="ag-theme-quartz" style={{ height: "400px", width: "100%", marginTop: "1rem" }}>
+                  <div className="mb-3 fw-600">{chart.title}</div>
+                  <AgGridReact
+                    theme="legacy"
+                    rowData={chart.rowData}
+                    columnDefs={chart.columnDefs}
+                    pagination
+                    paginationPageSize={5}
+                  />
+                </div>
               </div>
-              <AgGridReact
-                theme="legacy"
-                rowData={escalationRaisedCategoriesByCompany?.count_remark || []}
-                columnDefs={columnDefs}
-                pagination={true}
-                paginationPageSize={5}
+            );
+          }
+
+          // NORMAL CHARTS (BAR, DONUT, ETC)
+          return (
+            <div
+              key={chart.id}
+              className={`chart-card ${cardClass(chart.id) ? "selected-card" : ""}`}
+              onClick={canSelect ? () => handleSelect(chart.id) : undefined}
+              style={{ cursor: canSelect ? "pointer" : "default" }}
+            >
+              <div className="d-flex justify-content-end align-items-center">
+                <input
+                  type="checkbox"
+                  className="chart-select-checkbox"
+                  onChange={() => toggleChartSelection(chart.id)}
+                  checked={selectedCharts.includes(chart.id)}
+                />
+
+                {/* Drawer or Snackbar */}
+                {chart.drawer ? (
+                  <div
+                    className="dashboard-icon ms-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDrawer(
+                        chart.drawer.side,
+                        chart.drawer.title,
+                        chart.drawer.data,
+                        chart.drawer.categories
+                      );
+                    }}
+                  >
+                    <ArrowUpRight />
+                  </div>
+                ) : (
+                  <div
+                    className="dashboard-icon ms-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsSnackbarsOpen({
+                        ...issnackbarsOpen,
+                        open: true,
+                        message: "No Data available",
+                        severityType: "info"
+                      });
+                    }}
+                  >
+                    <ArrowUpRight />
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-3 fw-600">{chart.title}</div>
+
+              <Chart
+                options={chart.format.options}
+                series={chart.format.series}
+                type={chart.type}
+                height={380}
               />
-
             </div>
-          </div>
-
-        </div>
+          );
+        })}
       </div>
+
 
       <DashboardDrawerGrid
         anchor={drawerAnchor}
@@ -521,6 +475,7 @@ const ReturnsAndSubmissions = ({
         chartXaxisCategory={chartXaxisCategory}
       />
     </div>
+
   );
 };
 

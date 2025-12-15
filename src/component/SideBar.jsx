@@ -17,7 +17,7 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { ScanEye } from 'lucide-react';
+import { Layers, ScanEye } from 'lucide-react';
 
 function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
     // const [activePage, setActivePage] = useState(() => {
@@ -36,6 +36,7 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         // { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
+        { icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Widget Mappings', link: 'widget_mappings' },
         // { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
     ];
 
