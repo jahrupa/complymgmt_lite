@@ -53,6 +53,7 @@ const DocumentUpload = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([])
+  console.log(uploadedFiles, 'uploadedFiles')
   const [documentId, setDocumentId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -193,14 +194,14 @@ const DocumentUpload = () => {
 
 
   const handleFileUpload = async () => {
+
     if (!uploadedFiles?.length) {
       alert("Please select at least one file.");
       return;
     }
-
     try {
       // const result = await uploadFile(uploadedFiles);
-      const result = await uploadFileGolang(uploadedFiles)
+      const result = await uploadFileGolang(uploadedFiles, isAutoUpload);
       //  console.log("Files uploaded successfully:", result);
       setIsFileUploadModalModalOpen(false);
       const message = result?.message || "Status update successfully"
@@ -441,20 +442,7 @@ const DocumentUpload = () => {
     }
   }, [current?.service_tracker_name]);
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'Admin':
-        return { background: '#d1e7dd', color: '#0f5132' }; // green
-      case 'Manager':
-        return { background: '#cff4fc', color: '#055160' }; // blue
-      case 'Client':
-        return { background: '#fce5cd', color: '#7f4f24' }; // brown
-      case 'Super Admin':
-        return { background: '#f8d7da', color: '#842029' }; // red
-      default:
-        return { background: '#e2e3e5', color: '#41464b' }; // gray
-    }
-  };
+
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
       case 0:
@@ -497,7 +485,6 @@ const DocumentUpload = () => {
       width: 130,
       flex: 1,
       pinned: "right",
-      editable: 'false',
       cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
       cellRenderer: (params) => {
         return (
@@ -557,6 +544,19 @@ const DocumentUpload = () => {
           "No File"
         );
       }
+    },
+    { field: "ai_data.doc_type", headerName: "AI Document Type", editable: 'false', valueGetter: (params) => params.data?.ai_data?.doc_type || '-' },
+    {
+      field: "ai_data.confidence", headerName: "AI Confidence Score", editable: 'false', valueGetter: (params) =>
+        params.data?.ai_data?.confidence !== undefined
+          ? `${params.data.ai_data.confidence}%`
+          : '-'
+    },
+    {
+      field: "group_holdings_id", headerName: "Document Status", editable: 'false',
+      cellRenderer: (params) => (
+        <span style={{ color: params.value !== '' ? 'black' : 'gray' }}>{params.value !== '' ? 'Taged' : 'Untaged'}</span>
+      )
     },
     {
       editable: 'false',
@@ -647,7 +647,7 @@ const DocumentUpload = () => {
               onChange={() => setIsAutoUpload(!isAutoUpload)}
             />
           </span>
-          <span className='fs-12 ms-2 mt-1'>Auto Upload</span>
+          <span className='fs-12 ms-2 mt-1'>AI Processed</span>
         </div>
 
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">

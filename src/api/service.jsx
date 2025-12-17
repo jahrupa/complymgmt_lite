@@ -917,14 +917,14 @@ export const uploadFile = async (filesArray) => {
 
 
 // File upload Golang without python
-export const uploadFileGolang = async (filesArray) => {
+export const uploadFileGolang = async (filesArray, isAutoUpload) => {
   try {
     const formData = new FormData();
 
     filesArray.forEach((file) => {
       formData.append("files", file);
     });
-
+    formData.append("is_ai_upload", isAutoUpload);
     const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -1546,7 +1546,7 @@ export const fetchTotalDelayFlagsByGovt = async (company_name) => {
 }
 
 
-export const fetchTotalDelayFlagsByClient= async (company_name) => {
+export const fetchTotalDelayFlagsByClient = async (company_name) => {
   try {
     const url = `${GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
