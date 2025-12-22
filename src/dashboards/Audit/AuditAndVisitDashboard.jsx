@@ -14,6 +14,7 @@ import DashboardDrawerGrid from "../DashboardDrawer";
 import { ArrowUpRight, X } from "lucide-react";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
+import { generateDynamicSeries } from "../../../Utils/chartUtils";
 
 const AuditAndVisitDashboard = ({
   selectedCompany,
@@ -144,6 +145,43 @@ const AuditAndVisitDashboard = ({
     data: data.map((item) => item[key] || 0),
   }));
 
+
+  const [AuditPercentageMeetingSLA, setAuditPercentageMeetingSLA] =
+    React.useState([]);
+
+  const [
+    checklistApprovalRateByCompanyName,
+    setChecklistApprovalRateByCompanyName,
+  ] = React.useState([]);
+
+
+
+
+  const [riskLevel, setRiskLevel] = React.useState([]);
+
+  const [countOfAuditStatus, setCountOfAuditStatus] = React.useState([]);
+
+  const [riskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] =
+    React.useState([]);
+
+  const [escalationTriggeredRateByState, setEscalationTriggeredRateByState] =
+    React.useState([]);
+
+  const userRole = decryptData(localStorage.getItem("user_role"));
+  const checklistApprovalRateByCompanyNameDynamiChart = generateDynamicSeries(
+    checklistApprovalRateByCompanyName?.top_counts || [],
+    {
+      excludeKeys: ["company_name",],
+    }
+  );
+
+  const escalationTriggeredRateByStateDynamiChart = generateDynamicSeries(
+    escalationTriggeredRateByState?.top_counts || [],
+    {
+      excludeKeys: ["state",],
+    }
+  );
+  // chart data formate
   const AuditCountByStateSegmentedFormat = {
     series: series,
     options: {
@@ -208,8 +246,7 @@ const AuditAndVisitDashboard = ({
       },
     },
   };
-  const [AuditPercentageMeetingSLA, setAuditPercentageMeetingSLA] =
-    React.useState([]);
+
   const AuditPercentageMeetingSLAFormat = {
     series: [
       {
@@ -279,72 +316,73 @@ const AuditAndVisitDashboard = ({
       },
     },
   };
-  const [
-    checklistApprovalRateByCompanyName,
-    setChecklistApprovalRateByCompanyName,
-  ] = React.useState([]);
+
   const checklistApprovalRateByCompanyNameFormat = {
-    series: [
-      {
-        name: "Approval Rate",
-        data:
-          checklistApprovalRateByCompanyName?.top_counts?.map(
-            (item) => item.checklist_rate
-          ) || [],
-      },
-    ],
+    series: checklistApprovalRateByCompanyNameDynamiChart,
     options: {
       chart: {
         type: "bar",
         height: 350,
+        stacked: true, // 👈 stacked enabled
       },
-      colors: ["#5ad5e2"],
+
+      colors: escalationTriggeredRateByStateDynamiChart.map(
+        (_, index) => `hsl(${(index * 60) % 360}, 50%, 60%)`
+      ),
+
       fill: {
         opacity: 1,
-        colors: ["#5ad5e2"],
+        colors: escalationTriggeredRateByStateDynamiChart.map(
+          (_, index) => `hsl(${(index * 60) % 360}, 50%, 60%)`
+        ),
       },
+
       states: {
         hover: {
-          filter: {
-            type: "none", // 👈 disables the lighten effect
-          },
+          filter: { type: "none" },
         },
         active: {
-          filter: {
-            type: "none", // 👈 disables click highlight effect
-          },
+          filter: { type: "none" },
         },
       },
+
       plotOptions: {
         bar: {
           horizontal: false,
           dataLabels: {
             total: {
               enabled: true,
-              offsetX: 0,
               style: {
                 fontSize: "13px",
                 fontWeight: 900,
               },
             },
+            columnWidth: '50%',
           },
         },
+        fill: {
+          opacity: 1,
+        },
       },
+
       stroke: {
         width: 1,
         colors: ["#fff"],
       },
+
       xaxis: {
         categories:
           checklistApprovalRateByCompanyName?.top_counts?.map(
             (item) => item.company_name
           ) || [],
       },
+
       yaxis: {
         title: {
           text: undefined,
         },
       },
+
       legend: {
         position: "top",
         horizontalAlign: "left",
@@ -352,7 +390,7 @@ const AuditAndVisitDashboard = ({
       },
     },
   };
-  const [riskLevel, setRiskLevel] = React.useState([]);
+
   const riskLevelFormat = {
     series: riskLevel?.map((item) => item.count) || [],
     options: {
@@ -405,7 +443,7 @@ const AuditAndVisitDashboard = ({
       ],
     },
   };
-  const [countOfAuditStatus, setCountOfAuditStatus] = React.useState([]);
+
   const countOfAuditStatusFormated = {
     series: countOfAuditStatus?.map((item) => item.count) || [],
     options: {
@@ -458,8 +496,7 @@ const AuditAndVisitDashboard = ({
       ],
     },
   };
-  const [riskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] =
-    React.useState([]);
+
   const RiskLevelBreakdownByServiceTypeFormat = {
     series: [
       {
@@ -529,28 +566,25 @@ const AuditAndVisitDashboard = ({
       },
     },
   };
-  const [escalationTriggeredRateByState, setEscalationTriggeredRateByState] =
-    React.useState([]);
+
   const escalationTriggeredRateByStateFormat = {
-    series: [
-      {
-        name: "Escalation Count",
-        data:
-          escalationTriggeredRateByState?.top_counts?.map(
-            (item) => item.count_of_escalation
-          ) || [],
-      },
-    ],
+    series: escalationTriggeredRateByStateDynamiChart,
     options: {
       chart: {
         type: "bar",
         height: 350,
         stacked: true,
       },
-      colors: ["#2cafc0ff", "#5ad5e2"],
+      colors: escalationTriggeredRateByStateDynamiChart.map(
+        (_, index) => `hsl(${(index * 60) % 360}, 50%, 60%)`
+      ),
+
       fill: {
         opacity: 1,
-        colors: ["#2cafc0ff", "#5ad5e2"],
+        colors: escalationTriggeredRateByStateDynamiChart.map(
+          (_, index) => `hsl(${(index * 60) % 360}, 50%, 60%)`
+        ),
+
       },
       states: {
         hover: {
@@ -596,8 +630,7 @@ const AuditAndVisitDashboard = ({
       },
     },
   };
-  const userRole = decryptData(localStorage.getItem("user_role"));
-
+  // Chart data fetch
   useEffect(() => {
     const fetchData = async () => {
       const [
@@ -716,7 +749,7 @@ const AuditAndVisitDashboard = ({
     );
   };
 
-  const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
+  const canSelect = userRole === "Admin" || userRole === "Super-Admin";
   const cardClass = (id, defaultClass = "") =>
     canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
 
@@ -732,15 +765,11 @@ const AuditAndVisitDashboard = ({
       <div className="charts-grid mb-4">
         {shouldShow("av-1") && (
           <div
-            className={`chart-card ${cardClass("av-1") ? "selected-card" : ""
-              }`}
+            className={`chart-card ${cardClass("av-1") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-1") : undefined}
             style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <div
-              className="d-flex justify-content-end align-items-center"
-
-            >
+            <div className="d-flex justify-content-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -751,7 +780,7 @@ const AuditAndVisitDashboard = ({
               <div
                 className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation();   // prevent parent click from firing
+                  e.stopPropagation(); // prevent parent click from firing
                   handleOpenDrawer(
                     "right",
                     "Aaudit count by Service Type across all companies",
@@ -759,10 +788,8 @@ const AuditAndVisitDashboard = ({
                     AuditCountByServiceType?.rest_counts?.map(
                       (item) => item.service_type
                     )
-                  )
-                }
-
-                }
+                  );
+                }}
               >
                 <ArrowUpRight />
               </div>
@@ -777,20 +804,15 @@ const AuditAndVisitDashboard = ({
               height={380}
             />
           </div>
-
         )}
 
         {shouldShow("av-2") && (
           <div
-            className={`chart-card ${cardClass("av-2") ? "selected-card" : ""
-              }`}
+            className={`chart-card ${cardClass("av-2") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-2") : undefined}
             style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <div
-              className="d-flex justify-content-end align-items-center"
-
-            >
+            <div className="d-flex justify-content-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -809,7 +831,7 @@ const AuditAndVisitDashboard = ({
                     AuditCountByStateSegmented?.rest_count?.map(
                       (item) => item.state
                     )
-                  )
+                  );
                 }}
               >
                 <ArrowUpRight />
@@ -830,14 +852,12 @@ const AuditAndVisitDashboard = ({
 
       <div className="charts-grid mb-4">
         {shouldShow("av-3") && (
-          <div className={`chart-card ${cardClass("av-3") ? "selected-card" : ""
-            }`}
+          <div
+            className={`chart-card ${cardClass("av-3") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-3") : undefined}
-            style={{ cursor: canSelect ? "pointer" : "default" }}>
-            <div
-              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-            >
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div className="d-flex justify-content-lg-end justify-content-md-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -845,9 +865,10 @@ const AuditAndVisitDashboard = ({
                 checked={selectedCharts.includes("av-3")}
                 disabled={!current?.user_name}
               />
-              <div className="dashboard-icon ms-2"
+              <div
+                className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation();   // prevent parent click from firing
+                  e.stopPropagation(); // prevent parent click from firing
                   setIsSnackbarsOpen({
                     ...issnackbarsOpen,
                     open: true,
@@ -873,15 +894,11 @@ const AuditAndVisitDashboard = ({
 
         {shouldShow("av-4") && (
           <div
-            className={`chart-card ${cardClass("av-4") ? "selected-card" : ""
-              }`}
+            className={`chart-card ${cardClass("av-4") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-4") : undefined}
             style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <div
-              className="d-flex justify-content-end align-items-center"
-
-            >
+            <div className="d-flex justify-content-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -900,7 +917,7 @@ const AuditAndVisitDashboard = ({
                     checklistApprovalRateByCompanyName?.rest_counts?.map(
                       (item) => item.company_name
                     )
-                  )
+                  );
                 }}
               >
                 <ArrowUpRight />
@@ -917,19 +934,16 @@ const AuditAndVisitDashboard = ({
             />
           </div>
         )}
-
       </div>
 
       <div className="charts-grid mb-4">
         {shouldShow("av-5") && (
-          <div className={`chart-card ${cardClass("av-5") ? "selected-card" : ""
-            }`}
+          <div
+            className={`chart-card ${cardClass("av-5") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-5") : undefined}
-            style={{ cursor: canSelect ? "pointer" : "default" }}>
-            <div
-              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-            >
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div className="d-flex justify-content-lg-end justify-content-md-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -937,9 +951,10 @@ const AuditAndVisitDashboard = ({
                 checked={selectedCharts.includes("av-5")}
                 disabled={!current?.user_name}
               />
-              <div className="dashboard-icon ms-2"
+              <div
+                className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation();   // prevent parent click from firing
+                  e.stopPropagation(); // prevent parent click from firing
                   setIsSnackbarsOpen({
                     ...issnackbarsOpen,
                     open: true,
@@ -961,17 +976,12 @@ const AuditAndVisitDashboard = ({
           </div>
         )}
         {shouldShow("av-6") && (
-
           <div
-            className={`chart-card ${cardClass("av-6") ? "selected-card" : ""
-              }`}
+            className={`chart-card ${cardClass("av-6") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-6") : undefined}
             style={{ cursor: canSelect ? "pointer" : "default" }}
           >
-            <div
-              className="d-flex justify-content-end align-items-center"
-
-            >
+            <div className="d-flex justify-content-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -990,10 +1000,8 @@ const AuditAndVisitDashboard = ({
                     escalationTriggeredRateByState?.rest_counts?.map(
                       (item) => item.state
                     )
-                  )
-                }
-
-                }
+                  );
+                }}
               >
                 <ArrowUpRight />
               </div>
@@ -1009,19 +1017,16 @@ const AuditAndVisitDashboard = ({
             />
           </div>
         )}
-
       </div>
 
       <div className="charts-grid mb-4">
         {shouldShow("av-7") && (
-          <div className={`chart-card ${cardClass("av-7") ? "selected-card" : ""
-            }`}
+          <div
+            className={`chart-card ${cardClass("av-7") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-7") : undefined}
-            style={{ cursor: canSelect ? "pointer" : "default" }}>
-            <div
-              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-            >
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div className="d-flex justify-content-lg-end justify-content-md-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -1029,9 +1034,10 @@ const AuditAndVisitDashboard = ({
                 checked={selectedCharts.includes("av-7")}
                 disabled={!current?.user_name}
               />
-              <div className="dashboard-icon ms-2"
+              <div
+                className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation();   // prevent parent click from firing
+                  e.stopPropagation(); // prevent parent click from firing
                   setIsSnackbarsOpen({
                     ...issnackbarsOpen,
                     open: true,
@@ -1055,14 +1061,12 @@ const AuditAndVisitDashboard = ({
           </div>
         )}
         {shouldShow("av-8") && (
-          <div className={`chart-card ${cardClass("av-8") ? "selected-card" : ""
-            }`}
+          <div
+            className={`chart-card ${cardClass("av-8") ? "selected-card" : ""}`}
             onClick={canSelect ? () => handleSelect("av-8") : undefined}
-            style={{ cursor: canSelect ? "pointer" : "default" }}>
-            <div
-              className="d-flex justify-content-lg-end justify-content-md-end align-items-center"
-
-            >
+            style={{ cursor: canSelect ? "pointer" : "default" }}
+          >
+            <div className="d-flex justify-content-lg-end justify-content-md-end align-items-center">
               <input
                 type="checkbox"
                 className="chart-select-checkbox"
@@ -1070,9 +1074,10 @@ const AuditAndVisitDashboard = ({
                 checked={selectedCharts.includes("av-8")}
                 disabled={!current?.user_name}
               />
-              <div className="dashboard-icon ms-2"
+              <div
+                className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation();   // prevent parent click from firing
+                  e.stopPropagation(); // prevent parent click from firing
                   setIsSnackbarsOpen({
                     ...issnackbarsOpen,
                     open: true,
@@ -1093,7 +1098,6 @@ const AuditAndVisitDashboard = ({
             />
           </div>
         )}
-
       </div>
       <DashboardDrawerGrid
         anchor={drawerAnchor}

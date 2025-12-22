@@ -513,9 +513,6 @@ const PayrollServices = ({
             footnote: "Payrolls closed on or ahead of SLA"
         },
 
-        /* =======================
-           CHARTS – ROW 1
-        ======================== */
         {
             id: "ps-4",
             type: "chart",
@@ -645,77 +642,193 @@ const PayrollServices = ({
                 </div>
 
                 <div className="charts-grid mb-4">
-                    {payrollDashboardConfig
-                        .filter((item) => item.type === "chart")
-                        .map((chart) => (
-                            shouldShow(chart.id) ? (
 
-
-                            <div
-                                key={chart.id}
-                                className={`chart-card ${cardClass(chart.id) ? "selected-card mb-4" : "mb-4"
-                                    }`}
-                                onClick={canSelect ? () => handleSelect(chart.id) : undefined}
-                                style={{ cursor: canSelect ? "pointer" : "default" }}
-                            >
-                                <div className="d-flex justify-content-end align-items-center">
-                                    <input
-                                        type="checkbox"
-                                        className="chart-select-checkbox"
-                                        onChange={() => toggleChartSelection(chart.id)}
-                                        checked={selectedCharts.includes(chart.id)}
-                                        disabled={!current?.user_name}
-                                    />
-
-                                    {chart.drawer ? (
-                                        <div
-                                            className="dashboard-icon ms-2"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleOpenDrawer(
-                                                    chart.drawer.side,
-                                                    chart.drawer.title,
-                                                    dataRequestAndClientDataReceived?.[
-                                                    chart.drawer.dataKey
-                                                    ] || [],
-                                                    dataRequestAndClientDataReceived?.[
-                                                        chart.drawer.dataKey
-                                                    ]?.map((i) => i[chart.drawer.categoryKey]) || []
-                                                );
-                                            }}
-                                        >
-                                            <ArrowUpRight />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className="dashboard-icon ms-2"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setIsSnackbarsOpen({
-                                                    ...issnackbarsOpen,
-                                                    open: true,
-                                                    message: "No Data available",
-                                                    severityType: "info"
-                                                });
-                                            }}
-                                        >
-                                            <ArrowUpRight />
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="mb-3 fw-600">{chart.title}</div>
-
-                                <Chart
-                                    options={chart.format.options}
-                                    series={chart.format.series}
-                                    type={chart.chartType}
-                                    height={380}
+                    {/* ps-4 */}
+                    {shouldShow("ps-4") && (
+                        <div
+                            className={`chart-card ${cardClass("ps-4") ? "selected-card" : ""}`}
+                            onClick={canSelect ? () => handleSelect("ps-4") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <div className="d-flex justify-content-end align-items-center">
+                                <input
+                                    type="checkbox"
+                                    className="chart-select-checkbox"
+                                    onChange={() => toggleChartSelection("ps-4")}
+                                    checked={selectedCharts.includes("ps-4")}
+                                    disabled={!current?.user_name}
                                 />
+
+                                <div
+                                    className="dashboard-icon ms-2"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsSnackbarsOpen({
+                                            ...issnackbarsOpen,
+                                            open: true,
+                                            message: "No Data available",
+                                            severityType: "info"
+                                        });
+                                    }}
+                                >
+                                    <ArrowUpRight />
+                                </div>
                             </div>
-                            ):null
-                        ))}
+
+                            <div className="mb-3 fw-600">
+                                Breakdown of Investment declaration status by Company
+                            </div>
+
+                            <Chart
+                                options={investmentDataFormate.options}
+                                series={investmentDataFormate.series}
+                                type="donut"
+                                height={380}
+                            />
+                        </div>
+                    )}
+
+                    {/* ps-5 */}
+                    {shouldShow("ps-5") && (
+                        <div
+                            className={`chart-card ${cardClass("ps-5") ? "selected-card" : ""}`}
+                            onClick={canSelect ? () => handleSelect("ps-5") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <div className="d-flex justify-content-end align-items-center">
+                                <input
+                                    type="checkbox"
+                                    className="chart-select-checkbox"
+                                    onChange={() => toggleChartSelection("ps-5")}
+                                    checked={selectedCharts.includes("ps-5")}
+                                    disabled={!current?.user_name}
+                                />
+
+                                <div
+                                    className="dashboard-icon ms-2"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleOpenDrawer(
+                                            "left",
+                                            "Average delay between data request date and client data received date by company",
+                                            dataRequestAndClientDataReceived?.rest_delays,
+                                            dataRequestAndClientDataReceived?.rest_delays?.map(
+                                                (item) => item.company_name
+                                            )
+                                        );
+                                    }}
+                                >
+                                    <ArrowUpRight />
+                                </div>
+                            </div>
+
+                            <div className="mb-3 fw-600">
+                                Top 5 average delay between data request date and client data received date by company
+                            </div>
+
+                            <Chart
+                                options={dataRequestAndClientDataReceivedFormat.options}
+                                series={dataRequestAndClientDataReceivedFormat.series}
+                                type="bar"
+                                height={380}
+                            />
+                        </div>
+                    )}
                 </div>
+
+                <div className="charts-grid mb-4">
+
+                    {/* ps-6 */}
+                    {shouldShow("ps-6") && (
+                        <div
+                            className={`chart-card ${cardClass("ps-6") ? "selected-card" : ""}`}
+                            onClick={canSelect ? () => handleSelect("ps-6") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <div className="d-flex justify-content-end align-items-center">
+                                <input
+                                    type="checkbox"
+                                    className="chart-select-checkbox"
+                                    onChange={() => toggleChartSelection("ps-6")}
+                                    checked={selectedCharts.includes("ps-6")}
+                                    disabled={!current?.user_name}
+                                />
+
+                                <div
+                                    className="dashboard-icon ms-2"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsSnackbarsOpen({
+                                            ...issnackbarsOpen,
+                                            open: true,
+                                            message: "No Data available",
+                                            severityType: "info"
+                                        });
+                                    }}
+                                >
+                                    <ArrowUpRight />
+                                </div>
+                            </div>
+
+                            <div className="mb-3 fw-600">
+                                Type of Systems Used by Employer
+                            </div>
+
+                            <Chart
+                                options={systemUsedByEmpFormat.options}
+                                series={systemUsedByEmpFormat.series}
+                                type="bar"
+                                height={380}
+                            />
+                        </div>
+                    )}
+
+                    {/* ps-7 */}
+                    {shouldShow("ps-7") && (
+                        <div
+                            className={`chart-card ${cardClass("ps-7") ? "selected-card" : ""}`}
+                            onClick={canSelect ? () => handleSelect("ps-7") : undefined}
+                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                        >
+                            <div className="d-flex justify-content-end align-items-center">
+                                <input
+                                    type="checkbox"
+                                    className="chart-select-checkbox"
+                                    onChange={() => toggleChartSelection("ps-7")}
+                                    checked={selectedCharts.includes("ps-7")}
+                                    disabled={!current?.user_name}
+                                />
+
+                                <div
+                                    className="dashboard-icon ms-2"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsSnackbarsOpen({
+                                            ...issnackbarsOpen,
+                                            open: true,
+                                            message: "No Data available",
+                                            severityType: "info"
+                                        });
+                                    }}
+                                >
+                                    <ArrowUpRight />
+                                </div>
+                            </div>
+
+                            <div className="mb-3 fw-600">
+                                Distribution of Company across Multiple Entities / Locations (Y/N)
+                            </div>
+
+                            <Chart
+                                options={distributionOfEmployeeFormate.options}
+                                series={distributionOfEmployeeFormate.series}
+                                type="pie"
+                                height={380}
+                            />
+                        </div>
+                    )}
+                </div>
+
 
                 {payrollDashboardConfig
                     .filter((item) => item.type === "table")

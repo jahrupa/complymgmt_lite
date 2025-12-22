@@ -164,7 +164,7 @@ const NoticeDashboard = ({
     };
     const [noticeTypeBreakdown, setNoticeTypeBreakdown] = React.useState([]);
     const noticeTypeBreakdownFormat = {
-        series: noticeTypeBreakdown?.map((item) => item.count) || [],
+        series: noticeTypeBreakdown?.map((item) => item?.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -196,7 +196,7 @@ const NoticeDashboard = ({
             },
 
             labels:
-                noticeTypeBreakdown?.map((item) => item.type_of_notice_inspection) ||
+                noticeTypeBreakdown?.map((item) => item?.type_of_notice_inspection) ||
                 [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
@@ -619,10 +619,6 @@ const NoticeDashboard = ({
                     noticeDistributionByAuthorityRes.value
                 );
             } else {
-                console.warn(
-                    "fetch notice distribution by authority failed:",
-                    noticeDistributionByAuthorityRes.reason
-                );
                 // Optionally set to empty or default data on failure
                 setNoticeDistributionByAuthority(
                     noticeDistributionByAuthorityRes.reason?.status || []
@@ -788,8 +784,7 @@ const NoticeDashboard = ({
                         />
                     </div>
                 )}
-
-
+                
                 {shouldShow("ni-2") && (
                     <div
                         className={`chart-card ${cardClass("ni-2") ? "selected-card" : ""
@@ -1056,16 +1051,6 @@ const NoticeDashboard = ({
                                         <ArrowUpRight />
                                     </div>
                                 </div>
-                                <div className="mb-3 fw-600">
-                                    Top 5 comparison of acknowledgement rates by different individuals
-                                    to evaluate responsiveness.
-                                </div>
-                                <Chart
-                                    options={countOfAcknowledgmentRatesFormat.options}
-                                    series={countOfAcknowledgmentRatesFormat.series}
-                                    type="bar"
-                                    height={380}
-                                />
                             </div>
                         </div>
                         <div className="mb-3 fw-600">
@@ -1080,8 +1065,6 @@ const NoticeDashboard = ({
                         />
                     </div>
                 )}
-
-
             </div>
             <div className="charts-grid mb-4">
                 {shouldShow("ni-7") && (

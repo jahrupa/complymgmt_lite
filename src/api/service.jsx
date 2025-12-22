@@ -1751,9 +1751,9 @@ export const fetchAuthorityDistributionCount = async (company_name) => {
     throw error;
   }
 }
-export const fetchStateWiseNoticeCount = async (state) => {
+export const fetchStateWiseNoticeCount = async (company_name) => {
   try {
-    const url = `${GET_STATE_WISE_NOTICE_COUNT}${state ? `?state=${encodeURIComponent(state)}` : ''}`;
+    const url = `${GET_STATE_WISE_NOTICE_COUNT}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1761,9 +1761,9 @@ export const fetchStateWiseNoticeCount = async (state) => {
     throw error;
   }
 }
-export const fetchTypesOfNoticeOrInspection = async () => {
+export const fetchTypesOfNoticeOrInspection = async (company_name) => {
   try {
-    const url = `${GET_TYPES_OF_NOTICE_OR_INSPECTION}`;
+    const url = `${GET_TYPES_OF_NOTICE_OR_INSPECTION} ${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {

@@ -17,6 +17,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { decryptData } from '../../page/utils/encrypt';
+import { generateDynamicSeries } from '../../../Utils/chartUtils';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ReturnsAndSubmissions = ({
@@ -83,7 +84,12 @@ const ReturnsAndSubmissions = ({
     const firstArray = Object.values(val).find((v) => Array.isArray(v));
     return firstArray || fallback;
   };
-
+  const riskDistributionByStateFormatSeries = generateDynamicSeries(
+    riskDistributionByState?.top_counts || [],
+    {
+      excludeKeys: ["state",],
+    }
+  );
   // --- Chart configs (use safe fallbacks) ---
   const comparisonOfReturnApplicabilityFormat = {
     series: [
@@ -165,15 +171,22 @@ const ReturnsAndSubmissions = ({
   };
 
   const riskDistributionByStateFormat = {
-    series: [{ name: "State", data: riskDistributionByState?.top_counts?.map((i) => i?.count_of_risk) || [] }],
+    series: riskDistributionByStateFormatSeries,
     options: {
-      chart: { type: "bar", toolbar: { show: false } },
+      chart: { type: "bar", toolbar: { show: false }, stacked: true },
+
       plotOptions: { bar: { horizontal: true } },
       dataLabels: { enabled: false },
       xaxis: { categories: riskDistributionByState?.top_counts?.map((i) => i?.state) || [], title: { text: "Risk Level Count" } },
       yaxis: { title: { text: "State" }, min: 0, tickAmount: 5 },
-      colors: ["#2cafc0ff"],
-      fill: { opacity: 1 },
+      colors: riskDistributionByStateFormatSeries.map(
+        (_, index) => `hsl(${(index * 60) % 360}, 50%, 60%)`
+      ),
+      fill: {
+        opacity: 1, colors: riskDistributionByStateFormatSeries.map(
+          (_, index) => `hsl(${(index * 60) % 360}, 50%, 60%)`
+        ),
+      },
       states: { hover: { filter: { type: "none" } }, active: { filter: { type: "none" } } },
     }
   };
