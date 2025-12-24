@@ -6,7 +6,6 @@ import { Tabs, Tab, Box } from "@mui/material";
 import GeneralComplianceDashboard from "../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard";
 import {
     createOrUpdateWidgetMapping,
-    fetchAllWidgetMappings,
     fetchClientOnboardingByCompany,
     fetchClientOnboardingPortfolio,
     fetchComplainceCockpit,

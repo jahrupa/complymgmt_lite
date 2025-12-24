@@ -1652,9 +1652,9 @@ export const fetchRemarksBasedOnCompany = async (company_name) => {
 }
 // Audit and Visits
 
-export const fetchAuditByServiceType = async (service_type) => {
+export const fetchAuditByServiceType = async (company_name) => {
   try {
-    const url = `${GET_AUDIT_BY_SERVICE_TYPE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const url = `${GET_AUDIT_BY_SERVICE_TYPE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1662,9 +1662,9 @@ export const fetchAuditByServiceType = async (service_type) => {
     throw error;
   }
 }
-export const fetchAuditPlatformsCountByStateSegmented = async (service_type) => {
+export const fetchAuditPlatformsCountByStateSegmented = async (company_name) => {
   try {
-    const url = `${GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const url = `${GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1718,9 +1718,9 @@ export const fetchCountOfRiskLevel = async (company_name) => {
 }
 
 
-export const fetchRiskLevelBasedOnServiceType = async (service_type) => {
+export const fetchRiskLevelBasedOnServiceType = async (company_name) => {
   try {
-    const url = `${GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE}${service_type ? `?service_type=${encodeURIComponent(service_type)}` : ''}`;
+    const url = `${GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
@@ -1783,7 +1783,7 @@ export const fetchAnalysisOfApplicableAct = async (company_name) => {
 }
 export const fetchNoticesAssignedTo = async (assigned_to) => {
   try {
-    const url = `${GET_NOTICES_ASSIGNED_TO}${assigned_to ? `?assigned_to=${encodeURIComponent(assigned_to)}` : ''}`;
+    const url = `${GET_NOTICES_ASSIGNED_TO}${assigned_to ? `?company_name=${encodeURIComponent(assigned_to)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {

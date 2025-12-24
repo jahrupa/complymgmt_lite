@@ -14,7 +14,6 @@ import DashboardDrawerGrid from "../DashboardDrawer";
 import { ArrowUpRight, X } from "lucide-react";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
-import MenuPopup from "../../component/MenuPopup";
 
 const NoticeDashboard = ({
     selectedCompany,
@@ -641,9 +640,7 @@ const NoticeDashboard = ({
                     "fetch types of notice or inspection failed:",
                     typesOfNoticeOrInspectionRes.reason
                 );
-                setNoticeTypeBreakdown(
-                    typesOfNoticeOrInspectionRes.reason?.status || []
-                );
+                setNoticeTypeBreakdown([]);
             }
             if (analysisOfApplicableActRes.status === "fulfilled") {
                 setApplicableActsAnalysis(analysisOfApplicableActRes.value);
@@ -784,7 +781,7 @@ const NoticeDashboard = ({
                         />
                     </div>
                 )}
-                
+
                 {shouldShow("ni-2") && (
                     <div
                         className={`chart-card ${cardClass("ni-2") ? "selected-card" : ""
