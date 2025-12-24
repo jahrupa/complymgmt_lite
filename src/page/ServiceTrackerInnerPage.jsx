@@ -26,12 +26,11 @@ const ServiceTrackerInnerPage = () => {
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
-    //  console.log(rowData, 'rowData')
-    //  console.log(columnDefs, 'columnDefs')
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileName, setFileName] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(null);
     const [editData, setEditData] = useState(null);
+    const [addData, setAddData] = useState(null);
     const [trackerId, setTrackerId] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -45,19 +44,26 @@ const ServiceTrackerInnerPage = () => {
         sheet_name: '',
         sheet_id: null,
         isFilteredData: false,
+        sheet_upload_type: ''
 
     });
-    console.log(current?.sheet_name?.[0], 'sheet_name');
+    // console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
     const gridRef = useRef();
-    const openModal = () => setIsModalOpen(true);
+    const openModal = () => {
+        setIsModalOpen(true);
+        // setIsEditing(null);/
+        setAddData(null);
+    };
     const closeModal = () => {
         setIsModalOpen(false);
-        setIsEditing(false);
+        setIsEditing(null);
         setEditData(null);
+        setCurrent({ sheet_upload_type: '' })
 
     };
+
     const formattedTrackerName = trackerName.toLowerCase().replace(/\s+/g, '_');
     const currentUser = decryptData(localStorage.getItem('user_id'));
     const navigate = useNavigate();
@@ -71,7 +77,11 @@ const ServiceTrackerInnerPage = () => {
             maxNumConditions: 10,
         },
     };
-
+    const SHEET_OPTIONS = [
+        { _id: "bulk_upload", name: "Bulk Upload" },
+        { _id: "replace_sheet", name: "Replace Sheet" },
+        { _id: "add_single_record", name: "Add Single Record" },
+    ];
     // Handle Delete
     const handleDelete = async (userId) => {
         try {
@@ -219,6 +229,7 @@ const ServiceTrackerInnerPage = () => {
                             setTrackerId(params.data._id);
                             setIsEditing(true);
                             setIsModalOpen(true);
+                            setCurrent({ sheet_upload_type: '' })
                         }}>
                             <EditIcon fontSize="small" className="action_icon" />
                         </button>
@@ -298,7 +309,26 @@ const ServiceTrackerInnerPage = () => {
     //     }
     // };
 
+    const handleAddSingleRecord = () => {
+        setIsEditing(false);
 
+        if (rowData.length > 0) {
+            const emptyObj = {};
+            Object.keys(rowData[0]).forEach((key) => {
+                emptyObj[key] = '';
+            });
+            setAddData(emptyObj);
+        }
+
+        setIsModalOpen(true);
+    };
+
+    const handleReplaceSheet = () => {
+        openModal();
+    };
+    const handleBulkUploadSheet = () => {
+        openModal();
+    };
 
     // Handle File Change
     const handleFileChange = (e) => {
@@ -345,6 +375,7 @@ const ServiceTrackerInnerPage = () => {
                 severityType: 'error',
             });
         }
+
     };
 
     // Handle Approve All
@@ -398,10 +429,50 @@ const ServiceTrackerInnerPage = () => {
             setEditData(null);
         }
     };
+    const handleAddSubmit = async () => {
+        try {
+            const response = await updateServiceTrackerData(
+                null, // backend naya record create karega
+                formattedTrackerName,
+                addData
+            );
+
+            const message = response?.message || 'Record added successfully';
+
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            setRowData(updatedData);
+
+            setIsSnackbarsOpen({
+                open: true,
+                message,
+                severityType: 'success',
+                vertical: 'top',
+                horizontal: 'center',
+            });
+
+            closeModal();
+            setIsEditing(false);
+            setEditData(null);
+        } catch (error) {
+            setIsSnackbarsOpen({
+                open: true,
+                message: error?.response?.data?.message || 'Failed to add record',
+                severityType: 'error',
+                vertical: 'top',
+                horizontal: 'center',
+            });
+        }
+    };
 
     // Handle Edit Input Change
     const handleEditChange = (e, key) => {
         setEditData({ ...editData, [key]: e.target.value });
+    };
+    const handleAddChange = (e, key) => {
+        setAddData({
+            ...addData,
+            [key]: e.target.value,
+        });
     };
 
     const onRowValueChanged = (event) => {
@@ -471,7 +542,6 @@ const ServiceTrackerInnerPage = () => {
             </div>
         </div>
     );
-
     const editServiceTracker = () => (
         <div className="p-3">
             <div className="mb-3">
@@ -563,6 +633,94 @@ const ServiceTrackerInnerPage = () => {
             </div>
         </div>
     );
+    const serviceTrackerForm = ({ formData, onChange, onSubmit }) => (
+        <div className="p-3">
+            <div className="mb-3">
+                {formData &&
+                    Object.keys(formData).map((key) => {
+                        if (
+                            [
+                                '_id',
+                                'created_at',
+                                'updated_at',
+                                'deleted_at',
+                                'deleted_by',
+                                'is_deleted',
+                                'is_active',
+                            ].includes(key)
+                        ) {
+                            return null;
+                        }
+
+                        const label = key
+                            .replace(/_/g, ' ')
+                            .replace(/\b\w/g, (l) => l.toUpperCase());
+
+                        const isDisabled =
+                            isEditing &&
+                            [
+                                'approval_status_by_karma',
+                                'approved_by',
+                                'approved_at',
+                                'created_by',
+                                'updated_by',
+                            ].includes(key);
+
+                        if (key === 'approval_status') {
+                            return (
+                                <div key={key} className="mb-3">
+                                    <label className="form-label">{label}</label>
+                                    <select
+                                        className="form-select"
+                                        value={formData[key] || ''}
+                                        onChange={(e) => onChange(e, key)}
+                                        disabled={isDisabled}
+                                    >
+                                        <option value="">Select Status</option>
+                                        <option value="0">Pending</option>
+                                        <option value="1">Approved</option>
+                                    </select>
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <div key={key} className="mb-3">
+                                <label className="form-label">{label}</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={formData[key] || ''}
+                                    onChange={(e) => onChange(e, key)}
+                                    disabled={isDisabled}
+                                />
+                            </div>
+                        );
+                    })}
+            </div>
+
+            <div className="row row-gap-2">
+                <div className="col-12 col-md-6">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={closeModal}
+                    >
+                        Cancel
+                    </button>
+                </div>
+                <div className="col-12 col-md-6">
+                    <button
+                        type="button"
+                        className="btn btn-primary w-100"
+                        onClick={onSubmit}
+                    >
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 
     const getRoleColorForFileStatus = (status) => {
         switch (status) {
@@ -635,7 +793,6 @@ const ServiceTrackerInnerPage = () => {
 
         fetchData();
     }, [current]);
-
 
     const onFilterOpened = (params) => {
         console.log("Filter opened");
@@ -713,21 +870,51 @@ const ServiceTrackerInnerPage = () => {
             });
         });
     };
+    const getCrudForm = () => {
+        if (isEditing) {
+            return editServiceTracker;
+        }
+
+        if (addData) {
+            return () =>
+                serviceTrackerForm({
+                    formData: addData,
+                    onChange: handleAddChange,
+                    onSubmit: handleAddSubmit,
+                });
+        }
+
+        if (
+            current?.sheet_upload_type === 'Replace Sheet' ||
+            current?.sheet_upload_type === 'Bulk Upload'
+        ) {
+            return fileUploadForm;
+        }
+
+        return null;
+    };
 
     return (
         <div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} uploadStatus={uploadStatus} />
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete Tracker' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
             <SmallSizeModal
-                crudForm={isEditing ? editServiceTracker : fileUploadForm}
-                crudTitle={isEditing ? 'Edit Tracker' : 'Upload File'}
+                crudForm={getCrudForm()}
+                crudTitle={
+                    isEditing
+                        ? 'Edit Tracker'
+                        : addData
+                            ? 'Add Tracker'
+                            : 'Upload File'
+                }
                 isEditing={isEditing}
                 editCrudTitle="Edit Tracker"
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
                 closeModal={closeModal}
             />
-            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex align-items-center'>
                 <div className="notification-page-title">
                     <button
                         className="back-button"
@@ -740,11 +927,57 @@ const ServiceTrackerInnerPage = () => {
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
-                    <button className="w-100 mb-2 justify-content-center reject upload-wrapper upload-label" onClick={openModal}>
+                    <div style={{ width: '250px' }}>
+                        <SingleSelectTextField
+                            name="sheet_upload_type"
+                            label="Sheet Upload"
+                            value={current?.sheet_upload_type || ''}
+                            onChange={(e) => {
+                                const selectSheetType = e.target.value;
+                                setCurrent((prev) => ({
+                                    ...prev,
+                                    sheet_upload_type: selectSheetType,
+                                    isFilteredData: !!selectSheetType,
+                                }));
+
+                                if (selectSheetType === "Replace Sheet"|| selectSheetType === "Bulk Upload") {
+                                    handleReplaceSheet();
+                                }
+
+                                if (selectSheetType === "Add Single Record" ) {
+                                    handleAddSingleRecord();
+                                }
+                                
+                            }}
+                            names={SHEET_OPTIONS}
+                        />
+
+                    </div>
+                    {/* <button
+                        className="w-100 mb-2 justify-content-center reject upload-wrapper upload-label mt-lg-2 mt-md-2"
+                        onClick={() => {
+                            setIsEditing(false);
+
+                            // editData se keys le kar empty object banana
+                            if (rowData.length > 0) {
+                                const emptyObj = {};
+                                Object.keys(rowData[0]).forEach((key) => {
+                                    emptyObj[key] = '';
+                                });
+                                setAddData(emptyObj);
+                            }
+
+                            setIsModalOpen(true);
+                        }}
+                    >
+                        <span className="text" style={{ whiteSpace: 'nowrap' }}>Add Record</span>
+                    </button> */}
+
+                    {/* <button className="w-100 mb-2 justify-content-center reject upload-wrapper upload-label" onClick={openModal}>
                         <Upload size={20} />
                         <span className="text">Upload</span>
-                    </button>
-                    <div className='btn-wrap-div'>
+                    </button> */}
+                    <div className='btn-wrap-div mt-lg-2 mt-md-2'>
                         <button className="button approve w-100 justify-content-center" onClick={handleApproveAll}>
                             <span className="icon">
                                 <svg viewBox="0 0 24 24">
@@ -760,39 +993,7 @@ const ServiceTrackerInnerPage = () => {
                 <div className="table_div p-3">
                     <div className='d-lg-flex d-md-flex  justify-content-between'>
                         <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-                        <div className='w-25'>
-                            {/* <SingleSelectTextField
-                                name="sheet_name"
-                                label="Sheet Name"
-                                value={current?.sheet_name || ''}
-                                onChange={async (e) => {
-                                    const selectedName = e.target.value;
-                                    setCurrent((prev) => ({
-                                        ...prev,
-                                        sheet_name: selectedName,
-                                        isFilteredData: selectedName ? true : false // Set to true to indicate filtered data
-                                    }));
-
-                                    if (selectedName) {
-                                        try {
-                                            const filterUpdateData = await fetchAllInnerPageServiceTracker(
-                                                formattedTrackerName,
-                                                selectedName
-                                            );
-                                            setRowData(filterUpdateData);
-                                        } catch (error) {
-                                            console.error("Error fetching service tracker data:", error);
-                                        }
-                                    }
-                                }}
-                                names={
-                                    serviceTrackerSheet?.map((data) => ({
-                                        _id: data?.name,
-                                        name: data?.name
-                                    })) || []
-                                }
-                            /> */}
-
+                        <div style={{ width: '250px' }}>
                             <SingleSelectTextField
                                 name="sheet_name"
                                 label="Sheet Name"
@@ -819,11 +1020,8 @@ const ServiceTrackerInnerPage = () => {
                                     })) || []
                                 }
                             />
-
-
-
-                            {/* <Modal crudForm={crudForm} closeModal={closeModal} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} /> */}
                         </div>
+
                     </div>
                     <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                         <AgGridReact

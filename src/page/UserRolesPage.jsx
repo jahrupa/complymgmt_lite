@@ -61,8 +61,8 @@ const UserRolesPage = () => {
   });
   const gridRef = useRef();
   const userType = [
-    { id: 1,  value: 'Internal' },
-    { id: 2, value: 'External' },
+    { id: 0,  value: 'Internal' },
+    { id: 1, value: 'External' },
   ];
    const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {

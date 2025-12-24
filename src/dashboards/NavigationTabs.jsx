@@ -13,6 +13,7 @@ import {
     fetchComplainceCockpitByCompany,
     fetchGeneralCompaiancePortfolio,
     fetchGeneralComplianceByCompany,
+    fetchWidgetMappingById,
 } from "../api/service";
 import CockpitComplinceByCompany from "./cockpitDashboard/CockpitComplinceByCompany";
 import CockpitComplince from "./cockpitDashboard/CockpitComplince";
@@ -50,6 +51,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
+    console.log(widgetsList, 'widgetsList')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -118,7 +120,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
 
     const userType = decryptData(localStorage.getItem("user_type"));
     const userId = decryptData(localStorage.getItem("user_id"));
-
     const shouldShow = (id) => {
         return Array.isArray(widgetsList) &&
             widgetsList.flat().some(
@@ -298,9 +299,17 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     useEffect(() => {
         const fetchWidgetsListData = async () => {
             const [a] = await Promise.allSettled([
-                fetchAllWidgetMappings(),
+                // fetchAllWidgetMappings(),
+                fetchWidgetMappingById(userId),
+
             ]);
-            setWidgetsList(a.status === "fulfilled" ? a.value?.map((item) => item?.widgets) : []);
+            setWidgetsList(
+                a.status === "fulfilled"
+                    ? a.value?.widgets || []
+                    : []
+            );
+
+
         };
         fetchWidgetsListData();
     }, [selectedCompany]);

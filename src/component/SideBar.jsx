@@ -18,12 +18,14 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Layers, ScanEye } from 'lucide-react';
+import { decryptData } from '../page/utils/encrypt';
 
 function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
     // const [activePage, setActivePage] = useState(() => {
     //     return localStorage.getItem('activeItem') || 'Dashboard';
     // });
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
+    const userRole = decryptData(localStorage.getItem("user_role"));
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
         { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
@@ -36,11 +38,15 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         // { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
-        { icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Widget Mappings', link: 'widget_mappings' },
-        // { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
-    ];
-
-
+          ...(userRole === 'Admin' || userRole === 'Super-Admin'
+        ? [{
+            icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+            label: 'Widget Mappings',
+            link: 'widget_mappings'
+        }]
+        : []
+    ),
+];
     const serviceTracker = [
         { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
         { icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tracker Access', link: 'service_tracker_access' },
