@@ -48,7 +48,6 @@ const ServiceTrackerInnerPage = () => {
         isFileAppended: false
 
     });
-    console.log(current, 'current')
     // console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
@@ -80,7 +79,7 @@ const ServiceTrackerInnerPage = () => {
         },
     };
     const SHEET_OPTIONS = [
-        { _id: "bulk_upload", name: "Bulk Upload" },
+        { _id: "bulk_upload", name: "Add Sheets" },
         { _id: "replace_sheet", name: "Replace Sheet" },
         { _id: "add_single_record", name: "Add Single Record" },
     ];
@@ -886,7 +885,7 @@ const ServiceTrackerInnerPage = () => {
 
         if (
             current?.sheet_upload_type === 'Replace Sheet' ||
-            current?.sheet_upload_type === 'Bulk Upload'
+            current?.sheet_upload_type === 'Add Sheets'
         ) {
             return fileUploadForm;
         }
@@ -938,10 +937,10 @@ const ServiceTrackerInnerPage = () => {
                                     ...prev,
                                     sheet_upload_type: selectSheetType,
                                     isFilteredData: !!selectSheetType,
-                                    isFileAppended: e.target.value === "Bulk Upload" ? true : false
+                                    isFileAppended: e.target.value === "Add Sheets" ? true : false
                                 }));
 
-                                if (selectSheetType === "Replace Sheet" || selectSheetType === "Bulk Upload") {
+                                if (selectSheetType === "Replace Sheet" || selectSheetType === "Add Sheets") {
                                     handleReplaceSheet();
                                 }
 
