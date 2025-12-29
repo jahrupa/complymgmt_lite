@@ -162,6 +162,7 @@ import {
   CREATE_OR_UPDATE_WIDGET_MAPPING,
   DELETE_WIDGET_MAPPING_BY_ID,
   GET_WIDGETS_BY_USER_ID,
+  APPEND_TRACKER,
 
 } from "./Endpoint";
 
@@ -723,6 +724,16 @@ export const fetchAllInnerPageServiceTracker = async (trackerName, sheetName) =>
   }
 };
 
+export const appendServiceTrackerInnerPageDAta= async (trackerName) => {
+  try {
+    const url = `${APPEND_TRACKER}${encodeURIComponent(trackerName)}}`;
+    const response = await API.post(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching inner page service tracker:", error);
+    throw error;
+  }
+};
 export const fetchAllServiceTrackerName = async () => {
   try {
     const response = await API.get(GET_ALL_SERVICE_TRACKER_NAME);
@@ -989,7 +1000,31 @@ export const uploadExcelFile = async (filesArray, metadata = {}) => {
     throw error;
   }
 };
+export const appendExcelFile = async (filesArray, metadata = {}) => {
+  try {
+    const formData = new FormData();
 
+    filesArray.forEach((file) => {
+      formData.append("file", file);
+    });
+
+    // Append other fields
+    Object.entries(metadata).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    const response = await API.post(`${APPEND_TRACKER}${encodeURIComponent(metadata.tracker_name)}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Upload failed:", error.response?.data || error);
+    throw error;
+  }
+};
 export const deleteFileById = async (id) => {
   try {
     const response = await API.delete(`${DELETE_FILE_ID}${id}`);

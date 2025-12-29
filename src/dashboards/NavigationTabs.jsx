@@ -16,10 +16,8 @@ import {
 } from "../api/service";
 import CockpitComplinceByCompany from "./cockpitDashboard/CockpitComplinceByCompany";
 import CockpitComplince from "./cockpitDashboard/CockpitComplince";
-
 import ClientOnbordingDashboard from "./clientOnbordingDashboard/ClientOnbordingDashboard";
 import ClientOnBoardingByCompany from "./clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany";
-
 import PayrollServices from "./payrollDashboard/PayrollServices ";
 import ReturnsAndSubmissions from "./payrollDashboard/ReturnsAndSubmissions";
 import HelpdeskAndEscalations from "./payrollDashboard/HelpdeskAndEscalations";

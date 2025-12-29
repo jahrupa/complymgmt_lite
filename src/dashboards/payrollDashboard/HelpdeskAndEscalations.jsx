@@ -839,7 +839,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               </div>
             </div>
             <div className="mb-3 fw-600">
-              Analysis of client delay flags for open tickets in PF_ESIC_Helpdesk
+              Analysis of client delay flags tickets in PF_ESIC_Helpdesk
             </div>
             <Chart
               options={clientDelayFlagsFormat.options}

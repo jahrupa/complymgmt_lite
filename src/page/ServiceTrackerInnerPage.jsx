@@ -11,7 +11,7 @@ import { ModuleRegistry, AllCommunityModule, ColumnAutoSizeModule } from 'ag-gri
 import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
-import { bulkApproveAllServiceTrackerData, fetchAllInnerPageServiceTracker, fetchAllServiceTrackerSheetData, updateServiceTrackerData, uploadExcelFile } from '../api/service';
+import { appendExcelFile, bulkApproveAllServiceTrackerData, fetchAllInnerPageServiceTracker, fetchAllServiceTrackerSheetData, updateServiceTrackerData, uploadExcelFile } from '../api/service';
 import Toggle from '../component/Toggle';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
@@ -44,9 +44,11 @@ const ServiceTrackerInnerPage = () => {
         sheet_name: '',
         sheet_id: null,
         isFilteredData: false,
-        sheet_upload_type: ''
+        sheet_upload_type: '',
+        isFileAppended: false
 
     });
+    console.log(current, 'current')
     // console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
@@ -326,9 +328,6 @@ const ServiceTrackerInnerPage = () => {
     const handleReplaceSheet = () => {
         openModal();
     };
-    const handleBulkUploadSheet = () => {
-        openModal();
-    };
 
     // Handle File Change
     const handleFileChange = (e) => {
@@ -346,6 +345,7 @@ const ServiceTrackerInnerPage = () => {
             bo_user_id: currentUser,
             tracker_name: trackerName,
         };
+        const fileUpload = current?.isFileAppended ? appendExcelFile : uploadExcelFile
         try {
             setUploadStatus("pending");
             setIsSnackbarsOpen({
@@ -354,7 +354,7 @@ const ServiceTrackerInnerPage = () => {
                 message: "Uploading file...",
                 severityType: 'info',
             });
-            const result = await uploadExcelFile([fileName], metadata);
+            const result = await fileUpload([fileName], metadata);
             setUploadStatus("success");
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -938,16 +938,17 @@ const ServiceTrackerInnerPage = () => {
                                     ...prev,
                                     sheet_upload_type: selectSheetType,
                                     isFilteredData: !!selectSheetType,
+                                    isFileAppended: e.target.value === "Bulk Upload" ? true : false
                                 }));
 
-                                if (selectSheetType === "Replace Sheet"|| selectSheetType === "Bulk Upload") {
+                                if (selectSheetType === "Replace Sheet" || selectSheetType === "Bulk Upload") {
                                     handleReplaceSheet();
                                 }
 
-                                if (selectSheetType === "Add Single Record" ) {
+                                if (selectSheetType === "Add Single Record") {
                                     handleAddSingleRecord();
                                 }
-                                
+
                             }}
                             names={SHEET_OPTIONS}
                         />
