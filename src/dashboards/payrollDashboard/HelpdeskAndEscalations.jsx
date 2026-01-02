@@ -973,8 +973,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               </div>
             </div>
             <div className="mb-3 fw-600">
-              Ticket volume by State for PF, ESIC, and LWF categories in
-              PF_ESIC_Helpdesk
+              Government delay flags tickets in PF_ESIC_Helpdesk
             </div>
             <Chart
               options={governmentDelayFlagsFormat.options}

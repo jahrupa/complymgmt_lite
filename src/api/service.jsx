@@ -1905,9 +1905,9 @@ export const fetchIssueCategoryByStatus = async (company_name) => {
 
 // Dashboaed Widgets 
 
-export const fetchAllWidgetMappings = async () => {
+export const fetchAllWidgetMappings = async (userId) => {
   try {
-    const response = await API.get(GET_ALL_WIDGET_MAPPINGS);
+    const response = await API.get(`${GET_ALL_WIDGET_MAPPINGS}?user_id=${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching all widget mappings:", error);
@@ -1915,9 +1915,9 @@ export const fetchAllWidgetMappings = async () => {
   }
 };
 
-export const createOrUpdateWidgetMapping = async (widgetData) => {
+export const createOrUpdateWidgetMapping = async (widgetData,userId) => {
   try {
-    const response = await API.post(CREATE_OR_UPDATE_WIDGET_MAPPING, widgetData);
+    const response = await API.post(`${CREATE_OR_UPDATE_WIDGET_MAPPING}?user_id=${userId}`, widgetData);
     return response.data;
   } catch (error) {
     console.error("Error creating or updating widget mapping:", error);
@@ -1925,9 +1925,9 @@ export const createOrUpdateWidgetMapping = async (widgetData) => {
   }
 };
 
-export const deleteWidgetMappingById = async (id) => {
+export const deleteWidgetMappingById = async (user_id,target_user_id) => {
   try {
-    const response = await API.delete(`${DELETE_WIDGET_MAPPING_BY_ID}${id}`);
+    const response = await API.delete(`${DELETE_WIDGET_MAPPING_BY_ID}${user_id}&target_user_id=${target_user_id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting widget mapping by ID:", error);

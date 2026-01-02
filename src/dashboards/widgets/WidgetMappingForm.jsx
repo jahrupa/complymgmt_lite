@@ -65,7 +65,7 @@ function WidgetMappingForm({ mapping, onSave, onCancel ,formData,setFormData}) {
               {formData.widgets?.map((widget, index) => (
                 <div key={index} className="widget-item">
                   <div className="widget-info">
-                    <span className="widget-id">{widget.widget_id}</span>
+                    <span className="widget-id">{widget.dashboard_name}</span>
                     <span className="widget-name">{widget.widget_name}</span>
                   </div>
                   <button

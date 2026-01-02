@@ -315,11 +315,11 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         if (!updatedFormData) return;
 
         const payload = {
-            user_id: userId,
+            user_id: current?.user_id,
             widget_ids: selectedCharts.map(id => id.toUpperCase())
         };
         try {
-            const response = await createOrUpdateWidgetMapping(payload);
+            const response = await createOrUpdateWidgetMapping(payload,userId);
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,

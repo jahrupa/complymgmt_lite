@@ -3,6 +3,7 @@ import WidgetMappingForm from './WidgetMappingForm';
 import '../../style/widgetMappings.css';
 import Snackbars from '../../component/Snackbars';
 import { createOrUpdateWidgetMapping, deleteWidgetMappingById, fetchAllWidgetMappings } from '../../api/service';
+import { decryptData } from '../../page/utils/encrypt';
 
 function WidgetMappings() {
   const [mappings, setMappings] = useState([]);
@@ -29,6 +30,8 @@ function WidgetMappings() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const userId = decryptData(localStorage.getItem("user_id"));
+
 
   // ------------------------
   // LOAD DATA
@@ -36,7 +39,7 @@ function WidgetMappings() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchAllWidgetMappings();
+        const data = await fetchAllWidgetMappings(userId);
         setMappings(data);
         setFilteredMappings(data);
       } catch (error) {
@@ -118,11 +121,11 @@ function WidgetMappings() {
     if (!deleteConfirm) return;
     try {
       // Call delete API
-      const response = await deleteWidgetMappingById(deleteConfirm);
+      const response = await deleteWidgetMappingById(userId,deleteConfirm);
       const message = response?.message || "Mapping deleted successfully";
 
       // Refresh list
-      const updatedData = await fetchAllWidgetMappings();
+      const updatedData = await fetchAllWidgetMappings(userId);
       setMappings(updatedData);
       setFilteredMappings(updatedData);
 
@@ -244,7 +247,7 @@ function WidgetMappings() {
                 <div className="widget-tags">
                   {mapping.widgets.map((widget, i) => (
                     <div key={i} className="widget-tag">
-                      <span className="tag-id">{widget.widget_id}</span>
+                      <span className="tag-id">{widget.dashboard_name}</span>
                       <span className="tag-name">{widget.widget_name}</span>
                     </div>
                   ))}
