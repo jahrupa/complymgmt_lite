@@ -5,19 +5,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import Toggle from '../component/Toggle';
-import { uploadFile, uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId, fetchDocumentDropdownTypes, fetchDocumentDropdownStages, approveUserAccess } from '../api/service';
+import { uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId, fetchDocumentDropdownTypes, fetchDocumentDropdownStages } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-// import AccountBoxIcon from '@mui/icons-material/CalendarMonth';
-// import MenuPopup from './MenuPopup';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import MenuPopup from '../component/MenuPopup';
 import MultiFileUpload from '../component/MultiFileUpload';
 import RightDrawer from '../component/RightDrawer';
 import { ReactPDFViewer } from '../component/ReactPDFViewer';
@@ -47,13 +43,11 @@ const DocumentUpload = () => {
       stage: '',
       stage_id: null
     });
-  console.log(current, 'current')
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([])
-  console.log(uploadedFiles, 'uploadedFiles')
   const [documentId, setDocumentId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -152,7 +146,7 @@ const DocumentUpload = () => {
   const closeModal = () => {
     setIsFileUploadModalModalOpen(false);
     setIsDeleteModalOpen(false);
-
+    setUploadedFiles([]);
   };
   const toggleDrawer = (newOpen) => () => {
     setIsModalOpen(newOpen);
@@ -194,15 +188,17 @@ const DocumentUpload = () => {
 
 
   const handleFileUpload = async () => {
-
     if (!uploadedFiles?.length) {
-      alert("Please select at least one file.");
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: "Please select at least one file.",
+        severityType: 'warning',
+      });
       return;
     }
     try {
-      // const result = await uploadFile(uploadedFiles);
       const result = await uploadFileGolang(uploadedFiles, isAutoUpload);
-      //  console.log("Files uploaded successfully:", result);
       setIsFileUploadModalModalOpen(false);
       const message = result?.message || "Status update successfully"
       // Show success snackbar
@@ -212,22 +208,10 @@ const DocumentUpload = () => {
         message,
         severityType: 'success',
       });
-      // const { Data } = result;
-
-      // if (Data && Data.length > 0) {
-      //   const summary = Data.map((file, index) => {
-      //     return `${index + 1}. 📄 ${file.filename}\n   🏷️ Doc Type: ${file.doc_type}\n   📊 Confidence: ${file.confidence}%`;
-      //   }).join("\n\n");
-
-      //   alert(`✅ Files uploaded successfully 🎉\n\n${summary}`);
-      // } else {
-      //   alert("Files uploaded, but no metadata returned.");
-      // }
       const updatedData = await fetchAllFiles();
       setData(updatedData);
+      setUploadedFiles([]);
     } catch (error) {
-      // console.error("Upload failed:", error);
-      // alert("❌ Upload failed. Please try again.");
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
@@ -453,29 +437,7 @@ const DocumentUpload = () => {
         return { color: '#41464b' }; // gray
     }
   };
-  const handleCheckboxClick = async (id) => {
-    try {
-      const response = await approveUserAccess(id);
-      const message = response?.message
-      // Show success snackbar
-      setIsSnackbarsOpen({
-        ...issnackbarsOpen,
-        open: true,
-        message,
-        severityType: 'success',
-      });
-    } catch (error) {
-      // Show error snackbar
-      setIsSnackbarsOpen({
-        ...issnackbarsOpen,
-        open: true,
-        message: error?.response?.data?.message,
-        severityType: 'error',
-      });
-    }
-    const updatedData = await fetchAllFiles();
-    setData(updatedData);
-  };
+
   const colDefs = [
     {
       headerName: 'Actions',
@@ -628,7 +590,7 @@ const DocumentUpload = () => {
     editable: true,
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
-  const onRowValueChanged = (event) => {
+  const onRowValueChanged = () => {
     //  console.log('Row updated:', event.data);
   };
   const onFilterTextBoxChanged = useCallback(() => {
@@ -1028,65 +990,45 @@ const DocumentUpload = () => {
   return (
     <div>
       <RightDrawer isPdfView={isPdfView} toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} pdfFile={pdfFile} />
-      <h5>Upload Document</h5>
-      <div className='row  mb-4 mt-4'>
-        <div className='col col-12 col-lg-4 mb-3 col-md-4'>
-          <div className='card_div p-3 w-auto card-border-blue'>
-            <div><AccountBoxIcon style={{ width: 20, height: 20, color: 'gray' }} /></div>
-            <div className='mt-1 fs-12'>Total Clients</div>
-            <div className='d-flex justify-content-between align-items-center'><div className='fs-14 fw-600 icon-color'>120</div><div><div><MenuPopup /></div></div></div>
+      <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+        <div className="notification-page-title">
+          <div>
+            <h1>Upload Document</h1>
           </div>
         </div>
-        <div className='col col-12 col-lg-4 mb-3 col-md-4'>
-          <div className='card_div p-3 w-auto card-border-green'>
-            <div><AccountBoxIcon style={{ width: 20, height: 20, color: 'gray' }} /></div>
-            <div className='mt-1 fs-12'>Total Active Clients</div>
-            <div className='d-flex justify-content-between align-items-center'>
-              <div className='fs-14 fw-600 active-color'>100</div>
-              <div><MenuPopup /></div>
+        <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+          <div className='pe-2 d-lg-flex d-md-flex gap-3'>
+            <div>
+              <button className="reject upload-wrapper upload-label" onClick={openModal}>
+                <span className="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
+                  </svg>
+                </span>
+                <span className="text">Upload File</span>
+              </button>
             </div>
-          </div>
-        </div>
-        <div className='col col-12 col-lg-4 mb-3 col-md-4'>
-          <div className='card_div p-3 w-auto card-border-red'>
-            <div><AccountBoxIcon style={{ width: 20, height: 20, color: 'gray' }} /></div>
-            <div className='mt-1 fs-12'>Total Inactive Clients</div>
-            <div className='d-flex justify-content-between align-items-center'><div className='fs-14 fw-600 inactive-color'>20</div><div><div><MenuPopup /></div></div></div>
+            <div className='btn-wrap-div'>
+              <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+                <span className="icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
+                  </svg>
+                </span>
+                <span className="text">Approve</span>
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
+
       <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
+      <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
+      <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} closeModal={closeModal} />
       <div className='table_div p-3'>
         <div className='d-lg-flex d-md-flex  justify-content-between'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-          <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div className='pe-2 d-lg-flex d-md-flex gap-3'>
-              <div>
-                <button className="reject upload-wrapper upload-label" onClick={openModal}>
-                  <span className="icon">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
-                    </svg>
-                  </span>
-                  <span className="text">Upload File</span>
-                </button>
-              </div>
-              {/* <MonthYearCalander /> */}
-              <div className='btn-wrap-div'>
-                <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
-                  <span className="icon">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
-                    </svg>
-                  </span>
-                  <span className="text">Approve</span>
-                </button>
-              </div>
-
-            </div>
-            <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-            <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} closeModal={closeModal} />
-          </div>
         </div>
 
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
@@ -1099,9 +1041,7 @@ const DocumentUpload = () => {
             editType="fullRow"
             rowSelection="single"
             pagination={true}
-            // rowBuffer={rowBuffer}
             onRowValueChanged={onRowValueChanged}
-
           />
         </div>
       </div>

@@ -829,8 +829,25 @@ const PayrollServices = ({
                     )}
                 </div>
 
-
-                {payrollDashboardConfig
+                {shouldShow("ps-8") && (
+                    <div
+                        className={`chart-card ${cardClass("ps-8") ? "selected-card" : ""}`}
+                        onClick={canSelect ? () => handleSelect("ps-8") : undefined}
+                        style={{ height: '515px' }}
+                    >
+                        <div className="ag-theme-quartz" style={{ height: "400px", width: "100%", marginTop: "1rem" }}>
+                            <div className="mb-3 fw-600">Explanation for Employee count</div>
+                            <AgGridReact
+                                theme="legacy"
+                                rowData={explanationOfEmployeeCount|| []}
+                                columnDefs={columnDefs}
+                                pagination
+                                paginationPageSize={5}
+                            />
+                        </div>
+                    </div>
+                )}
+                {/* {payrollDashboardConfig
                     .filter((item) => item.type === "table")
                     .map((table) => (
                         <div
@@ -865,7 +882,7 @@ const PayrollServices = ({
                                 />
                             </div>
                         </div>
-                    ))}
+                    ))} */}
             </div>
             <DashboardDrawerGrid
                 anchor={drawerAnchor}
