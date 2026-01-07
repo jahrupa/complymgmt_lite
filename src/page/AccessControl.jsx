@@ -212,8 +212,9 @@ const AccessControl = () => {
       case "service_tracker_wise":
         if (!current.service_tracker)
           tempErrors.service_tracker = "Service Tracker is required";
-        if (!current.sheet_name)
+        if (current.sheet_name && current.sheet_name.trim() === "") {
           tempErrors.sheet_name = "Sheet Name is required";
+        }
         if (!current.service_tracker_wise)
           tempErrors.service_tracker_wise = "Service Tracker Wise is required";
         break;
