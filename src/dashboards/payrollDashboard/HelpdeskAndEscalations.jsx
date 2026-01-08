@@ -175,24 +175,24 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         categories:
           ProportionOfCases?.top_count?.map((item) => item.pending_from ?? 0) ||
           [],
-        labels: {
-          formatter: function (val) {
-            return val + "K";
-          },
-        },
+        // labels: {
+        //   formatter: function (val) {
+        //     return val + "K";
+        //   },
+        // },
       },
       yaxis: {
         title: {
           text: undefined,
         },
       },
-      tooltip: {
-        y: {
-          formatter: function (val) {
-            return val + "K";
-          },
-        },
-      },
+      // tooltip: {
+      //   y: {
+      //     formatter: function (val) {
+      //       return val + "K";
+      //     },
+      //   },
+      // },
 
       legend: {
         position: "top",
