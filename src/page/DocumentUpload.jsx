@@ -1,91 +1,110 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import '../style/useRole.css';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import Toggle from '../component/Toggle';
-import { uploadFileGolang, fetchAllFiles, deleteFileById, updateFileById, bulkApproveAllPageData, fetchAllGroup, fetchCompaniesNameByGroupId, getLocationByCompanyId, fetchAllModulesNameByLocationId, fetchAllSubModuleNameByModuleId, fetchServiceTrackerBySubModuleId, fetchDocumentDropdownTypes, fetchDocumentDropdownStages } from '../api/service';
-import DeleteModal from '../component/DeleteModal';
-import Snackbars from '../component/Snackbars';
-import FilePresentIcon from '@mui/icons-material/FilePresent';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import MultiFileUpload from '../component/MultiFileUpload';
-import RightDrawer from '../component/RightDrawer';
-import { ReactPDFViewer } from '../component/ReactPDFViewer';
-import SmallSizeModal from '../component/SmallSizeModal';
-import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import "../style/useRole.css";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
+import Toggle from "../component/Toggle";
+import {
+  uploadFileGolang,
+  fetchAllFiles,
+  deleteFileById,
+  updateFileById,
+  bulkApproveAllPageData,
+  fetchAllGroup,
+  fetchCompaniesNameByGroupId,
+  getLocationByCompanyId,
+  fetchAllModulesNameByLocationId,
+  fetchAllSubModuleNameByModuleId,
+  fetchServiceTrackerBySubModuleId,
+  fetchDocumentDropdownTypes,
+  fetchDocumentDropdownStages,
+} from "../api/service";
+import DeleteModal from "../component/DeleteModal";
+import Snackbars from "../component/Snackbars";
+import FilePresentIcon from "@mui/icons-material/FilePresent";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import MultiFileUpload from "../component/MultiFileUpload";
+import RightDrawer from "../component/RightDrawer";
+import { ReactPDFViewer } from "../component/ReactPDFViewer";
+import SmallSizeModal from "../component/SmallSizeModal";
+import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
-  const [current, setCurrent] = useState(
-    {
-      group_name: "",
-      group_holdings_id: null,
-      company_name: "",
-      company_id: null,
-      location_name: "",
-      location_id: null,
-      module_name: '',
-      module_id: null,
-      sub_module_name: '',
-      sub_module_id: null,
-      service_tracker_name: '',
-      service_tracker_id: null,
-      document_type_name: '',
-      document_type_id: null,
-      stage: '',
-      stage_id: null
-    });
+  const [current, setCurrent] = useState({
+    group_name: "",
+    group_holdings_id: null,
+    company_name: "",
+    company_id: null,
+    location_name: "",
+    location_id: null,
+    module_name: "",
+    module_id: null,
+    sub_module_name: "",
+    sub_module_id: null,
+    service_tracker_name: "",
+    service_tracker_id: null,
+    document_type_name: "",
+    document_type_id: null,
+    stage: "",
+    stage_id: null,
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([])
-  const [documentId, setDocumentId] = useState(null)
+  const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] =
+    useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [documentId, setDocumentId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
-    vertical: 'top',
-    horizontal: 'center',
-    message: '',
-    severityType: '',
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severityType: "",
   });
   const [isAutoUpload, setIsAutoUpload] = useState(true);
   const [errors, setErrors] = useState({});
-  const [groupHoldingName, setGroupHoldingName] = useState([])
-  const [companyName, setCompanyName] = useState([])
-  const [locationName, setLocationName] = useState([])
-  const [moduleName, setModuleName] = useState([])
+  const [groupHoldingName, setGroupHoldingName] = useState([]);
+  const [companyName, setCompanyName] = useState([]);
+  const [locationName, setLocationName] = useState([]);
+  const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [serviceTrackerName, setServiceTrackerName] = useState([]);
   const [documentDropdownTypes, setDocumentDropdownTypes] = useState([]);
   const [documentDropdownStages, setDocumentDropdownStages] = useState([]);
   const validate = () => {
     let tempErrors = {};
-    if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
+    if (!current?.group_name)
+      tempErrors.group_name = "Group Holding is required";
     if (!current?.company_name) tempErrors.company_name = "Company is required";
-    if (!current?.location_name) tempErrors.location_name = "Location is required";
+    if (!current?.location_name)
+      tempErrors.location_name = "Location is required";
     if (!current?.module_name) tempErrors.module_name = "Module is required";
-    if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
-    if (!current?.service_tracker_name) tempErrors.service_tracker_name = "Service Tracker is required";
-    if (!current?.document_type_name) tempErrors.document_type_name = "Document Type is required";
+    if (!current?.sub_module_name)
+      tempErrors.sub_module_name = "Sub Module is required";
+    if (!current?.service_tracker_name)
+      tempErrors.service_tracker_name = "Service Tracker is required";
+    if (!current?.document_type_name)
+      tempErrors.document_type_name = "Document Type is required";
     if (!current?.stage_name) tempErrors.stage_name = "Stage is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
-  const crudTitle = "Upload Your File"
-  const editCrudTitle = "Edit Your Uploaded File"
+  const crudTitle = "Upload Your File";
+  const editCrudTitle = "Edit Your Uploaded File";
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
-    const payload = current
+    const payload = current;
 
     try {
       let response;
@@ -93,7 +112,12 @@ const DocumentUpload = () => {
       response = await updateFileById(documentId, payload);
       // ✅ Get the message from response
       const message = response?.message;
-      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: message,
+        severityType: "success",
+      });
 
       // Refresh data
       const updatedData = await fetchAllFiles();
@@ -103,7 +127,7 @@ const DocumentUpload = () => {
         ...issnackbarsOpen,
         open: true,
         message: error?.response?.data?.message,
-        severityType: 'error'
+        severityType: "error",
       });
     }
     setIsEditing(false);
@@ -126,7 +150,7 @@ const DocumentUpload = () => {
         ...issnackbarsOpen,
         open: true,
         message,
-        severityType: 'success',
+        severityType: "success",
       });
     } catch (error) {
       // Show error snackbar
@@ -134,7 +158,7 @@ const DocumentUpload = () => {
         ...issnackbarsOpen,
         open: true,
         message: error?.response?.data?.message,
-        severityType: 'error',
+        severityType: "error",
       });
     }
   };
@@ -186,27 +210,26 @@ const DocumentUpload = () => {
   //   }
   // };
 
-
   const handleFileUpload = async () => {
     if (!uploadedFiles?.length) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
         message: "Please select at least one file.",
-        severityType: 'warning',
+        severityType: "warning",
       });
       return;
     }
     try {
       const result = await uploadFileGolang(uploadedFiles, isAutoUpload);
       setIsFileUploadModalModalOpen(false);
-      const message = result?.message || "Status update successfully"
+      const message = result?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
         message,
-        severityType: 'success',
+        severityType: "success",
       });
       const updatedData = await fetchAllFiles();
       setData(updatedData);
@@ -216,32 +239,34 @@ const DocumentUpload = () => {
         ...issnackbarsOpen,
         open: true,
         message: error?.response?.data?.message,
-        severityType: 'error',
+        severityType: "error",
       });
     }
-
   };
 
   const handleToggleChange = async (e, params) => {
     const newIsActive = {
-      "module_id": params.data.module_id,
-      "submodule_id": params.data.submodule_id,
-      "company_name": params.data.company_name,
-      "company_location": params.data.company_location,
-      "document_type_name": params.data.document_type_name,
-      "stage": params.data.stage,
-      "is_active": e.target.checked,
-      "approval_status": params.data.approval_status
+      module_id: params.data.module_id,
+      submodule_id: params.data.submodule_id,
+      company_name: params.data.company_name,
+      company_location: params.data.company_location,
+      document_type_name: params.data.document_type_name,
+      stage: params.data.stage,
+      is_active: e.target.checked,
+      approval_status: params.data.approval_status,
     };
     try {
-      const response = await updateFileById(params.data.document_id, newIsActive);
-      const message = response?.message || "Status update successfully"
+      const response = await updateFileById(
+        params.data.document_id,
+        newIsActive
+      );
+      const message = response?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
         message,
-        severityType: 'success',
+        severityType: "success",
       });
       const updatedData = await fetchAllFiles();
       setData(updatedData);
@@ -251,21 +276,20 @@ const DocumentUpload = () => {
         ...issnackbarsOpen,
         open: true,
         message: error?.response?.data?.message,
-        severityType: 'error',
+        severityType: "error",
       });
     }
-
   };
   const handleApproveAll = async () => {
     try {
-      const response = await bulkApproveAllPageData('document_repository');
-      const message = response?.message || "Status update successfully"
+      const response = await bulkApproveAllPageData("document_repository");
+      const message = response?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
         message,
-        severityType: 'success',
+        severityType: "success",
       });
       // Refresh data
       const updatedData = await fetchAllFiles();
@@ -276,10 +300,9 @@ const DocumentUpload = () => {
         ...issnackbarsOpen,
         open: true,
         message: error?.response?.data?.message,
-        severityType: 'error',
+        severityType: "error",
       });
     }
-
   };
 
   useEffect(() => {
@@ -290,12 +313,16 @@ const DocumentUpload = () => {
           fetchAllGroup(),
           //  fetchAllModulesName(),
         ]);
-        if (results[0].status === 'fulfilled') setData(results[0].value);
-        if (results[1].status === 'fulfilled') setGroupHoldingName(results[1].value);
+        if (results[0].status === "fulfilled") setData(results[0].value);
+        if (results[1].status === "fulfilled")
+          setGroupHoldingName(results[1].value);
         // if (results[2].status === 'fulfilled') setModuleName(results[2].value);
         results.forEach((result, idx) => {
-          if (result.status === 'rejected') {
-            console.error(`Error fetching data at index ${idx}:`, result.reason);
+          if (result.status === "rejected") {
+            console.error(
+              `Error fetching data at index ${idx}:`,
+              result.reason
+            );
           }
         });
       } catch (error) {
@@ -308,7 +335,9 @@ const DocumentUpload = () => {
   useEffect(() => {
     const fetchCompany = async () => {
       try {
-        const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+        const data = await fetchCompaniesNameByGroupId(
+          current?.group_holdings_id
+        );
         if (data) {
           setCompanyName(data);
         }
@@ -342,7 +371,9 @@ const DocumentUpload = () => {
   useEffect(() => {
     const fetchModuleByLocationId = async () => {
       try {
-        const data = await fetchAllModulesNameByLocationId(current?.location_id);
+        const data = await fetchAllModulesNameByLocationId(
+          current?.location_id
+        );
         if (data) {
           setModuleName(data);
         }
@@ -382,7 +413,10 @@ const DocumentUpload = () => {
           setServiceTrackerName(data);
         }
       } catch (error) {
-        console.error("Failed to fetch service tracker by sub module ID:", error);
+        console.error(
+          "Failed to fetch service tracker by sub module ID:",
+          error
+        );
       }
     };
 
@@ -408,7 +442,6 @@ const DocumentUpload = () => {
     }
   }, [current?.service_tracker_name]);
 
-
   useEffect(() => {
     const getDocumentDropdownStages = async (service_tracker_name) => {
       try {
@@ -426,28 +459,27 @@ const DocumentUpload = () => {
     }
   }, [current?.service_tracker_name]);
 
-
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
       case 0:
-        return { color: '#FFC107' }; // amber
+        return { color: "#FFC107" }; // amber
       case 1:
-        return { color: '#4CAF50' }; // green
+        return { color: "#4CAF50" }; // green
       default:
-        return { color: '#41464b' }; // gray
+        return { color: "#41464b" }; // gray
     }
   };
 
   const colDefs = [
     {
-      headerName: 'Actions',
-      field: 'actions',
+      headerName: "Actions",
+      field: "actions",
       filter: false,
       editable: false,
       width: 130,
       flex: 1,
       pinned: "right",
-      cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
+      cellStyle: { "background-color": "rgb(252 229 205 / 64%)" },
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
@@ -487,48 +519,77 @@ const DocumentUpload = () => {
             {/* <VisibilityIcon/> */}
           </div>
         );
-      }
-    }
-    ,
-    { field: "file_name", headerName: "File Name", editable: 'false', },
-    { field: "document_type_name", headerName: "Document Type", editable: 'false', },
+      },
+    },
+    { field: "file_name", headerName: "File Name", editable: "false" },
+    {
+      field: "document_type_name",
+      headerName: "Document Type",
+      editable: "false",
+    },
     {
       field: "file_path",
       headerName: "File Path",
-      editable: 'false',
+      editable: "false",
       cellRenderer: (params) => {
         const path = params.value;
         return path ? (
-          <a href={`/${path}`} target="_blank" rel="noopener noreferrer" style={{ background: 'cadetblue', color: 'white', padding: '4px', borderRadius: '5px', textDecoration: 'none', fontSize: '12px' }}>
+          <a
+            href={`/${path}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: "cadetblue",
+              color: "white",
+              padding: "4px",
+              borderRadius: "5px",
+              textDecoration: "none",
+              fontSize: "12px",
+            }}
+          >
             Download
           </a>
         ) : (
           "No File"
         );
-      }
+      },
     },
-    { field: "ai_data.doc_type", headerName: "AI Document Type", editable: 'false', valueGetter: (params) => params.data?.ai_data?.doc_type || '-' },
     {
-      field: "ai_data.confidence", headerName: "AI Confidence Score", editable: 'false', valueGetter: (params) =>
+      field: "ai_data.doc_type",
+      headerName: "AI Document Type",
+      editable: "false",
+      valueGetter: (params) => params.data?.ai_data?.doc_type || "-",
+    },
+    {
+      field: "ai_data.confidence",
+      headerName: "AI Confidence Score",
+      editable: "false",
+      valueGetter: (params) =>
         params.data?.ai_data?.confidence !== undefined
           ? `${params.data.ai_data.confidence}%`
-          : '-'
+          : "-",
     },
     {
-      field: "group_holdings_id", headerName: "Document Status", editable: 'false',
+      field: "group_holdings_id",
+      headerName: "Document Status",
+      editable: "false",
       cellRenderer: (params) => (
-        <span style={{ color: params.value !== '' ? 'black' : 'gray' }}>{params.value !== '' ? 'Taged' : 'Untaged'}</span>
-      )
+        <span style={{ color: params.value !== "" ? "black" : "gray" }}>
+          {params.value !== "" ? "Taged" : "Untaged"}
+        </span>
+      ),
     },
     {
-      editable: 'false',
-      field: "is_active", headerName: "Status", valueGetter: (params) => params.data?.is_active,
+      editable: "false",
+      field: "is_active",
+      headerName: "Status",
+      valueGetter: (params) => params.data?.is_active,
       cellRenderer: (params) => (
         <Toggle
           checked={!!params.value}
           onChange={(e) => handleToggleChange(e, params)}
         />
-      )
+      ),
     },
     {
       field: "approval_status",
@@ -539,9 +600,12 @@ const DocumentUpload = () => {
       cellRenderer: (params) => {
         const getApprovalStatusText = (status) => {
           switch (status) {
-            case 0: return 'Pending';
-            case 1: return 'Approved';
-            default: return '-'; // fallback
+            case 0:
+              return "Pending";
+            case 1:
+              return "Approved";
+            default:
+              return "-"; // fallback
           }
         };
 
@@ -549,18 +613,23 @@ const DocumentUpload = () => {
         const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
 
         return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <input
               type="checkbox"
               checked={status}
               // readOnly={status === 1}
-              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+              style={{
+                cursor: "default",
+                width: 15,
+                height: 15,
+                accentColor: "orange",
+              }}
+              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
                 color,
-                fontSize: '0.8rem',
+                fontSize: "0.8rem",
                 fontWeight: 500,
               }}
             >
@@ -568,108 +637,138 @@ const DocumentUpload = () => {
             </span>
           </div>
         );
-      }
+      },
     },
-    { field: "approved_at", headerName: "Approved At", editable: 'false', },
-    { field: "approved_by", headerName: "Approved By", editable: 'false', },
-    { field: "company_location", headerName: "Company Location", editable: 'false', },
-    { field: "company_name", headerName: "Company Name", editable: 'false', },
-    { field: "created_at", headerName: "Created At", editable: 'false', },
-    { field: "created_by", headerName: "Created By", editable: 'false', },
-    { field: "deleted_at", headerName: "Deleted At", editable: 'false', },
-    { field: "deleted_by", headerName: "Deleted By", editable: 'false', },
-    { field: "stage", headerName: "Stage", editable: 'false', },
-    { field: "updated_at", headerName: "Updated At", editable: 'false', },
-    { field: "updated_by", headerName: "Updated By", editable: 'false', }
-
+    { field: "approved_at", headerName: "Approved At", editable: "false" },
+    { field: "approved_by", headerName: "Approved By", editable: "false" },
+    {
+      field: "company_location",
+      headerName: "Company Location",
+      editable: "false",
+    },
+    { field: "company_name", headerName: "Company Name", editable: "false" },
+    { field: "created_at", headerName: "Created At", editable: "false" },
+    { field: "created_by", headerName: "Created By", editable: "false" },
+    { field: "deleted_at", headerName: "Deleted At", editable: "false" },
+    { field: "deleted_by", headerName: "Deleted By", editable: "false" },
+    { field: "stage", headerName: "Stage", editable: "false" },
+    { field: "updated_at", headerName: "Updated At", editable: "false" },
+    { field: "updated_by", headerName: "Updated By", editable: "false" },
   ];
   const gridRef = useRef();
   const defaultColDef = {
     sortable: true,
     filter: true,
     editable: true,
-    headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   const onRowValueChanged = () => {
     //  console.log('Row updated:', event.data);
   };
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
-      'quickFilterText',
-      document.getElementById('filter-text-box').value
+      "quickFilterText",
+      document.getElementById("filter-text-box").value
     );
   }, []);
   const fileUploadForm = () => {
     return (
       <div>
-        <div className='d-flex align-items-center'>
+        <div className="d-flex align-items-center">
           <span>
             <Toggle
               checked={isAutoUpload}
               onChange={() => setIsAutoUpload(!isAutoUpload)}
             />
           </span>
-          <span className='fs-12 ms-2 mt-1'>AI Processed</span>
+          <span className="fs-12 ms-2 mt-1">AI Processed</span>
         </div>
 
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
-            <MultiFileUpload setUploadedFiles={setUploadedFiles} uploadedFiles={uploadedFiles} />
+            <MultiFileUpload
+              setUploadedFiles={setUploadedFiles}
+              uploadedFiles={uploadedFiles}
+            />
           </div>
         </div>
 
         <div className="row row-gap-2">
           <div className="col-12 col-md-6">
-            <button type="button" className="btn btn-secondary w-100" onClick={closeModal}>Cancel</button>
+            <button
+              type="button"
+              className="btn btn-secondary w-100"
+              onClick={closeModal}
+            >
+              Cancel
+            </button>
           </div>
           <div className="col-12 col-md-6">
-            <button type="submit" className="btn btn-primary w-100" onClick={handleFileUpload}>Upload</button>
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              onClick={handleFileUpload}
+            >
+              Upload
+            </button>
           </div>
         </div>
       </div>
-
-    )
-
-  }
+    );
+  };
 
   const deleteModal = () => {
     return (
       <div>
-        <div className='delete_message p-4'>
-          Are you sure you want to delete <DeleteIcon className='action_icon' /> this user role?
+        <div className="delete_message p-4">
+          Are you sure you want to delete <DeleteIcon className="action_icon" />{" "}
+          this user role?
         </div>
 
         <div className="row row-gap-2 mt-4">
-          <div className='col-6'>
-            <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
+          <div className="col-6">
+            <button
+              type="button"
+              className="btn-sm btn btn-secondary"
+              onClick={closeModal}
+            >
+              <span className="button-style">Cancel</span>
+            </button>
           </div>
-          <div className='col-6 d-flex justify-content-end'>
-            <button type="submit"
+          <div className="col-6 d-flex justify-content-end">
+            <button
+              type="submit"
               className="btn-sm btn btn-primary"
-              onClick={() => handleDelete(documentId)}>Yes, I'm sure</button>
+              onClick={() => handleDelete(documentId)}
+            >
+              Yes, I'm sure
+            </button>
           </div>
         </div>
       </div>
-
-
-    )
-
-  }
+    );
+  };
 
   const drawerHeader = () => {
     return (
-      <div className='p-3 fs-14 fw-600'><AttachFileIcon style={{ color: 'green' }} />Tag Document</div>
-    )
-  }
+      <div className="p-3 fs-14 fw-600">
+        <AttachFileIcon style={{ color: "green" }} />
+        Tag Document
+      </div>
+    );
+  };
   const drawerFilePreviewHeader = () => {
     return (
-      <div className='p-3 fs-14 fw-600'><FilePresentIcon style={{ color: 'deepskyblue' }} />Document Preview</div>
-    )
-  }
+      <div className="p-3 fs-14 fw-600">
+        <FilePresentIcon style={{ color: "deepskyblue" }} />
+        Document Preview
+      </div>
+    );
+  };
   const drawerBody = () => {
     return (
-      <div className='p-3'>
-        <div className='d-lg-flex d-md-flex gap-3 mb-3'>
+      <div className="p-3">
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
           <SingleSelectTextField
             name="group_name"
             label="Group Holding"
@@ -683,11 +782,10 @@ const DocumentUpload = () => {
                 ...prev,
                 group_name: selectedName,
                 group_holdings_id: matchedGroup?._id || null,
-                company_name: '',
-                location_name: '',
+                company_name: "",
+                location_name: "",
               }));
-              setErrors(prevErrors => ({ ...prevErrors, group_name: '' }));
-
+              setErrors((prevErrors) => ({ ...prevErrors, group_name: "" }));
             }}
             names={groupHoldingName.map((item) => ({
               _id: item._id,
@@ -696,7 +794,10 @@ const DocumentUpload = () => {
             error={!!errors.group_name}
             helperText={errors.group_name}
           />
-          <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
+          <SingleSelectTextField
+            name="company_name"
+            label="Company Name"
+            value={current?.company_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedCompany = companyName.find(
@@ -707,20 +808,22 @@ const DocumentUpload = () => {
                 company_name: selectedName,
                 company_id: matchedCompany?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, company_name: '' }));
-
+              setErrors((prevErrors) => ({ ...prevErrors, company_name: "" }));
             }}
             names={companyName.map((item) => ({
               _id: item._id,
               name: item.company_name,
-              optionalValue: item?.company_common_name
+              optionalValue: item?.company_common_name,
             }))}
             error={!!errors.company_name}
             helperText={errors.company_name}
           />
         </div>
-        <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <SingleSelectTextField
+            name="location_name"
+            label="Location"
+            value={current?.location_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = locationName.find(
@@ -731,8 +834,7 @@ const DocumentUpload = () => {
                 location_name: selectedName,
                 location_id: matchedLocation?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, location_name: '' }));
-
+              setErrors((prevErrors) => ({ ...prevErrors, location_name: "" }));
             }}
             names={locationName.map((item) => ({
               _id: item._id,
@@ -741,9 +843,11 @@ const DocumentUpload = () => {
             // isdisable={isEditing ? true : false}
             error={!!errors.location_name}
             helperText={errors.location_name}
-
           />
-          <SingleSelectTextField name="module_name" label="Module" value={current?.module_name}
+          <SingleSelectTextField
+            name="module_name"
+            label="Module"
+            value={current?.module_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = moduleName.find(
@@ -754,18 +858,19 @@ const DocumentUpload = () => {
                 module_name: selectedName,
                 module_id: matchedLocation?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, module_name: '' }));
-
+              setErrors((prevErrors) => ({ ...prevErrors, module_name: "" }));
             }}
             names={moduleName}
             // isdisable={isEditing ? true : false}
             error={!!errors.module_name}
             helperText={errors.module_name}
-
           />
         </div>
-        <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="sub_module_name" label="Sub-Module" value={current?.sub_module_name}
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <SingleSelectTextField
+            name="sub_module_name"
+            label="Sub-Module"
+            value={current?.sub_module_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = subModuleName.find(
@@ -776,8 +881,10 @@ const DocumentUpload = () => {
                 sub_module_name: selectedName,
                 sub_module_id: matchedLocation?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, sub_module_name: '' }));
-
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                sub_module_name: "",
+              }));
             }}
             names={subModuleName?.map((item) => ({
               _id: item._id,
@@ -786,11 +893,13 @@ const DocumentUpload = () => {
             // isdisable={isEditing ? true : false}
             error={!!errors.sub_module_name}
             helperText={errors.sub_module_name}
-
           />
 
           {/* <SingleSelectTextField name="company_common_name" label="Sub-Module" value={current.company_common_name} onChange={(e) => setCurrent((prev) => ({ ...prev, company_common_name: e.target.value }))} names={userStatus} /> */}
-          <SingleSelectTextField name="service_tracker_name" label="Service Tracker" value={current?.service_tracker_name}
+          <SingleSelectTextField
+            name="service_tracker_name"
+            label="Service Tracker"
+            value={current?.service_tracker_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = serviceTrackerName.find(
@@ -801,8 +910,10 @@ const DocumentUpload = () => {
                 service_tracker_name: selectedName,
                 service_tracker_id: matchedLocation?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, service_tracker_name: '' }));
-
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                service_tracker_name: "",
+              }));
             }}
             names={serviceTrackerName?.map((item) => ({
               _id: item._id,
@@ -813,8 +924,11 @@ const DocumentUpload = () => {
             helperText={errors.service_tracker_name}
           />
         </div>
-        <div className='d-lg-flex d-md-flex gap-3 mb-3'>
-          <SingleSelectTextField name="document_type_name" label="Document Type" value={current?.document_type_name}
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <SingleSelectTextField
+            name="document_type_name"
+            label="Document Type"
+            value={current?.document_type_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownTypes.find(
@@ -825,8 +939,10 @@ const DocumentUpload = () => {
                 document_type_name: selectedName,
                 document_type_id: matchedLocation?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, document_type_name: '' }));
-
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                document_type_name: "",
+              }));
             }}
             names={documentDropdownTypes?.map((item) => ({
               _id: item._id,
@@ -836,7 +952,10 @@ const DocumentUpload = () => {
             error={!!errors.document_type_name}
             helperText={errors.document_type_name}
           />
-          <SingleSelectTextField name="stage" label="Stage" value={current?.stage_name}
+          <SingleSelectTextField
+            name="stage"
+            label="Stage"
+            value={current?.stage_name}
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownStages.find(
@@ -847,8 +966,7 @@ const DocumentUpload = () => {
                 stage_name: selectedName,
                 stage_id: matchedLocation?._id || null,
               }));
-              setErrors(prevErrors => ({ ...prevErrors, stage_name: '' }));
-
+              setErrors((prevErrors) => ({ ...prevErrors, stage_name: "" }));
             }}
             names={documentDropdownStages?.map((item) => ({
               _id: item._id,
@@ -859,66 +977,79 @@ const DocumentUpload = () => {
             helperText={errors.stage}
           />
         </div>
-        <div className='d-lg-flex d-md-flex d-flex justify-content-between'>
+        <div className="d-lg-flex d-md-flex d-flex justify-content-between">
           <div>
-            <button type='submit' className='btn btn-secondary' onClick={toggleDrawer(false)}>Cancel</button>
+            <button
+              type="submit"
+              className="btn btn-secondary"
+              onClick={toggleDrawer(false)}
+            >
+              Cancel
+            </button>
           </div>
           <div>
-            <button type='submit' className='btn btn btn-primary' onClick={handleSubmit}>{isEditing ? 'Save Changes' : 'Save'}</button>
+            <button
+              type="submit"
+              className="btn btn btn-primary"
+              onClick={handleSubmit}
+            >
+              {isEditing ? "Save Changes" : "Save"}
+            </button>
           </div>
         </div>
-
       </div>
-    )
-  }
+    );
+  };
   const drawerFilePreviewBody = () => {
     return (
-      <div className='p-3'>
-        <div className='row mb-4'>
-          <div className='col col-4'>
-            <div className='pdf-tab'>
-              <div className='fs-12'>
-                Document2
-              </div>
-              <div className='fs-12'>
-                <span style={{ color: 'gray' }}>Uploaded By :</span> Rupa
+      <div className="p-3">
+        <div className="row mb-4">
+          <div className="col col-4">
+            <div className="pdf-tab">
+              <div className="fs-12">Document2</div>
+              <div className="fs-12">
+                <span style={{ color: "gray" }}>Uploaded By :</span> Rupa
               </div>
             </div>
           </div>
-          <div className='col col-4'>
-            <div className='pdf-tab'>
-              <div className='fs-12'>
-                Document2
-              </div>
-              <div className='fs-12'>
-                <span style={{ color: 'gray' }}>Uploaded By :</span> Rupa
+          <div className="col col-4">
+            <div className="pdf-tab">
+              <div className="fs-12">Document2</div>
+              <div className="fs-12">
+                <span style={{ color: "gray" }}>Uploaded By :</span> Rupa
               </div>
             </div>
-
           </div>
-          <div className='col col-4'>
-            <div className='pdf-tab'>
-              <div className='fs-12'>
-                Document2
-              </div>
-              <div className='fs-12'>
-                <span style={{ color: 'gray' }}>Uploaded By :</span> Rupa
+          <div className="col col-4">
+            <div className="pdf-tab">
+              <div className="fs-12">Document2</div>
+              <div className="fs-12">
+                <span style={{ color: "gray" }}>Uploaded By :</span> Rupa
               </div>
             </div>
           </div>
         </div>
         {/* history */}
-        <div className='mb-2 card_div p-3 w-auto card-border-blue'>
+        <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
-              <div className="p-2 rounded" style={{ background: '#FEEED2', color: '#F68E3F', textAlign: 'center' }}>
+              <div
+                className="p-2 rounded"
+                style={{
+                  background: "#FEEED2",
+                  color: "#F68E3F",
+                  textAlign: "center",
+                }}
+              >
                 v1
               </div>
             </div>
 
             <div className="col-9 col-md-10">
               <div className="mb-1">
-                <span className="fs-14" style={{ color: 'gray' }}>Tagged by - </span>
+                <span className="fs-14" style={{ color: "gray" }}>
+                  Tagged by -{" "}
+                </span>
                 <span className="fs-14 fw-semibold">Mayank</span>
               </div>
 
@@ -928,20 +1059,28 @@ const DocumentUpload = () => {
               </div>
             </div>
           </div>
-
         </div>
 
-        <div className='mb-2 card_div p-3 w-auto card-border-blue'>
+        <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
-              <div className="p-2 rounded" style={{ background: '#FEEED2', color: '#F68E3F', textAlign: 'center' }}>
+              <div
+                className="p-2 rounded"
+                style={{
+                  background: "#FEEED2",
+                  color: "#F68E3F",
+                  textAlign: "center",
+                }}
+              >
                 v2
               </div>
             </div>
 
             <div className="col-9 col-md-10">
               <div className="mb-1">
-                <span className="fs-14" style={{ color: 'gray' }}>Re-Uploaded by - </span>
+                <span className="fs-14" style={{ color: "gray" }}>
+                  Re-Uploaded by -{" "}
+                </span>
                 <span className="fs-14 fw-semibold">Harsh Rana</span>
               </div>
 
@@ -953,17 +1092,26 @@ const DocumentUpload = () => {
           </div>
         </div>
 
-        <div className='mb-2 card_div p-3 w-auto card-border-blue'>
+        <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
-              <div className="p-2 rounded" style={{ background: '#FEEED2', color: '#F68E3F', textAlign: 'center' }}>
+              <div
+                className="p-2 rounded"
+                style={{
+                  background: "#FEEED2",
+                  color: "#F68E3F",
+                  textAlign: "center",
+                }}
+              >
                 v3
               </div>
             </div>
 
             <div className="col-9 col-md-10">
               <div className="mb-1">
-                <span className="fs-14" style={{ color: 'gray' }}>Uploaded by - </span>
+                <span className="fs-14" style={{ color: "gray" }}>
+                  Uploaded by -{" "}
+                </span>
                 <span className="fs-14 fw-semibold">Rahul Singh</span>
               </div>
 
@@ -973,33 +1121,44 @@ const DocumentUpload = () => {
               </div>
             </div>
           </div>
-
         </div>
-
       </div>
-    )
-  }
+    );
+  };
 
   const pdfFile = () => {
     return (
-      <div className='p-3 w-100'>
+      <div className="p-3 w-100">
         <ReactPDFViewer />
       </div>
     );
   };
   return (
     <div>
-      <RightDrawer isPdfView={isPdfView} toggleDrawer={toggleDrawer} drawerHeader={drawerHeader} drawerBody={drawerBody} drawerFilePreviewHeader={drawerFilePreviewHeader} drawerFilePreviewBody={drawerFilePreviewBody} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} pdfFile={pdfFile} />
-      <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+      <RightDrawer
+        isPdfView={isPdfView}
+        toggleDrawer={toggleDrawer}
+        drawerHeader={drawerHeader}
+        drawerBody={drawerBody}
+        drawerFilePreviewHeader={drawerFilePreviewHeader}
+        drawerFilePreviewBody={drawerFilePreviewBody}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        pdfFile={pdfFile}
+      />
+      <div className="service-tracker-inner-page-header d-lg-flex d-md-flex">
         <div className="notification-page-title">
           <div>
             <h1>Upload Document</h1>
           </div>
         </div>
-        <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-          <div className='pe-2 d-lg-flex d-md-flex gap-3'>
+        <div className="d-lg-flex d-md-flex  justify-content-end mb-3">
+          <div className="pe-2 d-lg-flex d-md-flex gap-3">
             <div>
-              <button className="reject upload-wrapper upload-label" onClick={openModal}>
+              <button
+                className="reject upload-wrapper upload-label"
+                onClick={openModal}
+              >
                 <span className="icon">
                   <svg viewBox="0 0 24 24">
                     <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
@@ -1008,8 +1167,11 @@ const DocumentUpload = () => {
                 <span className="text">Upload File</span>
               </button>
             </div>
-            <div className='btn-wrap-div'>
-              <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
+            <div className="btn-wrap-div">
+              <button
+                className="button approve w-100 justify-content-center"
+                onClick={() => handleApproveAll()}
+              >
                 <span className="icon">
                   <svg viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
@@ -1018,20 +1180,43 @@ const DocumentUpload = () => {
                 <span className="text">Approve</span>
               </button>
             </div>
-
           </div>
         </div>
       </div>
 
-      <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-      <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
-      <SmallSizeModal crudForm={fileUploadForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isFileUploadModalOpen} setIsModalOpen={setIsFileUploadModalModalOpen} closeModal={closeModal} />
-      <div className='table_div p-3'>
-        <div className='d-lg-flex d-md-flex  justify-content-between'>
-          <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+      <Snackbars
+        issnackbarsOpen={issnackbarsOpen}
+        setIsSnackbarsOpen={setIsSnackbarsOpen}
+      />
+      <DeleteModal
+        deleteForm={deleteModal}
+        deleteTitle="Delete User"
+        isModalOpen={isDeleteModalOpen}
+        setIsModalOpen={setIsDeleteModalOpen}
+      />
+      <SmallSizeModal
+        crudForm={fileUploadForm}
+        crudTitle={crudTitle}
+        isEditing={isEditing}
+        editCrudTitle={editCrudTitle}
+        isModalOpen={isFileUploadModalOpen}
+        setIsModalOpen={setIsFileUploadModalModalOpen}
+        closeModal={closeModal}
+      />
+      <div className="table_div p-3">
+        <div className="d-lg-flex d-md-flex  justify-content-between">
+          <AnimatedSearchBar
+            placeholder="Search..."
+            type="text"
+            id="filter-text-box"
+            onInput={onFilterTextBoxChanged}
+          />
         </div>
 
-        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+        <div
+          className="ag-theme-quartz"
+          style={{ height: "600px", width: "100%", marginTop: "1rem" }}
+        >
           <AgGridReact
             theme="legacy"
             ref={gridRef}

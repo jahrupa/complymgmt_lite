@@ -49,7 +49,14 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
 ];
     const serviceTracker = [
         { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
-        { icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tracker Access', link: 'service_tracker_access' },
+         ...(userRole === 'Admin' || userRole === 'Super-Admin'
+        ? [{
+            icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+            label: 'Tracker Access',
+            link: 'service_tracker_access'
+        }]
+        : []
+    ),
     ];
 
     // Sync active tab with URL on page load

@@ -17,36 +17,28 @@ const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
   const [current, setCurrent] = useState({});
   const [allUser, setAllUser] = useState([]);
- useEffect(() => {
-  const fetchCockpitData = async () => {
-    const [cockpitByCompanyRes, allUserRes] = await Promise.allSettled([
-      fetchAllCompanies(),
-      fetchAllUser(),
-    ]);
+  useEffect(() => {
+    const fetchCockpitData = async () => {
+      const [cockpitByCompanyRes, allUserRes] = await Promise.allSettled([
+        fetchAllCompanies(),
+        fetchAllUser(),
+      ]);
+      if (cockpitByCompanyRes.status === "fulfilled" && Array.isArray(cockpitByCompanyRes.value)) {
+        setCompanyName(cockpitByCompanyRes.value);
+      } else {
+        console.warn("fetchAll Companies failed:", cockpitByCompanyRes.reason);
+        setCompanyName([]);
+      }
+      if (allUserRes.status === "fulfilled" && Array.isArray(allUserRes.value)) {
+        setAllUser(allUserRes.value);
+      } else {
+        console.warn("fetchAll Users failed:", allUserRes.reason);
+        setAllUser([]);
+      }
+    };
 
-    // -------------------------
-    // SAFE COMPANY RESPONSE
-    // -------------------------
-    if (cockpitByCompanyRes.status === "fulfilled" && Array.isArray(cockpitByCompanyRes.value)) {
-      setCompanyName(cockpitByCompanyRes.value);
-    } else {
-      console.warn("fetchAll Companies failed:", cockpitByCompanyRes.reason);
-      setCompanyName([]); // ALWAYS SET EMPTY ARRAY ON FAIL
-    }
-
-    // -------------------------
-    // SAFE USER RESPONSE
-    // -------------------------
-    if (allUserRes.status === "fulfilled" && Array.isArray(allUserRes.value)) {
-      setAllUser(allUserRes.value);
-    } else {
-      console.warn("fetchAll Users failed:", allUserRes.reason);
-      setAllUser([]); // ALWAYS SET EMPTY ARRAY ON FAIL
-    }
-  };
-
-  fetchCockpitData();
-}, []);
+    fetchCockpitData();
+  }, []);
 
   return (
     <div>
