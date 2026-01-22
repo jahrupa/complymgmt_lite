@@ -46,10 +46,10 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         height: 350,
         stacked: true,
       },
-      colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+      colors: ['#EF4444', '#10B981', ],
       fill: {
         opacity: 1,
-        colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+        colors: ['#EF4444', '#10B981'],
       },
       states: {
         hover: {
@@ -89,9 +89,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
             (item) => item.issue_sub_type || []
           ) || [],
         labels: {
-          formatter: function (val) {
-            return val + "K";
-          },
         },
       },
       yaxis: {
@@ -100,11 +97,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         },
       },
       tooltip: {
-        y: {
-          formatter: function (val) {
-            return val + "K";
-          },
-        },
       },
 
       legend: {
