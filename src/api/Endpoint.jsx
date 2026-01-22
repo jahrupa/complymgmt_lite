@@ -115,6 +115,7 @@ export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
 export const APPROVE_USER_ACCESS = "/api/v1/user_access/update/approve/";
+export const COMPANY_WISE_ACCESS='/api/v1/user_access/create/company-wise/access';
 // Common API
 export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';
 

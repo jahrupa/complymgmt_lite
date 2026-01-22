@@ -32,6 +32,7 @@ import {
   toggleUserAccessLevelStatus,
   updateUserAccessLevelById,
   approveUserAccess,
+  companyWiseAccess,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -239,6 +240,10 @@ const AccessControl = () => {
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
+    const companyWiseAccessPayload = {
+      company_name: current?.company_name,
+      access_key: current?.access
+    };
     const accessType = current?.access_type === "service_tracker_wise";
     const payload = {
       user_id: current?.user_id,
@@ -307,7 +312,7 @@ const AccessControl = () => {
         });
       } else {
         // Create new AccessControl
-        const response = await createUserAccessLevel(payload);
+        const response = current?.access_type === "company-wise" ? await companyWiseAccess(companyWiseAccessPayload) : await createUserAccessLevel(payload);
         const message = response?.message || "create successfully";
         // Show success snackbar
         setIsSnackbarsOpen({
@@ -478,13 +483,13 @@ const AccessControl = () => {
     const showUser_access = current.access_type === "user_access";
 
     const showGroup =
-      ["group", "company", "company_location"].includes(current.access_type) &&
+      ["group", "company", "company_location", "company-wise"].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
     const showCompany =
-      ["company", "company_location"].includes(current.access_type) &&
+      ["company", "company_location", "company-wise"].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
@@ -523,7 +528,7 @@ const AccessControl = () => {
               }}
               error={!!errors.user_name}
               helperText={errors.user_name}
-              // isRequired={true}
+            // isRequired={true}
             />
           ) : (
             <SingleSelectTextField

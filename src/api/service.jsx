@@ -163,6 +163,7 @@ import {
   DELETE_WIDGET_MAPPING_BY_ID,
   GET_WIDGETS_BY_USER_ID,
   APPEND_TRACKER,
+  COMPANY_WISE_ACCESS,
 
 } from "./Endpoint";
 
@@ -1142,6 +1143,17 @@ export const approveUserAccess = async (id) => {
     return response.data;
   } catch (error) {
     console.error("Error approving user access:", error);
+    throw error;
+  }
+};
+
+
+export const companyWiseAccess = async (data) => {
+  try {
+    const response = await API.post(`${COMPANY_WISE_ACCESS}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error rejecting user access:", error);
     throw error;
   }
 };
