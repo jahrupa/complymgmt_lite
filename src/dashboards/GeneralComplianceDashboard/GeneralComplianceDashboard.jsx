@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
+import { Sandwich } from 'lucide-react';
 
 const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -12,182 +12,137 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         message: "",
         severityType: "",
     });
+
     if (!data || Object.keys(data).length === 0) {
         return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
     }
-    // const data = {
-    //     licenses: {
-    //         active: 265,
-    //         expired: 21,
-    //         expiring: 0,
-    //         inprogress: 51,
-    //         total: 343
-    //     },
-    //     payroll: {
-    //         completed: 0,
-    //         in_progress: 0,
-    //         overdue: 0,
-    //         pending: 0,
-    //         total_payroll: 0
-    //     },
-    //     registers: {
-    //         applicable_registers: 5384,
-    //         available_registers: 0,
-    //         completed_registers: 0,
-    //         missing_registers: 918,
-    //         partial_registers: 4466
-    //     },
-    //     returns: {
-    //         total_returns_applicable: 1175,
-    //         total_returns_at_risk: 80,
-    //         total_returns_completed: 1577,
-    //         total_returns_delayed: 80,
-    //         total_returns_pending: 9
-    //     }
-    // };
-
 
     // Payroll display items generated from data
+
+    const challanData = {
+        "completed": (data?.challans?.completed) ?? (data?.completed_challans),
+        "pending": (data?.challans?.pending) ?? (data?.pending_challans),
+        "total": (data?.challans?.total) ?? (data?.total_challans)
+    }
+    
     const payrollData = [
         {
             icon: '✔', label: 'Completed',
-            value: data.payroll.completed,
-            status: data.payroll.completed > 0 ? 'normal' : 'warning'
-        },
-        {
-            icon: '↻', label: 'In Progress',
-            value: data.payroll.in_progress,
-            status: data.payroll.in_progress > 0 ? 'progress' : 'normal'
-        },
-        {
-            icon: '⚠', label: 'Overdue',
-            value: data.payroll.overdue,
-            status: data.payroll.overdue > 0 ? 'warning' : 'normal'
+            value: challanData.completed,
+            status: challanData.completed > 0 ? 'normal' : 'warning'
         },
         {
             icon: '⏳', label: 'Pending',
-            value: data.payroll.pending,
-            status: data.payroll.pending > 0 ? 'normal' : 'muted'
+            value: (challanData.pending),
+            status: (challanData.pending) > 0 ? 'normal' : 'muted'
+        },
+        {
+            icon: '⏳', label: 'Total',
+            value: (challanData.total),
+            status: (challanData.total) > 0 ? 'normal' : 'muted'
         }
     ];
 
+    const licenseData = {
+        "active": (data?.licenses?.active) ?? (data?.active_licenses),
+        "expired": (data?.licenses?.expired) ?? (data?.expired_licenses),
+        "expiring": (data?.licenses?.expiring) ?? (data?.expiring_licenses),
+        "inprogress": (data?.licenses?.inprogress) ?? (data?.inprogress_licenses),
+        "total": (data?.licenses?.total) ?? (data?.total_licenses),
+    }
+    
     // Licenses Pie Chart
     const licensesChart = {
         series: [
-            data.licenses.active,
-            data.licenses.expired,
-            data.licenses.expiring,
-            data.licenses.inprogress
+            licenseData.active,
+            licenseData.expired,
+            licenseData.expiring,
+            licenseData.inprogress
         ],
         options: {
-            chart: {
-                type: 'pie',
-                height: 350
-            },
+            chart: { type: 'pie', height: 350 },
             labels: ['Active', 'Expired', 'Expiring', 'In Progress'],
-            colors: [
-                '#2E7D32', // Active - Green
-                '#D32F2F', // Expired - Red
-                '#F57C00', // Expiring - Orange
-                '#1976D2'  // In Progress - Blue
-            ],
-            legend: {
-                position: 'bottom'
-            },
+            colors: ['#2E7D32', '#D32F2F', '#F57C00', '#1976D2'],
+            legend: { position: 'bottom' },
             responsive: [
                 {
                     breakpoint: 480,
-                    options: {
-                        chart: {
-                            width: 200
-                        },
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
+                    options: { chart: { width: 200 }, legend: { position: 'bottom' } }
                 }
             ]
         }
     };
 
+    const registerData = {
+        "applicable": (data?.registers?.applicable_registers) ?? (data?.applicable_registers),
+        "available": (data?.registers?.available_registers) ?? (data.available_registers),
+        "completed": (data?.registers?.completed_registers) ?? (data?.completed_registers),
+        "missing": (data?.registers?.missing_registers) ?? (data?.missing_registers),
+        "partial": (data?.registers?.partial_registers) ?? (data?.partial_registers)
+    }
 
     // Registers Bar Chart
     const registersChart = {
         series: [{
             data: [
-                data.registers.applicable_registers,
-                data.registers.available_registers,
-                data.registers.completed_registers,
-                data.registers.missing_registers,
-                data.registers.partial_registers
+                registerData.applicable,
+                registerData.available,
+                registerData.completed,
+                registerData.missing,
+                registerData.partial
             ]
         }],
         options: {
-            chart: {
-                type: 'bar',
-                height: 350
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 4,
-                    horizontal: true,
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            xaxis: {
-                categories: ['Applicable', 'Available', 'Completed', 'Missing', 'Partial']
-            },
-            title: {
-                text: 'Registers'
-            }
+            chart: { type: 'bar', height: 350 },
+            plotOptions: { bar: { borderRadius: 4, horizontal: true } },
+            dataLabels: { enabled: false },
+            xaxis: { categories: ['Applicable', 'Available', 'Completed', 'Missing', 'Partial'] },
+            title: { text: 'Registers' }
         }
     };
 
-    // Returns Radial Bar Chart
+    // Returns Radial Bar Chart (fixed division by zero)
+    // const totalReturns = (data.returns.total_returns_applicable) || 1;
+
+    const returnsData = {
+        "completed": (data?.returns?.total_returns_completed) ?? (data?.completed_returns),
+        "at_risk": (data?.returns?.total_returns_at_risk) ?? (data?.at_risk_returns),
+        "delayed": (data?.returns?.total_returns_delayed) ?? (data?.total_returns_delayed),
+        "pending": (data?.returns?.total_returns_pending) ?? (data?.total_returns_pending),
+        "total": (data?.returns?.total_returns_applicable) ?? (data?.total_returns)
+    }
+
     const returnsChart = {
         series: [
-            data.returns.total_returns_completed / data.returns.total_returns_applicable * 100 || 0,
-            data.returns.total_returns_at_risk / data.returns.total_returns_applicable * 100 || 0,
-            data.returns.total_returns_delayed / data.returns.total_returns_applicable * 100 || 0,
-            data.returns.total_returns_pending / data.returns.total_returns_applicable * 100 || 0
+            ((returnsData.completed ?? 0) / (returnsData.total || 1)) * 100,
+            ((returnsData.at_risk ?? 0) / (returnsData.total || 1)) * 100,
+            ((returnsData.delayed ?? 0) / (returnsData.total || 1)) * 100,
+            ((returnsData.pending ?? 0) / (returnsData.total || 1)) * 100,
         ],
         options: {
-            chart: {
-                height: 350,
-                type: 'radialBar',
-            },
+            chart: { height: 350, type: 'radialBar' },
             plotOptions: {
                 radialBar: {
                     dataLabels: {
-                        name: {
-                            show: true,
-                        },
-                        value: {
-                            show: true,
-                        },
+                        name: { show: true },
+                        value: { show: true },
                         total: {
                             show: true,
                             label: 'Applicable',
-                            formatter: function () {
-                                return data.returns.total_returns_applicable;
-                            }
+                            formatter: () => (returnsData.total)
                         }
                     }
                 }
             },
             labels: ['Completed', 'At Risk', 'Delayed', 'Pending'],
-            title: {
-                text: 'Returns'
-            }
+            title: { text: 'Returns' }
         }
     };
+
     const userRole = decryptData(localStorage.getItem("user_role"));
 
     const toggleChartSelection = (chartId) => {
         if (!current?.user_name) {
-            // alert("First you need to select a user");
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -205,10 +160,8 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
     };
 
     const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
-
     const cardClass = (id, defaultClass = "") =>
         canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
-
 
     const handleSelect = (id) => {
         if (canSelect) toggleChartSelection(id);
@@ -223,14 +176,12 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
             <div className='row'>
                 {shouldShow("gc-1") && (
                     <div className='col-12 col-md-6 mb-4'>
-                        {/* Licenses Section */}
                         <div
                             className={`general-compliance ${cardClass("gc-1")}`}
                             onClick={canSelect ? () => handleSelect("gc-1") : undefined}
                             style={{ cursor: canSelect ? "pointer" : "default" }}
                         >
-
-                            <h2>Licenses (Total: {data.licenses.total})</h2>
+                            <h2>Licenses (Total: {licenseData.total})</h2>
                             <input
                                 type="checkbox"
                                 className="chart-select-checkbox"
@@ -254,8 +205,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                             onClick={canSelect ? () => handleSelect("gc-2") : undefined}
                             style={{ cursor: canSelect ? "pointer" : "default" }}
                         >
-
-                            <h2>General Compliance</h2>
+                            <h2>Challan Compliance</h2>
                             <input
                                 type="checkbox"
                                 className="chart-select-checkbox"
@@ -264,29 +214,19 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                                 disabled={!current?.user_name}
                             />
                             <div className="compliance-items">
-                                {payrollData?.map((item, index) => (
+                                {payrollData.map((item, index) => (
                                     <div key={index} className={`compliance-item ${item.status}`}>
                                         <div className="compliance-icon">{item.icon}</div>
                                         <span className="compliance-label">{item.label}</span>
                                         <span className="compliance-value">{item.value}</span>
-                                        {item.status === 'progress' && (
-                                            <div className="progress-indicator">
-                                                <div className="progress-bar-small">
-                                                    <div className="progress-fill-small" style={{ width: '75%' }}></div>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
                 )}
-
-                {/* Payroll Section */}
                 {shouldShow("gc-3") && (
                     <div className='col-12 col-md-6 mb-4'>
-                        {/* Registers Section */}
                         <div
                             className={`general-compliance ${cardClass("gc-3")}`}
                             onClick={canSelect ? () => handleSelect("gc-3") : undefined}
@@ -310,7 +250,6 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 )}
                 {shouldShow("gc-4") && (
                     <div className='col-12 col-md-6 mb-4'>
-                        {/* Returns Section */}
                         <div
                             className={`general-compliance ${cardClass("gc-4")}`}
                             onClick={canSelect ? () => handleSelect("gc-4") : undefined}
@@ -334,7 +273,6 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 )}
             </div>
         </>
-
     );
 };
 

@@ -851,7 +851,7 @@ const NoticeDashboard = ({
                             />
                             <div
                                 className="dashboard-icon ms-2"
-                                oonClick={(e) => {
+                                onClick={(e) => {
                                     e.stopPropagation();   // prevent parent click from firing
                                     setIsSnackbarsOpen({
                                         ...issnackbarsOpen,

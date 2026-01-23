@@ -3,7 +3,7 @@ import '../../style/cockpitComplinceByCompany.css';
 import { useState } from 'react';
 import Snackbars from '../../component/Snackbars';
 
-const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedCharts }) => {
+const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts, setSelectedCharts }) => {
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: "top",
@@ -11,12 +11,6 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
     message: "",
     severityType: "",
   });
-  if (!data || !data.compliance_info) {
-    return <div className='no-data'>{data === 403 || data === 500 ? 'No Data Found' : 'Loading...'}</div>;;
-  }
-  const companyName = Object?.keys(data?.compliance_info)[0];
-  const complianceData = data?.compliance_info?.[companyName];
-  const clientInfo = data?.client_info?.[companyName];
 
   // Compliance Score Donut Chart
   const complianceChartOptions = {
@@ -24,8 +18,8 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
       type: 'donut',
       height: 300,
     },
-    colors: ['#10b981', '#f59e0b', '#ef4444'],
-    labels: ['License', 'Returns', 'Registers'],
+    colors: ['#10b981', '#f59e0b', '#ef4444', '#777777'],
+    labels: ['License', 'Returns', 'Registers', 'Challans'],
     plotOptions: {
       pie: {
         donut: {
@@ -35,7 +29,7 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
             total: {
               show: true,
               label: 'Overall Score',
-              formatter: () => `${complianceData?.average_compliance_score ?? 0}%`
+              formatter: () => `${data?.average_compliance_score}%`
             }
           }
         }
@@ -52,9 +46,10 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
   };
 
   const complianceChartSeries = [
-    complianceData?.license?.compliance_score ?? 0,
-    complianceData?.returns?.compliance_score ?? 0,
-    complianceData?.registers?.compliance_score ?? 0
+    data?.licenses_compliance_score ?? 0,
+    data?.returns_compliance_score ?? 0,
+    data?.registers_compliance_score ?? 0,
+    data?.challans_compliance_score ?? 0
   ];
 
   // Progress Bar Chart
@@ -76,7 +71,7 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
       formatter: (val) => `${val}`
     },
     xaxis: {
-      categories: ['Licenses', 'Returns', 'Registers'],
+      categories: ['Licenses', 'Returns', 'Registers', 'Challans'],
       title: {
         text: 'Count'
       }
@@ -96,17 +91,19 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
     {
       name: 'Completed',
       data: [
-        complianceData?.license?.completed_count ?? 0,
-        complianceData?.returns?.completed_count ?? 0,
-        complianceData?.registers?.completed_count ?? 0
+        data?.active_licenses ?? 0,
+        data?.completed_returns ?? 0,
+        data?.completed_registers ?? 0,
+        data?.completed_challans ?? 0
       ]
     },
     {
       name: 'Pending',
       data: [
-        complianceData?.license?.pending_count ?? 0,
-        complianceData?.returns?.pending_count ?? 0,
-        complianceData?.registers?.pending_count ?? 0
+        data?.expired_licenses ?? 0,
+        data?.total_returns_pending ?? 0,
+        data?.missing_registers ?? 0,
+        data?.pending_challans ?? 0
       ]
     }
   ];
@@ -156,12 +153,12 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
           <div className="info-item">
             <span className="label">Location:</span>
             <span className="value">
-              {clientInfo?.location?.join(', ')}, {clientInfo?.state?.join(', ')}
+              {data?.location_names?.join(', ')}, {data?.state?.join(', ')}
             </span>
           </div>
           <div className="info-item">
             <span className="label">Modules:</span>
-            <span className="value">{clientInfo?.modules_subscribed?.join(', ')}</span>
+            <span className="value">{data?.modules_subscribed?.join(', ')}</span>
           </div>
         </div>
       </div>
@@ -189,20 +186,20 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
                       checked={selectedCharts.includes("ccbc-2")}
                       disabled={!current?.user_name}
                     />
-                    <div className="score">{complianceData?.license?.compliance_score ?? 0}%</div>
+                    <div className="score">{data?.licenses_compliance_score ?? 0}%</div>
                   </div>
                   <div className="card-stats">
                     <div className="stat">
                       <span className="stat-label">Completed</span>
-                      <span className="stat-value">{complianceData?.license?.completed_count ?? 0}</span>
+                      <span className="stat-value">{data?.active_licenses ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Pending</span>
-                      <span className="stat-value">{complianceData?.license?.pending_count ?? 0}</span>
+                      <span className="stat-value">{data?.expired_licenses ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Total</span>
-                      <span className="stat-value">{complianceData?.license?.location_count ?? 0}</span>
+                      <span className="stat-value">{data?.total_licenses ?? 0}</span>
                     </div>
                   </div>
                 </div>
@@ -226,20 +223,20 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
                       checked={selectedCharts.includes("ccbc-3")}
                       disabled={!current?.user_name}
                     />
-                    <div className="score">{complianceData?.returns?.compliance_score ?? 0}%</div>
+                    <div className="score">{data?.returns_compliance_score ?? 0}%</div>
                   </div>
                   <div className="card-stats">
                     <div className="stat">
                       <span className="stat-label">Completed</span>
-                      <span className="stat-value">{complianceData?.returns?.completed_count ?? 0}</span>
+                      <span className="stat-value">{data?.completed_returns ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Pending</span>
-                      <span className="stat-value">{complianceData?.returns?.pending_count ?? 0}</span>
+                      <span className="stat-value">{data?.total_returns_pending ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Total</span>
-                      <span className="stat-value">{complianceData?.returns?.location_count ?? 0}</span>
+                      <span className="stat-value">{data?.total_locations ?? 0}</span>
                     </div>
                   </div>
                 </div>
@@ -263,20 +260,69 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
                       checked={selectedCharts.includes("ccbc-4")}
                       disabled={!current?.user_name}
                     />
-                    <div className="score">{complianceData?.registers?.compliance_score ?? 0}%</div>
+                    <div className="score">{data?.registers_compliance_score ?? 0}%</div>
                   </div>
                   <div className="card-stats">
                     <div className="stat">
                       <span className="stat-label">Completed</span>
-                      <span className="stat-value">{complianceData?.registers?.completed_count ?? 0}</span>
+                      <span className="stat-value">{data?.completed_registers ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Pending</span>
-                      <span className="stat-value">{complianceData?.registers?.pending_count ?? 0}</span>
+                      <span className="stat-value">{data?.missing_registers ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Total</span>
-                      <span className="stat-value">{complianceData?.registers?.location_count ?? 0}</span>
+                      <span className="stat-value">{data?.total_locations ?? 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='col'>
+              <div
+                className={`cards-grid ${selectedCharts.includes("ccbc-13") ? "selected-card " : "challans"
+                  }`}
+                onClick={() => {
+                  toggleChartSelection("ccbc-13");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="metric-card challans">
+                  <div className="card-header">
+                    <h3>Challans</h3>
+                    <input
+                      type="checkbox"
+                      className="chart-select-checkbox"
+                      onChange={() => toggleChartSelection("ccbc-13")}
+                      checked={selectedCharts.includes("ccbc-13")}
+                      disabled={!current?.user_name}
+                    />
+                    <div className="score">
+                      {data?.challans_compliance_score ?? 0}%
+                    </div>
+                  </div>
+
+                  <div className="card-stats">
+                    <div className="stat">
+                      <span className="stat-label">Resolved</span>
+                      <span className="stat-value">
+                        {data?.resolved_challans ?? 0}
+                      </span>
+                    </div>
+
+                    <div className="stat">
+                      <span className="stat-label">Pending</span>
+                      <span className="stat-value">
+                        {data?.pending_challans ?? 0}
+                      </span>
+                    </div>
+
+                    <div className="stat">
+                      <span className="stat-label">Total</span>
+                      <span className="stat-value">
+                        {data?.total_challans ?? 0}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -371,14 +417,14 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
       </div>
 
       {/* Summary Stats */}
-      <div  className={`summary-section ${selectedCharts.includes("ccbc-8") ? "selected-card" : ""
+      <div className={`summary-section ${selectedCharts.includes("ccbc-8") ? "selected-card" : ""
         }`}
         onClick={() => {
           toggleChartSelection("ccbc-8");
         }}
         style={{ cursor: "pointer" }}>
         <h2>Summary Statistics</h2>
-         <input
+        <input
           type="checkbox"
           className="chart-select-checkbox"
           onChange={() => toggleChartSelection("ccbc-8")}
@@ -387,69 +433,69 @@ const CockpitComplinceByCompany = ({ data, current, selectedCharts, setSelectedC
         />
         <div className="summary-grid">
           <div className={`summary-item ${selectedCharts.includes("ccbc-9") ? "selected-card" : ""
-        }`}
-        onClick={() => {
-          toggleChartSelection("ccbc-9");
-        }}
-        style={{ cursor: "pointer" }}
-        >
-            <div className="summary-value">{data?.total_clients ?? 0}</div>
-            <div className="summary-label">Total Clients</div>
+            }`}
+            onClick={() => {
+              toggleChartSelection("ccbc-9");
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <div className="summary-value">{data?.total_locations ?? 0}</div>
+            <div className="summary-label">Total Locations</div>
             <input
-          type="checkbox"
-          className="chart-select-checkbox"
-          onChange={() => toggleChartSelection("ccbc-9")}
-          checked={selectedCharts.includes("ccbc-9")}
-          disabled={!current?.user_name}
-        />
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("ccbc-9")}
+              checked={selectedCharts.includes("ccbc-9")}
+              disabled={!current?.user_name}
+            />
           </div>
           <div className={`summary-item ${selectedCharts.includes("ccbc-10") ? "selected-card" : ""
-        }`}
-        onClick={() => {
-          toggleChartSelection("ccbc-10");
-        }}
-        style={{ cursor: "pointer" }}>
+            }`}
+            onClick={() => {
+              toggleChartSelection("ccbc-10");
+            }}
+            style={{ cursor: "pointer" }}>
             <div className="summary-value">{data?.total_licenses ?? 0}</div>
             <div className="summary-label">Total Licenses</div>
             <input
-          type="checkbox"
-          className="chart-select-checkbox"
-          onChange={() => toggleChartSelection("ccbc-10")}
-          checked={selectedCharts.includes("ccbc-10")}
-          disabled={!current?.user_name}
-        />
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("ccbc-10")}
+              checked={selectedCharts.includes("ccbc-10")}
+              disabled={!current?.user_name}
+            />
           </div>
           <div className={`summary-item ${selectedCharts.includes("ccbc-11") ? "selected-card" : ""
-        }`}
-        onClick={() => {
-          toggleChartSelection("ccbc-11");
-        }}
-        style={{ cursor: "pointer" }}>
+            }`}
+            onClick={() => {
+              toggleChartSelection("ccbc-11");
+            }}
+            style={{ cursor: "pointer" }}>
             <div className="summary-value">{data?.total_returns ?? 0}</div>
             <div className="summary-label">Total Returns</div>
             <input
-          type="checkbox"
-          className="chart-select-checkbox"
-          onChange={() => toggleChartSelection("ccbc-11")}
-          checked={selectedCharts.includes("ccbc-11")}
-          disabled={!current?.user_name}
-        />
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("ccbc-11")}
+              checked={selectedCharts.includes("ccbc-11")}
+              disabled={!current?.user_name}
+            />
           </div>
           <div className={`summary-item ${selectedCharts.includes("ccbc-12") ? "selected-card" : ""
-        }`}
-        onClick={() => {
-          toggleChartSelection("ccbc-12");
-        }}
-        style={{ cursor: "pointer" }}>
-            <div className="summary-value">{data?.total_registers ?? 0}</div>
+            }`}
+            onClick={() => {
+              toggleChartSelection("ccbc-12");
+            }}
+            style={{ cursor: "pointer" }}>
+            <div className="summary-value">{data?.applicable_registers ?? 0}</div>
             <div className="summary-label">Total Registers</div>
             <input
-          type="checkbox"
-          className="chart-select-checkbox"
-          onChange={() => toggleChartSelection("ccbc-12")}
-          checked={selectedCharts.includes("ccbc-12")}
-          disabled={!current?.user_name}
-        />
+              type="checkbox"
+              className="chart-select-checkbox"
+              onChange={() => toggleChartSelection("ccbc-12")}
+              checked={selectedCharts.includes("ccbc-12")}
+              disabled={!current?.user_name}
+            />
           </div>
         </div>
       </div>

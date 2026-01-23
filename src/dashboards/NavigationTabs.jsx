@@ -48,7 +48,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
-
+    
+    // console.log(widgetsList, 'widgetsList')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -131,6 +132,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     <CockpitComplinceByCompany data={cockpitByCompanyData}
                         current={current}
                         selectedCharts={selectedCharts}
+                        companyName={selectedCompany}
                         setSelectedCharts={setSelectedCharts} />
                 ) : (
                     <CockpitComplince data={cockpitData}
@@ -144,13 +146,13 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         },
         {
             label: "General Compliance",
-            content: (''
-                // <GeneralComplianceDashboard data={generalDashboardData} current={current}
-                //     selectedCharts={selectedCharts}
-                //     setSelectedCharts={setSelectedCharts}
-                //     shouldShow={shouldShow}
+            content: (
+                <GeneralComplianceDashboard data={generalDashboardData} current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
 
-                // />
+                />
             )
         }
     ];
@@ -315,11 +317,11 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         if (!updatedFormData) return;
 
         const payload = {
-            user_id: userId,
+            user_id: current?.user_id,
             widget_ids: selectedCharts.map(id => id.toUpperCase())
         };
         try {
-            const response = await createOrUpdateWidgetMapping(payload);
+            const response = await createOrUpdateWidgetMapping(payload,userId);
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,

@@ -86,7 +86,7 @@ function WidgetMappings() {
       user_id: updatedFormData.user_id,
       widget_ids: (updatedFormData.widgets || []).map(w => w.widget_id)
     };
-    console.log(payload, 'payload')
+    // console.log(payload, 'payload')
     try {
       const response = await createOrUpdateWidgetMapping(payload);
       setIsSnackbarsOpen({

@@ -25,7 +25,7 @@ export default function DashboardDrawerGrid({
   const [chartOptions, setChartOptions] = React.useState({});
   const [chartSeries, setChartSeries] = React.useState([]);
   const [error, setError] = React.useState(""); // error state
-  console.log(chartType,'chartType')
+  // console.log(chartType,'chartType')
   // Set rowData & columnDefs
   React.useEffect(() => {
     try {

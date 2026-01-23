@@ -22,7 +22,7 @@ const CockpitComplince = ({ data, selectedCharts, setSelectedCharts, current, sh
   });
   const gridRef = useRef();
   const userRole = decryptData(localStorage.getItem("user_role"));
-  console.log(userRole, 'userRole')
+  // console.log(userRole, 'userRole')
   const itemsPerPage = 10; // number of cards per page
   useEffect(() => {
     const handleResize = () => {

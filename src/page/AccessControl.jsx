@@ -1297,7 +1297,7 @@ const AccessControl = () => {
     editable: true,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = (event) => {
+  const onRowValueChanged = () => {
     //  console.log('Row updated:', event.data);
   };
   useEffect(() => {
