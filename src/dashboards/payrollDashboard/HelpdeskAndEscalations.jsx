@@ -46,10 +46,10 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         height: 350,
         stacked: true,
       },
-      colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+      colors: ["#f45b5b", "#38b68c",],
       fill: {
         opacity: 1,
-        colors: ["#14b8a6", "#2dd4bf", "#5eead4", "#99f6e4", "#c8fdf1ff"],
+        colors: ["#f45b5b", "#38b68c"],
       },
       states: {
         hover: {
