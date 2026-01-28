@@ -9,9 +9,10 @@ import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
 import { Link, useNavigate } from "react-router-dom";
+import { fetchComplainceCockpit } from "../../api/service";
 
 const CockpitComplince = ({
-  data,
+  // data,
   selectedCharts,
   setSelectedCharts,
   current,
@@ -27,12 +28,13 @@ const CockpitComplince = ({
     message: "",
     severityType: "",
   });
+  const [data, setData] = useState([]);
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
   // console.log(userRole, 'userRole')
   const itemsPerPage = 10; // number of cards per page
-  
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
@@ -52,13 +54,26 @@ const CockpitComplince = ({
       document.getElementById("filter-text-box").value,
     );
   }, []);
-  if (!data || !data.client_info) {
-    return (
-      <div className="no-data">
-        {data === 403 || data === 500 ? "No Data Found" : "Loading..."}
-      </div>
-    );
-  }
+
+  // if (!data || Object.keys(data).length === 0) {
+  //   return (
+  //     <div className="no-data">
+  //       {data === 403 || data === 500 ? "No Data Found" : "Loading..."}
+  //     </div>
+  //   );
+  // }
+
+   useEffect(() => {
+          const fetchCockpitData = async () => {
+              const [ b] = await Promise.allSettled([
+                  // fetchComplainceCockpitByCompany(selectedCompany),
+                  fetchComplainceCockpit()
+              ]);
+  
+              setData(b.status === "fulfilled" ? b.value : []);
+          };
+          fetchCockpitData();
+      }, []);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -67,24 +82,7 @@ const CockpitComplince = ({
     setAnchorEl(null);
   };
 
-  const sampleClients = Object.entries(data.compliance_info).map(
-    ([name, details]) => ({
-      name,
-      average_compliance_score: details.average_compliance_score || 0,
-      type:
-        Object.keys(details).find(
-          (key) => key !== "average_compliance_score",
-        ) || "general",
-    }),
-  );
-
-  // Step 2: Pagination logic
-  const totalPages = Math.ceil(sampleClients.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentClients = sampleClients.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+ 
 
   // Overall Compliance Chart
   const overallChartOptions = {
@@ -113,7 +111,6 @@ const CockpitComplince = ({
                 score: clickedValue,
                 seriesName: clickedLabel,
                 index: index,
-                widget_name: "Compliance Cockpit - Overall Compliance Score",
               },
             }
           );
@@ -697,47 +694,7 @@ const CockpitComplince = ({
               </div>
             ) : (
               /* CARD VIEW */
-              <div className="performers-grid client-performance-table-sm">
-                {currentClients.map((client, index) => {
-                  const score = client.average_compliance_score || 0;
-
-                  const getClassName = (score) => {
-                    if (score > 300) return "excellent";
-                    if (score > 100 && score < 300) return "high-performer";
-                    if (score > 80 && score <= 100) return "compliant";
-                    if (score >= 50 && score <= 80) return "good";
-                    if (score > 0 && score < 50) return "moderate";
-                    if (score === 0) return "needs-attention";
-                    return "";
-                  };
-
-                  return (
-                    <div
-                      key={index}
-                      className={`performer-card ${getClassName(score)}`}
-                    >
-                      <div className="performer-header">
-                        <h4>{client.name}</h4>
-                        <span
-                          className={`performance-badge ${getClassName(score)}`}
-                        >
-                          Compliance Score
-                        </span>
-                      </div>
-
-                      <div className="performer-score">
-                        <span className="score-value">{score}%</span>
-                        <div className="score-bar">
-                          <div
-                            className="score-fill"
-                            style={{ width: `${Math.min(score, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              ''
             )}
 
             {/* PAGINATION */}
@@ -756,7 +713,7 @@ const CockpitComplince = ({
                 </button>
 
                 <button
-                  disabled={currentPage === totalPages}
+                  // disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
                   style={{
                     background: "black",

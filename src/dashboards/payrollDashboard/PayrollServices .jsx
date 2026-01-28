@@ -19,6 +19,7 @@ import { ArrowUpRight, X } from "lucide-react";
 import DashboardDrawerGrid from "../DashboardDrawer";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
+import { useNavigate } from "react-router-dom";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -38,6 +39,8 @@ const PayrollServices = ({
         compliance_alerts: 0,
     });
     const [investmentData, setInvestmentData] = useState({});
+    const navigate = useNavigate();
+
     const investmentDataFormate = {
         series: [
             investmentData.count_yes || 0,
@@ -48,6 +51,35 @@ const PayrollServices = ({
             chart: {
                 width: 380,
                 type: "donut",
+                events: {
+                    dataPointSelection(event, chartContext, opts) {
+                        // console.log(opts,'opts')
+                        const seriesIndex = opts.seriesIndex;
+
+                        // safety check
+                        if (seriesIndex === undefined || seriesIndex === -1) return;
+
+                        const clickedValue = opts.w.globals.series;
+                        const clickedLabel = opts.w.globals.labels;
+
+                        // console.log("Clicked label:", clickedLabel);
+                        // console.log("Clicked value:", clickedValue);
+
+                        // optional: zero-value segments block
+                        if (clickedValue === 0) return;
+
+                        navigate(
+                            "/payroll_service/dashboard/investment_declaration_status_by_company",
+                            {
+                                state: {
+                                    score: clickedValue,
+                                    seriesName: clickedLabel,
+                                    dataPointIndex: opts.dataPointIndex
+                                },
+                            }
+                        );
+                    },
+                },
             },
             colors: ["#f5d3cc", "#ffb397", "#ff7c4c"],
             fill: {
@@ -297,6 +329,23 @@ const PayrollServices = ({
             chart: {
                 type: "bar",
                 height: 350,
+                events: {
+                    click(event, chartContext, opts) {
+
+                        navigate(
+                            "/payroll_service/dashboard/delay_between_data_request_date_and_client_data_received_date",
+                            {
+                                state: {
+                                    score:
+                                        opts.config.series[opts.seriesIndex].data[
+                                        opts.dataPointIndex
+                                        ],
+                                    seriesName: opts.config.series[opts.seriesIndex].name,
+                                },
+                            },
+                        );
+                    },
+                },
             },
             colors: ["#2cafc0ff"],
             fill: {
@@ -839,7 +888,7 @@ const PayrollServices = ({
                             <div className="mb-3 fw-600">Explanation for Employee count</div>
                             <AgGridReact
                                 theme="legacy"
-                                rowData={explanationOfEmployeeCount|| []}
+                                rowData={explanationOfEmployeeCount || []}
                                 columnDefs={columnDefs}
                                 pagination
                                 paginationPageSize={5}

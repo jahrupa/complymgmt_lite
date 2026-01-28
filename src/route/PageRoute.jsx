@@ -45,6 +45,7 @@ import ChangeForgetPassword from '../page/ChangeForgetPassword.jsx';
 import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful.jsx';
 import NotificationMainPage from '../component/notification/NotificationMainPage.jsx';
 import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
+import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -72,7 +73,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
       setIsAuthenticated(false)
     }
   }, [tokenId])
-  
+
   const pageActiveRoute = localStorage.getItem('active_url')
   return (
     <>
@@ -138,7 +139,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
-            
+
             {/* notification sub-routes */}
             <Route path="/notification" element={
               <NotificationMainPage setUnreadCountNotification={setUnreadCountNotification} />
@@ -153,7 +154,10 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
+            {/* Dashboard Internal Routes */}
+            <Route path='/:dashboard_name/dashboard/:info' element={<DashboardInternalPage />} />
           </Route>
+
         </Route>
 
         {/* Catch-all: 404 */}
