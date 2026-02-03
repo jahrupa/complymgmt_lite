@@ -4,15 +4,12 @@ import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MuiTextField from '../component/MuiInputs/MuiTextField';
-import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import MuiSearchBar from '../component/MuiInputs/MuiSearchBar';
 import SmallSizeModal from '../component/SmallSizeModal';
 import { bulkApproveAllPageData, createGroup, deleteGroupById, fetchAllGroup, updateGroupById, updateGroupStatusById, updateGroupApprovalStatusById } from '../api/service';
 import Snackbars from '../component/Snackbars';
 import DeleteModal from '../component/DeleteModal';
 
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -38,7 +35,6 @@ const GroupCompaniesPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [userId, setUserId] = useState(null)
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -145,7 +141,6 @@ const GroupCompaniesPage = () => {
         severityType: 'success',
       });
     } catch (error) {
-      console.error("Error deleting company:", error);
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -182,7 +177,6 @@ const GroupCompaniesPage = () => {
         severityType: 'success',
       });
     } catch (error) {
-      console.error("Error:", error);
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -202,8 +196,8 @@ const GroupCompaniesPage = () => {
           fetchAllGroup(),
         ]);
         setData(GroupData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch{
+        // Handle error silently
       }
     };
     fetchData();
@@ -282,7 +276,6 @@ const GroupCompaniesPage = () => {
   };
 
   const handleCheckboxClick = async (rowId) => {
-    //  console.log("Checkbox clicked with status:", rowId);
     const response = await updateGroupApprovalStatusById(rowId);
     const message = response?.message
 
@@ -313,7 +306,6 @@ const GroupCompaniesPage = () => {
               setCurrent(params.data);
               setIsEditing(true);
               setIsModalOpen(true);
-              setUserId(params.data._id);
             }}>
               <EditIcon fontSize="small" className="action_icon" />
             </button>
@@ -323,12 +315,7 @@ const GroupCompaniesPage = () => {
             }}>
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
-            {/* <button className="btn btn-sm" onClick={() => {
-              setUserId(params.data._id);
-              setIsDeleteModalOpen(true);
-            }}>
-              <VisibilityIcon fontSize="small" className="action_icon" />
-            </button> */}
+            
           </div>
         );
       }
@@ -411,8 +398,7 @@ const GroupCompaniesPage = () => {
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
 
-  const onRowValueChanged = (event) => {
-    //  console.log('Row updated:', event.data);
+  const onRowValueChanged = () => {
   };
 
   const onFilterTextBoxChanged = useCallback(() => {

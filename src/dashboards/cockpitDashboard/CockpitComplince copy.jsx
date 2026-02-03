@@ -32,8 +32,6 @@ const CockpitComplince = ({
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
-  // console.log(userRole, 'userRole')
-  const itemsPerPage = 10; // number of cards per page
 
   useEffect(() => {
     const handleResize = () => {
@@ -97,13 +95,7 @@ const CockpitComplince = ({
 
           const clickedLabel = opts.w.globals.labels[index];
           const clickedValue = opts.w.globals.series[index];
-
-          console.log("Clicked Index:", index);
-          console.log("Clicked Label:", clickedLabel);
-          console.log("Clicked Value:", clickedValue);
-
           if (clickedValue === 0) return;
-
           navigate(
             "/compliance_cockpit/dashboard/overall_compliance_score",
             {
@@ -196,12 +188,6 @@ const CockpitComplince = ({
       stacked: true,
       events: {
         click(event, chartContext, opts) {
-          // console.log(opts, 'opts')
-          // console.log(opts?.config?.series[opts?.seriesIndex]);
-          // console.log(opts?.config?.series[opts?.seriesIndex]?.name);
-          // console.log(
-          //   opts?.config?.series[opts?.seriesIndex]?.data[opts?.dataPointIndex],
-          // );
           const seriesData = opts?.config?.series?.[opts?.seriesIndex]?.data?.[opts?.dataPointIndex];
           const seriesName = opts?.config?.series?.[opts?.seriesIndex]?.name;
 

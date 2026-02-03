@@ -42,8 +42,8 @@ function WidgetMappings() {
         const data = await fetchAllWidgetMappings(userId);
         setMappings(data);
         setFilteredMappings(data);
-      } catch (error) {
-        console.error("Error fetching widget mappings:", error);
+      } catch {
+        // Do nothing
       }
     };
     fetchData();
@@ -86,7 +86,6 @@ function WidgetMappings() {
       user_id: updatedFormData.user_id,
       widget_ids: (updatedFormData.widgets || []).map(w => w.widget_id)
     };
-    // console.log(payload, 'payload')
     try {
       const response = await createOrUpdateWidgetMapping(payload);
       setIsSnackbarsOpen({

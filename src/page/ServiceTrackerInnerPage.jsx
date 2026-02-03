@@ -48,7 +48,7 @@ const ServiceTrackerInnerPage = () => {
         isFileAppended: false
 
     });
-    // console.log(current?.sheet_name?.[0], 'sheet_name');
+    // // console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
     const gridRef = useRef();
@@ -107,7 +107,7 @@ const ServiceTrackerInnerPage = () => {
                 horizontal: 'center'
             });
         } catch (error) {
-            console.error("Error deleting user:", error);
+            // console.error("Error deleting user:", error);
             const errorMessage = error?.response?.data?.message || error?.message || "Failed to delete user";
             setIsSnackbarsOpen({
                 open: true,
@@ -245,7 +245,7 @@ const ServiceTrackerInnerPage = () => {
             };
             setColumnDefs([...dynamicCols, actionCol]);
         } catch (error) {
-            console.error("Error fetching tracker data:", error);
+            // console.error("Error fetching tracker data:", error);
         }
     };
 
@@ -253,11 +253,11 @@ const ServiceTrackerInnerPage = () => {
     //    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
     //     try {
     //         const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
-    //          console.log("Fetched response:", response);
+    //          // console.log("Fetched response:", response);
     //         setRowData(response || []);
 
     //         const dataSample = response?.[0];
-    //          console.log("dataSample:", dataSample);
+    //          // console.log("dataSample:", dataSample);
 
     //         if (!dataSample || Object.keys(dataSample).length === 0) {
     //             setColumnDefs([]);
@@ -303,9 +303,9 @@ const ServiceTrackerInnerPage = () => {
     //         };
 
     //         setColumnDefs([...dynamicCols, actionCol]);
-    //          console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
+    //          // console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
     //     } catch (error) {
-    //         console.error("Error fetching tracker data:", error);
+    //         // console.error("Error fetching tracker data:", error);
     //         setColumnDefs([]);
     //     }
     // };
@@ -475,7 +475,7 @@ const ServiceTrackerInnerPage = () => {
     };
 
     const onRowValueChanged = (event) => {
-        //  console.log('Row updated:', event.data);
+        //  // console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {
@@ -773,20 +773,20 @@ const ServiceTrackerInnerPage = () => {
                         );
                         setRowData(filterUpdateData);
                     } catch (error) {
-                        console.error("Error fetching default sheet data:", error);
+                        // console.error("Error fetching default sheet data:", error);
                     }
 
                     return; // Skip rest of the function because default sheet already handled
                 }
             } else {
-                console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheetResult.reason);
+                // console.warn("fetchAllServiceTrackerSheet failed:", serviceTrackerSheetResult.reason);
             }
 
             // Fetch data only if not filtered and the sheet name is already set
             if (serviceTrackerInnerPageData.status === 'fulfilled' && current?.isFilteredData === false) {
                 setRowData(serviceTrackerInnerPageData.value);
             } else if (serviceTrackerInnerPageData.status === 'rejected') {
-                console.warn("fetchAllServiceTrackerInnerPage failed:", serviceTrackerInnerPageData.reason);
+                // console.warn("fetchAllServiceTrackerInnerPage failed:", serviceTrackerInnerPageData.reason);
             }
         };
 
@@ -794,7 +794,7 @@ const ServiceTrackerInnerPage = () => {
     }, [current]);
 
     const onFilterOpened = (params) => {
-        console.log("Filter opened");
+        // console.log("Filter opened");
         const field = params.column.getColId();
 
         const rowData = [];
@@ -807,7 +807,7 @@ const ServiceTrackerInnerPage = () => {
 
         const uniqueValues = [...new Set(rowData)];
 
-        console.log({ [field]: uniqueValues });
+        // console.log({ [field]: uniqueValues });
 
         const filterComponent = document.querySelectorAll('.ag-filter')
 
@@ -1010,7 +1010,7 @@ const ServiceTrackerInnerPage = () => {
                                         // Call fetchAndSetTrackerData with selectedName filter
                                         await fetchAndSetTrackerData(formattedTrackerName, selectedName || null);
                                     } catch (error) {
-                                        console.error("Error fetching service tracker data:", error);
+                                        // console.error("Error fetching service tracker data:", error);
                                     }
                                 }}
                                 names={

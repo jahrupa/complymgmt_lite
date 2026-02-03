@@ -25,7 +25,6 @@ export default function DashboardDrawerGrid({
   const [chartOptions, setChartOptions] = React.useState({});
   const [chartSeries, setChartSeries] = React.useState([]);
   const [error, setError] = React.useState(""); // error state
-  // console.log(chartType,'chartType')
   // Set rowData & columnDefs
   React.useEffect(() => {
     try {
@@ -50,8 +49,7 @@ export default function DashboardDrawerGrid({
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
       }));
       setColumnDefs(cols);
-    } catch (err) {
-      console.error("Error setting row data:", err);
+    } catch {
       setError("Failed to load data for the grid.");
     }
   }, [open, data]);
@@ -127,7 +125,6 @@ export default function DashboardDrawerGrid({
       setChartOptions(options);
 
     } catch (err) {
-      console.error("Error generating chart:", err);
       setError(err.message || "Failed to generate chart.");
       setChartSeries([]);
       setChartOptions({});

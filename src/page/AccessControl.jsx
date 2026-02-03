@@ -44,7 +44,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const AccessControl = () => {
   const [data, setData] = useState([]);
-  //  console.log(data, 'data')
   const [current, setCurrent] = useState({
     user_id: null,
     user_name: "",
@@ -71,7 +70,6 @@ const AccessControl = () => {
     access_user_type_id: null,
     is_access_user_type_dropdown: false,
   });
-  //  console.log(current?.access_user_type_id, current?.access_user_name, 'access_user_type')
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -276,7 +274,6 @@ const AccessControl = () => {
         ? current.access.map((a) => a.toLowerCase())
         : [],
     };
-    //  console.log(payload, 'payload')
     if (current?.access_type === "company") {
       payload.entity_id = current?.company_id;
       payload.entity_name = current?.company_name;
@@ -327,8 +324,8 @@ const AccessControl = () => {
         system_user_id: currentUserId,
       });
       setData(updatedData);
-    } catch (error) {
-      console.error("Error saving AccessControl:", error);
+    } catch {
+    //  handle error silently
     }
     setCurrent({
       id: null,
@@ -375,7 +372,6 @@ const AccessControl = () => {
         severityType: "success",
       });
     } catch (error) {
-      console.error("Error:", error);
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
@@ -414,7 +410,6 @@ const AccessControl = () => {
       });
       setIsDeleteModalOpen(false);
     } catch (error) {
-      console.error("Error:", error);
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
@@ -1002,8 +997,8 @@ const AccessControl = () => {
                       system_user_id: matchedUser._id,
                     });
                     setData(filterUpdateData);
-                  } catch (error) {
-                    console.error("Error fetching access levels:", error);
+                  } catch {
+                    // handle error silently
                   }
                 }
 
@@ -1297,9 +1292,6 @@ const AccessControl = () => {
     editable: true,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = () => {
-    //  console.log('Row updated:', event.data);
-  };
   useEffect(() => {
     const formattedTrackerName = current?.service_tracker
       ?.toLowerCase()
@@ -1335,10 +1327,7 @@ const AccessControl = () => {
       ) {
         setData(userAccessDataRes.value);
       } else {
-        console.warn(
-          "fetchAllUserAccessLevels failed:",
-          userAccessDataRes.reason
-        );
+       // intentionally ignored
       }
 
       if (groupHoldingRes.status === "fulfilled") {
@@ -1347,62 +1336,47 @@ const AccessControl = () => {
           setGroupHoldingData(groupHolding);
         }
       } else {
-        console.warn("fetchAllGroupHolding failed:", groupHoldingRes.reason);
+        // intentionally ignored
       }
       if (userNameListRes.status === "fulfilled") {
         const userNameList = userNameListRes.value;
         if (userNameList && userNameList.length > 0) {
           setUserNameListRes(userNameList);
         } else {
-          console.warn("fetchAllUser failed:", userNameListRes.reason);
+          // intentionally ignored
         }
       }
       if (accessTypeListRes.status === "fulfilled") {
         setAccessTypeList(accessTypeListRes.value);
       } else {
-        console.warn(
-          "fetchAllUserAccessLevels failed:",
-          accessTypeListRes.reason
-        );
+      // intentionally ignored
       }
       if (allPageListRes.status === "fulfilled") {
         setAllPageList(allPageListRes.value);
       } else {
-        console.warn("fetchAllPages failed:", allPageListRes.reason);
+        // intentionally ignored
       }
       if (allServiceTrackerListRes.status === "fulfilled") {
         setAllServiceTrackerList(allServiceTrackerListRes.value);
       } else {
-        console.warn(
-          "fetchAllServiceTracker failed:",
-          allServiceTrackerListRes.reason
-        );
+       // intentionally ignored
       }
       if (allServiceTrackerListRes.status === "fulfilled") {
         setAllServiceTrackerList(allServiceTrackerListRes.value);
       } else {
-        console.warn(
-          "fetchAllServiceTracker failed:",
-          allServiceTrackerListRes.reason
-        );
+       // intentionally ignored
       }
       if (allInnerPageServiceTrackerListRes.status === "fulfilled") {
         setAllInnerPageServiceTrackerList(
           allInnerPageServiceTrackerListRes.value
         );
       } else {
-        console.warn(
-          "fetchAllInnerPageServiceTracker failed:",
-          allInnerPageServiceTrackerListRes.reason
-        );
+       // intentionally ignored
       }
       if (serviceTrackerSheet.status === "fulfilled") {
         setServiceTrackerSheet(serviceTrackerSheet.value);
       } else {
-        console.warn(
-          "fetchAllServiceTrackerSheet failed:",
-          serviceTrackerSheet.reason
-        );
+      // intentionally ignored
       }
     };
 
@@ -1417,8 +1391,8 @@ const AccessControl = () => {
         if (data) {
           setCompanyNameByGroupHoldingId(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch company:", error);
+      } catch {
+        // handle error silently
       }
     };
 
@@ -1435,8 +1409,8 @@ const AccessControl = () => {
         if (data) {
           setLocationNameByCompanyId(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch location by company_id:", error);
+      } catch {
+        // handle error silently
       }
     };
 
@@ -1453,8 +1427,8 @@ const AccessControl = () => {
         if (data) {
           setModuleName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch location by location_id:", error);
+      } catch {
+        // handle error silently
       }
     };
     fetchModuleByLocationId();
@@ -1468,8 +1442,8 @@ const AccessControl = () => {
         if (data) {
           setSubModuleName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch location by location_id:", error);
+      } catch {
+        // handle error silently
       }
     };
 
@@ -1486,8 +1460,8 @@ const AccessControl = () => {
         if (data) {
           setLocationToModule(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch location to module:", error);
+      } catch {
+        // handle error silently
       }
     };
     fetchLocationToModule();
@@ -1565,8 +1539,8 @@ const AccessControl = () => {
                       system_user_id: matchedUser._id,
                     });
                     setData(filterUpdateData);
-                  } catch (error) {
-                    console.error("Error fetching access levels:", error);
+                  } catch  {
+                    // handle error silently
                   }
                 }
 
@@ -1609,7 +1583,6 @@ const AccessControl = () => {
             rowSelection="single"
             pagination={true}
             // rowBuffer={rowBuffer}
-            onRowValueChanged={onRowValueChanged}
           />
         </div>
       </div>

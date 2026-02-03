@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import '../style/changePassword.css';
 import { changePassword, changeTemporaryPasswordStatus } from '../api/service';
 import Snackbars from '../component/Snackbars';
@@ -59,19 +59,7 @@ function ChangeForgetPassword({ setIsChangePassword }) {
   const togglePasswordVisibility = (field) => {
     setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
   };
-  // useEffect(() => {
-  //   const fetchTempPasswordStatus = async () => {
-  //     try {
-  //       const response = await changeTemporaryPasswordStatus(localStorage.getItem("user_id") || currentUserId);
-  //       if (response && typeof response.is_temp_password !== "undefined") {
-  //         setIsChangePassword(response.is_temp_password);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching temporary password status:", error);
-  //     }
-  //   };
-  //   fetchTempPasswordStatus();
-  // }, []);
+  
   const validate = () => {
     const tempErrors = {};
     // Validate new password
@@ -105,8 +93,6 @@ function ChangeForgetPassword({ setIsChangePassword }) {
       const response = await changePassword(currentUserId, payload);
       const message = response?.message || 'Password changed successfully';
 
-       console.log(response?.message, 'response');
-
       // Update temp password status
       const userId = decryptData(localStorage.getItem('user_id')) || currentUserId;
       const changeTempPasswordStatusResponse = await changeTemporaryPasswordStatus(userId);
@@ -123,7 +109,6 @@ function ChangeForgetPassword({ setIsChangePassword }) {
       }, 2000);
 
     } catch (error) {
-      console.error('Error changing password:', error);
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,

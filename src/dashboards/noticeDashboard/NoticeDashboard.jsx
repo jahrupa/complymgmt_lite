@@ -626,29 +626,17 @@ const NoticeDashboard = ({
             if (stateWiseNoticeCountRes.status === "fulfilled") {
                 setStateWiseNoticeCount(stateWiseNoticeCountRes.value);
             } else {
-                console.warn(
-                    "fetch state wise notice count failed:",
-                    stateWiseNoticeCountRes.reason
-                );
                 // Optionally set to empty or default data on failure
                 setStateWiseNoticeCount(stateWiseNoticeCountRes.reason?.status || []);
             }
             if (typesOfNoticeOrInspectionRes.status === "fulfilled") {
                 setNoticeTypeBreakdown(typesOfNoticeOrInspectionRes.value);
             } else {
-                console.warn(
-                    "fetch types of notice or inspection failed:",
-                    typesOfNoticeOrInspectionRes.reason
-                );
                 setNoticeTypeBreakdown([]);
             }
             if (analysisOfApplicableActRes.status === "fulfilled") {
                 setApplicableActsAnalysis(analysisOfApplicableActRes.value);
             } else {
-                console.warn(
-                    "fetch analysis of applicable act failed:",
-                    analysisOfApplicableActRes.reason
-                );
                 setApplicableActsAnalysis(
                     analysisOfApplicableActRes.reason?.status || []
                 );
@@ -656,10 +644,7 @@ const NoticeDashboard = ({
             if (noticesAssignedToRes.status === "fulfilled") {
                 setNumberOfNoticesAssignedToEachTeamMember(noticesAssignedToRes.value);
             } else {
-                console.warn(
-                    "fetch notices assigned to failed:",
-                    noticesAssignedToRes.reason
-                );
+              
                 setNumberOfNoticesAssignedToEachTeamMember(
                     noticesAssignedToRes.reason?.status || []
                 );
@@ -667,10 +652,7 @@ const NoticeDashboard = ({
             if (countOfAcknowledgmentRates.status === "fulfilled") {
                 setCountOfAcknowledgmentRates(countOfAcknowledgmentRates.value);
             } else {
-                console.warn(
-                    "fetch count of acknowledgment rates failed:",
-                    countOfAcknowledgmentRates.reason
-                );
+              
                 setCountOfAcknowledgmentRates(
                     countOfAcknowledgmentRates.reason?.status || []
                 );
@@ -678,10 +660,6 @@ const NoticeDashboard = ({
             if (distributionOfResponseStatus.status === "fulfilled") {
                 setDistributionOfResponseStatus(distributionOfResponseStatus.value);
             } else {
-                console.warn(
-                    "fetch distribution of response status failed:",
-                    distributionOfResponseStatus.reason
-                );
                 setDistributionOfResponseStatus(
                     distributionOfResponseStatus.reason?.status || []
                 );
@@ -689,10 +667,6 @@ const NoticeDashboard = ({
             if (countOfClientDocSubmission.status === "fulfilled") {
                 setClientDocumentSubmission(countOfClientDocSubmission.value);
             } else {
-                console.warn(
-                    "fetch count of client document submission failed:",
-                    countOfClientDocSubmission.reason
-                );
                 setClientDocumentSubmission(
                     countOfClientDocSubmission.reason?.status || []
                 );

@@ -65,8 +65,8 @@ function ChangePassword({ setIsChangePassword }) {
         if (response && typeof response.is_temp_password !== "undefined") {
           setIsChangePassword(response.is_temp_password);
         }
-      } catch (error) {
-        console.error("Error fetching temporary password status:", error);
+      } catch{
+        // handle error silently
       }
     };
     fetchTempPasswordStatus();
@@ -124,7 +124,6 @@ function ChangePassword({ setIsChangePassword }) {
       const response = await changePassword(currentUserId, payload);
       const message = response?.message || 'Password changed successfully';
 
-       console.log(response?.message, 'response');
 
       // Update temp password status
       const userId = decryptData(localStorage.getItem('user_id')) || currentUserId;
@@ -142,7 +141,6 @@ function ChangePassword({ setIsChangePassword }) {
       }, 2000);
 
     } catch (error) {
-      console.error('Error changing password:', error);
       // Show error snackbar
       setIsSnackbarsOpen({
         ...issnackbarsOpen,

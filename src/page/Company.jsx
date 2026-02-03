@@ -219,7 +219,7 @@ const Company = () => {
       if (companiesRes.status === "fulfilled") {
         setData(companiesRes.value);
       } else {
-        console.warn("fetchAllCompanies failed:", companiesRes.reason);
+        // handle error silently
       }
 
       if (groupHoldingRes.status === "fulfilled") {
@@ -228,7 +228,7 @@ const Company = () => {
           setGroupHoldingName(groupHolding);
         }
       } else {
-        console.warn("fetchAllGroupHolding failed:", groupHoldingRes.reason);
+        // handle error silently
       }
     };
 
@@ -276,7 +276,6 @@ const Company = () => {
             const matchedGroup = groupHoldingName.find(
               (g) => g.name === selectedName,
             );
-            //  console.log(matchedGroup,'matchedGroup')
             setCurrent((prev) => ({
               ...prev,
               group_name: selectedName,
@@ -409,7 +408,6 @@ const Company = () => {
         severityType: "success",
       });
     } catch (error) {
-      // console.error("Error:", error);
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
@@ -624,10 +622,6 @@ const Company = () => {
     editable: true,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-
-  // const onRowValueChanged = (event) => {
-  //    console.log('Row updated:', event.data);
-  // };
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(

@@ -49,7 +49,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
     
-    // console.log(widgetsList, 'widgetsList')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -261,9 +260,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 } else {
                     setGeneralDashboardData(await fetchGeneralCompaiancePortfolio());
                 }
-            } catch (error) {
+            } catch{
                 setGeneralDashboardData([]);
-                // console.log(error);
             }
         };
         fetchGeneralDashboardData();

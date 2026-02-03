@@ -228,31 +228,26 @@ const ReturnsAndSubmissions = ({
 
       if (returnApplicabilityRes.status === 'fulfilled') setComparisonOfReturnApplicability(returnApplicabilityRes.value);
       else {
-        console.warn("fetchReturnApplicability failed:", returnApplicabilityRes.reason);
         setComparisonOfReturnApplicability(returnApplicabilityRes.reason?.status || {});
       }
 
       if (stateWiseAnalysisRes.status === 'fulfilled') setStateWiseAnalysisOfApplicableReturns(stateWiseAnalysisRes.value);
       else {
-        console.warn("fetchStateWiseAnalysis failed:", stateWiseAnalysisRes.reason);
         setStateWiseAnalysisOfApplicableReturns(stateWiseAnalysisRes.reason?.status || {});
       }
 
       if (frequencyWiseReturnsRes.status === 'fulfilled') setApplicableReturnsCount(frequencyWiseReturnsRes.value);
       else {
-        console.warn("fetchFrequencyWiseReturns failed:", frequencyWiseReturnsRes.reason);
         setApplicableReturnsCount(frequencyWiseReturnsRes.reason?.status || {});
       }
 
       if (companiesPerReturnsNamesRes.status === 'fulfilled') setCompaniesPerReturnsNames(companiesPerReturnsNamesRes.value);
       else {
-        console.warn("fetchCompaniesPerReturnsNames failed:", companiesPerReturnsNamesRes.reason);
         setCompaniesPerReturnsNames(companiesPerReturnsNamesRes.reason?.status || {});
       }
 
       if (complianceRiskDistributionByStateRes.status === 'fulfilled') setRiskDistributionByState(complianceRiskDistributionByStateRes.value);
       else {
-        console.warn("fetchComplianceRiskDistributionByState failed:", complianceRiskDistributionByStateRes.reason);
         setRiskDistributionByState(complianceRiskDistributionByStateRes.reason?.status || {});
       }
 
@@ -260,13 +255,11 @@ const ReturnsAndSubmissions = ({
         // keep raw; normalization above will handle shape
         setApplicableReturnsRaw(complianceStatusBasedOnReturnsRes.value);
       } else {
-        console.warn("fetchComplianceStatusBasedOnReturns failed:", complianceStatusBasedOnReturnsRes.reason);
         setApplicableReturnsRaw(complianceStatusBasedOnReturnsRes.reason?.status || []);
       }
 
       if (remarksBasedOnCompanyRes.status === 'fulfilled') setEscalationRaisedCategoriesByCompany(remarksBasedOnCompanyRes.value);
       else {
-        console.warn("fetchRemarksBasedOnCompany failed:", remarksBasedOnCompanyRes.reason);
         setEscalationRaisedCategoriesByCompany(remarksBasedOnCompanyRes.reason?.status || {});
       }
     };

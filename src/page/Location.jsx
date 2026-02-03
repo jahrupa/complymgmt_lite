@@ -7,7 +7,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, getCompanyByGroupId, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById } from '../api/service';
+import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -35,12 +35,10 @@ const Location = () => {
             state: '',
             location_description: ''
         });
-    //  console.log(current, 'company_name')
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
     const [companyNameData, setCompanyNameData] = useState([])
-    //  console.log(companyNameData, 'companyNameData')
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -51,7 +49,6 @@ const Location = () => {
     });
     const [locationId, setLocationId] = useState(null);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
-    //  console.log(companyNameByGroupHoldingId, 'companyNameByGroupHoldingId')
     const [errors, setErrors] = useState({});
 
     const validate = () => {
@@ -213,9 +210,9 @@ const Location = () => {
                 setGroupHoldinData(groupHolding);
                 setCompanyNameData(companyName);
 
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
+            } catch{
+                // handle error silently
+            }    
         };
         fetchData();
     }, []);
@@ -227,8 +224,8 @@ const Location = () => {
                 if (data) {
                     setCompanyNameByGroupHoldingId(data);
                 }
-            } catch (error) {
-                console.error("Failed to fetch company:", error);
+            } catch{
+                // handle error silently
             }
         };
 
@@ -252,7 +249,6 @@ const Location = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            console.error("Error:", error);
             // Show error snackbar
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -299,7 +295,6 @@ const Location = () => {
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedGroup = companyNameByGroupHoldingId.find((g) => g.company_name === selectedName) || {};
-                            //  console.log(matchedGroup, 'matchedGroup')
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
@@ -540,8 +535,7 @@ const Location = () => {
         editable: true,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
-    const onRowValueChanged = (event) => {
-         console.log('Row updated:', event.data);
+    const onRowValueChanged = () => {
     };
     const onFilterTextBoxChanged = useCallback(() => {
         gridRef.current.api.setGridOption(

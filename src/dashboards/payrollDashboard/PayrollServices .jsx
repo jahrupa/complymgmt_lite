@@ -53,18 +53,11 @@ const PayrollServices = ({
                 type: "donut",
                 events: {
                     dataPointSelection(event, chartContext, opts) {
-                        // console.log(opts,'opts')
                         const seriesIndex = opts.seriesIndex;
-
                         // safety check
                         if (seriesIndex === undefined || seriesIndex === -1) return;
-
                         const clickedValue = opts.w.globals.series;
                         const clickedLabel = opts.w.globals.labels;
-
-                        // console.log("Clicked label:", clickedLabel);
-                        // console.log("Clicked value:", clickedValue);
-
                         // optional: zero-value segments block
                         if (clickedValue === 0) return;
 
@@ -412,17 +405,12 @@ const PayrollServices = ({
             if (investmentRes.status === "fulfilled") {
                 setInvestmentData(investmentRes.value);
             } else if (investmentRes.status === "rejected") {
-                console.warn("fetchAllInvestments failed:", investmentRes.reason);
                 setInvestmentData(investmentRes.reason?.status || []); // Set to empty array on error
             }
 
             if (distrubutionMultipleLocationsRes.status === "fulfilled") {
                 setDistributionOfEmployee(distrubutionMultipleLocationsRes.value);
             } else if (distrubutionMultipleLocationsRes.status === "rejected") {
-                console.warn(
-                    "fetchAllDistributions failed:",
-                    distrubutionMultipleLocationsRes.reason
-                );
                 setDistributionOfEmployee(
                     distrubutionMultipleLocationsRes.reason?.status || []
                 ); // Set to empty array on error
@@ -431,7 +419,6 @@ const PayrollServices = ({
             if (typeOfSystemsRes.status === "fulfilled") {
                 setSystemUseByEmp(typeOfSystemsRes.value || []);
             } else if (typeOfSystemsRes.status === "rejected") {
-                console.warn("fetchAllDistributions failed:", typeOfSystemsRes.reason);
                 setSystemUseByEmp(typeOfSystemsRes.reason?.status || []); // Set to empty array on error
             }
 
@@ -441,10 +428,6 @@ const PayrollServices = ({
                     total_employees: payrollOverviewDataR.value.employee_count,
                 }));
             } else if (payrollOverviewDataR.status === "rejected") {
-                console.warn(
-                    "fetchAllDistributions failed:",
-                    payrollOverviewDataR.reason
-                );
                 setPayrollOverviewData(payrollOverviewDataR.reason?.status || []); // Set to empty array on error
             }
 
@@ -460,17 +443,12 @@ const PayrollServices = ({
                         payrollOverviewDataR2.value.sum_sla_days,
                 }));
             } else if (payrollOverviewDataR2.status === "rejected") {
-                console.warn(
-                    "fetchAllDistributions failed:",
-                    payrollOverviewDataR2.reason
-                );
                 setPayrollOverviewData(payrollOverviewDataR2.reason?.status || []); // Set to empty array on error
             }
 
             if (averageDelayRes.status === "fulfilled") {
                 setDataRequestAndClientDataReceived(averageDelayRes.value || []);
             } else if (averageDelayRes.status === "rejected") {
-                console.warn("fetchAllDistributions failed:", averageDelayRes.reason);
                 setDataRequestAndClientDataReceived(
                     averageDelayRes.reason?.status || []
                 ); // Set to empty array on error
@@ -478,10 +456,6 @@ const PayrollServices = ({
             if (explanationOfEmployeeCountRes.status === "fulfilled") {
                 setExplanationOfEmployeeCount(explanationOfEmployeeCountRes.value);
             } else if (explanationOfEmployeeCountRes.status === "rejected") {
-                console.warn(
-                    "fetchAllDistributions failed:",
-                    explanationOfEmployeeCountRes.reason
-                );
                 setExplanationOfEmployeeCount(
                     explanationOfEmployeeCountRes.reason?.status || []
                 ); // Set to empty array on error

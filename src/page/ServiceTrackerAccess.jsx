@@ -7,10 +7,10 @@ function ServiceTrackerAccess() {
     const [selectedCategory, setSelectedCategory] = useState('')
     const [checkedItems, setCheckedItems] = useState({})
     const [checkedTrackerKeys, setCheckedTrackerKeys] = useState('')
-    console.log(checkedTrackerKeys, 'checkedTrackerKeys')
+    // console.log(checkedTrackerKeys, 'checkedTrackerKeys')
     const [trackerName, setTrackerName] = useState([])
     const [serviceTrackerFields, setServiceTrackerFields] = useState([])
-    console.log(serviceTrackerFields, 'serviceTrackerFields')
+    // console.log(serviceTrackerFields, 'serviceTrackerFields')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -80,7 +80,7 @@ function ServiceTrackerAccess() {
         };
         try {
             const result = await createServiceTrackerSpecifics(payload);
-            console.log(result, 'result')
+            // console.log(result, 'result')
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,

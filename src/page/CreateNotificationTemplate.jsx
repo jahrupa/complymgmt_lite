@@ -8,7 +8,6 @@ import {
     ChevronDown
 } from 'lucide-react';
 import '../style/createNotification.css';
-import { useNavigate } from 'react-router-dom';
 import { createNotificationTemplate } from '../api/service';
 import Snackbars from '../component/Snackbars';
 
@@ -30,7 +29,6 @@ function CreateNotificationTemplate() {
             backgroundColor: '#ffffff'
         }
     });
-    //  console.log(notification, 'notification')
     const [errors, setErrors] = useState({});
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -39,8 +37,6 @@ function CreateNotificationTemplate() {
         message: '',
         severityType: '',
     });
-    const navigate = useNavigate();
-    const [currentPage, setCurrentPage] = useState('show');
 
     const [showPreview, setShowPreview] = useState(true);
 
@@ -117,7 +113,6 @@ function CreateNotificationTemplate() {
                 message: error?.response?.data?.message,
                 severityType: 'error',
             });
-            console.error(error);
         }
 
     };
@@ -147,7 +142,6 @@ function CreateNotificationTemplate() {
     };
 
     const currentTypeData = getNotificationTypeData(notification.type);
-    //  console.log(currentTypeData, 'currentTypeData')
     const toggleInApp = () => {
         setNotification(prev => {
             // if turning off and email is false → keep in_app true
@@ -164,11 +158,6 @@ function CreateNotificationTemplate() {
         });
     };
 
-
-    const handleNavigate = (page) => {
-        setCurrentPage(page);
-        navigate(page === 'show' ? '/notification' : '/notifications_list');
-    };
     return (
         <div className="">
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
@@ -388,20 +377,6 @@ function CreateNotificationTemplate() {
                     )}
                 </div>
             </div>
-            {/* <div className="navigation">
-                <button
-                    onClick={() => handleNavigate('show')}
-                    className={`nav-button ${currentPage === 'show' ? 'active' : ''}`}
-                >
-                    Incomming Notifications
-                </button>
-                <button
-                    onClick={() => handleNavigate('create')}
-                    className={`nav-button ${currentPage === 'create' ? 'active' : ''}`}
-                >
-                    Template List
-                </button>
-            </div> */}
         </div>
     );
 }

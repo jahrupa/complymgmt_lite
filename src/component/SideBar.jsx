@@ -8,7 +8,6 @@ import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined
 import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import AddModeratorOutlinedIcon from '@mui/icons-material/AddModeratorOutlined';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import complyn_mgmt_logo from '../assets/complyn_mgmt_logo.png'
@@ -21,9 +20,7 @@ import { Layers, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 
 function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
-    // const [activePage, setActivePage] = useState(() => {
-    //     return localStorage.getItem('activeItem') || 'Dashboard';
-    // });
+   
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const userRole = decryptData(localStorage.getItem("user_role"));
     const menuItems = [
@@ -58,23 +55,6 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
         : []
     ),
     ];
-
-    // Sync active tab with URL on page load
-    // useEffect(() => {
-    //     const currentPath = location.pathname.split('/')[1];
-    //     const allItems = [...menuItems, ...documentSubItems, ...serviceTracker];
-    //     const match = allItems.find(item => item.link === currentPath);
-    //     if (match) {
-    //         setActivePage(match.label);
-    //         localStorage.setItem('activeSidebarItem', match.label);
-    //     }
-    // }, [location.pathname]);
-
-    // 2nd method
-    // useEffect(() => {
-    //     localStorage.setItem("activeItem", activeItem);  // ✅ save on every change
-    //     localStorage.setItem('active_url',window.location.pathname)
-    // }, [activeItem]);
 
     return (
         <div>
@@ -141,7 +121,6 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
                                                     to={`/${link}`}
                                                     onClick={() => {
                                                         setActivePage(label);
-                                                        // localStorage.setItem('activeSidebarItem', label);
                                                         localStorage.setItem("activeItem", label);
                                                         localStorage.setItem('active_url', link)
                                                     }}

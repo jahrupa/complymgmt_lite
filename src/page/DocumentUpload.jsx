@@ -316,17 +316,16 @@ const DocumentUpload = () => {
         if (results[0].status === "fulfilled") setData(results[0].value);
         if (results[1].status === "fulfilled")
           setGroupHoldingName(results[1].value);
-        // if (results[2].status === 'fulfilled') setModuleName(results[2].value);
         results.forEach((result, idx) => {
           if (result.status === "rejected") {
-            console.error(
-              `Error fetching data at index ${idx}:`,
-              result.reason
-            );
+            // // console.error(
+            //   `Error fetching data at index ${idx}:`,
+            //   result.reason
+            // );
           }
         });
-      } catch (error) {
-        console.error("Error in fetchData:", error);
+      } catch  {
+        // Handle error silently
       }
     };
 
@@ -341,9 +340,9 @@ const DocumentUpload = () => {
         if (data) {
           setCompanyName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch company:", error);
-      }
+      } catch {
+        // Handle error silently
+        }
     };
 
     if (current?.group_holdings_id) {
@@ -358,9 +357,9 @@ const DocumentUpload = () => {
         if (data) {
           setLocationName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch location by company_id:", error);
-      }
+      } catch {
+        // Handle error silently
+        }
     };
 
     if (current?.company_id) {
@@ -377,8 +376,8 @@ const DocumentUpload = () => {
         if (data) {
           setModuleName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch module by location_id:", error);
+      } catch {
+        // Handle error silently
       }
     };
 
@@ -395,8 +394,8 @@ const DocumentUpload = () => {
         if (data) {
           setSubModuleName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch sub-module by module_id:", error);
+      } catch{
+        // Handle error silently
       }
     };
 
@@ -412,11 +411,8 @@ const DocumentUpload = () => {
         if (data) {
           setServiceTrackerName(data);
         }
-      } catch (error) {
-        console.error(
-          "Failed to fetch service tracker by sub module ID:",
-          error
-        );
+      } catch {
+        // Handle error silently
       }
     };
 
@@ -432,8 +428,8 @@ const DocumentUpload = () => {
         if (data) {
           setDocumentDropdownTypes(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch document dropdown types:", error);
+      } catch {
+        // Handle error silently
       }
     };
 
@@ -449,8 +445,8 @@ const DocumentUpload = () => {
         if (data) {
           setDocumentDropdownStages(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch document dropdown stages:", error);
+      } catch{
+        // Handle error silently
       }
     };
 
@@ -663,7 +659,6 @@ const DocumentUpload = () => {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   const onRowValueChanged = () => {
-    //  console.log('Row updated:', event.data);
   };
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(

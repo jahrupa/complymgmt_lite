@@ -357,40 +357,24 @@ const GeneralHelpdesk = ({
             if (stausCountres.status === "fulfilled") {
                 setClosedVsOpenCases(stausCountres.value);
             } else {
-                console.warn(
-                    "fetchStatusCountOfoOpenVsClosedCases failed:",
-                    stausCountres.reason
-                );
                 setClosedVsOpenCases(stausCountres.reason?.status || []);
             }
 
             if (assignedUser.status === "fulfilled") {
                 setAssignedUser(assignedUser.value);
             } else {
-                console.warn(
-                    "fetchAssignedIndividualsList failed:",
-                    assignedUser.reason
-                );
                 setAssignedUser(assignedUser.reason?.status || []);
             }
 
             if (documentPendingFormRes.status === "fulfilled") {
                 setDocumentPendingFrom(documentPendingFormRes.value);
             } else {
-                console.warn(
-                    "fetchDocumentsPendingFrom failed:",
-                    documentPendingFormRes.reason
-                );
                 setDocumentPendingFrom(documentPendingFormRes.reason?.status || []);
             }
 
             if (openVsCloseIssueCategory.status === "fulfilled") {
                 setOpenVsCloseIssueCategory(openVsCloseIssueCategory.value);
             } else {
-                console.warn(
-                    "fetchIssueCategoryByStatus failed:",
-                    openVsCloseIssueCategory.reason
-                );
                 setOpenVsCloseIssueCategory(
                     openVsCloseIssueCategory.reason?.status || []
                 );

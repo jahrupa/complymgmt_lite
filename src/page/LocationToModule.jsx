@@ -44,14 +44,11 @@ const LocationToModule = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [id, setId] = useState(null)
-    //  console.log(id, 'id')
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
-    //  console.log(companyName, 'companyName')
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
     const [subModuleName, setSubModuleName] = useState([])
-    console.log(subModuleName, 'subModuleName')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -211,11 +208,11 @@ const LocationToModule = () => {
                 if (results[2].status === 'fulfilled') setModuleName(results[2].value);
                 results.forEach((result, idx) => {
                     if (result.status === 'rejected') {
-                        console.error(`Error fetching data at index ${idx}:`, result.reason);
+                        // // console.error(`Error fetching data at index ${idx}:`, result.reason);
                     }
                 });
             } catch (error) {
-                console.error("Error in fetchData:", error);
+                // // console.error("Error in fetchData:", error);
             }
         };
 
@@ -230,7 +227,7 @@ const LocationToModule = () => {
                     setSubModuleName(data);
                 }
             } catch (error) {
-                console.error("Failed to fetch sub module:", error);
+                // console.error("Failed to fetch sub module:", error);
             }
         };
 
@@ -247,7 +244,7 @@ const LocationToModule = () => {
                     setCompanyName(data);
                 }
             } catch (error) {
-                console.error("Failed to fetch company:", error);
+                // console.error("Failed to fetch company:", error);
             }
         };
 
@@ -264,7 +261,7 @@ const LocationToModule = () => {
                     setLocationName(data);
                 }
             } catch (error) {
-                console.error("Failed to fetch location by company_id:", error);
+                // console.error("Failed to fetch location by company_id:", error);
             }
         };
 
@@ -455,7 +452,7 @@ const LocationToModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error:", error);
+            // // console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
@@ -650,7 +647,7 @@ const LocationToModule = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {

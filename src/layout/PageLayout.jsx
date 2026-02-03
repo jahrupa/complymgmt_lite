@@ -20,8 +20,9 @@ const PageLayout = ({
            try {
              const response = await getInAppNotification(SystemUserId || "");
              setUnreadCountNotification(response?.length || 0);
-           } catch (err) {
-             console.error("Error fetching notifications:", err);} 
+           } catch {
+             // handle error silently
+           }
          };
          fetchNotifications();
        }, []);

@@ -12,19 +12,15 @@ import {
   bulkApproveAllPageData,
   createNotification,
   deleteNotificationById,
-  deleteNotificationTemplateById,
   fetchAllGroupHolding,
   fetchAllNotifications,
   fetchAllNotificationTemplates,
   fetchAllUser,
   fetchCompaniesNameByGroupId,
   getLocationByCompanyId,
-  updateLocationToModuleById,
   updateNotificationApprovalStatusById,
   updateNotificationById,
   updateNotificationStatusById,
-  updateNotificationTemplate,
-  updateNotificationTemplateApprovalStatusById,
   uploadBulkNotification,
 } from "../api/service";
 import Snackbars from "../component/Snackbars";
@@ -50,10 +46,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const CreateNotification = () => {
   const [templates, setTemplates] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [editingId,] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  //  console.log(editForm, 'editForm')
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(null);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -73,8 +67,6 @@ const CreateNotification = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFileUploadModalOpen, setIsFileUploadModalOpen] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const navigate = useNavigate();
-  const { template_id } = useParams();
   const gridRef = useRef();
   const crudTitle = "Create Notification Template";
   const editCrudTitle = "Edit Notification Template";
@@ -94,14 +86,14 @@ const CreateNotification = () => {
   useEffect(() => {
     fetchAllNotificationTemplates()
       .then((data) => setTemplates(data))
-      .catch((err) => console.error("Error fetching templates:", err));
+      .catch();
   }, []);
 
   // ✅ Fetch notifications
   useEffect(() => {
     fetchAllNotifications()
       .then((data) => setNotifications(data))
-      .catch((err) => console.error("Error fetching notifications:", err));
+      .catch();
   }, []);
   const validate = () => {
     const newErrors = {};
@@ -134,11 +126,11 @@ const CreateNotification = () => {
 
         results.forEach((result, idx) => {
           if (result.status === "rejected") {
-            console.error(`Error fetching data at index ${idx}:`, result.reason);
+            // // console.error(`Error fetching data at index ${idx}:`, result.reason);
           }
         });
-      } catch (error) {
-        console.error("Error in fetchData:", error);
+      } catch  {
+        // Handle error silently
       }
     };
 
@@ -153,8 +145,8 @@ const CreateNotification = () => {
         if (data) {
           setCompanyName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch company:", error);
+      } catch {
+        // Handle error silently
       }
     };
 
@@ -170,8 +162,8 @@ const CreateNotification = () => {
         if (data) {
           setLocationName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch location by company_id:", error);
+      } catch  {
+        // Handle error silently
       }
     };
 
@@ -187,8 +179,8 @@ const CreateNotification = () => {
         if (data) {
           setTemplateName(data);
         }
-      } catch (error) {
-        console.error("Failed to fetch template names:", error);
+      } catch {
+        // Handle error silently
       }
     };
     fetchTemplateNames();
@@ -271,7 +263,6 @@ const CreateNotification = () => {
     try {
       // const result = await uploadFile(uploadedFiles);
       const result = await uploadBulkNotification(uploadedFiles, notificationId)
-      //  console.log("Files uploaded successfully:", result);
       setIsFileUploadModalOpen(false);
       const message = result?.message || "Status update successfully"
       // Show success snackbar
@@ -308,7 +299,6 @@ const CreateNotification = () => {
         severityType: 'success',
       });
     } catch (error) {
-      // console.error("Error:", error);
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||

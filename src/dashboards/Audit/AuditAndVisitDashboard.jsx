@@ -655,13 +655,11 @@ const AuditAndVisitDashboard = ({
       if (auditRes.status === "fulfilled") {
         setAuditCountByServiceType(auditRes.value);
       } else {
-        console.warn("fetchAll audit failed:", auditRes.reason);
         setAuditCountByServiceType(auditRes.reason?.status || []);
       }
       if (auditSlaRes.status === "fulfilled") {
         setAuditPercentageMeetingSLA(auditSlaRes.value);
       } else {
-        console.warn("fetchAll audit failed:", auditSlaRes.reason);
         setAuditPercentageMeetingSLA(auditSlaRes.reason?.status || []);
       }
       if (auditPlatformsCountByStateSegmentedRes.status === "fulfilled") {
@@ -669,10 +667,6 @@ const AuditAndVisitDashboard = ({
           auditPlatformsCountByStateSegmentedRes.value
         );
       } else {
-        console.warn(
-          "fetchAll audit failed:",
-          auditPlatformsCountByStateSegmentedRes.reason
-        );
         setAuditCountByStateSegmented(
           auditPlatformsCountByStateSegmentedRes.reason?.status || []
         );
@@ -680,7 +674,6 @@ const AuditAndVisitDashboard = ({
       if (auditStatusByCompanyRes.status === "fulfilled") {
         setChecklistApprovalRateByCompanyName(auditStatusByCompanyRes.value);
       } else {
-        console.warn("fetchAll audit failed:", auditStatusByCompanyRes.reason);
         setChecklistApprovalRateByCompanyName(
           auditStatusByCompanyRes.reason?.status || []
         );
@@ -688,13 +681,11 @@ const AuditAndVisitDashboard = ({
       if (riskLevelRes.status === "fulfilled") {
         setRiskLevel(riskLevelRes.value);
       } else {
-        console.warn("fetchAll audit failed:", riskLevelRes.reason);
         setRiskLevel(riskLevelRes.reason?.status || []);
       }
       if (auditStatusCountRes.status === "fulfilled") {
         setCountOfAuditStatus(auditStatusCountRes.value);
       } else {
-        console.warn("fetchAll audit failed:", auditStatusCountRes.reason);
         setCountOfAuditStatus(auditStatusCountRes.reason?.status || []);
       }
       if (escalationTriggeredRateByStateRes.status === "fulfilled") {
@@ -702,10 +693,6 @@ const AuditAndVisitDashboard = ({
           escalationTriggeredRateByStateRes.value
         );
       } else {
-        console.warn(
-          "fetchAll audit failed:",
-          escalationTriggeredRateByStateRes.reason
-        );
         setEscalationTriggeredRateByState(
           escalationTriggeredRateByStateRes.reason?.status || []
         );
@@ -715,10 +702,6 @@ const AuditAndVisitDashboard = ({
           riskLevelBreakdownByServiceTypeRes.value
         );
       } else {
-        console.warn(
-          "fetchAll audit failed:",
-          riskLevelBreakdownByServiceTypeRes.reason
-        );
         setRiskLevelBreakdownByServiceType(
           riskLevelBreakdownByServiceTypeRes.reason?.status || []
         );

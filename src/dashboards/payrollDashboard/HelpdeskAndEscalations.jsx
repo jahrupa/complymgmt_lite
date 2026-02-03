@@ -605,19 +605,13 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       if (communicationTypeRes.status === "fulfilled") {
         setCommunicationType(communicationTypeRes.value);
       } else {
-        console.warn(
-          "fetchAll communication type failed:",
-          communicationTypeRes.reason
-        );
+     
         setCommunicationType(communicationTypeRes.reason?.status || []);
       }
       if (helpdeskTicketsRes.status === "fulfilled") {
         setHelpdeskTicketsRaisedByCompany(helpdeskTicketsRes.value);
       } else {
-        console.warn(
-          "fetchAll helpdesk tickets failed:",
-          helpdeskTicketsRes.reason
-        );
+    
         setHelpdeskTicketsRaisedByCompany(
           helpdeskTicketsRes.reason?.status || []
         );
@@ -625,43 +619,29 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       if (helpdeskStatusRes.status === "fulfilled") {
         setCloseVsOpenCases(helpdeskStatusRes.value);
       } else {
-        console.warn(
-          "fetchAll helpdesk status failed:",
-          helpdeskStatusRes.reason
-        );
+   
         setCloseVsOpenCases(helpdeskStatusRes.reason?.status || []);
       }
       if (ticketsDistributionRes.status === "fulfilled") {
         setTicketDistribution(ticketsDistributionRes.value);
       } else {
-        console.warn(
-          "fetchAll tickets distribution failed:",
-          ticketsDistributionRes.reason
-        );
         setTicketDistribution(ticketsDistributionRes.reason?.status || []);
       }
       if (helpdeskPendingRes.status === "fulfilled") {
         setProportionofcases(helpdeskPendingRes.value);
       } else {
-        console.warn(
-          "fetchAll helpdesk pending failed:",
-          helpdeskPendingRes.reason
-        );
+   
         setProportionofcases(helpdeskPendingRes.reason?.status || []);
       }
       if (totalDelayFlags.status === "fulfilled") {
         setClientDelayFlags(totalDelayFlags.value);
       } else {
-        console.warn("fetchAll delay flags failed:", totalDelayFlags.reason);
         setClientDelayFlags(totalDelayFlags.reason?.status || []);
       }
       if (totalDelayFlagsByGovt.status === "fulfilled") {
         setGovernmentDelayFlags(totalDelayFlagsByGovt.value);
       } else {
-        console.warn(
-          "fetchAll delay flags failed:",
-          totalDelayFlagsByGovt.reason
-        );
+    
         setGovernmentDelayFlags(totalDelayFlagsByGovt.reason?.status || []);
       }
     };

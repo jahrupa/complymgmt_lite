@@ -162,7 +162,6 @@ export const GET_TOTAL_EMPLOYEE_COUNT ='/api/v1/dashboard/view/payroll/total/emp
 export const GET_PAYROLLS_CLOSED_ON_OR_AHEAD_OF_SLA_PERCENTAGE ='/api/v1/dashboard/view/payroll/closed/ahead/sla/percent'
 export const GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVED_DATE ='/api/v1/dashboard/view/payroll/calculate/average/delay'
 export const GET_EXPLANATION_OF_EMPLOYEE_COUNT ='/api/v1/dashboard/view/payroll/explanation/employee/count'
-// export const GET_NUMBER_OF_PAYROLLS_WITH_MORE_THAN_2_DAYS_DELAY ='/api/v1/payroll_service_dashboard/view/number_of_payrolls_with_more_than_2_days_delay'
 
 // Helpdesk and Escalations
 export const GET_TOTAL_COUNT_OF_COMMUNICATION_TYPES ='/api/v1/dashboard/view/helpdesk/communication/type'
@@ -187,7 +186,6 @@ export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/ty
 export const GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED ='/api/v1/dashboard/view/audit/platforms/count'
 export const GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
 export const GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME ='/api/v1/dashboard/view/audit/checklist/approval/company/name'
-// export const GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
 export const GET_ESCALATION_TRIGGERED_RATE_BY_STATE ='/api/v1/dashboard/view/audit/escalation/triggered/state_wise'
 export const GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE ='/api/v1/dashboard/view/audit/risk/based/service_type'
 export const GET_COUNT_OF_AUDIT_STATUS ='/api/v1/dashboard/view/audit/count/status'

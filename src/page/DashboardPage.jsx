@@ -26,13 +26,11 @@ const DashboardPage = () => {
       if (cockpitByCompanyRes.status === "fulfilled" && Array.isArray(cockpitByCompanyRes.value)) {
         setCompanyName(cockpitByCompanyRes.value);
       } else {
-        console.warn("fetchAll Companies failed:", cockpitByCompanyRes.reason);
         setCompanyName([]);
       }
       if (allUserRes.status === "fulfilled" && Array.isArray(allUserRes.value)) {
         setAllUser(allUserRes.value);
       } else {
-        console.warn("fetchAll Users failed:", allUserRes.reason);
         setAllUser([]);
       }
     };
