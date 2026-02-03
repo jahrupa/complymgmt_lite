@@ -663,12 +663,12 @@ const LocationToModule = () => {
                 <div className="notification-page-title">
                     <div>
                         {/* <h1>{data?.length > 1 ? "Companies" : "Company"}</h1> */}
-                        <h1>Module To Sub-Module Subscribe</h1>
+                        <h1>Modules Subscribed</h1>
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
                     <button className='crud_btn w-100 mb-2' onClick={openModal}>
-                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Module To Sub-Module Subscribe</span>
+                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Location to Module/Submodule</span>
                     </button>
                     <div className='btn-wrap-div'>
                         <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
