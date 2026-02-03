@@ -26,76 +26,20 @@ import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { decryptData } from './utils/encrypt';
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-const dummuJsonData = [
-    {
-        id: 1744096161424,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161425,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161426,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161427,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161428,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-    {
-        id: 1744096161429,
-        module_name: "Tata",
-        module_description: "XYZ",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        location: "Mumbai",
-        approved_by: "Admin"
-    },
-];
 
 const Module = () => {
     // const [data, setData] = useState([]);
     // if you want to show dummy jason data 
-    const [data, setData] = useState(dummuJsonData);
+    const [data, setData] = useState([]);
     const [current, setCurrent] = useState({ module_name: '', module_description: '', });
     const [isEditing, setIsEditing] = useState(false);
     const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [moduleId, setModuleId] = useState(null)
-    //  console.log(moduleId, 'moduleId')
+    //  // console.log(moduleId, 'moduleId')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -104,7 +48,7 @@ const Module = () => {
         severityType: '',
     });
     const [errors, setErrors] = useState({});
-
+const SystemUserId = decryptData(localStorage.getItem("user_id"));
 
     const validate = () => {
         let tempErrors = {};
@@ -147,7 +91,7 @@ const Module = () => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
             const CommonAttributes = {
-            [isEditing ? "Updated_By" : "Created_By"]:localStorage.getItem("user_id") || "",
+            [isEditing ? "Updated_By" : "Created_By"]:SystemUserId || "",
         };
         const payload = {
             "ModuleName": current.module_name,
@@ -239,7 +183,7 @@ const Module = () => {
                 ]);
                 setData(locationData);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                // console.error("Error fetching data:", error);
             }
         };
 
@@ -337,7 +281,7 @@ const Module = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error:", error);
+            // // console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
@@ -542,7 +486,7 @@ const Module = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-        //  console.log('Row updated:', event.data);
+        //  // console.log('Row updated:', event.data);
     };
     const onFilterTextBoxChanged = useCallback(() => {
         gridRef.current.api.setGridOption(

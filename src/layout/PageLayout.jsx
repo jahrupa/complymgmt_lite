@@ -3,6 +3,7 @@ import SideBar from '../component/SideBar'
 import NavBar from '../component/NavBar'
 import NotificationPage from '../component/notification/NotificationPage';
 import { getInAppNotification } from '../api/service';
+import { decryptData } from '../page/utils/encrypt';
 
 const PageLayout = ({
   sidebarOpen,
@@ -13,13 +14,15 @@ const PageLayout = ({
   activePage
 }) => {
      const [showNotifications, setShowNotifications] = useState(false);
+     const SystemUserId = decryptData(localStorage.getItem("user_id"));
       useEffect(() => {
          const fetchNotifications = async () => {
            try {
-             const response = await getInAppNotification(localStorage.getItem("user_id") || "");
+             const response = await getInAppNotification(SystemUserId || "");
              setUnreadCountNotification(response?.length || 0);
-           } catch (err) {
-             console.error("Error fetching notifications:", err);} 
+           } catch {
+             // handle error silently
+           }
          };
          fetchNotifications();
        }, []);

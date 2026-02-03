@@ -5,8 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:test": "vite --config vite.config.test.js",
-    "dev:demo": "vite --config vite.config.demo.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -27,6 +25,7 @@
     "apexcharts": "^5.2.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.7",
+    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "lucide": "^0.525.0",
     "lucide-react": "^0.525.0",

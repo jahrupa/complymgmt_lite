@@ -8,7 +8,6 @@ import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined
 import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
-import AddModeratorOutlinedIcon from '@mui/icons-material/AddModeratorOutlined';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import complyn_mgmt_logo from '../assets/complyn_mgmt_logo.png'
@@ -17,13 +16,13 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { ScanEye } from 'lucide-react';
+import { Layers, ScanEye } from 'lucide-react';
+import { decryptData } from '../page/utils/encrypt';
 
 function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
-    // const [activePage, setActivePage] = useState(() => {
-    //     return localStorage.getItem('activeItem') || 'Dashboard';
-    // });
+   
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
+    const userRole = decryptData(localStorage.getItem("user_role"));
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
         { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
@@ -31,36 +30,31 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
         { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
         { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location To Module', link: 'location_to_module' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module To Sub-Module Subscribe', link: 'location_to_module' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         // { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
-        // { icon: (active) => <SummarizeIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'document_repository' },
-    ];
-
-
+          ...(userRole === 'Admin' || userRole === 'Super-Admin'
+        ? [{
+            icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+            label: 'Widget Mappings',
+            link: 'widget_mappings'
+        }]
+        : []
+    ),
+];
     const serviceTracker = [
         { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
-        { icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tracker Access', link: 'service_tracker_access' },
+         ...(userRole === 'Admin' || userRole === 'Super-Admin'
+        ? [{
+            icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+            label: 'Tracker Access',
+            link: 'service_tracker_access'
+        }]
+        : []
+    ),
     ];
-
-    // Sync active tab with URL on page load
-    // useEffect(() => {
-    //     const currentPath = location.pathname.split('/')[1];
-    //     const allItems = [...menuItems, ...documentSubItems, ...serviceTracker];
-    //     const match = allItems.find(item => item.link === currentPath);
-    //     if (match) {
-    //         setActivePage(match.label);
-    //         localStorage.setItem('activeSidebarItem', match.label);
-    //     }
-    // }, [location.pathname]);
-
-    // 2nd method
-    // useEffect(() => {
-    //     localStorage.setItem("activeItem", activeItem);  // ✅ save on every change
-    //     localStorage.setItem('active_url',window.location.pathname)
-    // }, [activeItem]);
 
     return (
         <div>
@@ -127,7 +121,6 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
                                                     to={`/${link}`}
                                                     onClick={() => {
                                                         setActivePage(label);
-                                                        // localStorage.setItem('activeSidebarItem', label);
                                                         localStorage.setItem("activeItem", label);
                                                         localStorage.setItem('active_url', link)
                                                     }}

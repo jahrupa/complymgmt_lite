@@ -85,7 +85,7 @@ export const BULK_APPROVE_ALL_SERVICE_TRACKER_DATA ='/api/v1/service_tracker/upd
 export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID = '/api/v1/service_tracker/update/approval_status/';
 export const GET_SERVICE_TRACKER_BY_SUBMODULE_ID = '/api/v1/service_tracker/view/sub_module_id/multiple/';
-
+export const APPEND_TRACKER='api/v1/client_master/append/tracker?tracker_name=';
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
 export const CREATE_LOCATION_TO_MODULE='/api/v1/location_to_module/create';
@@ -115,6 +115,7 @@ export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
 export const APPROVE_USER_ACCESS = "/api/v1/user_access/update/approve/";
+export const COMPANY_WISE_ACCESS='/api/v1/user_access/create/company-wise/access';
 // Common API
 export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';
 
@@ -161,15 +162,15 @@ export const GET_TOTAL_EMPLOYEE_COUNT ='/api/v1/dashboard/view/payroll/total/emp
 export const GET_PAYROLLS_CLOSED_ON_OR_AHEAD_OF_SLA_PERCENTAGE ='/api/v1/dashboard/view/payroll/closed/ahead/sla/percent'
 export const GET_AVERAGE_DELAY_BETWEEN_DATA_REQUEST_DATE_AND_CLIENT_DATA_RECEIVED_DATE ='/api/v1/dashboard/view/payroll/calculate/average/delay'
 export const GET_EXPLANATION_OF_EMPLOYEE_COUNT ='/api/v1/dashboard/view/payroll/explanation/employee/count'
-// export const GET_NUMBER_OF_PAYROLLS_WITH_MORE_THAN_2_DAYS_DELAY ='/api/v1/payroll_service_dashboard/view/number_of_payrolls_with_more_than_2_days_delay'
 
 // Helpdesk and Escalations
 export const GET_TOTAL_COUNT_OF_COMMUNICATION_TYPES ='/api/v1/dashboard/view/helpdesk/communication/type'
 export const GET_HELPDESK_TICKETS_RAISED_BY_COMPANY ='/api/v1/dashboard/view/helpdesk/tickets/raised'
 export const GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE ='/api/v1/dashboard/view/helpdesk/status'
 export const GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT ='/api/v1/dashboard/view/helpdesk/tickets/distribution'
-// export const GET_HELPDESK_TICKETS_RAISED_BY_CATEGORY ='/api/v1/dashboard/view/helpdesk/tickets/raised/category'
-// export const GET_HELPDESK_TICKETS_RAISED_BY_PRIORITY ='/api/v1/dashboard/view/helpdesk/tickets/raised/priority'
+export const GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES ='/api/v1/dashboard/view/helpdesk/pending/issue/types'
+export const GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT ='/api/v1/dashboard/view/helpdesk/client/delay/flag'
+export const GET_TOTAL_DELAY_FLAGS_BY_GOVT ='/api/v1/dashboard/view/helpdesk/govt/delay/flag'
 
 // Returns and Submissions
 export const GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME ='/api/v1/dashboard/view/returns/applicability/company'
@@ -185,21 +186,33 @@ export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/ty
 export const GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED ='/api/v1/dashboard/view/audit/platforms/count'
 export const GET_AUDIT_MEETING_SLA_BY_RESPONSIBLE_TEAM ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
 export const GET_CHECKLIST_APPROVAL_BY_COMPANY_NAME ='/api/v1/dashboard/view/audit/checklist/approval/company/name'
-// export const GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/audit/sla_met/responsible/team'
 export const GET_ESCALATION_TRIGGERED_RATE_BY_STATE ='/api/v1/dashboard/view/audit/escalation/triggered/state_wise'
-export const GET_AUDIT_STATUS_BASED_ON_STORAGE_MODE ='/api/v1/dashboard/view/audit/status/based/storage_mode'
 export const GET_RISK_LEVEL_BASED_ON_SERVICE_TYPE ='/api/v1/dashboard/view/audit/risk/based/service_type'
 export const GET_COUNT_OF_AUDIT_STATUS ='/api/v1/dashboard/view/audit/count/status'
+export const GET_COUNT_OF_RISK_LEVEL ='/api/v1/dashboard/view/audit/count/risk/level'
 
 
 // Notice & Inspections (need to change form postnman this is auto generated)
-export const GET_NOTICE_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/notice/type'
-export const GET_NOTICE_STATUS_BY_COMPANY ='/api/v1/dashboard/view/notice/status/company'
-export const GET_INSPECTION_FINDINGS_BY_SEVERITY ='/api/v1/dashboard/view/notice/inspection/findings/severity'
-export const GET_NOTICE_RESPONSE_TIME_BY_STATE ='/api/v1/dashboard/view/notice/response/time/state_wise'
-export const GET_NOTICE_COMPLIANCE_STATUS_BY_NOTICE_TYPE ='/api/v1/dashboard/view/notice/compliance/status/notice_type'
-export const GET_COMMON_VIOLATIONS_BY_COMPANY ='/api/v1/dashboard/view/notice/common/violations/company'
-export const GET_AVERAGE_NOTICE_RESOLUTION_TIME ='/api/v1/dashboard/view/notice/average/resolution/time'
+export const GET_AUTHORITY_DISTRIBUTION_COUNT ='/api/v1/dashboard/view/notice/inspection/authority/distribution/count'
+export const GET_STATE_WISE_NOTICE_COUNT ='/api/v1/dashboard/view/notice/inspection/state/wise/notice/count'
+export const GET_TYPES_OF_NOTICE_OR_INSPECTION ='/api/v1/dashboard/view/notice/inspection/type/notices'
+export const GET_ANALYSIS_OF_APPLICABLE_ACT ='/api/v1/dashboard/view/notice/inspection/analysis/applicable/act'
+export const GET_NOTICES_ASSIGNED_TO ='/api/v1/dashboard/view/notice/inspection/assigned/to'
+export const GET_COUNT_OF_ACKNOWLEDGMENT_RATES ='/api/v1/dashboard/view/notice/inspection/acknowledged/by'
+export const GET_COUNT_OF_CLIENT_DOC_SUBMISSION ='/api/v1/dashboard/view/notice/inspection/document/submission/client'
+export const GET_DISTRIBUTION_OF_RESPONSE_STATUS ='/api/v1/dashboard/view/notice/inspection/response/status/count'
+
+// General Dashboard
+export const GET_STATUS_COUNT_OF_OPEN_VS_CLOSED_CASES ='/api/v1/dashboard/view/general/helpdesk/assigned/status/count';
+export const GET_ASSIGNED_INDIVIDUALS_LIST ='/api/v1/dashboard/view/general/helpdesk/assigned/count';
+export const GET_DOCUMENTS_PENDING_FROM ='/api/v1/dashboard/view/general/helpdesk/documents/pending/from';
+export const GET_ISSUE_CATEGORY_BY_STATUS ='/api/v1/dashboard/view/general/helpdesk/status/based/issue/category';
+
+// Dashboard Widget Mappings
+export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
+export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';
+export const DELETE_WIDGET_MAPPING_BY_ID ='/api/v1/widget-mapping/delete?user_id=';
+export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget-mapping/get?user_id=';
 
 
 

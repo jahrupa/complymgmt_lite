@@ -18,6 +18,7 @@ import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
+import { decryptData } from './utils/encrypt';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -60,9 +61,10 @@ const UserRolesPage = () => {
   });
   const gridRef = useRef();
   const userType = [
-    { id: 1,  value: 'Internal' },
-    { id: 2, value: 'External' },
+    { id: 0,  value: 'Internal' },
+    { id: 1, value: 'External' },
   ];
+   const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -85,7 +87,7 @@ const UserRolesPage = () => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
     const CommonAttributes = {
-      [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+      [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
     };
     const payload = {
       "FullName": current?.full_name,
@@ -109,14 +111,14 @@ const UserRolesPage = () => {
 
       //  Get the message from response
       const message = response?.message;
-      console.log(response, 'response')
+      // console.log(response, 'response')
       setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
       // Refresh data
       const updatedData = await fetchAllUser();
       setData(updatedData);
     } catch (error) {
-      console.error("Error saving user:", error);
+      // console.error("Error saving user:", error);
 
       // Extract message from error response if available
       const errorMessage =
@@ -162,7 +164,7 @@ const UserRolesPage = () => {
         severityType: 'success',
       });
     } catch (error) {
-      console.error("Error deleting user:", error);
+      // console.error("Error deleting user:", error);
 
       // Extract error message safely
       const errorMessage =
@@ -206,7 +208,7 @@ const UserRolesPage = () => {
       if (userData.status === 'fulfilled') {
         setData(userData.value);
       } else {
-        console.warn("fetchAllCompanies failed:", userData.reason);
+        // console.warn("fetchAllCompanies failed:", userData.reason);
       }
     };
 
@@ -266,7 +268,7 @@ const UserRolesPage = () => {
             value={current.user_type}
             onChange={(e) => {
               const selectedName = e.target.value;
-              //  console.log(matchedGroup,'matchedGroup')
+              //  // console.log(matchedGroup,'matchedGroup')
                const userId = userType.find((g) => g.value === selectedName) || {};
               setCurrent((prev) => ({
                 ...prev,
@@ -575,7 +577,7 @@ const UserRolesPage = () => {
   };
 
   const onRowValueChanged = (event) => {
-    //  console.log('Row updated:', event.data);
+    //  // console.log('Row updated:', event.data);
   };
 
   const onFilterTextBoxChanged = useCallback(() => {

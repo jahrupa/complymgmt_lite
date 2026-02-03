@@ -5,10 +5,12 @@ import Snackbars from '../component/Snackbars'
 
 function ServiceTrackerAccess() {
     const [selectedCategory, setSelectedCategory] = useState('')
-    //  console.log(selectedCategory, 'selectedCategory')
     const [checkedItems, setCheckedItems] = useState({})
+    const [checkedTrackerKeys, setCheckedTrackerKeys] = useState('')
+    // console.log(checkedTrackerKeys, 'checkedTrackerKeys')
     const [trackerName, setTrackerName] = useState([])
     const [serviceTrackerFields, setServiceTrackerFields] = useState([])
+    // console.log(serviceTrackerFields, 'serviceTrackerFields')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -16,9 +18,6 @@ function ServiceTrackerAccess() {
         message: '',
         severityType: '',
     });
-    //  console.log(serviceTrackerFields.data, 'serviceTrackerFields')
-    //  console.log(trackerName, 'trackerName')
-    //  console.log(checkedItems, 'checkedItems')
     const formattedTrackerName = selectedCategory?.toLowerCase().replace(/\s+/g, '_');
 
     useEffect(() => {
@@ -31,25 +30,33 @@ function ServiceTrackerAccess() {
     }, [])
     useEffect(() => {
         const fetchServiceTrackerFields = async () => {
-            const response = await fetchAllServiceTrackerFields(formattedTrackerName)
-            // Map the array of field names to objects with id and name
-            const data = {
-                ...response,
-                data: response.data.map(field => ({
+            const response = await fetchAllServiceTrackerFields(formattedTrackerName);
+
+            const data = Object.keys(response.tracker_keys).map(trackerKey => ({
+                trackerKey, // helpdesk_pf_esi_general
+                fields: response.tracker_keys[trackerKey].map(field => ({
                     id: field,
-                    name: field.replace(/_/g, ' ').replace(/\(y_n\)/g, '').replace(/\s+/g, ' ').trim()
+                    name: field
+                        .replace(/_/g, ' ')
+                        .replace(/\(y_n\)|\?/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
                 }))
-            }
-            setServiceTrackerFields(data)
-        }
+            }));
+
+            setServiceTrackerFields(data);
+        };
+
         if (formattedTrackerName) {
-            fetchServiceTrackerFields()
+            fetchServiceTrackerFields();
         }
-    }, [formattedTrackerName])
+    }, [formattedTrackerName]);
+
 
     const handleRadioChange = (selectedTrackerName) => {
         setSelectedCategory(selectedTrackerName)
         setCheckedItems({})
+        setCheckedTrackerKeys('')
 
     }
 
@@ -59,28 +66,10 @@ function ServiceTrackerAccess() {
             [itemId]: !prev[itemId]
         }))
     }
-
-    // const handleSaveTrackerAccess = async () => {
-    //     const selectedFields = Object.keys(checkedItems).filter(itemId => checkedItems[itemId]);
-    //     const selectedCategoryId = trackerName.find(category => category.name === selectedCategory)?._id;
-    //     // Call the API to save the selected fields
-    //     const payload = {
-    //         service_tracker_id: selectedCategoryId,
-    //         external_access: selectedFields
-    //     };
-
-
-
-    //     const result = await createServiceTrackerSpecifics(payload);
-    //     setIsSnackbarsOpen({
-    //         ...issnackbarsOpen,
-    //         open: true,
-    //         message: result?.message,
-    //         severityType: 'success',
-    //     });
-    //      console.log("Selected fields to save:", selectedFields);
-    // }
-
+    const handleTrackerKeyChange = (itemId) => {
+        setCheckedTrackerKeys(itemId)
+        setCheckedItems({});
+    }
     const handleSaveTrackerAccess = async () => {
         const selectedFields = Object.keys(checkedItems).filter(itemId => checkedItems[itemId]);
         const selectedCategoryId = trackerName.find(category => category.name === selectedCategory)?._id;
@@ -91,7 +80,7 @@ function ServiceTrackerAccess() {
         };
         try {
             const result = await createServiceTrackerSpecifics(payload);
-             console.log(result,'result')
+            // console.log(result, 'result')
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -106,22 +95,24 @@ function ServiceTrackerAccess() {
     return (
         <div>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-            <div className="notification-page-title service-tracker-access-page-header">
-                <div>
-                    <h1>Service Tracker Access For User</h1>
-                    <p className='d-flex justify-content-center'>Choose a tracker name to see available columns options</p>
+            <div className='service-tracker-inner-page-header d-lg-flex d-md-flex'>
+                <div className="notification-page-title">
+                    <div>
+                        <h1>Service Tracker Access For User</h1>
+                        <p className=''>Choose a tracker name to see available columns options</p>
+                    </div>
                 </div>
-                <div>
-                </div>
-            </div>
-            <div className="service-tracker-access-main-div">
-                <div className="service-tracker-access-page-container">
+                <div className='d-lg-flex d-md-flex gap-2 mt-2'>
                     <div className='d-flex justify-content-end'>
                         <button className='crud_btn' onClick={() => { handleSaveTrackerAccess() }}>
                             <span className='button-style'>Save Tracker Access</span>
                         </button>
                     </div>
 
+                </div>
+            </div>
+            <div className="service-tracker-access-main-div">
+                <div className="service-tracker-access-page-container">
                     <div className="content">
                         <div className="categories-section">
                             <h2>Trackers Name</h2>
@@ -145,31 +136,58 @@ function ServiceTrackerAccess() {
                                 ))}
                             </div>
                         </div>
-                        {serviceTrackerFields.data && (
+                        {serviceTrackerFields?.length > 0 ? (
                             <div className="items-section">
-                                <h2>Select from {selectedCategory}</h2>
+                                <h2>Select from - {selectedCategory}</h2>
                                 <div className="items-list">
-                                    {Array.isArray(serviceTrackerFields.data) && serviceTrackerFields.data.map(item => (
-                                        <div key={item.id} className="item-container">
-
-                                            <div className="checkbox-item">
+                                    {Array.isArray(serviceTrackerFields) && serviceTrackerFields.map(item => (
+                                        <div key={item.trackerKey}>
+                                            <div className="radio-item">
                                                 <input
-                                                    type="checkbox"
-                                                    id={item.id}
-                                                    checked={checkedItems[item.id] || false}
-                                                    onChange={() => handleCheckboxChange(item.id)}
-                                                    className="checkbox-input"
+                                                    type="radio"
+                                                    id={item.trackerKey}
+                                                    checked={checkedTrackerKeys === item.trackerKey || checkedTrackerKeys[item.trackerKey] || false}
+                                                    onChange={() => handleTrackerKeyChange(item.trackerKey)}
+                                                    className="radio-input"
                                                 />
-                                                <label htmlFor={item.id} className="checkbox-label">
-                                                    <span className="checkbox-custom"></span>
-                                                    {item.name}
+                                                <label htmlFor={item.trackerKey} className="radio-label">
+                                                    <span className="radio-custom"></span>
+                                                    {item.trackerKey.replace(/_/g, ' ')
+                                                        .replace(/\(y_n\)|\?/g, '')
+                                                        .replace(/\s+/g, ' ')
+                                                        .trim()}
                                                 </label>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+                                <div className="">
+                                    {checkedTrackerKeys && (
+                                        <div className="item-container">
+                                            {serviceTrackerFields
+                                                .find(item => item.trackerKey === checkedTrackerKeys)
+                                                ?.fields.map(field => (
+                                                    <div key={field.id} className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id={field.id}
+                                                            checked={checkedItems[field.id] || false}
+                                                            onChange={() => handleCheckboxChange(field.id)}
+                                                            className="checkbox-input"
+                                                        />
+                                                        <label htmlFor={field.id} className="checkbox-label">
+                                                            <span className="checkbox-custom"></span>
+                                                            {field.name}
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <div>
 
-                                <div className="selection-summary">
+                                </div>
+                                {/* <div className="selection-summary">
                                     <h3>Your Selections:</h3>
                                     <div className="summary-content">
                                         {Object.entries(checkedItems)
@@ -186,8 +204,12 @@ function ServiceTrackerAccess() {
                                                 ) : null;
                                             })}
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
+                        ) : (<div className="items-section">
+                            <h2>Select from - {selectedCategory}</h2>
+                            <p>No fields available for the selected tracker.</p>
+                        </div>
                         )}
                     </div>
                 </div>

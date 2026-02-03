@@ -146,10 +146,15 @@
     font-size: 2.5rem;
   }
 
-  .charts-grid {
+  /* .charts-grid {
     grid-template-columns: 1fr;
     gap: 20px;
-  }
+  } */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
 
   .chart-container {
     padding: 20px;
@@ -175,5 +180,11 @@
 
   .chart-container {
     padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
   }
 }

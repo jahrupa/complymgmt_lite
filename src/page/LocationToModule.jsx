@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateLocationToModulesApprovalStatusById, } from '../api/service';
+import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateLocationToModulesApprovalStatusById, } from '../api/service';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -16,6 +16,7 @@ import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { Link } from 'lucide-react';
+import { decryptData } from './utils/encrypt';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const LocationToModule = () => {
@@ -36,17 +37,18 @@ const LocationToModule = () => {
             location_id: null,
             module_name: '',
             module_id: null,
+            sub_module_name: '',
+            sub_module_id: null,
         });
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [id, setId] = useState(null)
-    //  console.log(id, 'id')
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
-    //  console.log(companyName, 'companyName')
     const [locationName, setLocationName] = useState([])
     const [moduleName, setModuleName] = useState([])
+    const [subModuleName, setSubModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -56,14 +58,16 @@ const LocationToModule = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const crudTitle = "Tag Location To Module"
-    const editCrudTitle = "Edit Tagged Location To Module"
+    const crudTitle = "Tag Module To Sub-Module Subscribe"
+    const editCrudTitle = "Edit Tagged Module To Sub-Module Subscribe"
+    const SystemUserId = decryptData(localStorage.getItem("user_id"));
     const validate = () => {
         let tempErrors = {};
         if (!current?.group_name) tempErrors.group_name = "Group Holding is required";
         if (!current?.company_name) tempErrors.company_name = "Company is required";
         if (!current?.location_name) tempErrors.location_name = "Location is required";
         if (!current?.module_name) tempErrors.module_name = "Module is required";
+        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -95,12 +99,13 @@ const LocationToModule = () => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
         const CommonAttributes = {
-            [isEditing ? "Updated_By" : "Created_By"]: localStorage.getItem("user_id") || "",
+            [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
         };
         const payload = {
             "CompanyID": current?.company_id,
             "LocationID": current?.location_id,
             "ModuleID": current?.module_id,
+            "SubmoduleID": current?.sub_module_id,
             "CommonAttributes": CommonAttributes
         };
 
@@ -133,6 +138,8 @@ const LocationToModule = () => {
             location_id: null,
             module_name: '',
             module_id: null,
+            sub_module_name: '',
+            sub_module_id: null,
         });
         setIsEditing(false);
         setIsModalOpen(false);
@@ -194,22 +201,41 @@ const LocationToModule = () => {
                     fetchLocationToModuleModule(),
                     fetchAllGroupHolding(),
                     fetchAllModulesName(),
+
                 ]);
                 if (results[0].status === 'fulfilled') setData(results[0].value);
                 if (results[1].status === 'fulfilled') setGroupHoldingName(results[1].value);
                 if (results[2].status === 'fulfilled') setModuleName(results[2].value);
                 results.forEach((result, idx) => {
                     if (result.status === 'rejected') {
-                        console.error(`Error fetching data at index ${idx}:`, result.reason);
+                        // // console.error(`Error fetching data at index ${idx}:`, result.reason);
                     }
                 });
             } catch (error) {
-                console.error("Error in fetchData:", error);
+                // // console.error("Error in fetchData:", error);
             }
         };
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const fetchSubModule = async () => {
+            try {
+                const data = await fetchAllSubModuleNameByModuleId(current?.module_id);
+                if (data) {
+                    setSubModuleName(data);
+                }
+            } catch (error) {
+                // console.error("Failed to fetch sub module:", error);
+            }
+        };
+
+        if (current?.module_id) {
+            fetchSubModule();
+        }
+    }, [current?.module_id]);
+
     useEffect(() => {
         const fetchCompany = async () => {
             try {
@@ -218,7 +244,7 @@ const LocationToModule = () => {
                     setCompanyName(data);
                 }
             } catch (error) {
-                console.error("Failed to fetch company:", error);
+                // console.error("Failed to fetch company:", error);
             }
         };
 
@@ -235,7 +261,7 @@ const LocationToModule = () => {
                     setLocationName(data);
                 }
             } catch (error) {
-                console.error("Failed to fetch location by company_id:", error);
+                // console.error("Failed to fetch location by company_id:", error);
             }
         };
 
@@ -331,6 +357,30 @@ const LocationToModule = () => {
                         error={!!errors.module_name}
                         helperText={errors.module_name}
                     />
+                    <SingleSelectTextField
+                        name="sub_module_name"
+                        label="Sub-Module"
+                        value={current?.sub_module_name}
+                        isdisable={isEditing ? true : false}
+                        onChange={(e) => {
+                            const selectedName = e.target.value;
+                            const matchedSubModule = subModuleName.find(
+                                (g) => g.sub_module_name === selectedName
+                            );
+                            setCurrent((prev) => ({
+                                ...prev,
+                                sub_module_name: selectedName,
+                                sub_module_id: matchedSubModule?._id || null,
+                            }));
+                        }}
+                        names={subModuleName?.map((data) => ({
+                            _id: data?._id,
+                            name: data?.sub_module_name,
+                        }))}
+                        error={!!errors.sub_module_name}
+                        helperText={errors.sub_module_name}
+                    />
+
                 </div>
 
                 <div className="row row-gap-2">
@@ -352,7 +402,7 @@ const LocationToModule = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Location To Module?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Module To Sub-Module Subscribe?
                 </div>
 
                 <div className="row row-gap-2 mt-4">
@@ -402,7 +452,7 @@ const LocationToModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error:", error);
+            // // console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
@@ -597,7 +647,7 @@ const LocationToModule = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-         console.log('Row updated:', event.data);
+        // console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {
@@ -613,12 +663,12 @@ const LocationToModule = () => {
                 <div className="notification-page-title">
                     <div>
                         {/* <h1>{data?.length > 1 ? "Companies" : "Company"}</h1> */}
-                        <h1>Location to module</h1>
+                        <h1>Module To Sub-Module Subscribe</h1>
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
                     <button className='crud_btn w-100 mb-2' onClick={openModal}>
-                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Location To Module</span>
+                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Module To Sub-Module Subscribe</span>
                     </button>
                     <div className='btn-wrap-div'>
                         <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>

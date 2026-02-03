@@ -94,7 +94,7 @@ const Module = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [moduleId, setModuleId] = useState(null)
-     console.log(moduleId, 'moduleId')
+     // console.log(moduleId, 'moduleId')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -160,7 +160,7 @@ const Module = () => {
             const updatedData = await fetchAllModule();
             setData(updatedData);
         } catch (error) {
-            // console.error("Error saving company:", error);
+            // // console.error("Error saving company:", error);
             // setSnackbarMessage("Failed to save company");
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'error' });
         }
@@ -208,7 +208,7 @@ const Module = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error deleting company:", error);
+            // // console.error("Error deleting company:", error);
 
             // Extract error message safely
             const errorMessage =
@@ -294,7 +294,7 @@ const Module = () => {
                 // setCompanyNameData(companyName);
 
             } catch (error) {
-                console.error("Error fetching data:", error);
+                // console.error("Error fetching data:", error);
             }
         };
 
@@ -392,7 +392,7 @@ const Module = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error:", error);
+            // // console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
@@ -522,7 +522,7 @@ const Module = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = (event) => {
-         console.log('Row updated:', event.data);
+         // console.log('Row updated:', event.data);
     };
 
     return (

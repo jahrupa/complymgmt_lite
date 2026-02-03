@@ -6,6 +6,7 @@ import API from '../api/axios'; // your axios instance
 import { LOGIN_API } from '../api/Endpoint';
 import Snackbars from '../component/Snackbars';
 import { useToken } from '../TokenProvider';
+import { encryptData } from './utils/encrypt';
 
 
 const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsChangePassword }) => {
@@ -27,10 +28,14 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
             const message = response?.data?.message;
 
             if (token) {
-                localStorage.setItem('token', token);
+                const encryptedToken = encryptData(token);
+                localStorage.setItem("authToken", encryptedToken);
+                // localStorage.setItem('token', token);
                 localStorage.setItem('username', response.data?.username);
-                localStorage.setItem('user_id', response.data?.user_id);
-                // localStorage.setItem('is_temp_password', response.data?.is_temp_password);
+                localStorage.setItem('user_id', encryptData(response.data?.user_id));
+                localStorage.setItem("user_type", encryptData(String(response.data?.user_type)));
+                localStorage.setItem('user_role', encryptData(response.data?.user_role));
+
                 setIsChangePassword(response.data?.is_temp_password);
                 setToken(token);
 
@@ -70,42 +75,42 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                 <div className='d-lg-flex d-md-flex login_form_v2'>
                     <div className=''>
                         {/* <form onSubmit={handleSubmit}> */}
-                            <div className="container login_form_container">
-                                <div className='d-flex justify-content-center mb-3 mt-4'>
-                                    <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
-                                </div>
-                                <div className='mb-3 login_heading_text'>Log in</div>
-                                <label htmlFor="uname">UserName</label>
-                                <input
-                                    className='input_border_style'
-                                    type="text"
-                                    // placeholder="Enter Email address"
-                                    name="uname"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                />
-
-                                <label htmlFor="psw">Password</label>
-                                <input
-                                    className='input_border_style'
-                                    type="password"
-                                    // placeholder="Enter Password"
-                                    name="psw"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <button className='mt-2 mb-2' style={{display:'contents'}} onClick={() => navigate('forget_password')}>Forgot password?
-                                    {/* <a href="#">password?</a> */}
-                                </button>
-
-                                <button className='login_btn_style_v2  mt-2 mb-2' onClick={handleSubmit}><span className='login_btn'>Log in</span></button>
-                                {/* <div className="container" style={{ backgroundColor: '#f1f1f1' }}> */}
-                                {/* </div> */}
-                                {/* <div className='karma-logon-text_v2'>New to complymgmt?<span className='karma_logo_text_span_v2'> Create account</span></div> */}
-
+                        <div className="container login_form_container">
+                            <div className='d-flex justify-content-center mb-3 mt-4'>
+                                <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
                             </div>
+                            <div className='mb-3 login_heading_text'>Log in</div>
+                            <label htmlFor="uname">UserName</label>
+                            <input
+                                className='input_border_style'
+                                type="text"
+                                // placeholder="Enter Email address"
+                                name="uname"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+
+                            <label htmlFor="psw">Password</label>
+                            <input
+                                className='input_border_style'
+                                type="password"
+                                // placeholder="Enter Password"
+                                name="psw"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <button className='mt-2 mb-2' style={{ display: 'contents' }} onClick={() => navigate('forget_password')}>Forgot password?
+                                {/* <a href="#">password?</a> */}
+                            </button>
+
+                            <button className='login_btn_style_v2  mt-2 mb-2' onClick={handleSubmit}><span className='login_btn'>Log in</span></button>
+                            {/* <div className="container" style={{ backgroundColor: '#f1f1f1' }}> */}
+                            {/* </div> */}
+                            {/* <div className='karma-logon-text_v2'>New to complymgmt?<span className='karma_logo_text_span_v2'> Create account</span></div> */}
+
+                        </div>
                         {/* </form> */}
                     </div>
                 </div>

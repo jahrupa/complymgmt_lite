@@ -7,7 +7,7 @@ function ClientOnBoardingByCompany({locationData}) {
 
   const [selectedModule, setSelectedModule] = useState('all');
   const filteredLocations = useMemo(() => {
-    let locations = Object?.keys(locationData?.location_module_map || {});
+    let locations = Object?.keys(locationData.location_module_map || {});
     if (selectedModule !== 'all') {
       locations = locations?.filter(loc =>
         locationData?.location_module_map[loc]?.includes(selectedModule)
@@ -27,7 +27,7 @@ function ClientOnBoardingByCompany({locationData}) {
           <StatsPanel
             totalLocations={Object.keys(locationData.location_module_map).length}
             filteredLocations={filteredLocations.length}
-            totalModules={locationData.service_scope_matrix_company.modules_subscribed.length}
+            totalModules={locationData.modules_subscribed.length}
           />
 
 
@@ -39,7 +39,7 @@ function ClientOnBoardingByCompany({locationData}) {
               <ModuleFilter
                 selectedModule={selectedModule}
                 onModuleChange={setSelectedModule}
-                modules={locationData.service_scope_matrix_company.modules_subscribed}
+                modules={locationData.modules_subscribed}
               />
             </div>
             <div className='col'>

@@ -106,6 +106,7 @@ const PayrollSection = () => {
     data: chartData
   }];
 
+  
   return (
     <div className="payroll-section">
       <div className="health-item">

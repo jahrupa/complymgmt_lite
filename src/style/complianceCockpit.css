@@ -33,13 +33,17 @@
   gap: 24px;
 }
 .dashboard-header-card {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   margin-bottom: 30px;
   padding: 10px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+.dashboard-page-title {
+  align-items: center;
+  gap: 1rem;
 }
 @media (max-width: 1200px) {
   .dashboard-grid {
