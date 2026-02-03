@@ -337,28 +337,40 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         }
     };
     return (
-        <Box sx={{ width: "100%" }}>
-            <Snackbars
-                issnackbarsOpen={issnackbarsOpen}
-                setIsSnackbarsOpen={setIsSnackbarsOpen}
-            />
-            <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-            >
-                {tabsList.map((t, i) => (
-                    <Tab key={i} label={t.label} />
-                ))}
-            </Tabs>
-
-            <Box sx={{ marginTop: 2 }}>
-                {tabsList.map((tab, index) => (
-                    <TabPanel key={index} value={activeTab} index={index} keepMounted>
-                        {tab.content}
-                    </TabPanel>
-                ))}
+        <Box sx={{ width: '100%' }}>
+            {/* {renderCards(stats)} */}
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: 2 }}>
+                <Tabs
+                    value={activeTab}
+                    onChange={handleTabChange}
+                    variant="scrollable"
+                    scrollButtons="auto" >
+                    <Tab label="Compliance Cockpit " />
+                    <Tab label="General Compliance" />
+                    <Tab label="Client Onboarding" />
+                    <Tab label="Payroll Services" />
+                    <Tab label="Returns & Submissions" />
+                    <Tab label="Helpdesk & Escalations" />
+                    <Tab label="General Helpdesk" />
+                    <Tab label="Audit & Visits" />
+                    <Tab label="Notices & Inspections" />
+                </Tabs>
+            </Box>
+            <Box>
+                {/* {activeTab === 0 && renderCards(stats)} */}
+                {activeTab === 0 && (selectedCompany !== ''
+                    ? <CockpitComplinceByCompany data={cockpitByCompanyData} />
+                    : <CockpitComplince data={cockpitData} />)}
+                {activeTab === 1 && <GeneralComplianceDashboard data={generalDashboardData} />}
+                {activeTab === 2 && (selectedCompany === ''
+                    ? <ClientOnbordingDashboard data={clientOnboardingData} />
+                    : <ClientOnBoardingByCompany locationData={ClientOnBoardingByCompanyData} />)}
+                {activeTab === 3 && <PayrollServices selectedCompany={selectedCompany} />}
+                {activeTab === 4 && <ReturnsAndSubmissions selectedCompany={selectedCompany} />}
+                {activeTab === 5 && <HelpdeskAndEscalations selectedCompany={selectedCompany} />}
+                {/* {activeTab === 6 && <GeneralHelpdesk selectedCompany={selectedCompany}/>}
+                {activeTab === 7 && <AuditAndVisitDashboard selectedCompany={selectedCompany}/>}
+                {activeTab === 8 && <NoticeDashboard selectedCompany={selectedCompany}/>} */}
             </Box>
 
             {userType === "0" && (
