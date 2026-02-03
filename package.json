@@ -9,7 +9,10 @@
     "dev:demo": "vite --config vite.config.demo.js",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "demo-mode": "vite --mode demo",
+    "prod-mode": "vite --mode prod",
+    "dev-mode": "vite --mode dev"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
