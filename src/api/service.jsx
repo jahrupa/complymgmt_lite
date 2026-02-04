@@ -167,6 +167,7 @@ import {
   GET_ALL_REGISTER_NAMES,
   GET_REGISTER_MAPPING,
   PROCESS_REGISTERS,
+  GET_FILE_BY_TYPE,
 
 } from "./Endpoint";
 
@@ -1990,6 +1991,17 @@ export const createRegisterProcess = async (data) => {
     return response.data;
   } catch (error) {
     // console.error("Error fetching process register by name:", error);
+    throw error;
+  }
+}
+
+
+export const fetchFileByType = async () => {
+  try {
+    const response = await API.get(`${GET_FILE_BY_TYPE}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching file by type:", error);
     throw error;
   }
 }

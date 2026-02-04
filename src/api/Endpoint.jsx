@@ -218,6 +218,7 @@ export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget-mapping/get?user_id=';
 export const GET_ALL_REGISTER_NAMES='/api/v1/register_processing/view/register/names/multiple';
 export const GET_REGISTER_MAPPING='/api/v1/register_processing/view/mapping/get?register_id=';
 export const PROCESS_REGISTERS='/api/v1/register_processing/create/register';
+export const GET_FILE_BY_TYPE='/api/v1/document_repository/view/files/type?file_type=xlsx';
 
 
 

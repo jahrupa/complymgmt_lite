@@ -4,8 +4,8 @@ import Mapping from "./Mapping";
 import {
   createRegisterProcess,
   fetchAllCompaniesName,
-  fetchAllFiles,
   fetchAllRegisterNames,
+  fetchFileByType,
   fetchRegisterMappingByName,
 } from "../../api/service";
 import SingleSelectTextField from "../../component/MuiInputs/SingleSelectTextField";
@@ -59,7 +59,7 @@ function RegisterProcessing() {
         const [companyRes, registerRes, filesRes] = await Promise.allSettled([
           fetchAllCompaniesName(),
           fetchAllRegisterNames(),
-          fetchAllFiles(),
+          fetchFileByType(),
         ]);
 
         if (companyRes.status === "fulfilled")
