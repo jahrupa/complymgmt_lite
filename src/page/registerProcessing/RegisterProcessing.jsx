@@ -80,10 +80,8 @@ function RegisterProcessing() {
     const fetchMappingData = async () => {
       try {
         const mappingRes = await fetchRegisterMappingByName(
-          // current.register_id,
-          "6981c984eb9dd86d8d56e9e3",
-          // current.file_id
-          "DOC001",
+          current.register_id,
+          current.file_id
         );
 
         if (Array.isArray(mappingRes)) {
@@ -109,10 +107,10 @@ function RegisterProcessing() {
       }
     };
 
-    // if (current.register_id && current.file_id) {
+    if (current.register_id && current.file_id) {
     fetchMappingData();
-    // }
-  }, []);
+    }
+  }, [current.register_id, current.file_id]);
 
   const addMapping = () => {
     setMappings((prev) => [
@@ -285,7 +283,7 @@ function RegisterProcessing() {
             setCurrent((prev) => ({
               ...prev,
               file_name: selected,
-              file_id: matched._id || null,
+              file_id: matched.document_id || null,
             }));
             setSelectedFile(matched);
           }}
