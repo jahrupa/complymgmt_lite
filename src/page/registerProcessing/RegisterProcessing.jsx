@@ -1,260 +1,332 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "../../style/registerProcessing.css";
 import Mapping from "./Mapping";
+import {
+  createRegisterProcess,
+  fetchAllCompaniesName,
+  fetchAllFiles,
+  fetchAllRegisterNames,
+  fetchRegisterMappingByName,
+} from "../../api/service";
+import SingleSelectTextField from "../../component/MuiInputs/SingleSelectTextField";
+import Snackbars from "../../component/Snackbars";
 
 function RegisterProcessing() {
-  const [activeTab, setActiveTab] = useState("mapping");
-
   const [columns, setColumns] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [mappings, setMappings] = useState( [
-    ]);
-  console.log(mappings,'mappings')
+
+  const [mappings, setMappings] = useState([]);
+  console.log(mappings.length, "mappings");
   const [isSaved, setIsSaved] = useState(false);
   const [loadedFromApi, setLoadedFromApi] = useState(false);
   const [tempPayload, setTempPayload] = useState(null);
 
-
+  const [companyName, setCompanyName] = useState([]);
+  const [registerNames, setRegisterNames] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+    message: "",
+    severityType: "",
+  });
+  const [current, setCurrent] = useState({
+    company_name: "",
+    company_id: null,
+    register_name: "",
+    register_id: null,
+    file_name: "",
+    file_id: null,
+    mappings: [],
+    source: [],
+    transform: "",
+    transform_id: null,
+    formula: "",
+    params: {},
+    default: "",
+    target: "",
+  });
+  console.log(current, "current");
   useEffect(() => {
     if (loadedFromApi) return;
     setIsSaved(false);
   }, [mappings, loadedFromApi]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [companyRes, registerRes, filesRes] = await Promise.allSettled([
+          fetchAllCompaniesName(),
+          fetchAllRegisterNames(),
+          fetchAllFiles(),
+        ]);
 
-  // Save
-  const handleSave = () => {
-    if (!selectedFile) return alert("No file selected!");
-
-    const payloadMappings = mappings.map((m) => ({
-      target: m.Target,
-      source: m.Source,
-      default: m.Default || "",
-      transform: m.Transform,
-      ...(m.Transform === "raw" && m.Formula?.trim() && {
-        formula: m.Formula.trim(),
-      }),
-      ...(m.Params && Object.keys(m.Params).length > 0 && { params: m.Params }),
-    }));
-
-    const payload = { filename: selectedFile.name, mappings: payloadMappings };
-    setTempPayload(payload);
-  };
-
-
-
-  // Convert
-  const handleConvert = async () => {
-    if (!selectedFile) return alert("No file selected!");
-
-    const payloadMappings = mappings.map((m) => ({
-      target: m.Target,
-      source: m.Source,
-      default: m.Default || "",
-      transform: m.Transform,
-      ...(m.Transform === "raw" && m.Formula?.trim() && {
-        formula: m.Formula.trim(),
-      }),
-      ...(m.Params && Object.keys(m.Params).length > 0 && { params: m.Params }),
-    }));
-
-    const payload = { filename: selectedFile.name, mappings: payloadMappings };
-
-    let convertedFilename;
-
-    try {
-      const res = await axios.post(
-        'http://192.168.1.225:9002' + "/v1/file/process",
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      convertedFilename = res.data;
-      alert("Converted successfully!");
-      console.log("Converted file:", convertedFilename);
-    } catch (err) {
-      console.error("Conversion failed:", err);
-      return alert("Conversion failed!");
-    }
-
-    try {
-      const downloadPayload = { filepath: convertedFilename };
-      const downloadResponse = await axios.post(
-        'http://192.168.1.225:9002' + "/v1/file/download",
-        downloadPayload,
-        { headers: { "Content-Type": "application/json" }, responseType: "blob" }
-      );
-      console.log(downloadResponse.headers);
-
-      // Get filename from headers
-      let filename = "download.xlsx";
-      const disposition = downloadResponse.headers["content-disposition"];
-
-      if (disposition && disposition.includes("filename=")) {
-        filename = disposition.split("filename=")[1].replace(/"/g, "").trim();
+        if (companyRes.status === "fulfilled")
+          setCompanyName(companyRes.value || []);
+        if (registerRes.status === "fulfilled")
+          setRegisterNames(registerRes.value || []);
+        if (filesRes.status === "fulfilled") setFiles(filesRes.value || []);
+      } catch  {
+        // Handle error
+        // console.error("Error fetching data:", error);
       }
+    };
 
-      const url = window.URL.createObjectURL(new Blob([downloadResponse.data]));
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+    fetchData();
+  }, []);
 
-      alert("Downloaded successfully!");
-    } catch (err) {
-      console.error("Download failed:", err);
-      alert("Download failed!");
-    }
-  };
+  useEffect(() => {
+    const fetchMappingData = async () => {
+      try {
+        const mappingRes = await fetchRegisterMappingByName(
+          // current.register_id,
+          "6981c984eb9dd86d8d56e9e3",
+          // current.file_id
+          "DOC001",
+        );
 
+        if (Array.isArray(mappingRes)) {
+          const normalized = mappingRes.map((m) => ({
+            id: Date.now() + Math.random(),
+            Target: m.target || "",
+            Source: m.source || [""],
+            Transform: m.transform || "",
+            Formula: m.formula || "",
+            Params: m.params || {},
+            Default: m.default || "",
+          }));
 
-  // Clear everything
-  const handleClear = () => {
-    setColumns([]);
-    setSelectedFile(null);
-    setMappings([]);
-    setIsSaved(false);
-    setLoadedFromApi(false);
-    setTempPayload(null);
-  };
+          setMappings(normalized);
+          setLoadedFromApi(true);
+          setIsSaved(true);
+        } else {
+          setMappings([]);
+        }
+      } catch (err) {
+        console.error("Mapping fetch failed", err);
+        setMappings([]);
+      }
+    };
 
-
-  const [availableMappingSets, setAvailableMappingSets] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+    // if (current.register_id && current.file_id) {
+    fetchMappingData();
+    // }
+  }, []);
 
   const addMapping = () => {
-    setMappings([
-      ...mappings,
+    setMappings((prev) => [
+      ...prev,
       {
         id: Date.now(),
         Target: "",
-        Source: [],
+        Source: [""],
         Transform: "",
         Formula: "",
         Params: {},
         Default: "",
       },
     ]);
-    setLoadedFromApi(false); // any manual addition is not loaded from API
-    setIsSaved(false);       // mark as unsaved
+    setIsSaved(false);
+    setLoadedFromApi(false);
   };
 
   const updateMapping = (id, newMapping) => {
-    setMappings(mappings.map((m) => (m.id === id ? newMapping : m)));
-    setLoadedFromApi(false); // any manual change
-    setIsSaved(false);       // mark as unsaved
+    setMappings((prev) => prev.map((m) => (m.id === id ? newMapping : m)));
+    setIsSaved(false);
+    setLoadedFromApi(false);
   };
 
   const removeMapping = (id) => {
-    setMappings(mappings.filter((m) => m.id !== id));
-    setLoadedFromApi(false); // any manual change
-    setIsSaved(false);       // mark as unsaved
+    setMappings((prev) => prev.filter((m) => m.id !== id));
+    setIsSaved(false);
+    setLoadedFromApi(false);
   };
 
+  const handleProceed = async (e) => {
+    e?.preventDefault();
 
-  const handleMappingSelect = (unique_id) => {
-    const selectedSet = availableMappingSets.find((m) => m.unique_id === unique_id);
-    if (selectedSet) {
-      const newMappings = selectedSet.mappings.map((m) => ({
-        id: Date.now() + Math.random(), // unique id for React keys
-        Target: m.target || "",
-        Source: m.source || [],
-        Transform: m.transform || "",
-        Formula: m.formula || "",
-        Params: m.params || {},
-        Default: m.default || "",
-      }));
-      setMappings(newMappings);
-      setLoadedFromApi(true); // this mapping is loaded from API
-      setIsSaved(true);       // loaded mapping is considered saved
+    const payload = {
+      src_file_path: "document_repository",
+      src_file_name: current.file_name,
+      mappings: mappings.map((m) => ({
+        target: m.Target || "",
+        source: m.Source || [],
+        transform: m.Transform || "",
+        formula: m.Formula || "",
+        params: m.Transform === "concat" ? { sep: m.Params?.sep || " " } : {},
+        default: m.Default ?? "",
+        unique: m.Transform === "unique",
+      })),
+    };
+
+    try {
+      // 🔥 This is already BLOB
+      const blobData = await createRegisterProcess(payload);
+
+      const blob = new Blob([blobData], {
+        type:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "report.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+      const message = blobData?.message || "Register processed successfully";
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: message,
+        severityType: 'success',
+      });
+      setCurrent({
+        company_name: "",
+        company_id: null,
+        register_name: "",
+        register_id: null,
+        file_name: "",
+        file_id: null,
+        mappings: [],
+        source: [],
+        transform: "",
+        transform_id: null,
+        formula: "",
+        params: {},
+        default: "",
+        target: "",
+      });
+    } catch (error) {
+       const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Failed to process register";
+
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: errorMessage,
+        severityType: 'error',
+      });
     }
-    setIsModalOpen(false);
   };
 
+
+
+  const handleClear = () => {
+    setMappings([]);
+    setSelectedFile(null);
+    setIsSaved(false);
+    setLoadedFromApi(false);
+    setTempPayload(null);
+  };
 
   return (
     <div className="app-container">
-      {/* Tabs */}
-      {columns.length > 0 && (
-        <div className="tabs sticky-tabs">
-          <button
-            className={activeTab === "mapping" ? "active-tab" : ""}
-            onClick={() => setActiveTab("mapping")}
-          >
-            Mapping
-          </button>
-          
-        </div>
-      )}
-      <div className="service-tracker-inner-page-header d-lg-flex d-md-flex">
-        <div className="notification-page-title">
-          <div>
-            <h1>Register Processing</h1>
-          </div>
-        </div>
-        <div className="d-lg-flex d-md-flex gap-2 mt-2">
-          <button className="crud_btn w-100 mb-2" onClick={addMapping}>
-            <span className="button-style"> Add Mapping</span>
-          </button>
+      <Snackbars
+        issnackbarsOpen={issnackbarsOpen}
+        setIsSnackbarsOpen={setIsSnackbarsOpen}
+      />
+      <div className="service-tracker-inner-page-header d-flex justify-content-between">
+        <h1>Register Processing</h1>
 
-        </div>
+        <button className="crud_btn" onClick={addMapping}>
+          + Add Mapping
+        </button>
       </div>
 
-      <div className="mapping-list-container">
-        <div className="mapping-list-header">
-          <h2>Mappings</h2>
-          <div className="save-convert-container">
-            <button
-              className="crud_btn w-100"
-              onClick={handleSave}
-              disabled={isSaved || loadedFromApi}
-            >
-              Process
-            </button>
-            {/* <button
-              className="button approve w-100 justify-content-center"
-              onClick={handleConvert}
-              disabled={!isSaved && !loadedFromApi}
-            >
-              Convert
-            </button>
-            <button className="btn btn-secondary" onClick={handleClear}>
-              Clear
-            </button> */}
-          </div>
-        </div>
+      <div className="mapping-container d-flex gap-3">
+        <SingleSelectTextField
+          label="Company Name"
+          value={current.company_name}
+          onChange={(e) => {
+            const selected = e.target.value;
+            const matched = companyName.find((c) => c.name === selected) || {};
+            setCurrent((prev) => ({
+              ...prev,
+              company_name: selected,
+              company_id: matched._id || null,
+            }));
+          }}
+          names={companyName.map((c) => ({ _id: c._id, name: c.name }))}
+        />
 
-        {mappings.map((mapping) => (
+        <SingleSelectTextField
+          label="Register Name"
+          value={current.register_name}
+          onChange={(e) => {
+            const selected = e.target.value;
+            const matched =
+              registerNames.find((r) => r.register_name === selected) || {};
+            setCurrent((prev) => ({
+              ...prev,
+              register_name: selected,
+              register_id: matched._id || null,
+            }));
+          }}
+          names={registerNames.map((r) => ({
+            _id: r._id,
+            name: r.register_name,
+          }))}
+        />
+
+        <SingleSelectTextField
+          label="Document"
+          value={current.file_name}
+          onChange={(e) => {
+            const selected = e.target.value;
+            const matched = files.find((f) => f.file_name === selected) || {};
+            setCurrent((prev) => ({
+              ...prev,
+              file_name: selected,
+              file_id: matched._id || null,
+            }));
+            setSelectedFile(matched);
+          }}
+          names={files.map((f) => ({ _id: f._id, name: f.file_name }))}
+        />
+      </div>
+
+      {mappings.length > 0 ? (
+        mappings.map((mapping) => (
           <Mapping
             key={mapping.id}
             columns={columns}
             mapping={mapping}
             onChange={(newMapping) => updateMapping(mapping.id, newMapping)}
             onRemove={() => removeMapping(mapping.id)}
+            current={current}
+            setCurrent={setCurrent}
           />
-        ))}
+        ))
+      ) : (
+        <div className="text-center p-5">
+          No mappings available. Click "Add Mapping".
+        </div>
+      )}
 
-        {isModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h3>Select a Mapping Set</h3>
-              <ul className="mapping-set-list">
-                {availableMappingSets.map((set) => (
-                  <li key={set.unique_id}>
-                    <button onClick={() => handleMappingSelect(set.unique_id)}>
-                      {set.unique_id}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <button className="modal-close" onClick={() => setIsModalOpen(false)}>
-                Close
-              </button>
-            </div>
-          </div>
-        )}
+      <div className="d-flex justify-content-end gap-3 mt-4">
+        <button
+          className="crud_btn"
+          onClick={handleProceed}
+          disabled={mappings.length === 0}
+        >
+          Process
+        </button>
+
+        <button
+          className="btn btn-secondary"
+          onClick={handleClear}
+          disabled={mappings.length === 0}
+        >
+          Clear
+        </button>
       </div>
     </div>
   );

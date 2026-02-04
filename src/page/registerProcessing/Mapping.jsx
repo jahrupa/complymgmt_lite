@@ -1,9 +1,8 @@
-import React from "react";
+import MuiTextField from "../../component/MuiInputs/MuiTextField";
+import SingleSelectTextField from "../../component/MuiInputs/SingleSelectTextField";
 import ColumnDropdown from "./ColumnDropdown";
-
-const transformFieldOptions = ["", "sum", "concat", "average", "unique", "count", "raw"];
-
 export default function Mapping({ columns, mapping, onChange, onRemove }) {
+
   const handleSourceChange = (value, index) => {
     const newSources = [...mapping.Source];
     newSources[index] = value;
@@ -18,128 +17,104 @@ export default function Mapping({ columns, mapping, onChange, onRemove }) {
     onChange({ ...mapping, Source: newSources });
   };
 
-  const handleTransformChange = (value) => {
-    onChange({
-      ...mapping,
-      Transform: value === "" ? null : value,
-      Params: value === "concat" ? { sep: "" } : undefined,
-      Formula: value === "raw" ? mapping.Formula : undefined
-    });
-  };
-
-  const updateSep = (value) => {
-    onChange({
-      ...mapping,
-      Params: { sep: value }
-    });
-  };
-
   return (
     <div className="mapping-container">
+
+      <div className="d-flex justify-content-end gap-2 mb-3">
+        <button className="crud_btn" onClick={addSource}>+ Add Source</button>
+        <button onClick={onRemove} className="btn btn-secondary">Remove Mapping</button>
+      </div>
+
       {/* Target */}
-      <div className="mapping-target">
-        <label>Target: </label>
-        <input
-          type="text"
-          value={mapping.Target}
-          onChange={(e) => onChange({ ...mapping, Target: e.target.value })}
-        />
-      </div>
-      <div className="mapping-transform">
-        <label>Company </label>
-        <select
-          value={mapping.Transform || ""}
-          onChange={(e) => handleTransformChange(e.target.value)}
-        >
-          <option value="">-- None --</option>
-         
-        </select>
-      </div><div className="mapping-transform">
-        <label>Register</label>
-        <select
-          value={mapping.Transform || ""}
-          onChange={(e) => handleTransformChange(e.target.value)}
-        >
-          <option value="">-- None --</option>
-          
-        </select>
-      </div><div className="mapping-transform">
-        <label>Document: </label>
-        <select
-          value={mapping.Transform || ""}
-          onChange={(e) => handleTransformChange(e.target.value)}
-        >
-          <option value="">-- None --</option>
-          
-        </select>
-      </div>
-      <div className="mapping-source" >
+      <MuiTextField
+        label="Target"
+        fieldName="target"
+        value={mapping.Target}
+        handleChange={(e) =>
+          onChange({ ...mapping, Target: e.target.value })
+        }
+      />
+
+      {/* Sources */}
+      <div className="mapping-source">
         {mapping.Source.map((src, idx) => (
           <div key={idx}>
-            <ColumnDropdown
-              columns={columns}
-              value={src}               
-              onSelect={(value) => handleSourceChange(value, idx)}
+            <MuiTextField
+              label="Source"
+              fieldName="Source"
+              value={mapping.Source}
+              handleChange={(e) =>
+                onChange({ ...mapping, Source: e.target.value })
+              }
             />
+            {/* <ColumnDropdown
+              columns={columns}
+              value={src}
+              onSelect={(value) => handleSourceChange(value, idx)}
+            /> */}
             <button onClick={() => removeSource(idx)}>Remove</button>
           </div>
         ))}
-        <button onClick={addSource}>Add Source</button>
       </div>
 
-      <div className="mapping-transform">
-        <label>Transform: </label>
-        <select
+      <div className="d-flex gap-3">
+
+        {/* Transform */}
+        {/* <SingleSelectTextField
+          label="Transform"
           value={mapping.Transform || ""}
-          onChange={(e) => handleTransformChange(e.target.value)}
-        >
-          <option value="">-- None --</option>
-          {transformFieldOptions
-            .filter((t) => t !== "")
-            .map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-        </select>
-      </div>
-
-      <div className="mapping-default">
-        <label>Default: </label>
-        <input
-          type="text"
-          value={mapping.Default || ""}
-          onChange={(e) => onChange({ ...mapping, Default: e.target.value })}
+          onChange={(e) =>
+            onChange({ ...mapping, Transform: e.target.value })
+          }
+          // names={transformFieldOptions}
+        /> */}
+        <MuiTextField
+          label="Transform"
+          fieldName="transform"
+          value={mapping.Transform}
+          handleChange={(e) =>
+            onChange({ ...mapping, Transform: e.target.value })
+          }
         />
-      </div>
 
-      {mapping.Transform === "raw" && (
-        <div className="mapping-formula">
-          <label>Formula: </label>
-          <input
-            type="text"
-            value={mapping.Formula || ""}
-            onChange={(e) => onChange({ ...mapping, Formula: e.target.value })}
+        {/* Default */}
+        <MuiTextField
+          label="Default"
+          fieldName="default"
+          value={mapping.Default}
+          handleChange={(e) =>
+            onChange({ ...mapping, Default: e.target.value })
+          }
+        />
+
+        {/* Formula */}
+        {mapping.Transform === "raw" && (
+          <MuiTextField
+            label="Formula"
+            fieldName="formula"
+            value={mapping.Formula}
+            handleChange={(e) =>
+              onChange({ ...mapping, Formula: e.target.value })
+            }
           />
-        </div>
-      )}
+        )}
 
-      {mapping.Transform === "concat" && (
-        <div className="mapping-concat-param">
-          <label>Separator: </label>
-          <input
-            type="text"
+        {/* Separator */}
+        {mapping.Transform === "concat" && (
+          <MuiTextField
+            label="Separator"
+            fieldName="separator"
             value={mapping.Params?.sep || ""}
-            onChange={(e) => updateSep(e.target.value)}
+            handleChange={(e) =>
+              onChange({
+                ...mapping,
+                Params: { sep: e.target.value },
+              })
+            }
           />
-        </div>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'end' }}>
-        <button onClick={onRemove} className="mapping-remove-button">
-          Remove Mapping
-        </button>
-      </div>
+        )}
 
+      </div>
     </div>
   );
 }

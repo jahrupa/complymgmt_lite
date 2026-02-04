@@ -164,6 +164,9 @@ import {
   GET_WIDGETS_BY_USER_ID,
   APPEND_TRACKER,
   COMPANY_WISE_ACCESS,
+  GET_ALL_REGISTER_NAMES,
+  GET_REGISTER_MAPPING,
+  PROCESS_REGISTERS,
 
 } from "./Endpoint";
 
@@ -1957,3 +1960,36 @@ export const fetchWidgetMappingById = async (id) => {
   }
 };
 
+
+export const fetchAllRegisterNames = async () => {
+  try {
+    const response = await API.get(GET_ALL_REGISTER_NAMES);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all register names:", error);
+    throw error;
+  }
+};
+
+
+export const fetchRegisterMappingByName = async (register_id,doc_id) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_MAPPING}${register_id}&document_id=${doc_id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching register mapping by name:", error);
+    throw error;
+  }
+};
+
+export const createRegisterProcess = async (data) => {
+  try {
+    const response = await API.post(PROCESS_REGISTERS, data, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching process register by name:", error);
+    throw error;
+  }
+}

@@ -140,7 +140,7 @@ input[type="file"]:hover {
   margin-bottom: 5px;
 }
 
-.mapping-container input[type="text"],
+/* .mapping-container input[type="text"],
 .mapping-container select {
   padding: 10px;
   border: 1px solid #ddd;
@@ -148,14 +148,14 @@ input[type="file"]:hover {
   font-size: 14px;
   width: calc(100% - 120px);
   transition: all 0.3s ease;
-}
+} */
 
-.mapping-container input[type="text"]:focus,
+/* .mapping-container input[type="text"]:focus,
 .mapping-container select:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
+} */
 
 .mapping-source > div {
   display: flex;
@@ -544,11 +544,11 @@ input[type="file"]:hover {
     width: 100%;
   }
 
-  .mapping-container input[type="text"],
+  /* .mapping-container input[type="text"],
   .mapping-container select {
     width: 100%;
     margin-top: 5px;
-  }
+  } */
 
   .mapping-container label {
     display: block;
@@ -569,10 +569,10 @@ input[type="file"]:hover {
   }
 }
 
-select,
+/* select,
 input[type="text"] {
   box-sizing: border-box;
-}
+} */
 
 /* .description-modal {
   max-width: 600px;

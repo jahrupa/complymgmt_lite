@@ -214,6 +214,11 @@ export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';
 export const DELETE_WIDGET_MAPPING_BY_ID ='/api/v1/widget-mapping/delete?user_id=';
 export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget-mapping/get?user_id=';
 
+// Register Processing
+export const GET_ALL_REGISTER_NAMES='/api/v1/register_processing/view/register/names/multiple';
+export const GET_REGISTER_MAPPING='/api/v1/register_processing/view/mapping/get?register_id=';
+export const PROCESS_REGISTERS='/api/v1/register_processing/create/register';
+
 
 
 
