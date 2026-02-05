@@ -27,7 +27,7 @@ const ValidationCheckModal = ({
             display: 'block',
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
           }}
-          onMouseDown={handleBackdropClick}
+          // onMouseDown={handleBackdropClick}
         >
           <div
             className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
