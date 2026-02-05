@@ -10,17 +10,18 @@ import {
 } from "../../api/service";
 import SingleSelectTextField from "../../component/MuiInputs/SingleSelectTextField";
 import Snackbars from "../../component/Snackbars";
+import Modal from "../../component/Modal";
+import ValidationRules from "./ValidationRules";
+import ValidationCheckModal from "../../component/ValidationCheckModal";
 
 function RegisterProcessing() {
   const [columns, setColumns] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const [mappings, setMappings] = useState([]);
-  console.log(mappings.length, "mappings");
   const [isSaved, setIsSaved] = useState(false);
   const [loadedFromApi, setLoadedFromApi] = useState(false);
   const [tempPayload, setTempPayload] = useState(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [companyName, setCompanyName] = useState([]);
   const [registerNames, setRegisterNames] = useState([]);
   const [files, setFiles] = useState([]);
@@ -67,7 +68,7 @@ function RegisterProcessing() {
         if (registerRes.status === "fulfilled")
           setRegisterNames(registerRes.value || []);
         if (filesRes.status === "fulfilled") setFiles(filesRes.value || []);
-      } catch  {
+      } catch {
         // Handle error
         // console.error("Error fetching data:", error);
       }
@@ -88,7 +89,7 @@ function RegisterProcessing() {
           const normalized = mappingRes.map((m) => ({
             id: Date.now() + Math.random(),
             Target: m.target || "",
-            Source: m.source || [""],
+            Source: m.source || [],
             Transform: m.transform || "",
             Formula: m.formula || "",
             Params: m.params || {},
@@ -108,7 +109,7 @@ function RegisterProcessing() {
     };
 
     if (current.register_id && current.file_id) {
-    fetchMappingData();
+      fetchMappingData();
     }
   }, [current.register_id, current.file_id]);
 
@@ -118,7 +119,7 @@ function RegisterProcessing() {
       {
         id: Date.now(),
         Target: "",
-        Source: [""],
+        Source: [],
         Transform: "",
         Formula: "",
         Params: {},
@@ -184,27 +185,28 @@ function RegisterProcessing() {
         message: message,
         severityType: 'success',
       });
-      setCurrent({
-        company_name: "",
-        company_id: null,
-        register_name: "",
-        register_id: null,
-        file_name: "",
-        file_id: null,
-        mappings: [],
-        source: [],
-        transform: "",
-        transform_id: null,
-        formula: "",
-        params: {},
-        default: "",
-        target: "",
-      });
+      // setCurrent({
+      //   company_name: "",
+      //   company_id: null,
+      //   register_name: "",
+      //   register_id: null,
+      //   file_name: "",
+      //   file_id: null,
+      //   mappings: [],
+      //   source: [],
+      //   transform: "",
+      //   transform_id: null,
+      //   formula: "",
+      //   params: {},
+      //   default: "",
+      //   target: "",
+      // });
+      setIsModalOpen(true);
     } catch (error) {
-       const errorMessage =
-                error?.response?.data?.message ||
-                error?.message ||
-                "Failed to process register";
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to process register";
 
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -219,14 +221,23 @@ function RegisterProcessing() {
 
   const handleClear = () => {
     setMappings([]);
-    setSelectedFile(null);
     setIsSaved(false);
     setLoadedFromApi(false);
     setTempPayload(null);
   };
+const closeModal = () => {
+  setIsModalOpen(false);
+};
 
   return (
     <div className="app-container">
+        <ValidationCheckModal
+        crudForm={<ValidationRules/>}
+        crudTitle='Validation Checking'
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        closeModal={closeModal}
+      />
       <Snackbars
         issnackbarsOpen={issnackbarsOpen}
         setIsSnackbarsOpen={setIsSnackbarsOpen}
@@ -285,7 +296,6 @@ function RegisterProcessing() {
               file_name: selected,
               file_id: matched.document_id || null,
             }));
-            setSelectedFile(matched);
           }}
           names={files.map((f) => ({ _id: f._id, name: f.file_name }))}
         />

@@ -38,24 +38,21 @@ export default function Mapping({ columns, mapping, onChange, onRemove }) {
       {/* Sources */}
       <div className="mapping-source">
         {mapping.Source.map((src, idx) => (
-          <div key={idx}>
+          <div key={idx} className="d-flex gap-2 align-items-center">
             <MuiTextField
-              label="Source"
+              label={`Source ${idx + 1}`}
               fieldName="Source"
-              value={mapping.Source}
+              value={src}
               handleChange={(e) =>
-                onChange({ ...mapping, Source: e.target.value })
+                handleSourceChange(e.target.value, idx)
               }
             />
-            {/* <ColumnDropdown
-              columns={columns}
-              value={src}
-              onSelect={(value) => handleSourceChange(value, idx)}
-            /> */}
+
             <button onClick={() => removeSource(idx)}>Remove</button>
           </div>
         ))}
       </div>
+
 
       <div className="d-flex gap-3">
 
