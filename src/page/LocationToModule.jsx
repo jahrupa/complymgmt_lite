@@ -67,7 +67,6 @@ const LocationToModule = () => {
         if (!current?.company_name) tempErrors.company_name = "Company is required";
         if (!current?.location_name) tempErrors.location_name = "Location is required";
         if (!current?.module_name) tempErrors.module_name = "Module is required";
-        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -377,8 +376,7 @@ const LocationToModule = () => {
                             _id: data?._id,
                             name: data?.sub_module_name,
                         }))}
-                        error={!!errors.sub_module_name}
-                        helperText={errors.sub_module_name}
+                        
                     />
 
                 </div>
