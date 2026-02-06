@@ -58,8 +58,8 @@ const LocationToModule = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const crudTitle = "Tag Module To Sub-Module Subscribe"
-    const editCrudTitle = "Edit Tagged Module To Sub-Module Subscribe"
+    const crudTitle = "Tag Sucribe Modules & Sub-Modules"
+    const editCrudTitle = "Edit Tagged Sucribe Modules & Sub-Modules"
     const SystemUserId = decryptData(localStorage.getItem("user_id"));
     const validate = () => {
         let tempErrors = {};
@@ -402,7 +402,7 @@ const LocationToModule = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Module To Sub-Module Subscribe?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Sucribe Modules & Sub-Modules?
                 </div>
 
                 <div className="row row-gap-2 mt-4">
@@ -663,12 +663,12 @@ const LocationToModule = () => {
                 <div className="notification-page-title">
                     <div>
                         {/* <h1>{data?.length > 1 ? "Companies" : "Company"}</h1> */}
-                        <h1>Module To Sub-Module Subscribe</h1>
+                        <h1>Sucribe Modules & Sub-Modules</h1>
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
                     <button className='crud_btn w-100 mb-2' onClick={openModal}>
-                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Module To Sub-Module Subscribe</span>
+                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link </span>
                     </button>
                     <div className='btn-wrap-div'>
                         <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>
