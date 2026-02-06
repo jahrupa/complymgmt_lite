@@ -34,6 +34,7 @@ import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful
 import NotificationMainPage from '../component/notification/NotificationMainPage.jsx';
 import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
+import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -116,6 +117,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
+            <Route path="/register_processing" element={<RegisterProcessing />} />
 
             {/* notification sub-routes */}
             <Route path="/notification" element={

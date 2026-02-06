@@ -16,11 +16,11 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { Layers, ScanEye } from 'lucide-react';
+import { Layers, PanelsRightBottom, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 
-function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
-   
+function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
+
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const userRole = decryptData(localStorage.getItem("user_role"));
     const menuItems = [
@@ -33,27 +33,28 @@ function SideBar({ sidebarOpen, setSidebarOpen , setActivePage, activePage}) {
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module To Sub-Module Subscribe', link: 'location_to_module' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
-        // { icon: (active) => <AddModeratorOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Role Manager / Create User Role', link: 'role_manager' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Upload Document', link: 'upload_documents' },
-          ...(userRole === 'Admin' || userRole === 'Super-Admin'
-        ? [{
-            icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
-            label: 'Widget Mappings',
-            link: 'widget_mappings'
-        }]
-        : []
-    ),
-];
+        ...(userRole === 'Admin' || userRole === 'Super-Admin'
+            ? [{
+                icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+                label: 'Widget Mappings',
+                link: 'widget_mappings'
+            }]
+            : []
+        ),
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
+
+    ];
     const serviceTracker = [
         { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
-         ...(userRole === 'Admin' || userRole === 'Super-Admin'
-        ? [{
-            icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
-            label: 'Tracker Access',
-            link: 'service_tracker_access'
-        }]
-        : []
-    ),
+        ...(userRole === 'Admin' || userRole === 'Super-Admin'
+            ? [{
+                icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+                label: 'Tracker Access',
+                link: 'service_tracker_access'
+            }]
+            : []
+        ),
     ];
 
     return (
