@@ -206,12 +206,12 @@ const LocationToModule = () => {
                 if (results[0].status === 'fulfilled') setData(results[0].value);
                 if (results[1].status === 'fulfilled') setGroupHoldingName(results[1].value);
                 if (results[2].status === 'fulfilled') setModuleName(results[2].value);
-                results.forEach((result, idx) => {
+                results.forEach((result,) => {
                     if (result.status === 'rejected') {
                         // // console.error(`Error fetching data at index ${idx}:`, result.reason);
                     }
                 });
-            } catch (error) {
+            } catch {
                 // // console.error("Error in fetchData:", error);
             }
         };
@@ -226,7 +226,7 @@ const LocationToModule = () => {
                 if (data) {
                     setSubModuleName(data);
                 }
-            } catch (error) {
+            } catch {
                 // console.error("Failed to fetch sub module:", error);
             }
         };
@@ -243,7 +243,7 @@ const LocationToModule = () => {
                 if (data) {
                     setCompanyName(data);
                 }
-            } catch (error) {
+            } catch  {
                 // console.error("Failed to fetch company:", error);
             }
         };
@@ -260,7 +260,7 @@ const LocationToModule = () => {
                 if (data) {
                     setLocationName(data);
                 }
-            } catch (error) {
+            } catch  {
                 // console.error("Failed to fetch location by company_id:", error);
             }
         };
@@ -646,7 +646,7 @@ const LocationToModule = () => {
         editable: true,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
-    const onRowValueChanged = (event) => {
+    const onRowValueChanged = () => {
         // console.log('Row updated:', event.data);
     };
 
