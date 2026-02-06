@@ -85,24 +85,24 @@ const DashboardPage = () => {
           </div>
           <div className="me-1 ms-1" style={{ width: '250px' }}>
             <SingleSelectTextField
-  name="user_id"
-  label="Choose a user to create a widget"
-  value={current.user_id ?? ''}
-  onChange={(e) => {
-    const userId = e.target.value;
-    const matchedUser = allUser.find((u) => u._id === userId);
+              name="user_id"
+              label="Choose a user to create a widget"
+              value={current.user_name ?? ''}
+              onChange={(e) => {
+                const userName = e.target.value;
+                const matchedUser = allUser.find((u) => u.full_name === userName);
 
-    setCurrent((prev) => ({
-      ...prev,
-      user_id: userId,
-      user_name: matchedUser?.full_name || '',
-    }));
-  }}
-  names={allUser?.map((item) => ({
-    _id: item._id,
-    name: item.full_name,
-  }))}
-/>
+                setCurrent((prev) => ({
+                  ...prev,
+                  user_id: matchedUser?._id,
+                  user_name: matchedUser?.full_name || '',
+                }));
+              }}
+              names={allUser?.map((item) => ({
+                _id: item._id,
+                name: item.full_name,
+              }))}
+            />
 
           </div>
         </div>

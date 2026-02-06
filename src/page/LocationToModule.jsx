@@ -58,8 +58,8 @@ const LocationToModule = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const crudTitle = "Tag Module To Sub-Module Subscribe"
-    const editCrudTitle = "Edit Tagged Module To Sub-Module Subscribe"
+    const crudTitle = "Tag Sucribe Modules & Sub-Modules"
+    const editCrudTitle = "Edit Tagged Sucribe Modules & Sub-Modules"
     const SystemUserId = decryptData(localStorage.getItem("user_id"));
     const validate = () => {
         let tempErrors = {};
@@ -67,7 +67,6 @@ const LocationToModule = () => {
         if (!current?.company_name) tempErrors.company_name = "Company is required";
         if (!current?.location_name) tempErrors.location_name = "Location is required";
         if (!current?.module_name) tempErrors.module_name = "Module is required";
-        if (!current?.sub_module_name) tempErrors.sub_module_name = "Sub Module is required";
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
@@ -206,12 +205,12 @@ const LocationToModule = () => {
                 if (results[0].status === 'fulfilled') setData(results[0].value);
                 if (results[1].status === 'fulfilled') setGroupHoldingName(results[1].value);
                 if (results[2].status === 'fulfilled') setModuleName(results[2].value);
-                results.forEach((result, idx) => {
+                results.forEach((result,) => {
                     if (result.status === 'rejected') {
                         // // console.error(`Error fetching data at index ${idx}:`, result.reason);
                     }
                 });
-            } catch (error) {
+            } catch {
                 // // console.error("Error in fetchData:", error);
             }
         };
@@ -226,7 +225,7 @@ const LocationToModule = () => {
                 if (data) {
                     setSubModuleName(data);
                 }
-            } catch (error) {
+            } catch {
                 // console.error("Failed to fetch sub module:", error);
             }
         };
@@ -243,7 +242,7 @@ const LocationToModule = () => {
                 if (data) {
                     setCompanyName(data);
                 }
-            } catch (error) {
+            } catch  {
                 // console.error("Failed to fetch company:", error);
             }
         };
@@ -260,7 +259,7 @@ const LocationToModule = () => {
                 if (data) {
                     setLocationName(data);
                 }
-            } catch (error) {
+            } catch  {
                 // console.error("Failed to fetch location by company_id:", error);
             }
         };
@@ -377,8 +376,7 @@ const LocationToModule = () => {
                             _id: data?._id,
                             name: data?.sub_module_name,
                         }))}
-                        error={!!errors.sub_module_name}
-                        helperText={errors.sub_module_name}
+                        
                     />
 
                 </div>
@@ -402,7 +400,7 @@ const LocationToModule = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Module To Sub-Module Subscribe?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Sucribe Modules & Sub-Modules?
                 </div>
 
                 <div className="row row-gap-2 mt-4">
@@ -646,7 +644,7 @@ const LocationToModule = () => {
         editable: true,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
-    const onRowValueChanged = (event) => {
+    const onRowValueChanged = () => {
         // console.log('Row updated:', event.data);
     };
 
@@ -663,12 +661,12 @@ const LocationToModule = () => {
                 <div className="notification-page-title">
                     <div>
                         {/* <h1>{data?.length > 1 ? "Companies" : "Company"}</h1> */}
-                        <h1>Modules Subscribed</h1>
+                        <h1>Sucribe Modules & Sub-Module</h1>
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
                     <button className='crud_btn w-100 mb-2' onClick={openModal}>
-                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link Location to Module/Submodule</span>
+                        <span><Link style={{ width: '15px', height: '15px' }} /></span> <span className='button-style'>Link </span>
                     </button>
                     <div className='btn-wrap-div'>
                         <button className="button approve w-100 justify-content-center" onClick={() => handleApproveAll()}>

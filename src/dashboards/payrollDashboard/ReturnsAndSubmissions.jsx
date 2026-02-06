@@ -587,7 +587,7 @@ const ReturnsAndSubmissions = ({
               rowData={escalationRaisedCategoriesByCompany?.count_remark || []}
               columnDefs={columnDefs}
               pagination
-              paginationPageSize={5}
+              paginationPageSize={20}
             />
           </div>
         </div>
