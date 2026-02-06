@@ -279,6 +279,7 @@ const CockpitComplince = ({
     // alert("First you need to select a user");
   };
   const toggleChartSelection = (chartId) => {
+    console.log(chartId,'chartId')
     if (!current?.user_name) {
       // alert("First you need to select a user");
       setIsSnackbarsOpen({

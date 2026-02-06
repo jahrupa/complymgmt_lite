@@ -865,7 +865,7 @@ const PayrollServices = ({
                                 rowData={explanationOfEmployeeCount || []}
                                 columnDefs={columnDefs}
                                 pagination
-                                paginationPageSize={5}
+                                paginationPageSize={20}
                             />
                         </div>
                     </div>

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "../style/statsCards.css";
 import "../style/dashboard.css";
 import { Tabs, Tab, Box } from "@mui/material";
-
 import GeneralComplianceDashboard from "../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard";
 import {
     createOrUpdateWidgetMapping,
@@ -24,7 +23,6 @@ import HelpdeskAndEscalations from "./payrollDashboard/HelpdeskAndEscalations";
 import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";
 import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
-
 import { decryptData } from "../page/utils/encrypt";
 import Snackbars from "../component/Snackbars";
 
@@ -48,7 +46,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
-    
+
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -81,17 +79,13 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     // Dragging
     const onDrag = (e) => {
         if (!isDragging) return;
-
         const clientX = e.clientX || e.touches?.[0]?.clientX;
         const clientY = e.clientY || e.touches?.[0]?.clientY;
-
         let newX = clientX - offset.x;
         let newY = clientY - offset.y;
-
         // Restrict inside screen
         newX = Math.max(0, Math.min(newX, window.innerWidth - 150));
         newY = Math.max(0, Math.min(newY, window.innerHeight - 60));
-
         setPosition({ x: newX, y: newY });
     };
 
@@ -101,7 +95,6 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         if (isDragging) {
             window.addEventListener("mousemove", onDrag);
             window.addEventListener("mouseup", stopDrag);
-
             window.addEventListener("touchmove", onDrag);
             window.addEventListener("touchend", stopDrag);
         }
@@ -128,13 +121,13 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             label: "Compliance Cockpit",
             content:
                 selectedCompany !== "" ? (
-                    <CockpitComplinceByCompany data={cockpitByCompanyData?cockpitByCompanyData:[]}
+                    <CockpitComplinceByCompany data={cockpitByCompanyData ? cockpitByCompanyData : []}
                         current={current}
                         selectedCharts={selectedCharts}
                         companyName={selectedCompany}
                         setSelectedCharts={setSelectedCharts} />
                 ) : (
-                    <CockpitComplince data={cockpitData?cockpitData:[]}
+                    <CockpitComplince data={cockpitData ? cockpitData : []}
                         current={current}
                         selectedCharts={selectedCharts}
                         setSelectedCharts={setSelectedCharts}
@@ -260,7 +253,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 } else {
                     setGeneralDashboardData(await fetchGeneralCompaiancePortfolio());
                 }
-            } catch{
+            } catch {
                 setGeneralDashboardData([]);
             }
         };
@@ -296,17 +289,13 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     useEffect(() => {
         const fetchWidgetsListData = async () => {
             const [a] = await Promise.allSettled([
-                // fetchAllWidgetMappings(),
                 fetchWidgetMappingById(userId),
-
             ]);
             setWidgetsList(
                 a.status === "fulfilled"
                     ? a.value?.widgets || []
                     : []
             );
-
-
         };
         fetchWidgetsListData();
     }, [selectedCompany]);
@@ -319,7 +308,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             widget_ids: selectedCharts.map(id => id.toUpperCase())
         };
         try {
-            const response = await createOrUpdateWidgetMapping(payload,userId);
+            const response = await createOrUpdateWidgetMapping(payload, userId);
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -371,6 +360,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                             top: position.y,
                             cursor: isDragging ? "grabbing" : "grab",
                             zIndex: 9999,
+                            ...(selectedCharts?.length === 0
+                                ? { cursor: "not-allowed", opacity: 0.9 }
+                                : { pointerEvents: "auto", opacity: 1 })
                         }}
                         onMouseDown={startDrag}
                         onTouchStart={startDrag}
