@@ -80,7 +80,7 @@
   flex-wrap: wrap;
 }
 
-.search-box {
+/* .search-box {
   flex: 1;
   min-width: 300px;
 }
@@ -94,13 +94,13 @@
   background: white;
   transition: all 0.3s ease;
   box-sizing: border-box;
-}
+} */
 
-.search-input:focus {
+/* .search-input:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
+} */
 
 .filter-buttons {
   display: flex;

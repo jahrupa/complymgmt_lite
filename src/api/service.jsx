@@ -168,6 +168,7 @@ import {
   GET_REGISTER_MAPPING,
   PROCESS_REGISTERS,
   GET_FILE_BY_TYPE,
+  DOWNLOAD_FILE,
 
 } from "./Endpoint";
 
@@ -1076,6 +1077,18 @@ export const fetchDocumentDropdownStages = async (service_tracker_name) => {
     throw error;
   }
 };
+
+export const downloadFile = async (fileId) => {
+  try {
+    const response = await API.get(`${DOWNLOAD_FILE}${fileId}`, {
+      responseType: "blob", // Important for file downloads
+    });
+    return response.data;
+  } catch (error) {
+    // console.error("Error downloading file:", error);
+    throw error;
+  }
+}
 // USER ACCESS LEVEL
 export const fetchAllUserAccessLevels = async ({ system_user_id }) => {
   try {
