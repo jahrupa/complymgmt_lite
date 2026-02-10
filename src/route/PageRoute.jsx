@@ -35,6 +35,7 @@ import NotificationMainPage from '../component/notification/NotificationMainPage
 import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
+import MultiFilterTest from '../page/multifiltertest/MultiFilterTest.jsx';
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -118,6 +119,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
+            <Route path="/test" element={<MultiFilterTest />} />
+            
 
             {/* notification sub-routes */}
             <Route path="/notification" element={

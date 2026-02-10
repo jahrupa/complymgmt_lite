@@ -97,7 +97,7 @@ export default function DashboardDrawerGrid({
           })
         }));
 
-       const categories = chartXaxisCategory || rowData.map((_, idx) => `Item ${idx + 1}`);
+        const categories = chartXaxisCategory || rowData.map((_, idx) => `Item ${idx + 1}`);
 
 
         options = {
@@ -158,7 +158,7 @@ export default function DashboardDrawerGrid({
         )}
 
         {/* Chart Selector */}
-        {rowData.length > 0 && (
+        {/* {rowData.length > 0 && (
           <div className="mb-3 d-flex align-items-center">
             <span className="me-2 fw-600 text-muted">Chart Type:</span>
             <select
@@ -172,8 +172,10 @@ export default function DashboardDrawerGrid({
               <option value="pie">Pie Chart</option>
             </select>
           </div>
-        )}
-
+        )} */}
+        <div className="d-flex justify-content-end">
+        <button className="btn btn-primary " onClick={() => { console.log("View Details clicked"); }}>View Details</button>
+        </div>
         {/* Chart Rendering */}
         {chartType && chartSeries.length > 0 && !error && (
           <div className="mb-4" style={{ width: '100%', height: '400px' }}>

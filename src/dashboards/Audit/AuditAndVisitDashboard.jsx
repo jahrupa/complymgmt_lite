@@ -154,13 +154,8 @@ const AuditAndVisitDashboard = ({
     setChecklistApprovalRateByCompanyName,
   ] = React.useState([]);
 
-
-
-
   const [riskLevel, setRiskLevel] = React.useState([]);
-
   const [countOfAuditStatus, setCountOfAuditStatus] = React.useState([]);
-
   const [riskLevelBreakdownByServiceType, setRiskLevelBreakdownByServiceType] =
     React.useState([]);
 
@@ -251,11 +246,11 @@ const AuditAndVisitDashboard = ({
     series: [
       {
         name: "SLA Met (Y)",
-        data: AuditPercentageMeetingSLA?.map((item) => item.count_y) || [],
+        data: AuditPercentageMeetingSLA?.count_sla?.map((item) => item.count_y) || [],
       },
       {
         name: "SLA Met (N)",
-        data: AuditPercentageMeetingSLA?.map((item) => item.count_n) || [],
+        data: AuditPercentageMeetingSLA?.count_sla?.map((item) => item.count_n) || [],
       },
     ],
     options: {
@@ -301,7 +296,7 @@ const AuditAndVisitDashboard = ({
       },
       xaxis: {
         categories:
-          AuditPercentageMeetingSLA?.map((item) => item.responsible_team) || [],
+          AuditPercentageMeetingSLA?.count_sla?.map((item) => item.responsible_team) || [],
       },
       yaxis: {
         title: {
@@ -392,7 +387,7 @@ const AuditAndVisitDashboard = ({
   };
 
   const riskLevelFormat = {
-    series: riskLevel?.map((item) => item.count) || [],
+    series: riskLevel?.count_risk?.map((item) => item.count) || [],
     options: {
       chart: {
         width: 380,
@@ -416,7 +411,7 @@ const AuditAndVisitDashboard = ({
         },
       },
 
-      labels: riskLevel?.map((item) => item.risk_level) || [],
+      labels: riskLevel?.count_risk?.map((item) => item.risk_level) || [],
       legend: {
         position: "top", // 👈 moves Yes/No below the chart
         horizontalAlign: "center",
@@ -445,7 +440,7 @@ const AuditAndVisitDashboard = ({
   };
 
   const countOfAuditStatusFormated = {
-    series: countOfAuditStatus?.map((item) => item.count) || [],
+    series: countOfAuditStatus?.count_status?.map((item) => item.count) || [],
     options: {
       chart: {
         width: 380,
@@ -469,7 +464,7 @@ const AuditAndVisitDashboard = ({
         },
       },
 
-      labels: countOfAuditStatus?.map((item) => item.audit_status) || [],
+      labels: countOfAuditStatus?.count_status?.map((item) => item.audit_status) || [],
       legend: {
         position: "top", // 👈 moves Yes/No below the chart
         horizontalAlign: "center",
@@ -501,15 +496,15 @@ const AuditAndVisitDashboard = ({
     series: [
       {
         name: "High",
-        data: riskLevelBreakdownByServiceType?.map((item) => item.high) || [],
+        data: riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.high) || [],
       },
       {
         name: "Medium",
-        data: riskLevelBreakdownByServiceType?.map((item) => item.medium) || [],
+        data: riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.medium) || [],
       },
       {
         name: "Low",
-        data: riskLevelBreakdownByServiceType?.map((item) => item.low) || [],
+        data: riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.low) || [],
       },
     ],
     options: {
@@ -551,7 +546,7 @@ const AuditAndVisitDashboard = ({
 
       xaxis: {
         categories:
-          riskLevelBreakdownByServiceType?.map((item) => item.service_type) ||
+          riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.service_type) ||
           [],
       },
       yaxis: {
