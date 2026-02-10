@@ -3,12 +3,11 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
-import MultiSelectFilter from "./MuiMultiSelectFilter";
+import MultiSelectFilter from "./MultiSelectFilter";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-function MultiFilterTest() {
+function DashboardDrawerGridDetailPage() {
     const [filters, setFilters] = useState({});
-
     const rowData = useMemo(() => ([
 
         {
@@ -51167,4 +51166,4 @@ function MultiFilterTest() {
     );
 }
 
-export default MultiFilterTest;
+export default DashboardDrawerGridDetailPage;
