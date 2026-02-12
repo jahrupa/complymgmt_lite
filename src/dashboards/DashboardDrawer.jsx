@@ -8,6 +8,7 @@ import Chart from 'react-apexcharts';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import DashboardDrawerGridDetailPage from '../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -17,8 +18,11 @@ export default function DashboardDrawerGrid({
   onClose,
   data,
   title = "Details",
-  chartXaxisCategory
+  chartXaxisCategory,
+  setIsDetailPage,
+  isDetailPage
 }) {
+  console.log(chartXaxisCategory,'chartXaxisCategory')
   const [rowData, setRowData] = React.useState([]);
   const [columnDefs, setColumnDefs] = React.useState([]);
   const [chartType, setChartType] = React.useState(""); // bar, line, pie
@@ -174,7 +178,7 @@ export default function DashboardDrawerGrid({
           </div>
         )} */}
         <div className="d-flex justify-content-end">
-        <button className="btn btn-primary " onClick={() => { console.log("View Details clicked"); }}>View Details</button>
+          <button className="btn btn-primary " onClick={() => { setIsDetailPage(true); }}>View Details</button>
         </div>
         {/* Chart Rendering */}
         {chartType && chartSeries.length > 0 && !error && (
@@ -187,17 +191,24 @@ export default function DashboardDrawerGrid({
             />
           </div>
         )}
+        {isDetailPage ? (
+          <>
+            <DashboardDrawerGridDetailPage
+              rowData={rowData}
+            />
+          </>
 
-        {/* DATA GRID */}
-        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+        ) : <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
             theme="legacy"
             rowData={rowData}
             columnDefs={columnDefs}
             pagination={true}
-            paginationPageSize={10}
+            paginationPageSize={50}
           />
-        </div>
+        </div>}
+
+
 
       </Box>
     </Drawer>

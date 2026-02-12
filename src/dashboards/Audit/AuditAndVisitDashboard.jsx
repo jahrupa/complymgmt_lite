@@ -105,7 +105,7 @@ const AuditAndVisitDashboard = ({
     message: "",
     severityType: "",
   });
-
+const[isDetailPage, setIsDetailPage]=useState(false);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
@@ -119,7 +119,6 @@ const AuditAndVisitDashboard = ({
     setChartXaxisCategory(chartXaxisCategory);
   };
   const data = AuditCountByStateSegmented?.top_count || [];
-
   // Collect all keys except "state"
   const keys =
     data.length > 0 ? Object.keys(data[0]).filter((k) => k !== "state") : [];
@@ -144,7 +143,6 @@ const AuditAndVisitDashboard = ({
     name: cleanName(key),
     data: data.map((item) => item[key] || 0),
   }));
-
 
   const [AuditPercentageMeetingSLA, setAuditPercentageMeetingSLA] =
     React.useState([]);
@@ -1084,6 +1082,8 @@ const AuditAndVisitDashboard = ({
         data={drawerData} //direct array
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}
+        isDetailPage={isDetailPage}
+        setIsDetailPage={setIsDetailPage}
       />
     </div>
   );
