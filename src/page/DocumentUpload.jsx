@@ -19,6 +19,7 @@ import {
   fetchServiceTrackerBySubModuleId,
   fetchDocumentDropdownTypes,
   fetchDocumentDropdownStages,
+  downloadFile,
 } from "../api/service";
 import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
@@ -33,6 +34,7 @@ import RightDrawer from "../component/RightDrawer";
 import { ReactPDFViewer } from "../component/ReactPDFViewer";
 import SmallSizeModal from "../component/SmallSizeModal";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
+import { Download } from "lucide-react";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -324,7 +326,7 @@ const DocumentUpload = () => {
             // );
           }
         });
-      } catch  {
+      } catch {
         // Handle error silently
       }
     };
@@ -342,7 +344,7 @@ const DocumentUpload = () => {
         }
       } catch {
         // Handle error silently
-        }
+      }
     };
 
     if (current?.group_holdings_id) {
@@ -359,7 +361,7 @@ const DocumentUpload = () => {
         }
       } catch {
         // Handle error silently
-        }
+      }
     };
 
     if (current?.company_id) {
@@ -394,7 +396,7 @@ const DocumentUpload = () => {
         if (data) {
           setSubModuleName(data);
         }
-      } catch{
+      } catch {
         // Handle error silently
       }
     };
@@ -445,7 +447,7 @@ const DocumentUpload = () => {
         if (data) {
           setDocumentDropdownStages(data);
         }
-      } catch{
+      } catch {
         // Handle error silently
       }
     };
@@ -526,27 +528,32 @@ const DocumentUpload = () => {
     {
       field: "file_path",
       headerName: "File Path",
-      editable: "false",
+      editable: false,
       cellRenderer: (params) => {
-        const path = params.value;
-        return path ? (
-          <a
-            href={`/${path}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              background: "cadetblue",
-              color: "white",
-              padding: "4px",
-              borderRadius: "5px",
-              textDecoration: "none",
-              fontSize: "12px",
-            }}
+        const handleDownload = async () => {
+          try {
+            const blob = await downloadFile(params.data.document_id);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = params.data.file_name || "report.xlsx";
+            document.body.appendChild(a);
+            a.click();
+
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          } catch (error) {
+            console.error("File download failed:", error);
+          }
+        };
+
+        return (
+          <button
+            onClick={handleDownload}
+            style={{display:'contents'}}
           >
-            Download
-          </a>
-        ) : (
-          "No File"
+           <Download style={{height:'21px',width:'21px',color:'cadetblue',cursor:'pointer'}}/>
+          </button>
         );
       },
     },
@@ -620,7 +627,7 @@ const DocumentUpload = () => {
                 height: 15,
                 accentColor: "orange",
               }}
-              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{

@@ -103,6 +103,7 @@ export const DELETE_FILE_ID='/api/v1/document_repository/delete/file/';
 export const UPDATE_FILE='/api/v1/document_repository/update/file/';
 export const GET_DOCUMENT_DROPDOWNS_TYPES='/api/v1/document_repository/view/dropdowns/type/';
 export const GET_DOCUMENT_DROPDOWNS_STAGE='/api/v1/document_repository/view/dropdowns/stage/';
+export const DOWNLOAD_FILE='/api/v1/document_repository/view/download?document_id=';
 
 // pages
 export const GET_ALL_PAGE='/api/v1/pages/view/all';
@@ -213,6 +214,12 @@ export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
 export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';
 export const DELETE_WIDGET_MAPPING_BY_ID ='/api/v1/widget-mapping/delete?user_id=';
 export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget-mapping/get?user_id=';
+
+// Register Processing
+export const GET_ALL_REGISTER_NAMES='/api/v1/register_processing/view/register/names/multiple';
+export const GET_REGISTER_MAPPING='/api/v1/register_processing/view/mapping/get?register_id=';
+export const PROCESS_REGISTERS='/api/v1/register_processing/create/register';
+export const GET_FILE_BY_TYPE='/api/v1/document_repository/view/files/type?file_type=xlsx';
 
 
 
