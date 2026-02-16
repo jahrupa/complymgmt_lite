@@ -62,7 +62,7 @@ const PayrollServices = ({
                         if (clickedValue === 0) return;
 
                         navigate(
-                            "/payroll_service/dashboard/investment_declaration_status_by_company",
+                            // "/payroll_service/dashboard/investment_declaration_status_by_company",
                             {
                                 state: {
                                     score: clickedValue,
@@ -326,7 +326,7 @@ const PayrollServices = ({
                     click(event, chartContext, opts) {
 
                         navigate(
-                            "/payroll_service/dashboard/delay_between_data_request_date_and_client_data_received_date",
+                            // "/payroll_service/dashboard/delay_between_data_request_date_and_client_data_received_date",
                             {
                                 state: {
                                     score:

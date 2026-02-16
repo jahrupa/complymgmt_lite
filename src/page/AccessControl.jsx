@@ -239,6 +239,7 @@ const AccessControl = () => {
     e?.preventDefault();
     if (!validate()) return; // Don't proceed if validation fails
     const companyWiseAccessPayload = {
+      user_id: current?.user_id,
       company_name: current?.company_name,
       access_key: current?.access
     };
