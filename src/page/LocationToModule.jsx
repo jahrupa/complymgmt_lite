@@ -242,7 +242,7 @@ const LocationToModule = () => {
                 if (data) {
                     setCompanyName(data);
                 }
-            } catch  {
+            } catch {
                 // console.error("Failed to fetch company:", error);
             }
         };
@@ -259,7 +259,7 @@ const LocationToModule = () => {
                 if (data) {
                     setLocationName(data);
                 }
-            } catch  {
+            } catch {
                 // console.error("Failed to fetch location by company_id:", error);
             }
         };
@@ -376,7 +376,7 @@ const LocationToModule = () => {
                             _id: data?._id,
                             name: data?.sub_module_name,
                         }))}
-                        
+
                     />
 
                 </div>
@@ -532,10 +532,8 @@ const LocationToModule = () => {
             }
         }
         ,
-
-        // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-
         { field: 'module_name', headerName: 'Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        { field: 'sub_module_name', headerName: 'Sub Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
             field: 'group_name',
             headerName: 'Group Holding',
