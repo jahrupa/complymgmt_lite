@@ -108,7 +108,6 @@ const AuditAndVisitDashboard = ({
   });
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [isDetailPageData, setIsDetailPageData] = useState([]);
-  console.log(isDetailPageData, 'isDetailPageData')
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
@@ -1082,7 +1081,6 @@ const AuditAndVisitDashboard = ({
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         isDetailPageData={isDetailPageData}
-        isDetailPagebtnDisabled={!drawerData || drawerData.length === 0}
       />
     </div>
   );
