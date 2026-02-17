@@ -48,10 +48,10 @@ function DashboardDrawerGridDetailPage({rowData}) {
     return (
         <div className="app-container">
             <div className="app-wrapper">
-                <div className="app-header">
+                {/* <div className="app-header">
                     <h1 className="app-title">Audit Data Management</h1>
                     <p className="app-subtitle">Filter and view audit records with advanced multi-column filtering</p>
-                </div>
+                </div> */}
 
                 <div className="app-card">
                     <div className="app-filter-section">

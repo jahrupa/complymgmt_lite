@@ -20,9 +20,9 @@ export default function DashboardDrawerGrid({
   title = "Details",
   chartXaxisCategory,
   setIsDetailPage,
-  isDetailPage
+  isDetailPage,
+  isDetailPageData
 }) {
-  console.log(chartXaxisCategory,'chartXaxisCategory')
   const [rowData, setRowData] = React.useState([]);
   const [columnDefs, setColumnDefs] = React.useState([]);
   const [chartType, setChartType] = React.useState(""); // bar, line, pie
@@ -147,7 +147,7 @@ export default function DashboardDrawerGrid({
         {/* HEADER */}
         <div className='d-flex justify-content-between align-items-center mb-2'>
           <h4 className="ms-2 fs-19 fw-600" style={{ color: 'gray' }}>{title}</h4>
-          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); }}>
+          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); setIsDetailPage(false); }}>
             <X />
           </div>
         </div>
@@ -178,7 +178,7 @@ export default function DashboardDrawerGrid({
           </div>
         )} */}
         <div className="d-flex justify-content-end">
-          <button className="btn btn-primary " onClick={() => { setIsDetailPage(true); }}>View Details</button>
+          <button className="btn btn-primary " onClick={() => { setIsDetailPage(!isDetailPage); }}>{isDetailPage ? "Back" : "View Details"}</button>
         </div>
         {/* Chart Rendering */}
         {chartType && chartSeries.length > 0 && !error && (
@@ -194,7 +194,7 @@ export default function DashboardDrawerGrid({
         {isDetailPage ? (
           <>
             <DashboardDrawerGridDetailPage
-              rowData={rowData}
+              rowData={isDetailPageData}
             />
           </>
 
