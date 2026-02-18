@@ -795,7 +795,8 @@ const PayrollServices = ({
                                             systemUseByEmp?.system_used_by_employer?.map(
                                                 (item) => item.system_used
                                             ),
-                                            systemUseByEmp?.payrollServicesRecords
+                                            systemUseByEmp?.payrollServicesRecords,
+                                            systemUseByEmp?.columns
                                         );
                                     }}
                                 >
@@ -843,7 +844,8 @@ const PayrollServices = ({
                                             distributionOfEmployee?.system_used_by_employer?.map(
                                                 (item) => item.system_used
                                             ),
-                                            distributionOfEmployee?.payrollServicesRecords
+                                            distributionOfEmployee?.payrollServicesRecords,
+                                            distributionOfEmployee?.columns
                                         );
                                     }}
                                 >

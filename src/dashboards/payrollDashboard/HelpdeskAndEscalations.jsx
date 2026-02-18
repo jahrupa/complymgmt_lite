@@ -575,7 +575,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [isDetailPageData, setIsDetailPageData] = useState([]);
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData) => {
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
@@ -721,6 +722,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                       (item) => item.pending_from
                     ),
                     ProportionOfCases?.helpdeskRecords,
+                    ProportionOfCases?.columns
                   )
                 }
 
@@ -771,6 +773,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                       (item) => item.issue_sub_type
                     ),
                     closedVsOpenCases?.helpdeskRecords,
+                    closedVsOpenCases?.columns
                   )
                 }
 
@@ -821,6 +824,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                       (item) => item.delay_type
                     ),
                     clientDelayFlags?.helpdeskRecords,
+                    clientDelayFlags?.columns
                   )
                 }
 
@@ -870,6 +874,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                       (item) => item.communication_type
                     ),
                     communicationType?.helpdeskRecords,
+                    communicationType?.columns
                   )
                 }
 
@@ -917,7 +922,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     ticketDistribution?.rest_assigned_to_counts?.map(
                       (item) => item.assigned_to
                     ),
-                    ticketDistribution?.helpdeskRecords
+                    ticketDistribution?.helpdeskRecords,
+                    ticketDistribution?.columns
                   )
 
                 }}
@@ -967,6 +973,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                       (item) => item.delay_type
                     ),
                     governmentDelayFlags?.helpdeskRecords,
+                    governmentDelayFlags?.columns
                   )
                 }
 
@@ -1014,7 +1021,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     helpdeskTicketsRaisedByCompany?.rest_company_tickets_count?.map(
                       (item) => item.company_name
                     ),
-                    helpdeskTicketsRaisedByCompany?.helpdeskRecords
+                    helpdeskTicketsRaisedByCompany?.helpdeskRecords,
+                    helpdeskTicketsRaisedByCompany?.columns
                   )
                 }}
               >
@@ -1044,6 +1052,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         isDetailPageData={isDetailPageData}
+        filterColumns={filterColumns}
       />
     </div>
   );

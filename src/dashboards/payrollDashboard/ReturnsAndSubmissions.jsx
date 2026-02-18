@@ -58,13 +58,15 @@ const ReturnsAndSubmissions = ({
   const [chartXaxisCategory, setChartXaxisCategory] = useState([]);
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [isDetailPageData, setIsDetailPageData] = useState([]);
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategories = [], isDetailData) => {
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategories = [], isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategories);
     setIsDetailPageData(isDetailData);
+    setFilterColumns(filterColumn);
 
   };
 
@@ -335,7 +337,8 @@ const ReturnsAndSubmissions = ({
                     comparisonOfReturnApplicability?.rest_count?.map(
                       (item) => item.pending_from
                     ),
-                    comparisonOfReturnApplicability?.returns_records
+                    comparisonOfReturnApplicability?.returns_records,
+                    comparisonOfReturnApplicability?.coloums 
                   )
                 }
 
@@ -385,7 +388,8 @@ const ReturnsAndSubmissions = ({
                     ApplicableReturnsCount?.frequency_returns?.map(
                       (item) => item.frequency
                     ),
-                    ApplicableReturnsCount?.returns_records
+                    ApplicableReturnsCount?.returns_records,
+                    ApplicableReturnsCount?.columns
                   )
                 }
 
@@ -433,7 +437,9 @@ const ReturnsAndSubmissions = ({
                     applicableReturnsRaw?.rest_count?.map(
                       (item) => item.returns
                     ),
-                    applicableReturnsRaw?.returns_records
+                    applicableReturnsRaw?.returns_records,
+                    applicableReturnsRaw?.columns
+                    
                   )
                 }
 
@@ -479,7 +485,8 @@ const ReturnsAndSubmissions = ({
                     "Applicable returns by company",
                     companiesPerReturnsNames?.rest_counts,
                     companiesPerReturnsNames?.rest_counts?.map(i => i.returns_name),
-                    companiesPerReturnsNames?.returns_records
+                    companiesPerReturnsNames?.returns_records,
+                    companiesPerReturnsNames?.columns
                   );
                 }}
               >
@@ -524,7 +531,8 @@ const ReturnsAndSubmissions = ({
                     "Risk distribution by state",
                     riskDistributionByState?.rest_counts,
                     riskDistributionByState?.rest_counts?.map(i => i.state),
-                    riskDistributionByState?.returns_records
+                    riskDistributionByState?.returns_records,
+                    riskDistributionByState?.columns
                   );
                 }}
               >
@@ -568,7 +576,8 @@ const ReturnsAndSubmissions = ({
                     "State-wise analysis of applicable returns",
                     stateWiseAnalysisOfApplicableReturns?.rest_counts,
                     stateWiseAnalysisOfApplicableReturns?.rest_counts?.map(i => i.state),
-                    stateWiseAnalysisOfApplicableReturns?.returns_records
+                    stateWiseAnalysisOfApplicableReturns?.returns_records,
+                    stateWiseAnalysisOfApplicableReturns?.columns
                   );
                 }}
               >
@@ -618,6 +627,7 @@ const ReturnsAndSubmissions = ({
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         isDetailPageData={isDetailPageData}
+        filterColumns={filterColumns}
       />
     </div>
 
