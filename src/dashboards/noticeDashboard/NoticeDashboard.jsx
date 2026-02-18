@@ -1170,7 +1170,7 @@ const NoticeDashboard = ({
                 isDetailPage={isDetailPage}
                 setIsDetailPage={setIsDetailPage}
                 isDetailPageData={isDetailPageData}
-                 filterColumns={filterColumns}
+                filterColumns={filterColumns}
             />
         </div>
     );
