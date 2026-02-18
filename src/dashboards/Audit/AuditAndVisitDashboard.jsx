@@ -784,8 +784,8 @@ const AuditAndVisitDashboard = ({
                     AuditCountByStateSegmented?.rest_count?.map(
                       (item) => item.state
                     ),
-                    AuditCountByServiceType?.auditRecord,
-                    AuditCountByServiceType?.columns
+                    AuditCountByStateSegmented?.auditRecord,
+                    AuditCountByStateSegmented?.columns
 
                   );
                 }}
