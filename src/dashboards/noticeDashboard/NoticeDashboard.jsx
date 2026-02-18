@@ -585,12 +585,14 @@ const NoticeDashboard = ({
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
     const [isDetailPage, setIsDetailPage] = useState(false);
     const [isDetailPageData, setIsDetailPageData] = useState([]);
-    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData) => {
+    const [filterColumns, setFilterColumns] = useState([]);
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
+        setFilterColumns(filterColumn);
         setIsDetailPageData(isDetailData);
     };
     const userRole = decryptData(localStorage.getItem("user_role"));
@@ -742,6 +744,7 @@ const NoticeDashboard = ({
                                             (item) => item.assigned_to
                                         ),
                                         NoticeDistributionByAuthority?.notice_records,
+                                        NoticeDistributionByAuthority?.columns
                                     );
                                 }}
                             >
@@ -792,6 +795,7 @@ const NoticeDashboard = ({
                                             (item) => item.assigned_to
                                         ),
                                         numberOfNoticesAssignedToEachTeamMember?.notice_records,
+                                        numberOfNoticesAssignedToEachTeamMember?.columns
                                     );
                                 }}
                             >
@@ -842,6 +846,7 @@ const NoticeDashboard = ({
                                             (item) => item.applicable_act
                                         ),
                                         noticeTypeBreakdown?.notice_records,
+                                        noticeTypeBreakdown?.columns
                                     )
                                 }}
                             >
@@ -891,6 +896,7 @@ const NoticeDashboard = ({
                                             (item) => item.applicable_act
                                         ),
                                         ApplicableActsAnalysis?.notice_records,
+                                        ApplicableActsAnalysis?.columns
                                     )
                                 }}
                             >
@@ -943,6 +949,7 @@ const NoticeDashboard = ({
                                             (item) => item.assigned_to
                                         ),
                                        numberOfNoticesAssignedToEachTeamMember?.notice_records,
+                                       numberOfNoticesAssignedToEachTeamMember?.columns
                                     )
                                 }
 
@@ -993,6 +1000,7 @@ const NoticeDashboard = ({
                                             (item) => item.acknowledged_by
                                         ),
                                         countOfAcknowledgmentRates?.notice_records,
+                                        countOfAcknowledgmentRates?.columns
                                     )
                                 }
 
@@ -1081,6 +1089,7 @@ const NoticeDashboard = ({
                                             (item) => item.acknowledged_by
                                         ),
                                         distributionOfResponseStatus?.notice_records,
+                                        distributionOfResponseStatus?.columns
                                     )
                                 }
 
@@ -1128,6 +1137,7 @@ const NoticeDashboard = ({
                                             (item) => item.acknowledged_by
                                         ),
                                         clientDocumentSubmission?.notice_records,
+                                        clientDocumentSubmission?.columns
                                     )
                                 }
 
@@ -1160,6 +1170,7 @@ const NoticeDashboard = ({
                 isDetailPage={isDetailPage}
                 setIsDetailPage={setIsDetailPage}
                 isDetailPageData={isDetailPageData}
+                 filterColumns={filterColumns}
             />
         </div>
     );

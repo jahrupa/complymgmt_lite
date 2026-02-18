@@ -113,12 +113,14 @@ const AuditAndVisitDashboard = ({
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState("");
   const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData) => {
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
+    setFilterColumns(filterColumn);
     setIsDetailPageData(isDetailData);
   };
   const data = AuditCountByStateSegmented?.top_count || [];
@@ -737,7 +739,8 @@ const AuditAndVisitDashboard = ({
                     AuditCountByServiceType?.rest_counts?.map(
                       (item) => item.service_type
                     ),
-                    AuditCountByServiceType?.auditRecord
+                    AuditCountByServiceType?.auditRecord,
+                    AuditCountByServiceType?.columns
                   );
                 }}
               >
@@ -781,7 +784,8 @@ const AuditAndVisitDashboard = ({
                     AuditCountByStateSegmented?.rest_count?.map(
                       (item) => item.state
                     ),
-                    AuditCountByServiceType?.auditRecord
+                    AuditCountByServiceType?.auditRecord,
+                    AuditCountByServiceType?.columns
 
                   );
                 }}
@@ -828,7 +832,8 @@ const AuditAndVisitDashboard = ({
                     AuditPercentageMeetingSLA?.rest_counts?.map(
                       (item) => item.company_name
                     ),
-                    AuditPercentageMeetingSLA?.auditRecord
+                    AuditPercentageMeetingSLA?.auditRecord,
+                    AuditPercentageMeetingSLA?.columns
 
                   );
                 }}
@@ -873,7 +878,8 @@ const AuditAndVisitDashboard = ({
                     checklistApprovalRateByCompanyName?.rest_counts?.map(
                       (item) => item.company_name
                     ),
-                    checklistApprovalRateByCompanyName?.auditRecord
+                    checklistApprovalRateByCompanyName?.auditRecord,
+                    checklistApprovalRateByCompanyName?.columns
 
                   );
                 }}
@@ -920,7 +926,8 @@ const AuditAndVisitDashboard = ({
                     riskLevel?.rest_counts?.map(
                       (item) => item.service_type
                     ),
-                    riskLevel?.auditRecord
+                    riskLevel?.auditRecord,
+                    riskLevel?.columns
 
                   );
                 }}
@@ -962,7 +969,8 @@ const AuditAndVisitDashboard = ({
                     escalationTriggeredRateByState?.rest_counts?.map(
                       (item) => item.state
                     ),
-                    escalationTriggeredRateByState?.auditRecord
+                    escalationTriggeredRateByState?.auditRecord,
+                    escalationTriggeredRateByState?.columns
 
                   );
                 }}
@@ -1009,7 +1017,8 @@ const AuditAndVisitDashboard = ({
                     riskLevelBreakdownByServiceType?.rest_counts?.map(
                       (item) => item.audit_status
                     ),
-                    riskLevelBreakdownByServiceType?.auditRecord
+                    riskLevelBreakdownByServiceType?.auditRecord,
+                    riskLevelBreakdownByServiceType?.columns
 
                   );
                 }}
@@ -1053,7 +1062,8 @@ const AuditAndVisitDashboard = ({
                     countOfAuditStatus?.rest_counts?.map(
                       (item) => item.audit_status
                     ),
-                    countOfAuditStatus?.auditRecord
+                    countOfAuditStatus?.auditRecord,
+                    countOfAuditStatus?.columns
 
                   );
                 }}
@@ -1081,6 +1091,7 @@ const AuditAndVisitDashboard = ({
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         isDetailPageData={isDetailPageData}
+         filterColumns={filterColumns}
       />
     </div>
   );
