@@ -689,14 +689,18 @@ const PayrollServices = ({
 
                                 <div
                                     className="dashboard-icon ms-2"
-                                    onClick={(e) => {
+                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setIsSnackbarsOpen({
-                                            ...issnackbarsOpen,
-                                            open: true,
-                                            message: "No Data available",
-                                            severityType: "info"
-                                        });
+                                        handleOpenDrawer(
+                                            "left",
+                                            "Breakdown of Investment declaration status by Company",
+                                            investmentData?.rest_delays,
+                                            investmentData?.rest_delays?.map(
+                                                (item) => item.company_name
+                                            ),
+                                            investmentData?.payrollServicesRecords,
+                                            investmentData?.columns
+                                        );
                                     }}
                                 >
                                     <ArrowUpRight />

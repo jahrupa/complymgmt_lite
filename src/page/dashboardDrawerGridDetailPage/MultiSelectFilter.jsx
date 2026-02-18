@@ -8,14 +8,18 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
   const [filters, setFilters] = useState({});
   const dropdownRef = useRef(null);
 
-  const columns = rowData.length > 0
-  ? Object.keys(rowData[0]).filter(key => {
-      if (key === '_id') return false;
-      if (!filterColumns.length) return true;
-      return filterColumns.includes(key);
-    })
-  : [];
-
+  // const columns = rowData.length > 0
+  // ? Object.keys(rowData[0]).filter(key => {
+  //     if (key === '_id') return false;
+  //     if (!filterColumns.length) return true;
+  //     return filterColumns.includes(key);
+  //   })
+  // : [];
+const columns = filterColumns.length > 0
+  ? filterColumns
+  : rowData.length > 0
+    ? Object.keys(rowData[0]).filter(key => key !== '_id')
+    : [];
 
   const getUniqueValues = (columnName) => {
     const values = rowData.map(row => row[columnName]).filter(Boolean);
