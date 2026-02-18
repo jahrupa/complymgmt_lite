@@ -194,13 +194,15 @@ const PayrollServices = ({
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
     const [isDetailPage, setIsDetailPage] = useState(false);
     const [isDetailPageData, setIsDetailPageData] = useState([]);
+    const [filterColumns, setFilterColumns] = useState([]);
     const userRole = decryptData(localStorage.getItem("user_role"));
-    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory,isDetailData) => {
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory,isDetailData,filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
+        setFilterColumns(filterColumn);
         setIsDetailPageData(isDetailData);
     };
     const columnDefs = useMemo(
@@ -741,7 +743,8 @@ const PayrollServices = ({
                                             dataRequestAndClientDataReceived?.rest_delays?.map(
                                                 (item) => item.company_name
                                             ),
-                                            dataRequestAndClientDataReceived?.payrollServicesRecords
+                                            dataRequestAndClientDataReceived?.payrollServicesRecords,
+                                            dataRequestAndClientDataReceived?.columns
                                         );
                                     }}
                                 >
@@ -927,6 +930,7 @@ const PayrollServices = ({
                 isDetailPage={isDetailPage}
                 setIsDetailPage={setIsDetailPage}
                 isDetailPageData={isDetailPageData}
+                filterColumns={filterColumns}
             />
         </div>
 

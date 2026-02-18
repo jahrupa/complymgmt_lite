@@ -6,7 +6,7 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import MultiSelectFilter from "./MultiSelectFilter";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-function DashboardDrawerGridDetailPage({rowData}) {
+function DashboardDrawerGridDetailPage({rowData,filterColumns}) {
     const [filters, setFilters] = useState({});
 
 
@@ -48,14 +48,9 @@ function DashboardDrawerGridDetailPage({rowData}) {
     return (
         <div className="app-container">
             <div className="app-wrapper">
-                {/* <div className="app-header">
-                    <h1 className="app-title">Audit Data Management</h1>
-                    <p className="app-subtitle">Filter and view audit records with advanced multi-column filtering</p>
-                </div> */}
-
                 <div className="app-card">
                     <div className="app-filter-section">
-                        <MultiSelectFilter rowData={rowData} onFilterApply={handleFilterApply} />
+                        <MultiSelectFilter rowData={rowData}  filterColumns={filterColumns} onFilterApply={handleFilterApply} />
                     </div>
 
                     <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>

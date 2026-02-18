@@ -2,13 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X, Filter } from 'lucide-react';
 import './MultiSelectFilter.css';
 
-const MultiSelectFilter = ({ rowData, onFilterApply }) => {
+const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState(null);
   const [filters, setFilters] = useState({});
   const dropdownRef = useRef(null);
 
-  const columns = rowData.length > 0 ? Object.keys(rowData[0]).filter(key => key !== '_id') : [];
+  const columns = rowData.length > 0
+  ? Object.keys(rowData[0]).filter(key => {
+      if (key === '_id') return false;
+      if (!filterColumns.length) return true;
+      return filterColumns.includes(key);
+    })
+  : [];
+
 
   const getUniqueValues = (columnName) => {
     const values = rowData.map(row => row[columnName]).filter(Boolean);

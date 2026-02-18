@@ -21,7 +21,8 @@ export default function DashboardDrawerGrid({
   chartXaxisCategory,
   setIsDetailPage,
   isDetailPage,
-  isDetailPageData
+  isDetailPageData,
+  filterColumns
 }) {
   const [rowData, setRowData] = React.useState([]);
   const [columnDefs, setColumnDefs] = React.useState([]);
@@ -195,6 +196,7 @@ export default function DashboardDrawerGrid({
           <>
             <DashboardDrawerGridDetailPage
               rowData={isDetailPageData}
+              filterColumns={filterColumns} 
             />
           </>
 
