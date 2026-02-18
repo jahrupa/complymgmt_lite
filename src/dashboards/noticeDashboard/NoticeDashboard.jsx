@@ -790,12 +790,12 @@ const NoticeDashboard = ({
                                     handleOpenDrawer(
                                         "right",
                                         "Number of notices assigned...",
-                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts,
-                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
+                                        stateWiseNoticeCount?.rest_counts,
+                                        stateWiseNoticeCount?.rest_counts?.map(
                                             (item) => item.assigned_to
                                         ),
-                                        numberOfNoticesAssignedToEachTeamMember?.notice_records,
-                                        numberOfNoticesAssignedToEachTeamMember?.columns
+                                        stateWiseNoticeCount?.notice_records,
+                                        stateWiseNoticeCount?.columns
                                     );
                                 }}
                             >
