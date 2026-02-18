@@ -134,13 +134,23 @@ const ReturnsAndSubmissions = ({
   };
 
   const applicableReturnsByLocationArray = ensureArray(applicableReturnsRaw, []);
+  
+const dataArray = applicableReturnsRaw?.top_count || [];
+
+const series = dataArray.length
+  ? Object.keys(dataArray[0])
+      .filter(key => key.startsWith("count_"))
+      .map(key => ({
+        name: key
+          .replace("count_", "")
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, l => l.toUpperCase()),
+        data: dataArray.map(item => item[key] || 0)
+      }))
+  : [];
 
   const applicableReturnsByLocationFormat = {
-    series: [
-      { name: 'Empty count', data: applicableReturnsByLocationArray.map((item) => item?.count_empty || 0) },
-      { name: 'Count filed on time', data: applicableReturnsByLocationArray.map((item) => item?.count_filed_on_time || 0) },
-      { name: 'Count late filing', data: applicableReturnsByLocationArray.map((item) => item?.count_late_filing || 0) },
-    ],
+    series: series,
     options: {
       chart: { type: 'bar', height: 350, stacked: true },
       colors: ["#14b8a6", "#2dd4bf", "#5eead4"],
@@ -156,7 +166,7 @@ const ReturnsAndSubmissions = ({
       },
       stroke: { width: 1, colors: ['#fff'] },
       title: { text: 'Escalation Counts' },
-      xaxis: { categories: applicableReturnsByLocationArray.map((i) => i?.return_name || "") },
+       xaxis: { categories: dataArray.map(item => item.returns || "") },
       yaxis: { title: { text: undefined } },
       legend: { position: 'top', horizontalAlign: 'left', offsetX: 40 }
     }
