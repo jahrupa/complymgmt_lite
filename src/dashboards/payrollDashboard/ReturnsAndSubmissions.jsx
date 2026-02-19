@@ -348,7 +348,7 @@ const series = dataArray.length
                       (item) => item.pending_from
                     ),
                     comparisonOfReturnApplicability?.returns_records,
-                    comparisonOfReturnApplicability?.coloums 
+                    comparisonOfReturnApplicability?.columns 
                   )
                 }
 

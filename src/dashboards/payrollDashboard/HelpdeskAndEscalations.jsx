@@ -583,6 +583,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
     setIsDetailPageData(isDetailData);
+    setFilterColumns(filterColumn);
 
   };
 
