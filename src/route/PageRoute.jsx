@@ -119,7 +119,6 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
-            <Route path="/test" element={<DashboardDrawerGridDetailPage />} />
             
 
             {/* notification sub-routes */}
