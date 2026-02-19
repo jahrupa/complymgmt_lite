@@ -332,13 +332,18 @@ const GeneralHelpdesk = ({
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const [isDetailPage, setIsDetailPage] = useState(false);
+    const [isDetailPageData, setIsDetailPageData] = useState([]);
+    const [filterColumns, setFilterColumns] = useState([]);
     const userRole = decryptData(localStorage.getItem("user_role"));
-    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
+        setIsDetailPageData(isDetailData);
+        setFilterColumns(filterColumn);
     };
     useEffect(() => {
         const fetchData = async () => {
@@ -412,11 +417,11 @@ const GeneralHelpdesk = ({
     const handleSelect = (id) => {
         if (canSelect) toggleChartSelection(id);
     };
-  const shouldShow = (id) => {
-    return widgetsList.flat().some(
-        item => item.widget_id?.toLowerCase() === id.toLowerCase()
-    );
-};
+    const shouldShow = (id) => {
+        return widgetsList.flat().some(
+            item => item.widget_id?.toLowerCase() === id.toLowerCase()
+        );
+    };
 
     return (
         <div>
@@ -453,7 +458,10 @@ const GeneralHelpdesk = ({
                                         closedVsOpenCases?.rest_assigned,
                                         closedVsOpenCases?.rest_assigned?.map(
                                             (item) => item.assigned_to
-                                        )
+                                        ),
+                                        closedVsOpenCases?.generalHelpdeskRecords,
+                                        closedVsOpenCases?.columns
+
                                     )
                                 }}
                             >
@@ -501,7 +509,9 @@ const GeneralHelpdesk = ({
                                         assignedUser?.rest_assigned_counts,
                                         assignedUser?.rest_assigned_counts?.map(
                                             (item) => item.assigned_to
-                                        )
+                                        ),
+                                        assignedUser?.generalHelpdeskRecords,
+                                        assignedUser?.columns
                                     )
                                 }
 
@@ -555,7 +565,9 @@ const GeneralHelpdesk = ({
                                         documentPendingFrom?.rest_docs_pending,
                                         documentPendingFrom?.rest_docs_pending?.map(
                                             (item) => item.documents_pending_from
-                                        )
+                                        ),
+                                        documentPendingFrom?.generalHelpdeskRecords,
+                                        documentPendingFrom?.columns
                                     )
                                 }}
                             >
@@ -604,7 +616,9 @@ const GeneralHelpdesk = ({
                                         openVsCloseIssueCategory?.rest_counts,
                                         openVsCloseIssueCategory?.rest_counts?.map(
                                             (item) => item.issue_category
-                                        )
+                                        ),
+                                        openVsCloseIssueCategory?.generalHelpdeskRecords,
+                                        openVsCloseIssueCategory?.columns
                                     )
                                 }}
                             >
@@ -633,6 +647,10 @@ const GeneralHelpdesk = ({
                 data={drawerData} //direct array
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}
+                isDetailPage={isDetailPage}
+                setIsDetailPage={setIsDetailPage}
+                isDetailPageData={isDetailPageData}
+                 filterColumns={filterColumns}
             />
         </div>
     );
