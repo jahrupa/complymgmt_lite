@@ -9,6 +9,7 @@ import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
 import { Link, useNavigate } from "react-router-dom";
+import DashboardDrawerGrid from "../DashboardDrawer";
 
 const CockpitComplince = ({
   data,
@@ -27,11 +28,18 @@ const CockpitComplince = ({
     message: "",
     severityType: "",
   });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerAnchor, setDrawerAnchor] = useState("right");
+  const [drawerData, setDrawerData] = useState("");
+  const [chartXaxisCategory, setChartXaxisCategory] = useState("");
+  const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
+  const [isDetailPage, setIsDetailPage] = useState(false);
+  const [filterColumns, setFilterColumns] = useState([]);
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
   const itemsPerPage = 10; // number of cards per page
-  
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
@@ -267,19 +275,9 @@ const CockpitComplince = ({
       ],
     },
   ];
-  const handleChartNavigate = () => {
-    if (!current?.user_name) {
-      navigate("/compliance_cockpit/dashboard/overall_compliance_score", {
-        state: {
-          score: overallChartSeries,
-          overallComplianceScore: data?.overall_compliance_score,
-        },
-      });
-    }
-    // alert("First you need to select a user");
-  };
+
   const toggleChartSelection = (chartId) => {
-    console.log(chartId,'chartId')
+    console.log(chartId, 'chartId')
     if (!current?.user_name) {
       // alert("First you need to select a user");
       setIsSnackbarsOpen({
@@ -304,7 +302,12 @@ const CockpitComplince = ({
   const handleSelect = (id) => {
     if (canSelect) toggleChartSelection(id);
   };
-
+  const handleOpenDrawer = (anchor, data = [], filterColumn) => {
+    setDrawerAnchor(anchor);
+    setDrawerOpen(true);
+    setDrawerData(data);
+    setFilterColumns(filterColumn);
+  };
   return (
     <div className="">
       <Snackbars
@@ -330,6 +333,7 @@ const CockpitComplince = ({
           </div>
 
           <div className="header-stats">
+
             <div className="header-stat">
               <span className="stat-value">
                 {data?.total_clients?.toLocaleString()}
@@ -345,6 +349,16 @@ const CockpitComplince = ({
               <span className="stat-label-cock-pit-complince">
                 Overall Score
               </span>
+            </div>
+            <div className="align-content-center">
+              <button className="btn btn-primary " onClick={(e) => {
+                e.stopPropagation();
+                handleOpenDrawer(
+                  "left",
+                )
+              }}>
+                View Details
+              </button>
             </div>
           </div>
         </div>
@@ -892,6 +906,30 @@ const CockpitComplince = ({
           </div>
         )}
       </div>
+      <DashboardDrawerGrid
+        anchor={drawerAnchor}
+        open={drawerOpen}
+        onClose={() => { setDrawerOpen(false); setIsDetailPageDataFor("Returns"); }}
+        // this is wirking
+        data={isDetailPageDataFor === 'Challans' ? data?.data?.challans
+          : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
+            : isDetailPageDataFor === 'Registers' ? data?.data?.registers
+              : data?.data?.returns} //direct array
+        title={'Compliance Details - ' + isDetailPageDataFor}
+        chartXaxisCategory={chartXaxisCategory}
+        isDetailPage={isDetailPage}
+        setIsDetailPage={setIsDetailPage}
+        // this was pass for view detail page
+        isDetailPageData={isDetailPageDataFor === 'Challans' ? data?.data?.challans
+          : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
+            : isDetailPageDataFor === 'Registers' ? data?.data?.registers
+              : data?.data?.returns}  //direct array but not working properly
+        filterColumns={filterColumns}
+        isCockpitComplianceDetailPage={true}
+        setIsDetailPageDataFor={setIsDetailPageDataFor}
+        isDetailPageDataFor={isDetailPageDataFor}
+        buttons={['Returns','Challans', 'Licenses', 'Registers']}
+      />
     </div>
   );
 };

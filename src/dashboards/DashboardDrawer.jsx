@@ -22,7 +22,11 @@ export default function DashboardDrawerGrid({
   setIsDetailPage,
   isDetailPage,
   isDetailPageData,
-  filterColumns
+  filterColumns,
+  isCockpitComplianceDetailPage,
+  setIsDetailPageDataFor,
+  isDetailPageDataFor,
+  buttons,
 }) {
   const [rowData, setRowData] = React.useState([]);
   const [columnDefs, setColumnDefs] = React.useState([]);
@@ -30,6 +34,7 @@ export default function DashboardDrawerGrid({
   const [chartOptions, setChartOptions] = React.useState({});
   const [chartSeries, setChartSeries] = React.useState([]);
   const [error, setError] = React.useState(""); // error state
+  console.log(isDetailPageData,'isDetailPageData2')
   // Set rowData & columnDefs
   React.useEffect(() => {
     try {
@@ -148,7 +153,7 @@ export default function DashboardDrawerGrid({
         {/* HEADER */}
         <div className='d-flex justify-content-between align-items-center mb-2'>
           <h4 className="ms-2 fs-19 fw-600" style={{ color: 'gray' }}>{title}</h4>
-          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); setIsDetailPage(false); }}>
+          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); setIsDetailPage(false); setIsDetailPageDataFor("Returns"); }}>
             <X />
           </div>
         </div>
@@ -179,7 +184,28 @@ export default function DashboardDrawerGrid({
           </div>
         )} */}
         <div className="d-flex justify-content-end">
-          <button className="btn btn-primary " onClick={() => { setIsDetailPage(!isDetailPage); }}>{isDetailPage ? "Back" : "View Details"}</button>
+          {isCockpitComplianceDetailPage ?
+            (
+              <div className='d-flex justify-content-between gap-3'>
+                {buttons.map((item) => (
+                  <button
+                    key={item}
+                    className="btn btn-primary"
+                    style={{
+                      border: isDetailPageDataFor === item ? '1px solid #0d6efd' : 'opacity(0.6)',
+                      backgroundColor: isDetailPageDataFor === item ? 'rgb(13 110 253)' : 'rgba(13, 110, 253, 0.6)',
+                    }}
+                    onClick={() => setIsDetailPageDataFor(item)}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )
+            : (
+              <button className="btn btn-primary " onClick={() => { setIsDetailPage(!isDetailPage); }}>{isDetailPage ? "Back" : "View Details"}</button>
+
+            )}
         </div>
         {/* Chart Rendering */}
         {chartType && chartSeries.length > 0 && !error && (
@@ -196,7 +222,7 @@ export default function DashboardDrawerGrid({
           <>
             <DashboardDrawerGridDetailPage
               rowData={isDetailPageData}
-              filterColumns={filterColumns} 
+              filterColumns={filterColumns}
             />
           </>
 

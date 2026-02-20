@@ -184,26 +184,7 @@ const ClientOnbordingDashboard = ({ data }) => {
 
         <div className="charts-grid mb-4">
           <div className="chart-card">
-            <div
-              className="d-flex justify-content-end align-items-center" style={{ cursor:'pointer'}}>
-              <div
-                className="dashboard-icon ms-2"
-                onClick={() => {
-                  handleOpenDrawer(
-                    "right",
-                    "Client Distribution by Size",
-                    sizeChartOptions?.size_wise_client,
-                    sizeChartOptions?.size_wise_client?.map(
-                      (item) => item.issue_category
-                    ),
-                    sizeChartOptions?.generalHelpdeskRecords,
-                    sizeChartOptions?.columns
-                  )
-                }}
-              >
-                <ArrowUpRight />
-              </div>
-            </div>
+           
             <Chart
               options={sizeChartOptions}
               series={clientSizeData.series}
@@ -213,24 +194,7 @@ const ClientOnbordingDashboard = ({ data }) => {
 
           </div>
           <div className="chart-card">
-             <div
-              className="d-flex justify-content-end align-items-center" style={{ cursor:'pointer'}}>
-              <div
-                className="dashboard-icon ms-2"
-                onClick={() => {
-                  handleOpenDrawer(
-                    "left",
-                    "Industries by Client Count",
-                    industryData?.data,
-                    industryData?.categories,
-                    industryData?.generalHelpdeskRecords,
-                    industryData?.columns
-                  )
-                }}
-              >
-                <ArrowUpRight />
-              </div>
-            </div>
+
             <Chart
               options={industryChartOptions}
               series={[{ data: industryData.series }]}
@@ -242,24 +206,7 @@ const ClientOnbordingDashboard = ({ data }) => {
       </div>
       <div className="client-onboarding-content">
         <div className="chart-card">
-           <div
-              className="d-flex justify-content-end align-items-center" style={{ cursor:'pointer'}}>
-              <div
-                className="dashboard-icon ms-2"
-                onClick={() => {
-                  handleOpenDrawer(
-                    "left",
-                    "Services in Portfolio",
-                    servicesData?.data,
-                    servicesData?.categories,
-                    servicesData?.generalHelpdeskRecords,
-                    servicesData?.columns
-                  )
-                }}
-              >
-                <ArrowUpRight />
-              </div>
-            </div>
+           
           <Chart
             options={servicesChartOptions}
             series={[{ data: servicesData.series }]}

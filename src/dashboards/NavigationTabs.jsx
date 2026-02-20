@@ -7,7 +7,7 @@ import {
     createOrUpdateWidgetMapping,
     fetchClientOnboardingByCompany,
     fetchClientOnboardingPortfolio,
-    fetchComplainceCockpit,
+    fetchComplianceCockpit,
     fetchComplainceCockpitByCompany,
     fetchGeneralCompaiancePortfolio,
     fetchGeneralComplianceByCompany,
@@ -264,7 +264,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         const fetchCockpitData = async () => {
             const [a, b] = await Promise.allSettled([
                 fetchComplainceCockpitByCompany(selectedCompany),
-                fetchComplainceCockpit()
+                fetchComplianceCockpit()
             ]);
 
             setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);

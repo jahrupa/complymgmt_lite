@@ -1444,15 +1444,15 @@ export const fetchComplainceCockpitByCompany = async (company_name) => {
 };
 
 
-export const fetchCockPitCompliancePortfolio = async () => {
-  try {
-    const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
+// export const fetchCockPitCompliancePortfolio = async () => {
+//   try {
+//     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
+//     return response.data;
+//   } catch (error) {
+//     // console.error("Error fetching all Client", error);
+//     throw error;
+//   }
+// };
 
 
 export const fetchClientOnboardingPortfolio = async () => {
@@ -1474,7 +1474,7 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
     throw error;
   }
 };
-export const fetchComplainceCockpit = async () => {
+export const fetchComplianceCockpit = async () => {
   try {
     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
     return response.data;
