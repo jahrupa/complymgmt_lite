@@ -203,7 +203,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   };
   const [clientDelayFlags, setClientDelayFlags] = React.useState([]);
   const clientDelayFlagsFormat = {
-    series: clientDelayFlags?.client_delay?.map((item) => item.count) || [],
+    series: clientDelayFlags?.top_counts?.map((item) => item.count) || [],
     options: {
       chart: {
         width: 380,
@@ -228,7 +228,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       },
 
       labels:
-        clientDelayFlags?.client_delay?.map((item) => item.delay_type) || [],
+        clientDelayFlags?.top_counts?.map((item) => item.delay_type) || [],
       legend: {
         position: "top", // 👈 moves Yes/No below the chart
         horizontalAlign: "center",
@@ -257,7 +257,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   };
   const [governmentDelayFlags, setGovernmentDelayFlags] = React.useState([]);
   const governmentDelayFlagsFormat = {
-    series: governmentDelayFlags?.govt_delay?.map((item) => item.count) || [],
+    series: governmentDelayFlags?.top_counts?.map((item) => item.count) || [],
     options: {
       chart: {
         width: 380,
@@ -282,7 +282,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       },
 
       labels:
-        governmentDelayFlags?.govt_delay?.map((item) => item.delay_type) || [],
+        governmentDelayFlags?.top_counts?.map((item) => item.delay_type) || [],
       legend: {
         position: "top", // 👈 moves Yes/No below the chart
         horizontalAlign: "center",
@@ -401,7 +401,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     series: [
       {
         name: "Number of Tickets",
-        data: communicationType?.map((item) => item.count || []) || [],
+        data: communicationType?.top_counts?.map((item) => item.count || []) || [],
       },
     ],
     options: {
@@ -451,7 +451,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       },
       xaxis: {
         categories:
-          communicationType?.map((item) => item.communication_type || []) || [],
+          communicationType?.top_counts?.map((item) => item.communication_type || []) || [],
         // labels: {
         //     formatter: function (val) {
         //         return val + "K"
@@ -573,12 +573,17 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState("");
   const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+  const [isDetailPage, setIsDetailPage] = useState(false);
+  const [isDetailPageData, setIsDetailPageData] = useState([]);
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
+    setIsDetailPageData(isDetailData);
+
   };
 
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -605,13 +610,13 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       if (communicationTypeRes.status === "fulfilled") {
         setCommunicationType(communicationTypeRes.value);
       } else {
-     
+
         setCommunicationType(communicationTypeRes.reason?.status || []);
       }
       if (helpdeskTicketsRes.status === "fulfilled") {
         setHelpdeskTicketsRaisedByCompany(helpdeskTicketsRes.value);
       } else {
-    
+
         setHelpdeskTicketsRaisedByCompany(
           helpdeskTicketsRes.reason?.status || []
         );
@@ -619,7 +624,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       if (helpdeskStatusRes.status === "fulfilled") {
         setCloseVsOpenCases(helpdeskStatusRes.value);
       } else {
-   
+
         setCloseVsOpenCases(helpdeskStatusRes.reason?.status || []);
       }
       if (ticketsDistributionRes.status === "fulfilled") {
@@ -630,7 +635,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       if (helpdeskPendingRes.status === "fulfilled") {
         setProportionofcases(helpdeskPendingRes.value);
       } else {
-   
+
         setProportionofcases(helpdeskPendingRes.reason?.status || []);
       }
       if (totalDelayFlags.status === "fulfilled") {
@@ -641,7 +646,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       if (totalDelayFlagsByGovt.status === "fulfilled") {
         setGovernmentDelayFlags(totalDelayFlagsByGovt.value);
       } else {
-    
+
         setGovernmentDelayFlags(totalDelayFlagsByGovt.reason?.status || []);
       }
     };
@@ -715,7 +720,9 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     ProportionOfCases?.rest_count,
                     ProportionOfCases?.rest_count?.map(
                       (item) => item.pending_from
-                    )
+                    ),
+                    ProportionOfCases?.helpdeskRecords,
+                    ProportionOfCases?.columns
                   )
                 }
 
@@ -764,7 +771,9 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     closedVsOpenCases?.rest_issue_sub_type_status,
                     closedVsOpenCases?.rest_issue_sub_type_status?.map(
                       (item) => item.issue_sub_type
-                    )
+                    ),
+                    closedVsOpenCases?.helpdeskRecords,
+                    closedVsOpenCases?.columns
                   )
                 }
 
@@ -807,13 +816,19 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               <div className="dashboard-icon ms-2"
                 onClick={(e) => {
                   e.stopPropagation();   // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
-                }}
+                  handleOpenDrawer(
+                    "left",
+                    "Analysis of client delay flags tickets in PF_ESIC_Helpdesk",
+                    clientDelayFlags?.top_counts,
+                    clientDelayFlags?.top_counts?.map(
+                      (item) => item.delay_type
+                    ),
+                    clientDelayFlags?.helpdeskRecords,
+                    clientDelayFlags?.columns
+                  )
+                }
+
+                }
               >
                 <ArrowUpRight />
               </div>
@@ -851,13 +866,19 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               <div className="dashboard-icon ms-2"
                 onClick={(e) => {
                   e.stopPropagation();   // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
-                }}
+                  handleOpenDrawer(
+                    "left",
+                    " Number of tickets by Communication Type in PF_ESIC_Helpdesk",
+                    communicationType?.top_counts,
+                    communicationType?.top_counts?.map(
+                      (item) => item.communication_type
+                    ),
+                    communicationType?.helpdeskRecords,
+                    communicationType?.columns
+                  )
+                }
+
+                }
               >
                 <ArrowUpRight />
               </div>
@@ -900,8 +921,11 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     ticketDistribution?.rest_assigned_to_counts,
                     ticketDistribution?.rest_assigned_to_counts?.map(
                       (item) => item.assigned_to
-                    )
+                    ),
+                    ticketDistribution?.helpdeskRecords,
+                    ticketDistribution?.columns
                   )
+
                 }}
               >
                 <ArrowUpRight />
@@ -941,13 +965,19 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
               <div className="dashboard-icon ms-2"
                 onClick={(e) => {
                   e.stopPropagation();   // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
-                }}
+                  handleOpenDrawer(
+                    "left",
+                    "Government delay flags tickets in PF_ESIC_Helpdesk",
+                    governmentDelayFlags?.top_counts,
+                    governmentDelayFlags?.top_counts?.map(
+                      (item) => item.delay_type
+                    ),
+                    governmentDelayFlags?.helpdeskRecords,
+                    governmentDelayFlags?.columns
+                  )
+                }
+
+                }
               >
                 <ArrowUpRight />
               </div>
@@ -990,7 +1020,9 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
                     helpdeskTicketsRaisedByCompany?.rest_company_tickets_count,
                     helpdeskTicketsRaisedByCompany?.rest_company_tickets_count?.map(
                       (item) => item.company_name
-                    )
+                    ),
+                    helpdeskTicketsRaisedByCompany?.helpdeskRecords,
+                    helpdeskTicketsRaisedByCompany?.columns
                   )
                 }}
               >
@@ -1017,6 +1049,10 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
         data={drawerData} //direct array
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}
+        isDetailPage={isDetailPage}
+        setIsDetailPage={setIsDetailPage}
+        isDetailPageData={isDetailPageData}
+        filterColumns={filterColumns}
       />
     </div>
   );

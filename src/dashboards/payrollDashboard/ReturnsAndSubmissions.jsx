@@ -56,13 +56,18 @@ const ReturnsAndSubmissions = ({
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState([]);
   const [chartXaxisCategory, setChartXaxisCategory] = useState([]);
-
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategories = []) => {
+  const [isDetailPage, setIsDetailPage] = useState(false);
+  const [isDetailPageData, setIsDetailPageData] = useState([]);
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategories = [], isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategories);
+    setIsDetailPageData(isDetailData);
+    setFilterColumns(filterColumn);
+
   };
 
   // --- state slices for API results ---
@@ -331,7 +336,9 @@ const ReturnsAndSubmissions = ({
                     comparisonOfReturnApplicability?.rest_count,
                     comparisonOfReturnApplicability?.rest_count?.map(
                       (item) => item.pending_from
-                    )
+                    ),
+                    comparisonOfReturnApplicability?.returns_records,
+                    comparisonOfReturnApplicability?.coloums 
                   )
                 }
 
@@ -374,12 +381,16 @@ const ReturnsAndSubmissions = ({
                 className="dashboard-icon ms-2"
                 onClick={(e) => {
                   e.stopPropagation();   // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
+                  handleOpenDrawer(
+                    "right",
+                    "Frequency-wise distribution of applicable returns",
+                    ApplicableReturnsCount?.frequency_returns,
+                    ApplicableReturnsCount?.frequency_returns?.map(
+                      (item) => item.frequency
+                    ),
+                    ApplicableReturnsCount?.returns_records,
+                    ApplicableReturnsCount?.columns
+                  )
                 }
 
                 }
@@ -418,14 +429,21 @@ const ReturnsAndSubmissions = ({
               <div
                 className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
-                }}
+                  e.stopPropagation();   // prevent parent click from firing
+                  handleOpenDrawer(
+                    "right",
+                    "Compliance status comparison across different return types",
+                    applicableReturnsRaw?.rest_count,
+                    applicableReturnsRaw?.rest_count?.map(
+                      (item) => item.returns
+                    ),
+                    applicableReturnsRaw?.returns_records,
+                    applicableReturnsRaw?.columns
+                    
+                  )
+                }
+
+                }
               >
                 <ArrowUpRight />
               </div>
@@ -466,7 +484,9 @@ const ReturnsAndSubmissions = ({
                     "right",
                     "Applicable returns by company",
                     companiesPerReturnsNames?.rest_counts,
-                    companiesPerReturnsNames?.rest_counts?.map(i => i.returns_name)
+                    companiesPerReturnsNames?.rest_counts?.map(i => i.returns_name),
+                    companiesPerReturnsNames?.returns_records,
+                    companiesPerReturnsNames?.columns
                   );
                 }}
               >
@@ -510,7 +530,9 @@ const ReturnsAndSubmissions = ({
                     "right",
                     "Risk distribution by state",
                     riskDistributionByState?.rest_counts,
-                    riskDistributionByState?.rest_counts?.map(i => i.state)
+                    riskDistributionByState?.rest_counts?.map(i => i.state),
+                    riskDistributionByState?.returns_records,
+                    riskDistributionByState?.columns
                   );
                 }}
               >
@@ -553,7 +575,9 @@ const ReturnsAndSubmissions = ({
                     "right",
                     "State-wise analysis of applicable returns",
                     stateWiseAnalysisOfApplicableReturns?.rest_counts,
-                    stateWiseAnalysisOfApplicableReturns?.rest_counts?.map(i => i.state)
+                    stateWiseAnalysisOfApplicableReturns?.rest_counts?.map(i => i.state),
+                    stateWiseAnalysisOfApplicableReturns?.returns_records,
+                    stateWiseAnalysisOfApplicableReturns?.columns
                   );
                 }}
               >
@@ -600,6 +624,10 @@ const ReturnsAndSubmissions = ({
         data={drawerData}
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}
+        isDetailPage={isDetailPage}
+        setIsDetailPage={setIsDetailPage}
+        isDetailPageData={isDetailPageData}
+        filterColumns={filterColumns}
       />
     </div>
 
