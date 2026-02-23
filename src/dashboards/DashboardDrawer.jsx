@@ -27,6 +27,8 @@ export default function DashboardDrawerGrid({
   setIsDetailPageDataFor,
   isDetailPageDataFor,
   buttons,
+  setPage,
+  setLimit
 }) {
   const [rowData, setRowData] = React.useState([]);
   const [columnDefs, setColumnDefs] = React.useState([]);
@@ -34,8 +36,8 @@ export default function DashboardDrawerGrid({
   const [chartOptions, setChartOptions] = React.useState({});
   const [chartSeries, setChartSeries] = React.useState([]);
   const [error, setError] = React.useState(""); // error state
-  console.log(isDetailPageData,'isDetailPageData2')
   // Set rowData & columnDefs
+  const gridRef = React.useRef();
   React.useEffect(() => {
     try {
       setError(""); // reset error
@@ -141,6 +143,19 @@ export default function DashboardDrawerGrid({
     }
   }, [chartType, rowData]);
 
+  const onPaginationChanged = () => {
+    if (gridRef.current) {
+      const currentPage = gridRef.current.api.paginationGetCurrentPage();
+      const pageSize = gridRef.current.api.paginationGetPageSize();
+
+      // AG Grid page index 0 se start hota hai
+      const page = currentPage + 1;
+      setPage(page);
+      setLimit(pageSize);
+      // Yaha API call karo
+      // fetchData(page, pageSize);
+    }
+  };
   return (
     <Drawer
       anchor={anchor}
@@ -187,7 +202,7 @@ export default function DashboardDrawerGrid({
           {isCockpitComplianceDetailPage ?
             (
               <div className='d-flex justify-content-between gap-3'>
-                {buttons.map((item) => (
+                {buttons?.map((item) => (
                   <button
                     key={item}
                     className="btn btn-primary"
@@ -233,6 +248,8 @@ export default function DashboardDrawerGrid({
             columnDefs={columnDefs}
             pagination={true}
             paginationPageSize={50}
+            onPaginationChanged={onPaginationChanged}
+
           />
         </div>}
 

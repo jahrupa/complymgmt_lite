@@ -51,8 +51,8 @@ function DashboardDrawerGridDetailPage({ rowData, filterColumns }) {
       // AG Grid page index 0 se start hota hai
       const page = currentPage + 1;
 
-      console.log("Page:", page);
-      console.log("Limit:", pageSize);
+      // console.log("Page:", page);
+      // console.log("Limit:", pageSize);
 
       // Yaha API call karo
       // fetchData(page, pageSize);

@@ -17,6 +17,8 @@ const CockpitComplince = ({
   setSelectedCharts,
   current,
   shouldShow,
+  setPage,
+  setLimit,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -277,7 +279,6 @@ const CockpitComplince = ({
   ];
 
   const toggleChartSelection = (chartId) => {
-    console.log(chartId, 'chartId')
     if (!current?.user_name) {
       // alert("First you need to select a user");
       setIsSnackbarsOpen({
@@ -929,6 +930,8 @@ const CockpitComplince = ({
         setIsDetailPageDataFor={setIsDetailPageDataFor}
         isDetailPageDataFor={isDetailPageDataFor}
         buttons={['Returns','Challans', 'Licenses', 'Registers']}
+        setPage={setPage}
+        setLimit={setLimit}
       />
     </div>
   );

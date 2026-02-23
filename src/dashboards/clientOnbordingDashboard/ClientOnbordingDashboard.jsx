@@ -181,10 +181,19 @@ const ClientOnbordingDashboard = ({ data }) => {
             <div className="stat-label">Categorized Clients</div>
           </div>
         </div>
-
+        <div className="align-content-center d-flex justify-content-end mb-3">
+          <button className="btn btn-primary " onClick={(e) => {
+            e.stopPropagation();
+            handleOpenDrawer(
+              "left",
+            )
+          }}>
+            View Details
+          </button>
+        </div>
         <div className="charts-grid mb-4">
           <div className="chart-card">
-           
+
             <Chart
               options={sizeChartOptions}
               series={clientSizeData.series}
@@ -206,7 +215,7 @@ const ClientOnbordingDashboard = ({ data }) => {
       </div>
       <div className="client-onboarding-content">
         <div className="chart-card">
-           
+
           <Chart
             options={servicesChartOptions}
             series={[{ data: servicesData.series }]}
@@ -220,7 +229,7 @@ const ClientOnbordingDashboard = ({ data }) => {
         anchor={drawerAnchor}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        data={drawerData} //direct array
+        data={data?.company_details} //direct array
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}
         isDetailPage={isDetailPage}
