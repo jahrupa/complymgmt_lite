@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,6 +17,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -42,6 +43,24 @@ const GroupCompaniesPage = () => {
     message: '',
     severityType: '',
   });
+
+  const [filters, setFilters] = useState({});
+
+  const [filterColumns, setFilterColumns] = useState([]);
+
+  const handleFilterApply = (newFilters,) => {
+    setFilters(newFilters);
+  };
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
   const [groupId, setgroupId] = useState(null)
   const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {
@@ -196,7 +215,7 @@ const GroupCompaniesPage = () => {
           fetchAllGroup(),
         ]);
         setData(GroupData);
-      } catch{
+      } catch {
         // Handle error silently
       }
     };
@@ -315,7 +334,7 @@ const GroupCompaniesPage = () => {
             }}>
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
-            
+
           </div>
         );
       }
@@ -437,10 +456,14 @@ const GroupCompaniesPage = () => {
       <SmallSizeModal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
 
       <div className='table_div p-3'>
-        <div className='d-lg-flex d-md-flex  justify-content-between'>
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
-
-          {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+          <MultiSelectFilter
+            rowData={filteredRowData}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
+          />
+        {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div>
               <button className='crud_btn w-100' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
@@ -456,26 +479,26 @@ const GroupCompaniesPage = () => {
               <span className="text">Approve All</span>
             </button>
           </div> */}
-        </div>
-        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
-          <AgGridReact
-            theme="legacy"
-            ref={gridRef}
-            rowData={data}
-            columnDefs={colDefs}
-            defaultColDef={defaultColDef}
-            editType="fullRow"
-            rowSelection="single"
-            pagination={true}
-            // rowBuffer={rowBuffer}
-            onRowValueChanged={onRowValueChanged}
-
-          />
-        </div>
-
-
       </div>
+      <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+        <AgGridReact
+          theme="legacy"
+          ref={gridRef}
+          rowData={filteredRowData}
+          columnDefs={colDefs}
+          defaultColDef={defaultColDef}
+          editType="fullRow"
+          rowSelection="single"
+          pagination={true}
+          // rowBuffer={rowBuffer}
+          onRowValueChanged={onRowValueChanged}
+
+        />
+      </div>
+
+
     </div>
+    </div >
   );
 };
 

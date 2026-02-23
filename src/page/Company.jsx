@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,6 +26,7 @@ import Toggle from "../component/Toggle";
 import MuiTextAreaField from "../component/MuiInputs/MuiTextAreaField";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import { decryptData } from "./utils/encrypt";
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -62,6 +63,23 @@ const Company = () => {
     severityType: "",
   });
 
+  const [filters, setFilters] = useState({});
+
+  const [filterColumns, setFilterColumns] = useState([]);
+
+  const handleFilterApply = (newFilters,) => {
+    setFilters(newFilters);
+  };
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
   const validate = () => {
     let tempErrors = {};
     if (!current?.company_name)
@@ -92,6 +110,8 @@ const Company = () => {
         message,
         severityType: "success",
       });
+
+
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -100,6 +120,7 @@ const Company = () => {
         message: error?.response?.data?.message,
         severityType: "error",
       });
+
     }
     const updatedData = await fetchAllCompanies();
     setData(updatedData);
@@ -680,12 +701,17 @@ const Company = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
-        <div className="d-lg-flex d-md-flex  justify-content-between">
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
+          />
+           <MultiSelectFilter
+            rowData={filteredRowData}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
           />
         </div>
         <div
@@ -695,7 +721,7 @@ const Company = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"

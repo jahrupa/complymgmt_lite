@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,6 +19,8 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -59,12 +61,30 @@ const UserRolesPage = () => {
     message: '',
     severityType: '',
   });
+
+  const [filters, setFilters] = useState({});
+
+  const [filterColumns, setFilterColumns] = useState([]);
+
+  const handleFilterApply = (newFilters, ) => {
+    setFilters(newFilters);
+  };
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
   const gridRef = useRef();
   const userType = [
-    { id: 0,  value: 'Internal' },
+    { id: 0, value: 'Internal' },
     { id: 1, value: 'External' },
   ];
-   const SystemUserId = decryptData(localStorage.getItem("user_id"));
+  const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -269,7 +289,7 @@ const UserRolesPage = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               //  // console.log(matchedGroup,'matchedGroup')
-               const userId = userType.find((g) => g.value === selectedName) || {};
+              const userId = userType.find((g) => g.value === selectedName) || {};
               setCurrent((prev) => ({
                 ...prev,
                 user_type: selectedName,
@@ -616,21 +636,29 @@ const UserRolesPage = () => {
       </div>
       {/* Table to display data */}
       <div className='table_div p-3'>
-        <div className='d-lg-flex d-md-flex  justify-content-between'>
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+          <MultiSelectFilter
+            rowData={filteredRowData}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
+          />
         </div>
+
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
+            filterColumns={filterColumns}
             editType="fullRow"
             rowSelection="single"
             pagination={true}
             // rowBuffer={rowBuffer}
             onRowValueChanged={onRowValueChanged}
+            
           />
         </div>
       </div>
