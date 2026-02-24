@@ -10,7 +10,8 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
 
   const columns = rowData.length > 0
   ? Object.keys(rowData[0]).filter(key => {
-      if (key === '_id') return false;
+    // key === 'common_attributes' is a nested object that we don't want to show as a filter option
+      if (key === '_id' || key === 'common_attributes') return false;
       if (!filterColumns.length) return true;
       return filterColumns.includes(key);
     })

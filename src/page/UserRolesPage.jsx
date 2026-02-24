@@ -50,6 +50,7 @@ const UserRolesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
   const crudTitle = "Add New User Form"
   const editCrudTitle = "Edit User"
 
@@ -65,8 +66,7 @@ const UserRolesPage = () => {
   const [filters, setFilters] = useState({});
 
   const [filterColumns, setFilterColumns] = useState([]);
-
-  const handleFilterApply = (newFilters, ) => {
+  const handleFilterApply = (newFilters,) => {
     setFilters(newFilters);
   };
   const filteredRowData = useMemo(() => {
@@ -78,7 +78,8 @@ const UserRolesPage = () => {
       });
     });
   }, [data, filters]);
-
+  
+console.log(filteredRowData,'filteredRowData')
   const gridRef = useRef();
   const userType = [
     { id: 0, value: 'Internal' },
@@ -234,6 +235,8 @@ const UserRolesPage = () => {
 
     fetchData();
   }, []);
+
+console.log(filteredRowData,"filterRowData");
 
   const crudForm = () => {
     return (
@@ -639,7 +642,7 @@ const UserRolesPage = () => {
         <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
           <MultiSelectFilter
-            rowData={filteredRowData}
+            rowData={data}
             filterColumns={filterColumns}
             onFilterApply={handleFilterApply}
           />
@@ -658,7 +661,7 @@ const UserRolesPage = () => {
             pagination={true}
             // rowBuffer={rowBuffer}
             onRowValueChanged={onRowValueChanged}
-            
+
           />
         </div>
       </div>

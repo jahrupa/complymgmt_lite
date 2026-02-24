@@ -709,7 +709,7 @@ const Company = () => {
             onInput={onFilterTextBoxChanged}
           />
            <MultiSelectFilter
-            rowData={filteredRowData}
+            rowData={data}
             filterColumns={filterColumns}
             onFilterApply={handleFilterApply}
           />
@@ -721,7 +721,7 @@ const Company = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={filteredRowData}
+            rowData={data}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"

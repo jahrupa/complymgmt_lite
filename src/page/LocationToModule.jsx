@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,6 +17,7 @@ import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { Link } from 'lucide-react';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const LocationToModule = () => {
@@ -56,6 +57,22 @@ const LocationToModule = () => {
         message: '',
         severityType: '',
     });
+    const [filters, setFilters] = useState({});
+
+    const [filterColumns, setFilterColumns] = useState([]);
+
+    const handleFilterApply = (newFilters,) => {
+        setFilters(newFilters);
+    };
+    const filteredRowData = useMemo(() => {
+        if (Object.keys(filters).length === 0) return data;
+
+        return data.filter((row) => {
+            return Object.entries(filters).every(([column, values]) => {
+                return values.includes(row[column]);
+            });
+        });
+    }, [data, filters]);
 
     const [errors, setErrors] = useState({});
     const crudTitle = "Tag Sucribe Modules & Sub-Modules"
@@ -242,7 +259,7 @@ const LocationToModule = () => {
                 if (data) {
                     setCompanyName(data);
                 }
-            } catch  {
+            } catch {
                 // console.error("Failed to fetch company:", error);
             }
         };
@@ -259,7 +276,7 @@ const LocationToModule = () => {
                 if (data) {
                     setLocationName(data);
                 }
-            } catch  {
+            } catch {
                 // console.error("Failed to fetch location by company_id:", error);
             }
         };
@@ -376,7 +393,7 @@ const LocationToModule = () => {
                             _id: data?._id,
                             name: data?.sub_module_name,
                         }))}
-                        
+
                     />
 
                 </div>
@@ -684,14 +701,19 @@ const LocationToModule = () => {
             <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
             <div className='table_div p-3'>
-                <div className='d-lg-flex d-md-flex  justify-content-between'>
+                 <div className='d-flex align-items-center gap-2'>
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    <MultiSelectFilter
+                        rowData={filteredRowData}
+                        filterColumns={filterColumns}
+                        onFilterApply={handleFilterApply}
+                    />
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact
                         theme="legacy"
                         ref={gridRef}
-                        rowData={data}
+                        rowData={filteredRowData}
                         columnDefs={colDefs}
                         defaultColDef={defaultColDef}
                         editType="fullRow"

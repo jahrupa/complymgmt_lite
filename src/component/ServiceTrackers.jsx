@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +28,7 @@ import MuiTextAreaField from "./MuiInputs/MuiTextAreaField";
 import { useNavigate } from "react-router-dom";
 import { AnimatedSearchBar } from "./AnimatedSearchBar";
 import { decryptData } from "../page/utils/encrypt";
+import MultiSelectFilter from '../page/dashboardDrawerGridDetailPage/MultiSelectFilter';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -60,6 +61,24 @@ const ServiceTrackers = () => {
     message: "",
     severityType: "",
   });
+
+  const [filters, setFilters] = useState({});
+
+  const [filterColumns, setFilterColumns] = useState([]);
+
+  const handleFilterApply = (newFilters,) => {
+    setFilters(newFilters);
+  };
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
   const [serviceTrackerId, setServiceTrackerId] = useState(null);
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
@@ -239,13 +258,13 @@ const ServiceTrackers = () => {
         if (serviceTrackerResult.status === "fulfilled") {
           setData(serviceTrackerResult.value);
         } else {
-        //  handle error silently
+          //  handle error silently
         }
 
         if (moduleNameResult.status === "fulfilled") {
           setModuleName(moduleNameResult.value);
         } else {
-            // handle error silently
+          // handle error silently
         }
       } catch {
         // handle error silently
@@ -661,12 +680,17 @@ const ServiceTrackers = () => {
       />
 
       <div className="table_div p-3">
-        <div className="d-lg-flex d-md-flex  justify-content-between">
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
+          />
+          <MultiSelectFilter
+            rowData={filteredRowData}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
           />
         </div>
         <div
@@ -676,7 +700,7 @@ const ServiceTrackers = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"

@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,6 +27,7 @@ import Snackbars from '../component/Snackbars';
 import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Module = () => {
@@ -35,7 +36,6 @@ const Module = () => {
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState({ module_name: '', module_description: '', });
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedRows, setSelectedRows] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [moduleId, setModuleId] = useState(null)
@@ -47,8 +47,25 @@ const Module = () => {
         message: '',
         severityType: '',
     });
+    const [filters, setFilters] = useState({});
+
+    const [filterColumns, setFilterColumns] = useState([]);
+
+    const handleFilterApply = (newFilters,) => {
+        setFilters(newFilters);
+    };
+    const filteredRowData = useMemo(() => {
+        if (Object.keys(filters).length === 0) return data;
+
+        return data.filter((row) => {
+            return Object.entries(filters).every(([column, values]) => {
+                return values.includes(row[column]);
+            });
+        });
+    }, [data, filters]);
+
     const [errors, setErrors] = useState({});
-const SystemUserId = decryptData(localStorage.getItem("user_id"));
+    const SystemUserId = decryptData(localStorage.getItem("user_id"));
 
     const validate = () => {
         let tempErrors = {};
@@ -90,13 +107,13 @@ const SystemUserId = decryptData(localStorage.getItem("user_id"));
     const handleSubmit = async (e) => {
         e?.preventDefault();
         if (!validate()) return; // Don't proceed if validation fails
-            const CommonAttributes = {
-            [isEditing ? "Updated_By" : "Created_By"]:SystemUserId || "",
+        const CommonAttributes = {
+            [isEditing ? "Updated_By" : "Created_By"]: SystemUserId || "",
         };
         const payload = {
             "ModuleName": current.module_name,
             "ModuleDescription": current.module_description,
-            "CommonAttributes":CommonAttributes
+            "CommonAttributes": CommonAttributes
         };
 
         try {
@@ -320,7 +337,7 @@ const SystemUserId = decryptData(localStorage.getItem("user_id"));
                 ...issnackbarsOpen,
                 open: true,
                 message,
-                severityType: 'success',                
+                severityType: 'success',
             });
         } catch (error) {
             // Show error snackbar
@@ -523,8 +540,13 @@ const SystemUserId = decryptData(localStorage.getItem("user_id"));
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
 
             <div className='table_div p-3'>
-                <div className='d-lg-flex d-md-flex  justify-content-between'>
+                <div className='d-flex align-items-center gap-2'>
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    <MultiSelectFilter
+                        rowData={filteredRowData}
+                        filterColumns={filterColumns}
+                        onFilterApply={handleFilterApply}
+                    />
                     {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
                         <div>
                             <button className='crud_btn w-100' onClick={openModal}>
@@ -539,7 +561,7 @@ const SystemUserId = decryptData(localStorage.getItem("user_id"));
                     <AgGridReact
                         theme="legacy"
                         ref={gridRef}
-                        rowData={data}
+                        rowData={filteredRowData}
                         columnDefs={colDefs}
                         defaultColDef={defaultColDef}
                         editType="fullRow"

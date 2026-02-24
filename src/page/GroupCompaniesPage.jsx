@@ -46,8 +46,8 @@ const GroupCompaniesPage = () => {
 
   const [filters, setFilters] = useState({});
 
-  const [filterColumns, setFilterColumns] = useState([]);
-
+  // const [filterColumns, setFilterColumns] = useState([]);
+  // console.log(filterColumns,'filterColumns')
   const handleFilterApply = (newFilters,) => {
     setFilters(newFilters);
   };
@@ -215,12 +215,15 @@ const GroupCompaniesPage = () => {
           fetchAllGroup(),
         ]);
         setData(GroupData);
+        console.log("Total Records:", GroupData.length);
+        console.log("Group Names:", GroupData.map(r => r.group_name));
       } catch {
         // Handle error silently
       }
     };
     fetchData();
   }, []);
+
 
   const crudForm = () => {
     return (
@@ -459,11 +462,11 @@ const GroupCompaniesPage = () => {
         <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
           <MultiSelectFilter
-            rowData={filteredRowData}
-            filterColumns={filterColumns}
+            rowData={data}
+            filterColumns={data.length > 0 ? Object.keys(data[0]) : []}
             onFilterApply={handleFilterApply}
           />
-        {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
+          {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
             <div>
               <button className='crud_btn w-100' onClick={openModal}>
                 <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
@@ -479,25 +482,25 @@ const GroupCompaniesPage = () => {
               <span className="text">Approve All</span>
             </button>
           </div> */}
+        </div>
+        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+          <AgGridReact
+            theme="legacy"
+            ref={gridRef}
+            rowData={filteredRowData}
+            columnDefs={colDefs}
+            defaultColDef={defaultColDef}
+            editType="fullRow"
+            rowSelection="single"
+            pagination={true}
+            // rowBuffer={rowBuffer}
+            onRowValueChanged={onRowValueChanged}
+
+          />
+        </div>
+
+
       </div>
-      <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
-        <AgGridReact
-          theme="legacy"
-          ref={gridRef}
-          rowData={filteredRowData}
-          columnDefs={colDefs}
-          defaultColDef={defaultColDef}
-          editType="fullRow"
-          rowSelection="single"
-          pagination={true}
-          // rowBuffer={rowBuffer}
-          onRowValueChanged={onRowValueChanged}
-
-        />
-      </div>
-
-
-    </div>
     </div >
   );
 };
