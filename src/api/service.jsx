@@ -1792,9 +1792,9 @@ export const fetchRiskLevelBasedOnServiceType = async (company_name) => {
     throw error;
   }
 }
-export const fetchEscalationTriggeredRateByState = async (state) => {
+export const fetchEscalationTriggeredRateByState = async (company_name) => {
   try {
-    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${state ? `?state=${encodeURIComponent(state)}` : ''}`;
+    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {
