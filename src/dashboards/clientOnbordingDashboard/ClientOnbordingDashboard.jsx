@@ -236,6 +236,8 @@ const ClientOnbordingDashboard = ({ data }) => {
         setIsDetailPage={setIsDetailPage}
         isDetailPageData={isDetailPageData}
         filterColumns={filterColumns}
+        isCockpitComplianceDetailPage={true}
+
       />
     </div>
   );

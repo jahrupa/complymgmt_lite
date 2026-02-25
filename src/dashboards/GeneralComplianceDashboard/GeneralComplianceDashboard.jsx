@@ -15,6 +15,8 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [drawerAnchor, setDrawerAnchor] = useState("right");
     const [filterColumns, setFilterColumns] = useState([]);
+    const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
+
     if (!data || Object.keys(data).length === 0) {
         return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
     }
@@ -185,7 +187,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 <button className="btn btn-primary " onClick={(e) => {
                     e.stopPropagation();
                     handleOpenDrawer(
-                      "left",
+                        "left",
                     )
                 }}>
                     View Details
@@ -291,15 +293,22 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 )}
             </div>
             <DashboardDrawerGrid
-                    anchor={drawerAnchor}
-                    open={drawerOpen}
-                    onClose={() => { setDrawerOpen(false); }}
-                    // this is wirking
-                    data={data} //direct array
-                    title={'General Compliance'}
-                    filterColumns={filterColumns}
-                    isCockpitComplianceDetailPage={true}
-                  />
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => { setDrawerOpen(false); setIsDetailPageDataFor("Returns"); }}
+                filterColumns={filterColumns}
+                isCockpitComplianceDetailPage={true}
+                // this is wirking
+                data={isDetailPageDataFor === 'Challans' ? data?.data?.challans
+                    : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
+                        : isDetailPageDataFor === 'Registers' ? data?.data?.registers
+                            : data?.data?.returns} //direct array
+                title={'General Compliance - ' + isDetailPageDataFor}
+                setIsDetailPageDataFor={setIsDetailPageDataFor}
+                isDetailPageDataFor={isDetailPageDataFor}
+                buttons={['Returns', 'Challans', 'Licenses', 'Registers']}
+
+            />
         </>
     );
 };
