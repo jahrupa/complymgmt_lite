@@ -85,10 +85,6 @@ function DashboardDrawerGridDetailPage({ rowData, filterColumns }) {
               onPaginationChanged={onPaginationChanged}
             />
           </div>
-
-          <div className="app-records-info">
-            Showing {filteredRowData.length} of {rowData.length} records
-          </div>
         </div>
       </div>
     </div>
