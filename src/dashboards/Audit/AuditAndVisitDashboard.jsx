@@ -26,7 +26,6 @@ const AuditAndVisitDashboard = ({
   const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState(
     []
   );
-  console.log(AuditCountByServiceType?.auditRecord, 'AuditCountByServiceType')
   const AuditCountByServiceTypeFormat = {
     series: [
       {

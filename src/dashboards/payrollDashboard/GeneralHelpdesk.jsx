@@ -587,7 +587,6 @@ const GeneralHelpdesk = ({
                     </div>
                 )}
                 {shouldShow("gh-4") && (
-
                     <div
                         className={`chart-card ${cardClass("gh-4") ? "selected-card" : ""
                             }`}

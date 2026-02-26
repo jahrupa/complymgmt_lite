@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
-import { Sandwich } from 'lucide-react';
+import DashboardDrawerGrid from '../DashboardDrawer';
 
 const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -12,6 +12,10 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         message: "",
         severityType: "",
     });
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [drawerAnchor, setDrawerAnchor] = useState("right");
+    const [filterColumns, setFilterColumns] = useState([]);
+    const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
 
     if (!data || Object.keys(data).length === 0) {
         return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
@@ -24,7 +28,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         "pending": (data?.challans?.pending) ?? (data?.pending_challans),
         "total": (data?.challans?.total) ?? (data?.total_challans)
     }
-    
+
     const payrollData = [
         {
             icon: '✔', label: 'Completed',
@@ -50,7 +54,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         "inprogress": (data?.licenses?.inprogress) ?? (data?.inprogress_licenses),
         "total": (data?.licenses?.total) ?? (data?.total_licenses),
     }
-    
+
     // Licenses Pie Chart
     const licensesChart = {
         series: [
@@ -167,12 +171,28 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         if (canSelect) toggleChartSelection(id);
     };
 
+
+    const handleOpenDrawer = (anchor, filterColumn) => {
+        setDrawerAnchor(anchor);
+        setDrawerOpen(true);
+        setFilterColumns(filterColumn);
+    };
     return (
         <>
             <Snackbars
                 issnackbarsOpen={issnackbarsOpen}
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
+            <div className="align-content-center d-flex justify-content-end mb-3">
+                <button className="btn btn-primary " onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenDrawer(
+                        "left",
+                    )
+                }}>
+                    View Details
+                </button>
+            </div>
             <div className='row'>
                 {shouldShow("gc-1") && (
                     <div className='col-12 col-md-6 mb-4'>
@@ -272,6 +292,23 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                     </div>
                 )}
             </div>
+            <DashboardDrawerGrid
+                anchor={drawerAnchor}
+                open={drawerOpen}
+                onClose={() => { setDrawerOpen(false); setIsDetailPageDataFor("Returns"); }}
+                filterColumns={filterColumns}
+                isCockpitComplianceDetailPage={true}
+                // this is wirking
+                data={isDetailPageDataFor === 'Challans' ? data?.data?.challans
+                    : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
+                        : isDetailPageDataFor === 'Registers' ? data?.data?.registers
+                            : data?.data?.returns} //direct array
+                title={'General Compliance - ' + isDetailPageDataFor}
+                setIsDetailPageDataFor={setIsDetailPageDataFor}
+                isDetailPageDataFor={isDetailPageDataFor}
+                buttons={['Returns', 'Challans', 'Licenses', 'Registers']}
+
+            />
         </>
     );
 };
