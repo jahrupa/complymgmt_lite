@@ -17,7 +17,7 @@ import CockpitComplinceByCompany from "./cockpitDashboard/CockpitComplinceByComp
 import CockpitComplince from "./cockpitDashboard/CockpitComplince";
 import ClientOnbordingDashboard from "./clientOnbordingDashboard/ClientOnbordingDashboard";
 import ClientOnBoardingByCompany from "./clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany";
-import PayrollServices from "./payrollDashboard/PayrollServices ";
+import PayrollServices from "./payrollDashboard/PayrollServices";
 import ReturnsAndSubmissions from "./payrollDashboard/ReturnsAndSubmissions";
 import HelpdeskAndEscalations from "./payrollDashboard/HelpdeskAndEscalations";
 import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";

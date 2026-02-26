@@ -62,7 +62,7 @@ const PayrollServices = ({
                         if (clickedValue === 0) return;
 
                         navigate(
-                            "/payroll_service/dashboard/investment_declaration_status_by_company",
+                            // "/payroll_service/dashboard/investment_declaration_status_by_company",
                             {
                                 state: {
                                     score: clickedValue,
@@ -331,7 +331,7 @@ const PayrollServices = ({
                     click(event, chartContext, opts) {
 
                         navigate(
-                            "/payroll_service/dashboard/delay_between_data_request_date_and_client_data_received_date",
+                            // "/payroll_service/dashboard/delay_between_data_request_date_and_client_data_received_date",
                             {
                                 state: {
                                     score:
@@ -689,14 +689,18 @@ const PayrollServices = ({
 
                                 <div
                                     className="dashboard-icon ms-2"
-                                    onClick={(e) => {
+                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setIsSnackbarsOpen({
-                                            ...issnackbarsOpen,
-                                            open: true,
-                                            message: "No Data available",
-                                            severityType: "info"
-                                        });
+                                        handleOpenDrawer(
+                                            "left",
+                                            "Breakdown of Investment declaration status by Company",
+                                            investmentData?.rest_delays,
+                                            investmentData?.rest_delays?.map(
+                                                (item) => item.company_name
+                                            ),
+                                            investmentData?.payrollServicesRecords,
+                                            investmentData?.columns
+                                        );
                                     }}
                                 >
                                     <ArrowUpRight />

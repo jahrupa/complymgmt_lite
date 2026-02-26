@@ -101,7 +101,7 @@ const CockpitComplince = ({
           if (clickedValue === 0) return;
 
           navigate(
-            "/compliance_cockpit/dashboard/overall_compliance_score",
+            // "/compliance_cockpit/dashboard/overall_compliance_score",
             {
               state: {
                 score: clickedValue,
@@ -200,7 +200,7 @@ const CockpitComplince = ({
             return; // exit early if data or name is missing
           }
           navigate(
-            "/compliance_cockpit/dashboard/completion_status_across_all_modules",
+            // "/compliance_cockpit/dashboard/completion_status_across_all_modules",
             {
               state: {
                 score: seriesData,
