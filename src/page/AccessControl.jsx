@@ -40,6 +40,7 @@ import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import DeleteModal from "../component/DeleteModal";
 import { decryptData } from "./utils/encrypt";
 import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { flattenObject } from '../../Utils/tableColUtils';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -1144,6 +1145,117 @@ const AccessControl = () => {
     setData(updatedData);
   };
 
+  const generateDynamicColDefs = (data) => {
+    if (!data || data.length === 0) return [];
+
+    const sample = flattenObject(data[0]);
+
+    return Object.keys(sample)
+      .map((key) => {
+        // Skip unwanted fields
+        if (
+          key === "_id" ||
+          key === "common_attributes.is_active" ||
+          key === "common_attributes.is_deleted" ||
+          key === "common_attributes.deleted_by" ||
+          key === "common_attributes.deleted_at"
+        )
+          return null;
+
+        // ✅ Special case for approval_status
+        if (key === "common_attributes.approval_status") {
+          return {
+            field: key,
+            headerName: "Approval Status",
+            filter: true,
+            editable: false,
+            valueGetter: (params) =>
+              params.data?.common_attributes?.approval_status,
+            cellRenderer: (params) => {
+              const status = params.value ?? 0;
+
+              const handleChange = async (e) => {
+                const checked = e.target.checked;
+
+                // UI Update Immediately (Optimistic Update)
+                params.node.setDataValue(
+                  "common_attributes.approval_status",
+                  checked ? 1 : 0,
+                );
+
+                // Optional: API Call
+                try {
+                  await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                } catch {
+                  // Revert if API fails
+                  params.node.setDataValue(
+                    "common_attributes.approval_status",
+                    status,
+                  );
+                }
+              };
+
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={status === 1}
+                    disabled={status === 1} // Approved hone ke baad disable
+                    onChange={handleChange}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      accentColor: "orange",
+                      cursor: status === 1 ? "not-allowed" : "pointer",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: status === 1 ? "green" : "orange",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {status === 1 ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              );
+            },
+          };
+        }
+
+        // ✅ Default column definition
+        return {
+          field: key,
+          headerName: key
+            .split(".")
+            .pop()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase()),
+
+          filter: true,
+          editable: false,
+          headerStyle: {
+            color: "#515151",
+            backgroundColor: "#ffffe24d",
+          },
+
+          valueGetter: (params) => {
+            return key
+              .split(".")
+              .reduce((acc, part) => acc?.[part], params.data);
+          },
+        };
+      })
+      .filter(Boolean);
+  };
+
   const colDefs = [
     {
       headerName: "Actions",
@@ -1177,6 +1289,8 @@ const AccessControl = () => {
         );
       },
     },
+
+    ...generateDynamicColDefs(data),
     // { field: '_id', headerName: 'Entity Name', filter: true, editable: false },
     {
       field: "EntityName",
