@@ -606,7 +606,28 @@ const ServiceTrackers = () => {
         );
       },
     },
-
+ {
+      field: "service_tracker_name",
+      headerName: "Service Tracker Name",
+      filter: true,
+      editable: false,
+      cellRenderer: (params) => (
+        <span
+          style={{
+            color: "#1976d2",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+          onClick={() =>
+            navigate(
+              `/service/${encodeURIComponent(params.data.service_tracker_name)}/${params.data._id}`,
+            )
+          }
+        >
+          {params.value}
+        </span>
+      ),
+    },
     ...generateDynamicColDefs(data),
     
     {
