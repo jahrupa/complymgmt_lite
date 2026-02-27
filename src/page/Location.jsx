@@ -592,60 +592,60 @@ const Location = () => {
         ...generateDynamicColDefs(data),
 
 
-        // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'city', headerName: 'City', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'state', headerName: 'State', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        {
-            field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
-            headerName: 'Approval Status',
-            editable: false,
-            headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-            filter: true,
-            valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
+        // // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'city', headerName: 'City', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'state', headerName: 'State', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'location_name', headerName: 'Location', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // {
+        //     field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
+        //     headerName: 'Approval Status',
+        //     editable: false,
+        //     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+        //     filter: true,
+        //     valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
 
-            cellRenderer: (params) => {
-                const getApprovalStatusText = (status) => {
-                    switch (status) {
-                        case 0: return 'Pending';
-                        case 1: return 'Approved';
-                        default: return '-'; // fallback
-                    }
-                };
+        //     cellRenderer: (params) => {
+        //         const getApprovalStatusText = (status) => {
+        //             switch (status) {
+        //                 case 0: return 'Pending';
+        //                 case 1: return 'Approved';
+        //                 default: return '-'; // fallback
+        //             }
+        //         };
 
-                const status = params.value;
-                const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+        //         const status = params.value;
+        //         const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
 
-                return (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <input
-                            type="checkbox"
-                            readOnly={status === 1}
-                            checked={status === 1}
-                            style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-                            onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
-                        />
-                        <span
-                            style={{
-                                color,
-                                fontSize: '0.8rem',
-                                fontWeight: 500,
-                            }}
-                        >
-                            {getApprovalStatusText(status)}
-                        </span>
-                    </div>
-                );
-            }
-        },
-        { field: 'location_description', headerName: 'Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        {
+        //         return (
+        //             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        //                 <input
+        //                     type="checkbox"
+        //                     readOnly={status === 1}
+        //                     checked={status === 1}
+        //                     style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+        //                     onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+        //                 />
+        //                 <span
+        //                     style={{
+        //                         color,
+        //                         fontSize: '0.8rem',
+        //                         fontWeight: 500,
+        //                     }}
+        //                 >
+        //                     {getApprovalStatusText(status)}
+        //                 </span>
+        //             </div>
+        //         );
+        //     }
+        // },
+        // { field: 'location_description', headerName: 'Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'group_name', headerName: 'Group Holding', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'company_name', headerName: 'Company Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'common_attributes.created_at', headerName: 'Created At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'common_attributes.created_by', headerName: 'Created By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'common_attributes.updated_at', headerName: 'Updated At', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        // { field: 'common_attributes.updated_by', headerName: 'Updated By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+         {
             headerName: 'Status',
             field: 'common_attributes.is_active',
             editable: false,
@@ -657,8 +657,9 @@ const Location = () => {
                     onChange={(e) => handleToggleChange(e, params)}
                 />
             )
-        }, { field: 'common_attributes.approval_time', headerName: 'Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-        { field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        }, 
+        //{ field: 'common_attributes.approval_time', headerName: 'Approval Time', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+        //{ field: 'common_attributes.approved_by', headerName: 'Approved By', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
 
     ];
     const gridRef = useRef();

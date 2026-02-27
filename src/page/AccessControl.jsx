@@ -1292,74 +1292,74 @@ const AccessControl = () => {
 
     ...generateDynamicColDefs(data),
     // { field: '_id', headerName: 'Entity Name', filter: true, editable: false },
-    {
-      field: "EntityName",
-      headerName: "Entity Name",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "EntityType",
-      headerName: "Entity Type",
-      filter: true,
-      editable: false,
-    },
-    { field: "view", headerName: "View", filter: true, editable: false },
-    { field: "create", headerName: "Create", filter: true, editable: false },
-    { field: "update", headerName: "Update", filter: true, editable: false },
-    { field: "delete", headerName: "Delete", filter: true, editable: false },
-    {
-      field: "Approval_Status", // or use valueGetter instead (recommended)
-      headerName: "Approval Status",
-      editable: false,
-      headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
-      filter: true,
-      valueGetter: (params) => params.data?.Approval_Status, // safer access
+    // {
+    //   field: "EntityName",
+    //   headerName: "Entity Name",
+    //   filter: true,
+    //   editable: false,
+    // },
+    // {
+    //   field: "EntityType",
+    //   headerName: "Entity Type",
+    //   filter: true,
+    //   editable: false,
+    // },
+    // { field: "view", headerName: "View", filter: true, editable: false },
+    // { field: "create", headerName: "Create", filter: true, editable: false },
+    // { field: "update", headerName: "Update", filter: true, editable: false },
+    // { field: "delete", headerName: "Delete", filter: true, editable: false },
+    // {
+    //   field: "Approval_Status", // or use valueGetter instead (recommended)
+    //   headerName: "Approval Status",
+    //   editable: false,
+    //   headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
+    //   filter: true,
+    //   valueGetter: (params) => params.data?.Approval_Status, // safer access
 
-      cellRenderer: (params) => {
-        const getApprovalStatusText = (status) => {
-          switch (status) {
-            case 0:
-              return "Pending";
-            case 1:
-              return "Approved";
-            default:
-              return "-"; // fallback
-          }
-        };
+    //   cellRenderer: (params) => {
+    //     const getApprovalStatusText = (status) => {
+    //       switch (status) {
+    //         case 0:
+    //           return "Pending";
+    //         case 1:
+    //           return "Approved";
+    //         default:
+    //           return "-"; // fallback
+    //       }
+    //     };
 
-        const status = params.value;
-        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+    //     const status = params.value;
+    //     const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
 
-        return (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <input
-              type="checkbox"
-              checked={status === 1}
-              readOnly={status === 1}
-              style={{
-                cursor: "default",
-                width: 15,
-                height: 15,
-                accentColor: "orange",
-              }}
-              onChange={
-                status !== 1 ? () => handleCheckboxClick(params.data._id) : null
-              }
-            />
-            <span
-              style={{
-                color,
-                fontSize: "0.8rem",
-                fontWeight: 500,
-              }}
-            >
-              {getApprovalStatusText(status)}
-            </span>
-          </div>
-        );
-      },
-    },
+    //     return (
+    //       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+    //         <input
+    //           type="checkbox"
+    //           checked={status === 1}
+    //           readOnly={status === 1}
+    //           style={{
+    //             cursor: "default",
+    //             width: 15,
+    //             height: 15,
+    //             accentColor: "orange",
+    //           }}
+    //           onChange={
+    //             status !== 1 ? () => handleCheckboxClick(params.data._id) : null
+    //           }
+    //         />
+    //         <span
+    //           style={{
+    //             color,
+    //             fontSize: "0.8rem",
+    //             fontWeight: 500,
+    //           }}
+    //         >
+    //           {getApprovalStatusText(status)}
+    //         </span>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
       headerName: "Status",
       field: "IsActive",
