@@ -456,58 +456,7 @@ const GroupCompaniesPage = () => {
     },
 
      ...generateDynamicColDefs(data),
-     
-    { field: 'group_name', headerName: 'Group Name', filter: true, editable: false, },
-    { field: 'group_description', headerName: 'Group Description', filter: true, editable: false, },
-    {
-      field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
-      headerName: 'Approval Status',
-      editable: false,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-      filter: true,
-
-      valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
-
-      cellRenderer: (params) => {
-        const getApprovalStatusText = (status) => {
-          switch (status) {
-            case 0: return 'Pending';
-            case 1: return 'Approved';
-            default: return '-'; // fallback
-          }
-        };
-
-        const status = params.value;
-        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
-
-        return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input
-              type="checkbox"
-              checked={status === 1}
-              readOnly={status === 1}
-              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
-            />
-            <span
-              style={{
-                color,
-                fontSize: '0.8rem',
-                fontWeight: 500,
-              }}
-            >
-              {getApprovalStatusText(status)}
-            </span>
-          </div>
-        );
-      }
-    },
-    { field: 'common_attributes.created_at', headerName: 'Created At', filter: true, editable: false, },
-    { field: 'common_attributes.created_by', headerName: 'Created By', filter: true, editable: false, },
-    { field: 'common_attributes.updated_at', headerName: 'Updated At', filter: true, editable: false, },
-    { field: 'common_attributes.updated_by', headerName: 'Updated By', filter: true, editable: false, },
-    { field: 'common_attributes.approved_at', headerName: 'Approved At', filter: true, editable: false, },
-    { field: 'common_attributes.approved_by', headerName: 'Approved By', filter: true, editable: false, },
+   
     {
       headerName: 'Is Active',
       field: 'common_attributes.is_active',
