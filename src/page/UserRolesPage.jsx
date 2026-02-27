@@ -605,81 +605,81 @@ const UserRolesPage = () => {
       }
     },
     // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    {
-      field: 'role_name', width: 300, headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
-      cellRenderer: (params) => {
-        const { background, color } = getRoleColor(params.value);
-        return (
-          <span
-            style={{
-              //   padding: '4px 12px',
-              padding: '5px 12px',
-              backgroundColor: background,
-              color: color,
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              //   display: 'inline-block',
-              textAlign: 'center',
-              minWidth: '60px'
-            }}
-          >
-            <span> <PermIdentityIcon style={{ width: '15', height: '15' }} className='mb-1 me-1' /></span>{params.value}<span></span>
-          </span>
-        );
-      }
-    },
+    // { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // {
+    //   field: 'role_name', width: 300, headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
+    //   cellRenderer: (params) => {
+    //     const { background, color } = getRoleColor(params.value);
+    //     return (
+    //       <span
+    //         style={{
+    //           //   padding: '4px 12px',
+    //           padding: '5px 12px',
+    //           backgroundColor: background,
+    //           color: color,
+    //           borderRadius: '20px',
+    //           fontSize: '0.8rem',
+    //           fontWeight: 500,
+    //           //   display: 'inline-block',
+    //           textAlign: 'center',
+    //           minWidth: '60px'
+    //         }}
+    //       >
+    //         <span> <PermIdentityIcon style={{ width: '15', height: '15' }} className='mb-1 me-1' /></span>{params.value}<span></span>
+    //       </span>
+    //     );
+    //   }
+    // },
 
     ...generateDynamicColDefs(data),
 
 
-    { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    {
-      field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
-      headerName: 'Approval Status',
-      editable: false,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-      filter: true,
-      valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
+    // { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // {
+    //   field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
+    //   headerName: 'Approval Status',
+    //   editable: false,
+    //   headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    //   filter: true,
+    //   valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
 
-      cellRenderer: (params) => {
-        const getApprovalStatusText = (status) => {
-          switch (status) {
-            case 0: return 'Pending';
-            case 1: return 'Approved';
-            default: return '-'; // fallback
-          }
-        };
+    //   cellRenderer: (params) => {
+    //     const getApprovalStatusText = (status) => {
+    //       switch (status) {
+    //         case 0: return 'Pending';
+    //         case 1: return 'Approved';
+    //         default: return '-'; // fallback
+    //       }
+    //     };
 
-        const status = params.value;
-        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
+    //     const status = params.value;
+    //     const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
 
-        return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input
-              type="checkbox"
-              // checked={true}
-              // readOnly // ✅ prevent manual toggle unless you implement onChange
-              checked={status === 1}
-              readOnly={status === 1}
-              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
-            />
-            <span
-              style={{
-                color,
-                fontSize: '0.8rem',
-                fontWeight: 500,
-              }}
-            >
-              {getApprovalStatusText(status)}
-            </span>
-          </div>
-        );
-      }
-    },
-    { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    //     return (
+    //       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    //         <input
+    //           type="checkbox"
+    //           // checked={true}
+    //           // readOnly // ✅ prevent manual toggle unless you implement onChange
+    //           checked={status === 1}
+    //           readOnly={status === 1}
+    //           style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
+    //           onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+    //         />
+    //         <span
+    //           style={{
+    //             color,
+    //             fontSize: '0.8rem',
+    //             fontWeight: 500,
+    //           }}
+    //         >
+    //           {getApprovalStatusText(status)}
+    //         </span>
+    //       </div>
+    //     );
+    //   }
+    // },
+    // { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',
       field: 'common_attributes.is_active',
@@ -692,20 +692,6 @@ const UserRolesPage = () => {
           onChange={(e) => handleToggleChange(e, params)}
         />
       )
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      editable: false,
-      filter: true,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-    },
-    {
-      field: 'password',
-      headerName: 'Password',
-      editable: false,
-      filter: true,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
   ];
   const defaultColDef = {

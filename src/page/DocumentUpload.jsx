@@ -36,6 +36,7 @@ import SmallSizeModal from "../component/SmallSizeModal";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import { Download } from "lucide-react";
 import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { flattenObject } from '../../Utils/tableColUtils';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -474,17 +475,116 @@ const DocumentUpload = () => {
     }
   }, [current?.service_tracker_name]);
 
-  const getRoleColorForFileStatus = (status) => {
-    switch (status) {
-      case 0:
-        return { color: "#FFC107" }; // amber
-      case 1:
-        return { color: "#4CAF50" }; // green
-      default:
-        return { color: "#41464b" }; // gray
-    }
-  };
+  const generateDynamicColDefs = (data) => {
+    if (!data || data.length === 0) return [];
 
+    const sample = flattenObject(data[0]);
+
+    return Object.keys(sample)
+      .map((key) => {
+        // Skip unwanted fields
+        if (
+          key === "_id" ||
+          key === "common_attributes.is_active" ||
+          key === "common_attributes.is_deleted" ||
+          key === "common_attributes.deleted_by" ||
+          key === "common_attributes.deleted_at"
+        )
+          return null;
+
+        // ✅ Special case for approval_status
+        if (key === "common_attributes.approval_status") {
+          return {
+            field: key,
+            headerName: "Approval Status",
+            filter: true,
+            editable: false,
+            valueGetter: (params) =>
+              params.data?.common_attributes?.approval_status,
+            cellRenderer: (params) => {
+              const status = params.value ?? 0;
+
+              const handleChange = async (e) => {
+                const checked = e.target.checked;
+
+                // UI Update Immediately (Optimistic Update)
+                params.node.setDataValue(
+                  "common_attributes.approval_status",
+                  checked ? 1 : 0,
+                );
+
+                // Optional: API Call
+                try {
+                  // await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                } catch  {
+                  // Revert if API fails
+                  params.node.setDataValue(
+                    "common_attributes.approval_status",
+                    status,
+                  );
+                }
+              };
+
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={status === 1}
+                    disabled={status === 1} // Approved hone ke baad disable
+                    onChange={handleChange}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      accentColor: "orange",
+                      cursor: status === 1 ? "not-allowed" : "pointer",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: status === 1 ? "green" : "orange",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {status === 1 ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              );
+            },
+          };
+        }
+
+        // ✅ Default column definition
+        return {
+          field: key,
+          headerName: key
+            .split(".")
+            .pop()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase()),
+
+          filter: true,
+          editable: false,
+          headerStyle: {
+            color: "#515151",
+            backgroundColor: "#ffffe24d",
+          },
+
+          valueGetter: (params) => {
+            return key
+              .split(".")
+              .reduce((acc, part) => acc?.[part], params.data);
+          },
+        };
+      })
+      .filter(Boolean);
+  };
   const colDefs = [
     {
       headerName: "Actions",
@@ -536,12 +636,7 @@ const DocumentUpload = () => {
         );
       },
     },
-    { field: "file_name", headerName: "File Name", editable: "false" },
-    {
-      field: "document_type_name",
-      headerName: "Document Type",
-      editable: "false",
-    },
+   
     {
       field: "file_path",
       headerName: "File Path",
@@ -603,6 +698,7 @@ const DocumentUpload = () => {
       editable: "false",
       field: "is_active",
       headerName: "Status",
+      pinned: "left",
       valueGetter: (params) => params.data?.is_active,
       cellRenderer: (params) => (
         <Toggle
@@ -611,69 +707,7 @@ const DocumentUpload = () => {
         />
       ),
     },
-    {
-      field: "approval_status",
-      headerName: "Approval Status",
-      editable: false,
-      width: 150,
-      valueGetter: (params) => params.data?.approval_status, // safer access
-      cellRenderer: (params) => {
-        const getApprovalStatusText = (status) => {
-          switch (status) {
-            case 0:
-              return "Pending";
-            case 1:
-              return "Approved";
-            default:
-              return "-"; // fallback
-          }
-        };
-
-        const status = params.value;
-        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
-
-        return (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <input
-              type="checkbox"
-              checked={status}
-              // readOnly={status === 1}
-              style={{
-                cursor: "default",
-                width: 15,
-                height: 15,
-                accentColor: "orange",
-              }}
-            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
-            />
-            <span
-              style={{
-                color,
-                fontSize: "0.8rem",
-                fontWeight: 500,
-              }}
-            >
-              {getApprovalStatusText(status)}
-            </span>
-          </div>
-        );
-      },
-    },
-    { field: "approved_at", headerName: "Approved At", editable: "false" },
-    { field: "approved_by", headerName: "Approved By", editable: "false" },
-    {
-      field: "company_location",
-      headerName: "Company Location",
-      editable: "false",
-    },
-    { field: "company_name", headerName: "Company Name", editable: "false" },
-    { field: "created_at", headerName: "Created At", editable: "false" },
-    { field: "created_by", headerName: "Created By", editable: "false" },
-    { field: "deleted_at", headerName: "Deleted At", editable: "false" },
-    { field: "deleted_by", headerName: "Deleted By", editable: "false" },
-    { field: "stage", headerName: "Stage", editable: "false" },
-    { field: "updated_at", headerName: "Updated At", editable: "false" },
-    { field: "updated_by", headerName: "Updated By", editable: "false" },
+     ...generateDynamicColDefs(data),
   ];
   const gridRef = useRef();
   const defaultColDef = {
