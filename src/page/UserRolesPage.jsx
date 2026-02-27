@@ -680,7 +680,7 @@ const UserRolesPage = () => {
     //     );
     //   }
     // },
-    //{ field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    // { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
     {
       headerName: 'Status',
       field: 'common_attributes.is_active',
@@ -693,20 +693,6 @@ const UserRolesPage = () => {
           onChange={(e) => handleToggleChange(e, params)}
         />
       )
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      editable: false,
-      filter: true,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-    },
-    {
-      field: 'password',
-      headerName: 'Password',
-      editable: false,
-      filter: true,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
   ];
   const defaultColDef = {
