@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -17,6 +17,8 @@ import Toggle from '../component/Toggle';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { Link } from 'lucide-react';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { flattenObject } from '../../Utils/tableColUtils';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const LocationToModule = () => {
@@ -56,6 +58,22 @@ const LocationToModule = () => {
         message: '',
         severityType: '',
     });
+    const [filters, setFilters] = useState({});
+
+    const [filterColumns, setFilterColumns] = useState([]);
+
+    const handleFilterApply = (newFilters,) => {
+        setFilters(newFilters);
+    };
+    const filteredRowData = useMemo(() => {
+        if (Object.keys(filters).length === 0) return data;
+
+        return data.filter((row) => {
+            return Object.entries(filters).every(([column, values]) => {
+                return values.includes(row[column]);
+            });
+        });
+    }, [data, filters]);
 
     const [errors, setErrors] = useState({});
     const crudTitle = "Tag Subscribe Modules & Sub-Modules"
@@ -492,6 +510,117 @@ const LocationToModule = () => {
         setData(updatedData);
     }
 
+    const generateDynamicColDefs = (data) => {
+        if (!data || data.length === 0) return [];
+
+        const sample = flattenObject(data[0]);
+
+        return Object.keys(sample)
+            .map((key) => {
+                // Skip unwanted fields
+                if (
+                    key === "_id" ||
+                    key === "common_attributes.is_active" ||
+                    key === "common_attributes.is_deleted" ||
+                    key === "common_attributes.deleted_by" ||
+                    key === "common_attributes.deleted_at"
+                )
+                    return null;
+
+                // ✅ Special case for approval_status
+                if (key === "common_attributes.approval_status") {
+                    return {
+                        field: key,
+                        headerName: "Approval Status",
+                        filter: true,
+                        editable: false,
+                        valueGetter: (params) =>
+                            params.data?.common_attributes?.approval_status,
+                        cellRenderer: (params) => {
+                            const status = params.value ?? 0;
+
+                            const handleChange = async (e) => {
+                                const checked = e.target.checked;
+
+                                // UI Update Immediately (Optimistic Update)
+                                params.node.setDataValue(
+                                    "common_attributes.approval_status",
+                                    checked ? 1 : 0,
+                                );
+
+                                // Optional: API Call
+                                try {
+                                    await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                                } catch {
+                                    // Revert if API fails
+                                    params.node.setDataValue(
+                                        "common_attributes.approval_status",
+                                        status,
+                                    );
+                                }
+                            };
+
+                            return (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={status === 1}
+                                        disabled={status === 1} // Approved hone ke baad disable
+                                        onChange={handleChange}
+                                        style={{
+                                            width: 15,
+                                            height: 15,
+                                            accentColor: "orange",
+                                            cursor: status === 1 ? "not-allowed" : "pointer",
+                                        }}
+                                    />
+                                    <span
+                                        style={{
+                                            color: status === 1 ? "green" : "orange",
+                                            fontSize: "0.8rem",
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        {status === 1 ? "Approved" : "Pending"}
+                                    </span>
+                                </div>
+                            );
+                        },
+                    };
+                }
+
+                // ✅ Default column definition
+                return {
+                    field: key,
+                    headerName: key
+                        .split(".")
+                        .pop()
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase()),
+
+                    filter: true,
+                    editable: false,
+                    headerStyle: {
+                        color: "#515151",
+                        backgroundColor: "#ffffe24d",
+                    },
+
+                    valueGetter: (params) => {
+                        return key
+                            .split(".")
+                            .reduce((acc, part) => acc?.[part], params.data);
+                    },
+                };
+            })
+            .filter(Boolean);
+    };
+
     const colDefs = [
         {
             headerName: 'Actions',
@@ -529,8 +658,9 @@ const LocationToModule = () => {
                     </div>
                 );
             }
-        }
-        ,
+        },
+
+        ...generateDynamicColDefs(data),
         { field: 'module_name', headerName: 'Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         { field: 'sub_module_name', headerName: 'Sub Module Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
         {
@@ -681,14 +811,19 @@ const LocationToModule = () => {
             <Modal crudForm={crudForm} crudTitle={crudTitle} isEditing={isEditing} editCrudTitle={editCrudTitle} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} closeModal={closeModal} />
             <DeleteModal deleteForm={deleteModal} deleteTitle='Delete User' isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen} />
             <div className='table_div p-3'>
-                <div className='d-lg-flex d-md-flex  justify-content-between'>
+                <div className='d-flex align-items-center gap-2'>
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                    <MultiSelectFilter
+                        rowData={filteredRowData}
+                        filterColumns={filterColumns}
+                        onFilterApply={handleFilterApply}
+                    />
                 </div>
                 <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
                     <AgGridReact
                         theme="legacy"
                         ref={gridRef}
-                        rowData={data}
+                        rowData={filteredRowData}
                         columnDefs={colDefs}
                         defaultColDef={defaultColDef}
                         editType="fullRow"
