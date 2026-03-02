@@ -8,6 +8,7 @@ import Chart from 'react-apexcharts';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import DashboardDrawerGridDetailPage from '../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -17,7 +18,17 @@ export default function DashboardDrawerGrid({
   onClose,
   data,
   title = "Details",
-  chartXaxisCategory
+  chartXaxisCategory,
+  setIsDetailPage,
+  isDetailPage,
+  isDetailPageData,
+  filterColumns,
+  isCockpitComplianceDetailPage,
+  setIsDetailPageDataFor,
+  isDetailPageDataFor,
+  buttons,
+  setPage,
+  setLimit
 }) {
   const [rowData, setRowData] = React.useState([]);
   const [columnDefs, setColumnDefs] = React.useState([]);
@@ -26,6 +37,7 @@ export default function DashboardDrawerGrid({
   const [chartSeries, setChartSeries] = React.useState([]);
   const [error, setError] = React.useState(""); // error state
   // Set rowData & columnDefs
+  const gridRef = React.useRef();
   React.useEffect(() => {
     try {
       setError(""); // reset error
@@ -97,7 +109,7 @@ export default function DashboardDrawerGrid({
           })
         }));
 
-       const categories = chartXaxisCategory || rowData.map((_, idx) => `Item ${idx + 1}`);
+        const categories = chartXaxisCategory || rowData.map((_, idx) => `Item ${idx + 1}`);
 
 
         options = {
@@ -131,6 +143,19 @@ export default function DashboardDrawerGrid({
     }
   }, [chartType, rowData]);
 
+  const onPaginationChanged = () => {
+    if (gridRef.current) {
+      const currentPage = gridRef.current.api.paginationGetCurrentPage();
+      const pageSize = gridRef.current.api.paginationGetPageSize();
+
+      // AG Grid page index 0 se start hota hai
+      const page = currentPage + 1;
+      setPage(page);
+      setLimit(pageSize);
+      // Yaha API call karo
+      // fetchData(page, pageSize);
+    }
+  };
   return (
     <Drawer
       anchor={anchor}
@@ -143,7 +168,7 @@ export default function DashboardDrawerGrid({
         {/* HEADER */}
         <div className='d-flex justify-content-between align-items-center mb-2'>
           <h4 className="ms-2 fs-19 fw-600" style={{ color: 'gray' }}>{title}</h4>
-          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); }}>
+          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); setIsDetailPage(false); setIsDetailPageDataFor("Returns"); }}>
             <X />
           </div>
         </div>
@@ -158,7 +183,7 @@ export default function DashboardDrawerGrid({
         )}
 
         {/* Chart Selector */}
-        {rowData.length > 0 && (
+        {/* {rowData.length > 0 && (
           <div className="mb-3 d-flex align-items-center">
             <span className="me-2 fw-600 text-muted">Chart Type:</span>
             <select
@@ -172,8 +197,31 @@ export default function DashboardDrawerGrid({
               <option value="pie">Pie Chart</option>
             </select>
           </div>
-        )}
+        )} */}
+        <div className="d-flex justify-content-end">
+          {isCockpitComplianceDetailPage ?
+            (
+              <div className='d-flex justify-content-between gap-3'>
+                {buttons?.map((item) => (
+                  <button
+                    key={item}
+                    className="btn btn-primary"
+                    style={{
+                      border: isDetailPageDataFor === item ? '1px solid #0d6efd' : 'opacity(0.6)',
+                      backgroundColor: isDetailPageDataFor === item ? 'rgb(13 110 253)' : 'rgba(13, 110, 253, 0.6)',
+                    }}
+                    onClick={() => setIsDetailPageDataFor(item)}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )
+            : (
+              <button className="btn btn-primary " onClick={() => { setIsDetailPage(!isDetailPage); }}>{isDetailPage ? "Back" : "View Details"}</button>
 
+            )}
+        </div>
         {/* Chart Rendering */}
         {chartType && chartSeries.length > 0 && !error && (
           <div className="mb-4" style={{ width: '100%', height: '400px' }}>
@@ -185,17 +233,27 @@ export default function DashboardDrawerGrid({
             />
           </div>
         )}
+        {isDetailPage ? (
+          <>
+            <DashboardDrawerGridDetailPage
+              rowData={isDetailPageData}
+              filterColumns={filterColumns}
+            />
+          </>
 
-        {/* DATA GRID */}
-        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
+        ) : <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
             theme="legacy"
             rowData={rowData}
             columnDefs={columnDefs}
             pagination={true}
-            paginationPageSize={10}
+            paginationPageSize={50}
+            onPaginationChanged={onPaginationChanged}
+
           />
-        </div>
+        </div>}
+
+
 
       </Box>
     </Drawer>

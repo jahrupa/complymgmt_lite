@@ -105,18 +105,22 @@ const AuditAndVisitDashboard = ({
     message: "",
     severityType: "",
   });
-const[isDetailPage, setIsDetailPage]=useState(false);
+  const [isDetailPage, setIsDetailPage] = useState(false);
+  const [isDetailPageData, setIsDetailPageData] = useState([]);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState("");
   const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
+    setFilterColumns(filterColumn);
+    setIsDetailPageData(isDetailData);
   };
   const data = AuditCountByStateSegmented?.top_count || [];
   // Collect all keys except "state"
@@ -244,11 +248,11 @@ const[isDetailPage, setIsDetailPage]=useState(false);
     series: [
       {
         name: "SLA Met (Y)",
-        data: AuditPercentageMeetingSLA?.count_sla?.map((item) => item.count_y) || [],
+        data: AuditPercentageMeetingSLA?.top_counts?.map((item) => item.count_y) || [],
       },
       {
         name: "SLA Met (N)",
-        data: AuditPercentageMeetingSLA?.count_sla?.map((item) => item.count_n) || [],
+        data: AuditPercentageMeetingSLA?.top_counts?.map((item) => item.count_n) || [],
       },
     ],
     options: {
@@ -294,7 +298,7 @@ const[isDetailPage, setIsDetailPage]=useState(false);
       },
       xaxis: {
         categories:
-          AuditPercentageMeetingSLA?.count_sla?.map((item) => item.responsible_team) || [],
+          AuditPercentageMeetingSLA?.top_counts?.map((item) => item.responsible_team) || [],
       },
       yaxis: {
         title: {
@@ -385,7 +389,7 @@ const[isDetailPage, setIsDetailPage]=useState(false);
   };
 
   const riskLevelFormat = {
-    series: riskLevel?.count_risk?.map((item) => item.count) || [],
+    series: riskLevel?.top_counts?.map((item) => item.count) || [],
     options: {
       chart: {
         width: 380,
@@ -409,7 +413,7 @@ const[isDetailPage, setIsDetailPage]=useState(false);
         },
       },
 
-      labels: riskLevel?.count_risk?.map((item) => item.risk_level) || [],
+      labels: riskLevel?.top_counts?.map((item) => item.risk_level) || [],
       legend: {
         position: "top", // 👈 moves Yes/No below the chart
         horizontalAlign: "center",
@@ -438,7 +442,7 @@ const[isDetailPage, setIsDetailPage]=useState(false);
   };
 
   const countOfAuditStatusFormated = {
-    series: countOfAuditStatus?.count_status?.map((item) => item.count) || [],
+    series: countOfAuditStatus?.top_counts?.map((item) => item.count) || [],
     options: {
       chart: {
         width: 380,
@@ -490,75 +494,45 @@ const[isDetailPage, setIsDetailPage]=useState(false);
     },
   };
 
+  const topCounts = riskLevelBreakdownByServiceType?.top_counts || [];
+
+  // 1️⃣ Get all risk level keys dynamically (except service_type)
+  const riskKeys =
+    topCounts.length > 0
+      ? Object.keys(topCounts[0]).filter(
+        (key) => key !== "service_type"
+      )
+      : [];
+
+  // 2️⃣ Build series dynamically
+  const dynamicSeries = riskKeys.map((key) => ({
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    data: topCounts.map((item) => item[key] ?? 0),
+  }));
+
   const RiskLevelBreakdownByServiceTypeFormat = {
-    series: [
-      {
-        name: "High",
-        data: riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.high) || [],
-      },
-      {
-        name: "Medium",
-        data: riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.medium) || [],
-      },
-      {
-        name: "Low",
-        data: riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.low) || [],
-      },
-    ],
+    series: dynamicSeries,
     options: {
       chart: {
         type: "bar",
         height: 350,
-      },
-      colors: ["#2cafc0ff", "#5ad5e2", "#f4b841"],
-      fill: {
-        opacity: 1,
-        colors: ["#2cafc0ff", "#5ad5e2", "#f4b841"],
-      },
-      states: {
-        hover: {
-          filter: {
-            type: "none", // 👈 disables the lighten effect
-          },
-        },
+        stacked: true,
       },
       plotOptions: {
         bar: {
           horizontal: false,
-          dataLabels: {
-            total: {
-              enabled: true,
-              offsetX: 0,
-              style: {
-                fontSize: "13px",
-                fontWeight: 900,
-              },
-            },
-          },
         },
       },
-      stroke: {
-        width: 1,
-        colors: ["#fff"],
-      },
-
       xaxis: {
-        categories:
-          riskLevelBreakdownByServiceType?.count_risk?.map((item) => item.service_type) ||
-          [],
-      },
-      yaxis: {
-        title: {
-          text: undefined,
-        },
+        categories: topCounts.map((item) => item.service_type),
       },
       legend: {
         position: "top",
         horizontalAlign: "left",
-        offsetX: 40,
       },
     },
   };
+
 
   const escalationTriggeredRateByStateFormat = {
     series: escalationTriggeredRateByStateDynamiChart,
@@ -763,7 +737,9 @@ const[isDetailPage, setIsDetailPage]=useState(false);
                     AuditCountByServiceType?.rest_counts,
                     AuditCountByServiceType?.rest_counts?.map(
                       (item) => item.service_type
-                    )
+                    ),
+                    AuditCountByServiceType?.auditRecord,
+                    AuditCountByServiceType?.columns
                   );
                 }}
               >
@@ -806,7 +782,10 @@ const[isDetailPage, setIsDetailPage]=useState(false);
                     AuditCountByStateSegmented?.rest_count,
                     AuditCountByStateSegmented?.rest_count?.map(
                       (item) => item.state
-                    )
+                    ),
+                    AuditCountByStateSegmented?.auditRecord,
+                    AuditCountByStateSegmented?.columns
+
                   );
                 }}
               >
@@ -843,14 +822,19 @@ const[isDetailPage, setIsDetailPage]=useState(false);
               />
               <div
                 className="dashboard-icon ms-2"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
+               onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "right",
+                    "Percentage of audits meeting SLA by Responsible Team",
+                    AuditPercentageMeetingSLA?.rest_counts,
+                    AuditPercentageMeetingSLA?.rest_counts?.map(
+                      (item) => item.company_name
+                    ),
+                    AuditPercentageMeetingSLA?.auditRecord,
+                    AuditPercentageMeetingSLA?.columns
+
+                  );
                 }}
               >
                 <ArrowUpRight />
@@ -892,7 +876,10 @@ const[isDetailPage, setIsDetailPage]=useState(false);
                     checklistApprovalRateByCompanyName?.rest_counts,
                     checklistApprovalRateByCompanyName?.rest_counts?.map(
                       (item) => item.company_name
-                    )
+                    ),
+                    checklistApprovalRateByCompanyName?.auditRecord,
+                    checklistApprovalRateByCompanyName?.columns
+
                   );
                 }}
               >
@@ -930,13 +917,18 @@ const[isDetailPage, setIsDetailPage]=useState(false);
               <div
                 className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation(); // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "left",
+                    "Risk level distribution",
+                    riskLevel?.rest_counts,
+                    riskLevel?.rest_counts?.map(
+                      (item) => item.service_type
+                    ),
+                    riskLevel?.auditRecord,
+                    riskLevel?.columns
+
+                  );
                 }}
               >
                 <ArrowUpRight />
@@ -975,7 +967,10 @@ const[isDetailPage, setIsDetailPage]=useState(false);
                     escalationTriggeredRateByState?.rest_counts,
                     escalationTriggeredRateByState?.rest_counts?.map(
                       (item) => item.state
-                    )
+                    ),
+                    escalationTriggeredRateByState?.auditRecord,
+                    escalationTriggeredRateByState?.columns
+
                   );
                 }}
               >
@@ -1013,13 +1008,18 @@ const[isDetailPage, setIsDetailPage]=useState(false);
               <div
                 className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation(); // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "left",
+                    "Risk Level breakdown by Service Type",
+                    riskLevelBreakdownByServiceType?.rest_counts,
+                    riskLevelBreakdownByServiceType?.rest_counts?.map(
+                      (item) => item.audit_status
+                    ),
+                    riskLevelBreakdownByServiceType?.auditRecord,
+                    riskLevelBreakdownByServiceType?.columns
+
+                  );
                 }}
               >
                 <ArrowUpRight />
@@ -1053,13 +1053,18 @@ const[isDetailPage, setIsDetailPage]=useState(false);
               <div
                 className="dashboard-icon ms-2"
                 onClick={(e) => {
-                  e.stopPropagation(); // prevent parent click from firing
-                  setIsSnackbarsOpen({
-                    ...issnackbarsOpen,
-                    open: true,
-                    message: "No Data available",
-                    severityType: "info",
-                  });
+                  e.stopPropagation();
+                  handleOpenDrawer(
+                    "right",
+                    "Proportion of audit status",
+                    countOfAuditStatus?.rest_counts,
+                    countOfAuditStatus?.rest_counts?.map(
+                      (item) => item.audit_status
+                    ),
+                    countOfAuditStatus?.auditRecord,
+                    countOfAuditStatus?.columns
+
+                  );
                 }}
               >
                 <ArrowUpRight />
@@ -1084,6 +1089,8 @@ const[isDetailPage, setIsDetailPage]=useState(false);
         chartXaxisCategory={chartXaxisCategory}
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
+        isDetailPageData={isDetailPageData}
+         filterColumns={filterColumns}
       />
     </div>
   );

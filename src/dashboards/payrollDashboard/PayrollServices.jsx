@@ -192,13 +192,18 @@ const PayrollServices = ({
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
+    const [isDetailPage, setIsDetailPage] = useState(false);
+    const [isDetailPageData, setIsDetailPageData] = useState([]);
+    const [filterColumns, setFilterColumns] = useState([]);
     const userRole = decryptData(localStorage.getItem("user_role"));
-    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory,isDetailData,filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
+        setFilterColumns(filterColumn);
+        setIsDetailPageData(isDetailData);
     };
     const columnDefs = useMemo(
         () => [
@@ -684,14 +689,18 @@ const PayrollServices = ({
 
                                 <div
                                     className="dashboard-icon ms-2"
-                                    onClick={(e) => {
+                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setIsSnackbarsOpen({
-                                            ...issnackbarsOpen,
-                                            open: true,
-                                            message: "No Data available",
-                                            severityType: "info"
-                                        });
+                                        handleOpenDrawer(
+                                            "left",
+                                            "Breakdown of Investment declaration status by Company",
+                                            investmentData?.rest_delays,
+                                            investmentData?.rest_delays?.map(
+                                                (item) => item.company_name
+                                            ),
+                                            investmentData?.payrollServicesRecords,
+                                            investmentData?.columns
+                                        );
                                     }}
                                 >
                                     <ArrowUpRight />
@@ -737,7 +746,9 @@ const PayrollServices = ({
                                             dataRequestAndClientDataReceived?.rest_delays,
                                             dataRequestAndClientDataReceived?.rest_delays?.map(
                                                 (item) => item.company_name
-                                            )
+                                            ),
+                                            dataRequestAndClientDataReceived?.payrollServicesRecords,
+                                            dataRequestAndClientDataReceived?.columns
                                         );
                                     }}
                                 >
@@ -781,12 +792,16 @@ const PayrollServices = ({
                                     className="dashboard-icon ms-2"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setIsSnackbarsOpen({
-                                            ...issnackbarsOpen,
-                                            open: true,
-                                            message: "No Data available",
-                                            severityType: "info"
-                                        });
+                                        handleOpenDrawer(
+                                            "left",
+                                            "Type of Systems Used by Employer",
+                                            systemUseByEmp?.system_used_by_employer,
+                                            systemUseByEmp?.system_used_by_employer?.map(
+                                                (item) => item.system_used
+                                            ),
+                                            systemUseByEmp?.payrollServicesRecords,
+                                            systemUseByEmp?.columns
+                                        );
                                     }}
                                 >
                                     <ArrowUpRight />
@@ -824,14 +839,18 @@ const PayrollServices = ({
 
                                 <div
                                     className="dashboard-icon ms-2"
-                                    onClick={(e) => {
+                                   onClick={(e) => {
                                         e.stopPropagation();
-                                        setIsSnackbarsOpen({
-                                            ...issnackbarsOpen,
-                                            open: true,
-                                            message: "No Data available",
-                                            severityType: "info"
-                                        });
+                                        handleOpenDrawer(
+                                            "left",
+                                            " Distribution of Company across Multiple Entities / Locations (Y/N)",
+                                            distributionOfEmployee?.system_used_by_employer,
+                                            distributionOfEmployee?.system_used_by_employer?.map(
+                                                (item) => item.system_used
+                                            ),
+                                            distributionOfEmployee?.payrollServicesRecords,
+                                            distributionOfEmployee?.columns
+                                        );
                                     }}
                                 >
                                     <ArrowUpRight />
@@ -914,6 +933,10 @@ const PayrollServices = ({
                 data={drawerData}
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}
+                isDetailPage={isDetailPage}
+                setIsDetailPage={setIsDetailPage}
+                isDetailPageData={isDetailPageData}
+                filterColumns={filterColumns}
             />
         </div>
 

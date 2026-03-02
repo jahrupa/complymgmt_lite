@@ -1444,15 +1444,15 @@ export const fetchComplainceCockpitByCompany = async (company_name) => {
 };
 
 
-export const fetchCockPitCompliancePortfolio = async () => {
-  try {
-    const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
+// export const fetchCockPitCompliancePortfolio = async () => {
+//   try {
+//     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
+//     return response.data;
+//   } catch (error) {
+//     // console.error("Error fetching all Client", error);
+//     throw error;
+//   }
+// };
 
 
 export const fetchClientOnboardingPortfolio = async () => {
@@ -1474,9 +1474,9 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
     throw error;
   }
 };
-export const fetchComplainceCockpit = async () => {
+export const fetchComplianceCockpit = async (page,limit) => {
   try {
-    const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
+    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}?page=${page}&limit=${10}`);
     return response.data;
   } catch (error) {
     // console.error("Error fetching all Complaince Cockpit", error);
@@ -1792,9 +1792,9 @@ export const fetchRiskLevelBasedOnServiceType = async (company_name) => {
     throw error;
   }
 }
-export const fetchEscalationTriggeredRateByState = async (state) => {
+export const fetchEscalationTriggeredRateByState = async (company_name) => {
   try {
-    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${state ? `?state=${encodeURIComponent(state)}` : ''}`;
+    const url = `${GET_ESCALATION_TRIGGERED_RATE_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
     const response = await API.get(url);
     return response.data;
   } catch (error) {

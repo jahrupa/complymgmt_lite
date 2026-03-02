@@ -28,7 +28,7 @@ const NoticeDashboard = ({
         series: [
             {
                 name: "Notice Count",
-                data: NoticeDistributionByAuthority?.map((item) => item.count) || [],
+                data: NoticeDistributionByAuthority?.top_counts?.map((item) => item.count) || [],
             },
         ],
         options: {
@@ -78,7 +78,7 @@ const NoticeDashboard = ({
             },
             xaxis: {
                 categories:
-                    NoticeDistributionByAuthority?.map((item) => item.authority) || [],
+                    NoticeDistributionByAuthority?.top_counts?.map((item) => item.authority) || [],
             },
             yaxis: {
                 title: {
@@ -163,7 +163,7 @@ const NoticeDashboard = ({
     };
     const [noticeTypeBreakdown, setNoticeTypeBreakdown] = React.useState([]);
     const noticeTypeBreakdownFormat = {
-        series: noticeTypeBreakdown?.map((item) => item?.count) || [],
+        series: noticeTypeBreakdown?.top_counts?.map((item) => item?.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -195,7 +195,7 @@ const NoticeDashboard = ({
             },
 
             labels:
-                noticeTypeBreakdown?.map((item) => item?.type_of_notice_inspection) ||
+                noticeTypeBreakdown?.top_counts?.map((item) => item?.type_of_notice_inspection) ||
                 [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
@@ -462,7 +462,7 @@ const NoticeDashboard = ({
     const [distributionOfResponseStatus, setDistributionOfResponseStatus] =
         React.useState([]);
     const distributionOfResponseStatusFormat = {
-        series: distributionOfResponseStatus?.map((item) => item.count) || [],
+        series: distributionOfResponseStatus?.top_counts?.map((item) => item.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -487,7 +487,7 @@ const NoticeDashboard = ({
             },
 
             labels:
-                distributionOfResponseStatus?.map((item) => item.response_status) || [],
+                distributionOfResponseStatus?.top_counts?.map((item) => item.response_status) || [],
             legend: {
                 position: "top", // 👈 moves Yes/No below the chart
                 horizontalAlign: "center",
@@ -517,7 +517,7 @@ const NoticeDashboard = ({
     const [clientDocumentSubmission, setClientDocumentSubmission] =
         React.useState([]);
     const clientDocumentSubmissionFormat = {
-        series: clientDocumentSubmission?.map((item) => item.count) || [],
+        series: clientDocumentSubmission?.top_counts?.map((item) => item.count) || [],
         options: {
             chart: {
                 width: 380,
@@ -542,7 +542,7 @@ const NoticeDashboard = ({
             },
 
             labels:
-                clientDocumentSubmission?.map(
+                clientDocumentSubmission?.top_counts?.map(
                     (item) => item.doc_submission_by_client
                 ) || [],
             legend: {
@@ -583,12 +583,17 @@ const NoticeDashboard = ({
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
     const [chartXaxisCategory, setChartXaxisCategory] = React.useState("");
-    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory) => {
+    const [isDetailPage, setIsDetailPage] = useState(false);
+    const [isDetailPageData, setIsDetailPageData] = useState([]);
+    const [filterColumns, setFilterColumns] = useState([]);
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
+        setFilterColumns(filterColumn);
+        setIsDetailPageData(isDetailData);
     };
     const userRole = decryptData(localStorage.getItem("user_role"));
 
@@ -644,7 +649,7 @@ const NoticeDashboard = ({
             if (noticesAssignedToRes.status === "fulfilled") {
                 setNumberOfNoticesAssignedToEachTeamMember(noticesAssignedToRes.value);
             } else {
-              
+
                 setNumberOfNoticesAssignedToEachTeamMember(
                     noticesAssignedToRes.reason?.status || []
                 );
@@ -652,7 +657,7 @@ const NoticeDashboard = ({
             if (countOfAcknowledgmentRates.status === "fulfilled") {
                 setCountOfAcknowledgmentRates(countOfAcknowledgmentRates.value);
             } else {
-              
+
                 setCountOfAcknowledgmentRates(
                     countOfAcknowledgmentRates.reason?.status || []
                 );
@@ -731,12 +736,16 @@ const NoticeDashboard = ({
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setIsSnackbarsOpen({
-                                        ...issnackbarsOpen,
-                                        open: true,
-                                        message: "No Data available",
-                                        severityType: "info",
-                                    });
+                                    handleOpenDrawer(
+                                        "right",
+                                        "Distribution of notices across different authorities",
+                                        NoticeDistributionByAuthority?.rest_counts,
+                                        NoticeDistributionByAuthority?.rest_counts?.map(
+                                            (item) => item.assigned_to
+                                        ),
+                                        NoticeDistributionByAuthority?.notice_records,
+                                        NoticeDistributionByAuthority?.columns
+                                    );
                                 }}
                             >
                                 <ArrowUpRight />
@@ -744,7 +753,7 @@ const NoticeDashboard = ({
                         </div>
 
                         <div className="mb-3 fw-600">
-                            Distribution of notices across different authorities...
+                            Distribution of notices across different authorities
                         </div>
 
                         <Chart
@@ -781,10 +790,12 @@ const NoticeDashboard = ({
                                     handleOpenDrawer(
                                         "right",
                                         "Number of notices assigned...",
-                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts,
-                                        numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
+                                        stateWiseNoticeCount?.rest_counts,
+                                        stateWiseNoticeCount?.rest_counts?.map(
                                             (item) => item.assigned_to
-                                        )
+                                        ),
+                                        stateWiseNoticeCount?.notice_records,
+                                        stateWiseNoticeCount?.columns
                                     );
                                 }}
                             >
@@ -826,13 +837,17 @@ const NoticeDashboard = ({
                             <div
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {
-                                    e.stopPropagation();   // prevent parent click from firing
-                                    setIsSnackbarsOpen({
-                                        ...issnackbarsOpen,
-                                        open: true,
-                                        message: "No Data available",
-                                        severityType: "info",
-                                    });
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "left",
+                                        "Breakdown of notice types to show the most common compliance actions",
+                                        noticeTypeBreakdown?.rest_counts,
+                                        noticeTypeBreakdown?.rest_counts?.map(
+                                            (item) => item.applicable_act
+                                        ),
+                                        noticeTypeBreakdown?.notice_records,
+                                        noticeTypeBreakdown?.columns
+                                    )
                                 }}
                             >
                                 <ArrowUpRight />
@@ -879,7 +894,9 @@ const NoticeDashboard = ({
                                         ApplicableActsAnalysis?.rest_counts,
                                         ApplicableActsAnalysis?.rest_counts?.map(
                                             (item) => item.applicable_act
-                                        )
+                                        ),
+                                        ApplicableActsAnalysis?.notice_records,
+                                        ApplicableActsAnalysis?.columns
                                     )
                                 }}
                             >
@@ -930,7 +947,9 @@ const NoticeDashboard = ({
                                         numberOfNoticesAssignedToEachTeamMember?.rest_counts,
                                         numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
                                             (item) => item.assigned_to
-                                        )
+                                        ),
+                                       numberOfNoticesAssignedToEachTeamMember?.notice_records,
+                                       numberOfNoticesAssignedToEachTeamMember?.columns
                                     )
                                 }
 
@@ -979,14 +998,17 @@ const NoticeDashboard = ({
                                         countOfAcknowledgmentRates?.rest_counts,
                                         countOfAcknowledgmentRates?.rest_counts?.map(
                                             (item) => item.acknowledged_by
-                                        )
+                                        ),
+                                        countOfAcknowledgmentRates?.notice_records,
+                                        countOfAcknowledgmentRates?.columns
                                     )
                                 }
 
                                 }
                             >
                                 <ArrowUpRight />
-                            </div> <div
+                            </div>
+                            {/* <div
                                 className={`chart-card ${cardClass("ni-6") ? "selected-card" : ""
                                     }`}
                                 onClick={canSelect ? () => handleSelect("ni-6") : undefined}
@@ -1013,7 +1035,8 @@ const NoticeDashboard = ({
                                                 countOfAcknowledgmentRates?.rest_counts,
                                                 countOfAcknowledgmentRates?.rest_counts?.map(
                                                     (item) => item.acknowledged_by
-                                                )
+                                                ),
+                                                countOfAcknowledgmentRates?.notice_records,
                                             )
                                         }
 
@@ -1022,7 +1045,7 @@ const NoticeDashboard = ({
                                         <ArrowUpRight />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                         <div className="mb-3 fw-600">
                             Top 5 comparison of acknowledgement rates by different individuals
@@ -1057,14 +1080,20 @@ const NoticeDashboard = ({
                             <div
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {
-                                    e.stopPropagation();   // prevent parent click from firing
-                                    setIsSnackbarsOpen({
-                                        ...issnackbarsOpen,
-                                        open: true,
-                                        message: "No Data available",
-                                        severityType: "info",
-                                    });
-                                }}
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "right",
+                                        "Distribution of response status to track resolution progress",
+                                        distributionOfResponseStatus?.rest_counts,
+                                        distributionOfResponseStatus?.rest_counts?.map(
+                                            (item) => item.acknowledged_by
+                                        ),
+                                        distributionOfResponseStatus?.notice_records,
+                                        distributionOfResponseStatus?.columns
+                                    )
+                                }
+
+                                }
                             >
                                 <ArrowUpRight />
                             </div>
@@ -1099,14 +1128,20 @@ const NoticeDashboard = ({
                             <div
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {
-                                    e.stopPropagation();   // prevent parent click from firing
-                                    setIsSnackbarsOpen({
-                                        ...issnackbarsOpen,
-                                        open: true,
-                                        message: "No Data available",
-                                        severityType: "info",
-                                    });
-                                }}
+                                    e.stopPropagation();
+                                    handleOpenDrawer(
+                                        "right",
+                                        "Proportion of notices with client document submission (Y/N) to measure client engagement.",
+                                        clientDocumentSubmission?.rest_counts,
+                                        clientDocumentSubmission?.rest_counts?.map(
+                                            (item) => item.acknowledged_by
+                                        ),
+                                        clientDocumentSubmission?.notice_records,
+                                        clientDocumentSubmission?.columns
+                                    )
+                                }
+
+                                }
                             >
                                 <ArrowUpRight />
                             </div>
@@ -1132,6 +1167,10 @@ const NoticeDashboard = ({
                 data={drawerData} //direct array
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}
+                isDetailPage={isDetailPage}
+                setIsDetailPage={setIsDetailPage}
+                isDetailPageData={isDetailPageData}
+                filterColumns={filterColumns}
             />
         </div>
     );

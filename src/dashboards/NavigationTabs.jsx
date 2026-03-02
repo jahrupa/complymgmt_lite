@@ -7,7 +7,7 @@ import {
     createOrUpdateWidgetMapping,
     fetchClientOnboardingByCompany,
     fetchClientOnboardingPortfolio,
-    fetchComplainceCockpit,
+    fetchComplianceCockpit,
     fetchComplainceCockpitByCompany,
     fetchGeneralCompaiancePortfolio,
     fetchGeneralComplianceByCompany,
@@ -46,7 +46,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
-
+    const[page, setPage] = useState(1);
+    const[limit, setLimit] = useState(50);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -132,6 +133,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         selectedCharts={selectedCharts}
                         setSelectedCharts={setSelectedCharts}
                         shouldShow={shouldShow}
+                        setPage={setPage}
+                        setLimit={setLimit}
 
                     />
                 )
@@ -258,15 +261,14 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             }
         };
         fetchGeneralDashboardData();
-    }, [selectedCompany]);
+    }, [selectedCompany,page,limit]);
 
     useEffect(() => {
         const fetchCockpitData = async () => {
             const [a, b] = await Promise.allSettled([
                 fetchComplainceCockpitByCompany(selectedCompany),
-                fetchComplainceCockpit()
+                fetchComplianceCockpit(page,limit)
             ]);
-
             setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);
             setCockpitData(b.status === "fulfilled" ? b.value : []);
         };

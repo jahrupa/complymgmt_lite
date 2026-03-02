@@ -9,7 +9,7 @@ import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchComplainceCockpit } from "../../api/service";
+import { fetchComplianceCockpit } from "../../api/service";
 
 const CockpitComplince = ({
   // data,
@@ -65,7 +65,7 @@ const CockpitComplince = ({
           const fetchCockpitData = async () => {
               const [ b] = await Promise.allSettled([
                   // fetchComplainceCockpitByCompany(selectedCompany),
-                  fetchComplainceCockpit()
+                  fetchComplianceCockpit()
               ]);
   
               setData(b.status === "fulfilled" ? b.value : []);
