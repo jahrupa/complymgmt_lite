@@ -119,6 +119,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
+            
 
             {/* notification sub-routes */}
             <Route path="/notification" element={

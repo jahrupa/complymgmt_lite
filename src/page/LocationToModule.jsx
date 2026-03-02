@@ -30,7 +30,7 @@ const LocationToModule = () => {
             desc: '',
             approved_by: '',
             group_name: "",
-            group_holdings_id: null,
+            group_holding_id: null,
             company_name: "",
             company_id: null,
             location_name: "",
@@ -58,8 +58,8 @@ const LocationToModule = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const crudTitle = "Tag Sucribe Modules & Sub-Modules"
-    const editCrudTitle = "Edit Tagged Sucribe Modules & Sub-Modules"
+    const crudTitle = "Tag Subscribe Modules & Sub-Modules"
+    const editCrudTitle = "Edit Tagged Subscribe Modules & Sub-Modules"
     const SystemUserId = decryptData(localStorage.getItem("user_id"));
     const validate = () => {
         let tempErrors = {};
@@ -130,7 +130,7 @@ const LocationToModule = () => {
         // Reset form state
         setCurrent({
             group_name: "",
-            group_holdings_id: null,
+            group_holding_id: null,
             company_name: "",
             company_id: null,
             location_name: "",
@@ -184,7 +184,7 @@ const LocationToModule = () => {
         setIsEditing(false);
         setCurrent({
             group_name: "",
-            group_holdings_id: null,
+            group_holding_id: null,
             company_name: "",
             company_id: null,
             location_name: "",
@@ -238,7 +238,7 @@ const LocationToModule = () => {
     useEffect(() => {
         const fetchCompany = async () => {
             try {
-                const data = await fetchCompaniesNameByGroupId(current?.group_holdings_id);
+                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
                 if (data) {
                     setCompanyName(data);
                 }
@@ -247,10 +247,10 @@ const LocationToModule = () => {
             }
         };
 
-        if (current?.group_holdings_id) {
+        if (current?.group_holding_id) {
             fetchCompany();
         }
-    }, [current?.group_holdings_id]);
+    }, [current?.group_holding_id]);
 
     useEffect(() => {
         const fetchLocationByCompanyId = async () => {
@@ -268,7 +268,6 @@ const LocationToModule = () => {
             fetchLocationByCompanyId();
         }
     }, [current?.company_id]);
-
     const crudForm = () => {
         return (
             <div>
@@ -285,7 +284,7 @@ const LocationToModule = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 group_name: selectedName,
-                                group_holdings_id: matchedGroup?._id || null,
+                                group_holding_id: matchedGroup?._id || null,
                                 company_name: '',
                                 location_name: '',
                             }));
@@ -360,7 +359,7 @@ const LocationToModule = () => {
                         name="sub_module_name"
                         label="Sub-Module"
                         value={current?.sub_module_name}
-                        isdisable={isEditing ? true : false}
+                        // isdisable={isEditing ? true : false}
                         onChange={(e) => {
                             const selectedName = e.target.value;
                             const matchedSubModule = subModuleName.find(
@@ -400,7 +399,7 @@ const LocationToModule = () => {
         return (
             <div>
                 <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Sucribe Modules & Sub-Modules?
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this user Tagged Subscribe Modules & Sub-Modules?
                 </div>
 
                 <div className="row row-gap-2 mt-4">
@@ -659,7 +658,7 @@ const LocationToModule = () => {
                 <div className="notification-page-title">
                     <div>
                         {/* <h1>{data?.length > 1 ? "Companies" : "Company"}</h1> */}
-                        <h1>Sucribe Modules & Sub-Module</h1>
+                        <h1>Subscribe Modules & Sub-Modules</h1>
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
