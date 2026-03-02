@@ -586,6 +586,7 @@ const NoticeDashboard = ({
     const [isDetailPage, setIsDetailPage] = useState(false);
     const [isDetailPageData, setIsDetailPageData] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
+    console.log(filterColumns,'filterColumns')
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);

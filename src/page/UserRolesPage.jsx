@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import '../style/useRole.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,6 +19,9 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { flattenObject } from '../../Utils/tableColUtils';
+
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -48,6 +51,7 @@ const UserRolesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userId, setUserId] = useState(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
   const crudTitle = "Add New User Form"
   const editCrudTitle = "Edit User"
 
@@ -59,12 +63,30 @@ const UserRolesPage = () => {
     message: '',
     severityType: '',
   });
+
+  const [filters, setFilters] = useState({});
+
+  const [filterColumns, setFilterColumns] = useState([]);
+  const handleFilterApply = (newFilters,) => {
+    setFilters(newFilters);
+  };
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
+  console.log(filteredRowData, 'filteredRowData')
   const gridRef = useRef();
   const userType = [
-    { id: 0,  value: 'Internal' },
+    { id: 0, value: 'Internal' },
     { id: 1, value: 'External' },
   ];
-   const SystemUserId = decryptData(localStorage.getItem("user_id"));
+  const SystemUserId = decryptData(localStorage.getItem("user_id"));
   const validate = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
@@ -215,6 +237,8 @@ const UserRolesPage = () => {
     fetchData();
   }, []);
 
+  console.log(filteredRowData, "filterRowData");
+
   const crudForm = () => {
     return (
       <div>
@@ -269,7 +293,7 @@ const UserRolesPage = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               //  // console.log(matchedGroup,'matchedGroup')
-               const userId = userType.find((g) => g.value === selectedName) || {};
+              const userId = userType.find((g) => g.value === selectedName) || {};
               setCurrent((prev) => ({
                 ...prev,
                 user_type: selectedName,
@@ -432,6 +456,117 @@ const UserRolesPage = () => {
     setData(updatedData);
   };
 
+  const generateDynamicColDefs = (data) => {
+    if (!data || data.length === 0) return [];
+
+    const sample = flattenObject(data[0]);
+
+    return Object.keys(sample)
+      .map((key) => {
+        // Skip unwanted fields
+        if (
+          key === "_id" ||
+          key === "common_attributes.is_active" ||
+          key === "common_attributes.is_deleted" ||
+          key === "common_attributes.deleted_by" ||
+          key === "common_attributes.deleted_at"
+        )
+          return null;
+
+        // ✅ Special case for approval_status
+        if (key === "common_attributes.approval_status") {
+          return {
+            field: key,
+            headerName: "Approval Status",
+            filter: true,
+            editable: false,
+            valueGetter: (params) =>
+              params.data?.common_attributes?.approval_status,
+            cellRenderer: (params) => {
+              const status = params.value ?? 0;
+
+              const handleChange = async (e) => {
+                const checked = e.target.checked;
+
+                // UI Update Immediately (Optimistic Update)
+                params.node.setDataValue(
+                  "common_attributes.approval_status",
+                  checked ? 1 : 0,
+                );
+
+                // Optional: API Call
+                try {
+                  await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                } catch {
+                  // Revert if API fails
+                  params.node.setDataValue(
+                    "common_attributes.approval_status",
+                    status,
+                  );
+                }
+              };
+
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={status === 1}
+                    disabled={status === 1} // Approved hone ke baad disable
+                    onChange={handleChange}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      accentColor: "orange",
+                      cursor: status === 1 ? "not-allowed" : "pointer",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: status === 1 ? "green" : "orange",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {status === 1 ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              );
+            },
+          };
+        }
+
+        // ✅ Default column definition
+        return {
+          field: key,
+          headerName: key
+            .split(".")
+            .pop()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase()),
+
+          filter: true,
+          editable: false,
+          headerStyle: {
+            color: "#515151",
+            backgroundColor: "#ffffe24d",
+          },
+
+          valueGetter: (params) => {
+            return key
+              .split(".")
+              .reduce((acc, part) => acc?.[part], params.data);
+          },
+        };
+      })
+      .filter(Boolean);
+  };
+
   const colDefs = [
     {
       headerName: 'Actions',
@@ -469,78 +604,9 @@ const UserRolesPage = () => {
         );
       }
     },
-    // { field: '_id', headerName: 'ID', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    { field: 'full_name', headerName: 'Full Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    {
-      field: 'role_name', width: 300, headerName: 'Role Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true,
-      cellRenderer: (params) => {
-        const { background, color } = getRoleColor(params.value);
-        return (
-          <span
-            style={{
-              //   padding: '4px 12px',
-              padding: '5px 12px',
-              backgroundColor: background,
-              color: color,
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              //   display: 'inline-block',
-              textAlign: 'center',
-              minWidth: '60px'
-            }}
-          >
-            <span> <PermIdentityIcon style={{ width: '15', height: '15' }} className='mb-1 me-1' /></span>{params.value}<span></span>
-          </span>
-        );
-      }
-    },
-    { field: 'username', headerName: 'User Name', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
-    {
-      field: 'common_attributes.approval_status', // or use valueGetter instead (recommended)
-      headerName: 'Approval Status',
-      editable: false,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-      filter: true,
-      valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
-
-      cellRenderer: (params) => {
-        const getApprovalStatusText = (status) => {
-          switch (status) {
-            case 0: return 'Pending';
-            case 1: return 'Approved';
-            default: return '-'; // fallback
-          }
-        };
-
-        const status = params.value;
-        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
-
-        return (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <input
-              type="checkbox"
-              // checked={true}
-              // readOnly // ✅ prevent manual toggle unless you implement onChange
-              checked={status === 1}
-              readOnly={status === 1}
-              style={{ cursor: 'default', width: 15, height: 15, accentColor: 'orange' }}
-              onClick={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
-            />
-            <span
-              style={{
-                color,
-                fontSize: '0.8rem',
-                fontWeight: 500,
-              }}
-            >
-              {getApprovalStatusText(status)}
-            </span>
-          </div>
-        );
-      }
-    },
-    { field: 'user_description', headerName: ' Description', editable: false, headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' }, filter: true, },
+    ...generateDynamicColDefs(data),
+  
+  
     {
       headerName: 'Status',
       field: 'common_attributes.is_active',
@@ -553,20 +619,6 @@ const UserRolesPage = () => {
           onChange={(e) => handleToggleChange(e, params)}
         />
       )
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      editable: false,
-      filter: true,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
-    },
-    {
-      field: 'password',
-      headerName: 'Password',
-      editable: false,
-      filter: true,
-      headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     },
   ];
   const defaultColDef = {
@@ -616,21 +668,29 @@ const UserRolesPage = () => {
       </div>
       {/* Table to display data */}
       <div className='table_div p-3'>
-        <div className='d-lg-flex d-md-flex  justify-content-between'>
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+          <MultiSelectFilter
+            rowData={data}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
+          />
         </div>
+
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
+            filterColumns={filterColumns}
             editType="fullRow"
             rowSelection="single"
             pagination={true}
             // rowBuffer={rowBuffer}
             onRowValueChanged={onRowValueChanged}
+
           />
         </div>
       </div>

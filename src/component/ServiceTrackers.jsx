@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +28,8 @@ import MuiTextAreaField from "./MuiInputs/MuiTextAreaField";
 import { useNavigate } from "react-router-dom";
 import { AnimatedSearchBar } from "./AnimatedSearchBar";
 import { decryptData } from "../page/utils/encrypt";
+import MultiSelectFilter from '../page/dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { flattenObject } from '../../Utils/tableColUtils';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -60,6 +62,24 @@ const ServiceTrackers = () => {
     message: "",
     severityType: "",
   });
+
+  const [filters, setFilters] = useState({});
+
+  const [filterColumns, setFilterColumns] = useState([]);
+
+  const handleFilterApply = (newFilters,) => {
+    setFilters(newFilters);
+  };
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
   const [serviceTrackerId, setServiceTrackerId] = useState(null);
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
@@ -239,13 +259,13 @@ const ServiceTrackers = () => {
         if (serviceTrackerResult.status === "fulfilled") {
           setData(serviceTrackerResult.value);
         } else {
-        //  handle error silently
+          //  handle error silently
         }
 
         if (moduleNameResult.status === "fulfilled") {
           setModuleName(moduleNameResult.value);
         } else {
-            // handle error silently
+          // handle error silently
         }
       } catch {
         // handle error silently
@@ -439,6 +459,117 @@ const ServiceTrackers = () => {
     setData(updatedData);
   };
 
+  const generateDynamicColDefs = (data) => {
+    if (!data || data.length === 0) return [];
+
+    const sample = flattenObject(data[0]);
+
+    return Object.keys(sample)
+      .map((key) => {
+        // Skip unwanted fields
+        if (
+          key === "_id" ||
+          key === "common_attributes.is_active" ||
+          key === "common_attributes.is_deleted" ||
+          key === "common_attributes.deleted_by" ||
+          key === "common_attributes.deleted_at"
+        )
+          return null;
+
+        // ✅ Special case for approval_status
+        if (key === "common_attributes.approval_status") {
+          return {
+            field: key,
+            headerName: "Approval Status",
+            filter: true,
+            editable: false,
+            valueGetter: (params) =>
+              params.data?.common_attributes?.approval_status,
+            cellRenderer: (params) => {
+              const status = params.value ?? 0;
+
+              const handleChange = async (e) => {
+                const checked = e.target.checked;
+
+                // UI Update Immediately (Optimistic Update)
+                params.node.setDataValue(
+                  "common_attributes.approval_status",
+                  checked ? 1 : 0,
+                );
+
+                // Optional: API Call
+                try {
+                  await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                } catch {
+                  // Revert if API fails
+                  params.node.setDataValue(
+                    "common_attributes.approval_status",
+                    status,
+                  );
+                }
+              };
+
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={status === 1}
+                    disabled={status === 1} // Approved hone ke baad disable
+                    onChange={handleChange}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      accentColor: "orange",
+                      cursor: status === 1 ? "not-allowed" : "pointer",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: status === 1 ? "green" : "orange",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {status === 1 ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              );
+            },
+          };
+        }
+
+        // ✅ Default column definition
+        return {
+          field: key,
+          headerName: key
+            .split(".")
+            .pop()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase()),
+
+          filter: true,
+          editable: false,
+          headerStyle: {
+            color: "#515151",
+            backgroundColor: "#ffffe24d",
+          },
+
+          valueGetter: (params) => {
+            return key
+              .split(".")
+              .reduce((acc, part) => acc?.[part], params.data);
+          },
+        };
+      })
+      .filter(Boolean);
+  };
+
   const colDefs = [
     {
       headerName: "Actions",
@@ -475,7 +606,7 @@ const ServiceTrackers = () => {
         );
       },
     },
-    {
+ {
       field: "service_tracker_name",
       headerName: "Service Tracker Name",
       filter: true,
@@ -497,91 +628,8 @@ const ServiceTrackers = () => {
         </span>
       ),
     },
-    // { field: 'group_name', headerName: 'Group Holding', filter: true, editable: false, },
-    // { field: 'company_name', headerName: 'company', filter: true, editable: false, },
-    {
-      field: "location_name",
-      headerName: "Location",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "module_name",
-      headerName: "Module",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "sub_module_name",
-      headerName: "Sub-Module",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "common_attributes.approval_status", // or use valueGetter instead (recommended)
-      headerName: "Approval Status",
-      editable: false,
-      headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
-      filter: true,
-
-      valueGetter: (params) => params.data?.common_attributes?.approval_status, // safer access
-
-      cellRenderer: (params) => {
-        const getApprovalStatusText = (status) => {
-          switch (status) {
-            case 0:
-              return "Pending";
-            case 1:
-              return "Approved";
-            default:
-              return "-"; // fallback
-          }
-        };
-
-        const status = params.value;
-        const { color } = getRoleColorForFileStatus(status || 0); // Fallback to 0 (Pending) if undefined
-
-        return (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <input
-              type="checkbox"
-              checked={status === 1}
-              readOnly={status === 1}
-              style={{
-                cursor: "default",
-                width: 15,
-                height: 15,
-                accentColor: "orange",
-              }}
-              onClick={
-                status !== 1 ? () => handleCheckboxClick(params.data._id) : null
-              }
-            />
-            <span
-              style={{
-                color,
-                fontSize: "0.8rem",
-                fontWeight: 500,
-              }}
-            >
-              {getApprovalStatusText(status)}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
-      field: "common_attributes.created_at",
-      headerName: "Created At",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "common_attributes.updated_at",
-      headerName: "Updated At",
-      filter: true,
-      editable: false,
-    },
+    ...generateDynamicColDefs(data),
+    
     {
       headerName: "Status",
       field: "common_attributes.is_active",
@@ -661,12 +709,17 @@ const ServiceTrackers = () => {
       />
 
       <div className="table_div p-3">
-        <div className="d-lg-flex d-md-flex  justify-content-between">
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
+          />
+          <MultiSelectFilter
+            rowData={filteredRowData}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
           />
         </div>
         <div
@@ -676,7 +729,7 @@ const ServiceTrackers = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
