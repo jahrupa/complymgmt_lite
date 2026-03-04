@@ -128,7 +128,7 @@
 .dropdown-content {
   display: flex;
   height: 24rem;
-  white-space: nowrap;
+  white-space: nowrap; 
 }
 
 .dropdown-columns {
@@ -250,10 +250,12 @@
   background-color: white;
   display: flex;
   gap: 0.5rem;
+  justify-content: end;
 }
 
 .dropdown-apply-btn {
-  flex: 1;
+  /* flex: 1; */
+  flex: 0 0 140px;
   padding: 0.5rem 1rem;
   background-color: #2563eb;
   color: white;
