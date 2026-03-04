@@ -699,7 +699,7 @@ const Company = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
