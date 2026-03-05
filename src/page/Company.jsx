@@ -687,7 +687,7 @@ const Company = () => {
             onInput={onFilterTextBoxChanged}
           />
            <MultiSelectFilter
-            rowData={data}
+            rowData={filteredRowData}
             filterColumns={filterColumns}
             onFilterApply={handleFilterApply}
           />
