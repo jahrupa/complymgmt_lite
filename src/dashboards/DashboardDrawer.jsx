@@ -1,3 +1,4 @@
+import { flattenObject } from '../../Utils/tableColUtils';
 import * as React from 'react';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -9,6 +10,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DashboardDrawerGridDetailPage from '../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage';
+import MultiSelectFilter from '../page/dashboardDrawerGridDetailPage/MultiSelectFilter';
+import react, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -38,6 +41,24 @@ export default function DashboardDrawerGrid({
   const [error, setError] = React.useState(""); // error state
   // Set rowData & columnDefs
   const gridRef = React.useRef();
+  const [filters, setFilters] = useState({});
+
+  
+
+  const filteredRowData = useMemo(() => {
+    if (Object.keys(filters).length === 0) return data;
+
+    return data.filter((row) => {
+      return Object.entries(filters).every(([column, values]) => {
+        return values.includes(row[column]);
+      });
+    });
+  }, [data, filters]);
+
+  const handleFilterApply = (newFilters) => {
+    setFilters(newFilters);
+  };
+
   React.useEffect(() => {
     try {
       setError(""); // reset error
@@ -168,7 +189,7 @@ export default function DashboardDrawerGrid({
         {/* HEADER */}
         <div className='d-flex justify-content-between align-items-center mb-2'>
           <h4 className="ms-2 fs-19 fw-600" style={{ color: 'gray' }}>{title}</h4>
-          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType({}); setIsDetailPage(false); setIsDetailPageDataFor("Returns"); }}>
+          <div className='dashboard-icon me-2 ms-1' style={{ cursor: "pointer" }} onClick={() => { onClose(); setChartType(""); setIsDetailPage(false); setIsDetailPageDataFor("Returns"); }}>
             <X />
           </div>
         </div>
@@ -198,7 +219,14 @@ export default function DashboardDrawerGrid({
             </select>
           </div>
         )} */}
-        <div className="d-flex justify-content-end">
+
+        <div className="d-flex justify-content-between align-items-center mb-2">
+
+          <MultiSelectFilter
+            rowData={filteredRowData}
+            filterColumns={filterColumns}
+            onFilterApply={handleFilterApply}
+          />
           {isCockpitComplianceDetailPage ?
             (
               <div className='d-flex justify-content-between gap-3'>
@@ -221,6 +249,7 @@ export default function DashboardDrawerGrid({
               <button className="btn btn-primary " onClick={() => { setIsDetailPage(!isDetailPage); }}>{isDetailPage ? "Back" : "View Details"}</button>
 
             )}
+
         </div>
         {/* Chart Rendering */}
         {chartType && chartSeries.length > 0 && !error && (
@@ -244,7 +273,7 @@ export default function DashboardDrawerGrid({
         ) : <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
             theme="legacy"
-            rowData={rowData}
+            rowData={filteredRowData}
             columnDefs={columnDefs}
             pagination={true}
             paginationPageSize={50}
