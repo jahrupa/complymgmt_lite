@@ -74,6 +74,7 @@ const LocationToModule = () => {
             });
         });
     }, [data, filters]);
+    console.log("🚀 ~ file: LocationToModule.jsx:122 ~ filteredRowData:", filteredRowData)
 
     const [errors, setErrors] = useState({});
     const crudTitle = "Tag Subscribe Modules & Sub-Modules"
