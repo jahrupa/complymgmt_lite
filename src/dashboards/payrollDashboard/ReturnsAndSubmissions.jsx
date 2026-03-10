@@ -79,16 +79,6 @@ const ReturnsAndSubmissions = ({
   const [riskDistributionByState, setRiskDistributionByState] = useState({});
   const [stateWiseAnalysisOfApplicableReturns, setStateWiseAnalysisOfApplicableReturns] = useState({});
   // --- Helper to normalize "maybe object-maybe-array" responses ---
-  const ensureArray = (val, fallback = []) => {
-    if (!val) return fallback;
-    if (Array.isArray(val)) return val;
-    // if object wrapping array in known key
-    if (val.count_remark && Array.isArray(val.count_remark)) return val.count_remark;
-    if (val.top_counts && Array.isArray(val.top_counts)) return val.top_counts;
-    // fallback: try to find a first array property
-    const firstArray = Object.values(val).find((v) => Array.isArray(v));
-    return firstArray || fallback;
-  };
   const riskDistributionByStateFormatSeries = generateDynamicSeries(
     riskDistributionByState?.top_counts || [],
     {
@@ -133,7 +123,6 @@ const ReturnsAndSubmissions = ({
     },
   };
 
-  const applicableReturnsByLocationArray = ensureArray(applicableReturnsRaw, []);
   
 const dataArray = applicableReturnsRaw?.top_count || [];
 

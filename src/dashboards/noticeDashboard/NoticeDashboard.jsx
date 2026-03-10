@@ -1009,44 +1009,6 @@ const NoticeDashboard = ({
                             >
                                 <ArrowUpRight />
                             </div>
-                            {/* <div
-                                className={`chart-card ${cardClass("ni-6") ? "selected-card" : ""
-                                    }`}
-                                onClick={canSelect ? () => handleSelect("ni-6") : undefined}
-                                style={{ cursor: canSelect ? "pointer" : "default" }}
-                            >
-                                <div
-                                    className="d-flex justify-content-end align-items-center"
-
-                                >
-                                    <input
-                                        type="checkbox"
-                                        className="chart-select-checkbox"
-                                        onChange={() => toggleChartSelection("ni-6")}
-                                        checked={selectedCharts.includes("ni-6")}
-                                        disabled={!current?.user_name}
-                                    />
-                                    <div
-                                        className="dashboard-icon ms-2"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleOpenDrawer(
-                                                "right",
-                                                "Comparison of acknowledgement rates by different individuals to evaluate responsiveness",
-                                                countOfAcknowledgmentRates?.rest_counts,
-                                                countOfAcknowledgmentRates?.rest_counts?.map(
-                                                    (item) => item.acknowledged_by
-                                                ),
-                                                countOfAcknowledgmentRates?.notice_records,
-                                            )
-                                        }
-
-                                        }
-                                    >
-                                        <ArrowUpRight />
-                                    </div>
-                                </div>
-                            </div> */}
                         </div>
                         <div className="mb-3 fw-600">
                             Top 5 comparison of acknowledgement rates by different individuals

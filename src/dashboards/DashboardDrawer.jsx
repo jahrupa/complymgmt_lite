@@ -1,4 +1,3 @@
-import { flattenObject } from '../../Utils/tableColUtils';
 import * as React from 'react';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -11,7 +10,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import DashboardDrawerGridDetailPage from '../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage';
 import MultiSelectFilter from '../page/dashboardDrawerGridDetailPage/MultiSelectFilter';
-import react, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -42,8 +41,6 @@ export default function DashboardDrawerGrid({
   // Set rowData & columnDefs
   const gridRef = React.useRef();
   const [filters, setFilters] = useState({});
-
-  
 
   const filteredRowData = useMemo(() => {
     if (Object.keys(filters).length === 0) return data;
@@ -202,28 +199,10 @@ export default function DashboardDrawerGrid({
             {error}
           </div>
         )}
-
-        {/* Chart Selector */}
-        {/* {rowData.length > 0 && (
-          <div className="mb-3 d-flex align-items-center">
-            <span className="me-2 fw-600 text-muted">Chart Type:</span>
-            <select
-              className="form-select w-auto"
-              value={chartType}
-              onChange={(e) => setChartType(e.target.value)}
-            >
-              <option value="">Select Chart</option>
-              <option value="bar">Bar Chart</option>
-              <option value="line">Line Chart</option>
-              <option value="pie">Pie Chart</option>
-            </select>
-          </div>
-        )} */}
-
         <div className="d-flex justify-content-between align-items-center mb-2">
 
           <MultiSelectFilter
-            rowData={filteredRowData}
+            rowData={rowData}
             filterColumns={filterColumns}
             onFilterApply={handleFilterApply}
           />
