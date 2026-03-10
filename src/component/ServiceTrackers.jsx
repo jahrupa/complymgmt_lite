@@ -65,9 +65,9 @@ const ServiceTrackers = () => {
 
   const [filters, setFilters] = useState({});
 
-  const [filterColumns, setFilterColumns] = useState([]);
+  // const [filterColumns, setFilterColumns] = useState([]);
 
-  const handleFilterApply = (newFilters,) => {
+  const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
   };
   const filteredRowData = useMemo(() => {
@@ -717,8 +717,7 @@ const ServiceTrackers = () => {
             onInput={onFilterTextBoxChanged}
           />
           <MultiSelectFilter
-            rowData={filteredRowData}
-            filterColumns={filterColumns}
+            rowData={data}
             onFilterApply={handleFilterApply}
           />
         </div>
