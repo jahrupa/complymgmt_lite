@@ -77,7 +77,6 @@ const UserRolesPage = () => {
 
   const [filters, setFilters] = useState({});
 
-  // const [filterColumns, setFilterColumns] = useState([]);
   const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
   };
