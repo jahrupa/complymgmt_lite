@@ -8,7 +8,6 @@ const ClientOnbordingDashboard = ({ data }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnchor, setDrawerAnchor] = useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
-  const [drawerData, setDrawerData] = useState("");
   const [chartXaxisCategory, setChartXaxisCategory] = useState("");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [isDetailPageData, setIsDetailPageData] = useState([]);
@@ -151,11 +150,10 @@ const ClientOnbordingDashboard = ({ data }) => {
   const totalServices = Object.keys(data.service_scope_matrix_portfolio).length;
   const totalIndustries = Object.keys(data.client_by_industry).filter(key => key !== "").length;
 
-  const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
+  const handleOpenDrawer = (anchor, title, chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
     setDrawerOpen(true);
-    setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
     setIsDetailPageData(isDetailData);
     setFilterColumns(filterColumn);

@@ -8,7 +8,7 @@ import { Settings2 } from "lucide-react";
 import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DashboardDrawerGrid from "../DashboardDrawer";
 
 const CockpitComplince = ({
@@ -32,8 +32,6 @@ const CockpitComplince = ({
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnchor, setDrawerAnchor] = useState("right");
-  const [drawerData, setDrawerData] = useState("");
-  const [chartXaxisCategory, setChartXaxisCategory] = useState("");
   const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [filterColumns, setFilterColumns] = useState([]);
@@ -303,10 +301,9 @@ const CockpitComplince = ({
   const handleSelect = (id) => {
     if (canSelect) toggleChartSelection(id);
   };
-  const handleOpenDrawer = (anchor, data = [], filterColumn) => {
+  const handleOpenDrawer = (anchor, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerOpen(true);
-    setDrawerData(data);
     setFilterColumns(filterColumn);
   };
   return (
@@ -917,7 +914,6 @@ const CockpitComplince = ({
             : isDetailPageDataFor === 'Registers' ? data?.data?.registers
               : data?.data?.returns} //direct array
         title={'Compliance Details - ' + isDetailPageDataFor}
-        chartXaxisCategory={chartXaxisCategory}
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         // this was pass for view detail page

@@ -889,42 +889,6 @@ const PayrollServices = ({
                         </div>
                     </div>
                 )}
-                {/* {payrollDashboardConfig
-                    .filter((item) => item.type === "table")
-                    .map((table) => (
-                        <div
-                            key={table.id}
-                            className={`dashboard-table-card d-lg-flex d-md-flex justify-content-between ${cardClass(table.id) ? "selected-card" : ""
-                                }`}
-                            onClick={canSelect ? () => handleSelect(table.id) : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default", height: "520px" }}
-                        >
-                            <div
-                                className="ag-theme-quartz"
-                                style={{ height: "400px", width: "100%", marginTop: "1rem" }}
-                            >
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div className="fw-600">{table.title}</div>
-
-                                    <input
-                                        type="checkbox"
-                                        className="chart-select-checkbox"
-                                        onChange={() => toggleChartSelection(table.id)}
-                                        checked={selectedCharts.includes(table.id)}
-                                        disabled={!current?.user_name}
-                                    />
-                                </div>
-
-                                <AgGridReact
-                                    theme="legacy"
-                                    rowData={window?.[table.rowDataKey] || explanationOfEmployeeCount}
-                                    columnDefs={table.columnDefs}
-                                    pagination={table.pagination}
-                                    paginationPageSize={table.pageSize}
-                                />
-                            </div>
-                        </div>
-                    ))} */}
             </div>
             <DashboardDrawerGrid
                 anchor={drawerAnchor}

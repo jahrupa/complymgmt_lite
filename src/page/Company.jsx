@@ -66,8 +66,6 @@ const Company = () => {
 
   const [filters, setFilters] = useState({});
 
-  const [filterColumns, setFilterColumns] = useState([]);
-
   const handleFilterApply = (newFilters,) => {
     setFilters(newFilters);
   };
@@ -688,7 +686,6 @@ const Company = () => {
           />
            <MultiSelectFilter
             rowData={filteredRowData}
-            filterColumns={filterColumns}
             onFilterApply={handleFilterApply}
           />
         </div>
@@ -705,8 +702,6 @@ const Company = () => {
             editType="fullRow"
             rowSelection="single"
             pagination={true}
-          // rowBuffer={rowBuffer}
-          // onRowValueChanged={onRowValueChanged}
           />
         </div>
       </div>

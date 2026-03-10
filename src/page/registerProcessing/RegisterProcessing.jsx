@@ -48,7 +48,7 @@ function RegisterProcessing() {
     default: "",
     target: "",
   });
-  console.log(current, "current");
+  // console.log(current, "current");
   useEffect(() => {
     if (loadedFromApi) return;
     setIsSaved(false);
