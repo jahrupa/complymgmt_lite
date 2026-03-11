@@ -202,7 +202,7 @@ export default function DashboardDrawerGrid({
         <div className="d-flex justify-content-between align-items-center mb-2">
 
           <MultiSelectFilter
-            rowData={rowData}
+            rowData={isDetailPage ? isDetailPageData : rowData}
             filterColumns={filterColumns}
             onFilterApply={handleFilterApply}
           />
@@ -246,6 +246,7 @@ export default function DashboardDrawerGrid({
             <DashboardDrawerGridDetailPage
               rowData={isDetailPageData}
               filterColumns={filterColumns}
+              filters={filters}
             />
           </>
 

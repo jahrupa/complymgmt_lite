@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -6,8 +6,7 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import MultiSelectFilter from "./MultiSelectFilter";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-function DashboardDrawerGridDetailPage({ rowData, filterColumns }) {
-  const [filters, setFilters] = useState({});
+function DashboardDrawerGridDetailPage({ rowData,filters }) {
   const gridRef = useRef();
   const filteredRowData = useMemo(() => {
     if (Object.keys(filters).length === 0) return rowData;
@@ -40,9 +39,6 @@ function DashboardDrawerGridDetailPage({ rowData, filterColumns }) {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
 
-  const handleFilterApply = (newFilters) => {
-    setFilters(newFilters);
-  };
   const onPaginationChanged = () => {
     if (gridRef.current) {
       const currentPage = gridRef.current.api.paginationGetCurrentPage();
@@ -63,11 +59,6 @@ function DashboardDrawerGridDetailPage({ rowData, filterColumns }) {
       <div className="app-wrapper">
         <div className="app-card">
           <div className="app-filter-section">
-            <MultiSelectFilter
-              rowData={rowData}
-              filterColumns={filterColumns}
-              onFilterApply={handleFilterApply}
-            />
           </div>
 
           <div
