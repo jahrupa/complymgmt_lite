@@ -1476,7 +1476,7 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
 };
 export const fetchComplianceCockpit = async (page,limit) => {
   try {
-    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}?page=${page}&limit=${10}`);
+    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}`);
     return response.data;
   } catch (error) {
     // console.error("Error fetching all Complaince Cockpit", error);
