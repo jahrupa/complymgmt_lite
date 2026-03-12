@@ -60,9 +60,7 @@ const LocationToModule = () => {
     });
     const [filters, setFilters] = useState({});
 
-    const [filterColumns, setFilterColumns] = useState([]);
-
-    const handleFilterApply = (newFilters,) => {
+    const handleFilterApply = (newFilters) => {
         setFilters(newFilters);
     };
     const filteredRowData = useMemo(() => {
@@ -74,6 +72,7 @@ const LocationToModule = () => {
             });
         });
     }, [data, filters]);
+    console.log("🚀 ~ file: LocationToModule.jsx:122 ~ filteredRowData:", filteredRowData)
 
     const [errors, setErrors] = useState({});
     const crudTitle = "Tag Subscribe Modules & Sub-Modules"
@@ -727,8 +726,7 @@ const LocationToModule = () => {
                 <div className='d-flex align-items-center gap-2'>
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
                     <MultiSelectFilter
-                        rowData={filteredRowData}
-                        filterColumns={filterColumns}
+                        rowData={data}
                         onFilterApply={handleFilterApply}
                     />
                 </div>

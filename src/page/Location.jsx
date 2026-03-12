@@ -52,9 +52,7 @@ const Location = () => {
 
     const [filters, setFilters] = useState({});
 
-    const [filterColumns, setFilterColumns] = useState([]);
-
-    const handleFilterApply = (newFilters,) => {
+    const handleFilterApply = (newFilters) => {
         setFilters(newFilters);
     };
     const filteredRowData = useMemo(() => {
@@ -655,8 +653,7 @@ const Location = () => {
                 <div className='d-flex align-items-center gap-2'>
                     <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
                     <MultiSelectFilter
-                        rowData={filteredRowData}
-                        filterColumns={filterColumns}
+                        rowData={data}
                         onFilterApply={handleFilterApply}
                     />
                     <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
@@ -671,7 +668,7 @@ const Location = () => {
                     <AgGridReact
                         theme="legacy"
                         ref={gridRef}
-                        rowData={data}
+                        rowData={filteredRowData}
                         columnDefs={colDefs}
                         defaultColDef={defaultColDef}
                         editType="fullRow"

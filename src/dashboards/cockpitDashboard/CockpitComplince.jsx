@@ -8,7 +8,7 @@ import { Settings2 } from "lucide-react";
 import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DashboardDrawerGrid from "../DashboardDrawer";
 
 const CockpitComplince = ({
@@ -32,8 +32,6 @@ const CockpitComplince = ({
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnchor, setDrawerAnchor] = useState("right");
-  const [drawerData, setDrawerData] = useState("");
-  const [chartXaxisCategory, setChartXaxisCategory] = useState("");
   const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [filterColumns, setFilterColumns] = useState([]);
@@ -196,87 +194,95 @@ const CockpitComplince = ({
   ];
 
   // Completion Status Chart
-  const completionChartOptions = {
-    chart: {
-      type: "bar",
-      height: 400,
-      stacked: true,
-      events: {
-        click(event, chartContext, opts) {
-          const seriesData = opts?.config?.series?.[opts?.seriesIndex]?.data?.[opts?.dataPointIndex];
-          const seriesName = opts?.config?.series?.[opts?.seriesIndex]?.name;
+const completionChartOptions = {
+  chart: {
+    type: "bar",
+    height: 400,
+    stacked: true,
+  },
 
-          if (seriesData === undefined || seriesName === undefined) {
-            return; // exit early if data or name is missing
-          }
-          navigate(
-            // "/compliance_cockpit/dashboard/completion_status_across_all_modules",
-            {
-              state: {
-                score: seriesData,
-                seriesName: seriesName,
-              },
-            },
-          );
-        },
-      },
+  colors: ["#43A047", "#FB8C00"],
+
+  plotOptions: {
+    bar: {
+      horizontal: false,
+      columnWidth: "70%",
     },
-    colors: ["#43A047", "#FB8C00", "#1E88E5"],
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "70%",
-      },
-    },
-    dataLabels: {
-      enabled: true,
-    },
-    xaxis: {
-      categories: ["Licenses", "Returns", "Registers", "Challans"],
-    },
-    yaxis: {
-      title: {
-        text: "Count",
-      },
-    },
-    legend: {
-      position: "top",
-    },
+  },
+
+  dataLabels: {
+    enabled: true,
+  },
+
+  xaxis: {
+    categories: ["Licenses", "Returns", "Registers", "Challans"],
+  },
+
+  yaxis: {
     title: {
-      text: "Completion Status Across All Modules",
-      align: "center",
+      text: "Count",
     },
-  };
+  },
 
-  const completionChartSeries = [
-    {
-      name: "Completed",
-      data: [
-        data?.total_licenses_completed,
-        data?.total_returns_completed,
-        data?.total_registers_completed,
-        data?.total_challans_completed,
-      ],
+  legend: {
+    position: "top",
+  },
+
+  title: {
+    text: "Completion Status Across All Modules",
+    align: "center",
+  },
+
+  tooltip: {
+    enabled: true,
+    custom: function ({ series, dataPointIndex, w }) {
+      const category = w.globals.labels[dataPointIndex];
+
+      const completed = series[0][dataPointIndex];
+      const pending = series[1][dataPointIndex];
+
+      return `
+        <div style="padding:10px; font-size:14px">
+          <strong>${category}</strong>
+          <div style="margin-top:6px">
+            <div>✅ Completed: <b>${completed}</b></div>
+            <div>⏳ Pending: <b>${pending}</b></div>
+          </div>
+        </div>
+      `;
     },
-    {
-      name: "Pending",
-      data: [
-        data.total_licenses_pending,
-        data.total_returns_pending,
-        data.total_registers_pending,
-        0, // challans don't have pending
-      ],
-    },
-    {
-      name: "Total",
-      data: [
-        data?.total_licenses,
-        data?.total_returns,
-        data?.total_registers,
-        data?.total_challans,
-      ],
-    },
-  ];
+  },
+};
+
+const completionChartSeries = [
+  {
+    name: "Completed",
+    data: [
+      data?.total_licenses_completed ?? 0,
+      data?.total_returns_completed ?? 0,
+      data?.total_registers_completed ?? 0,
+      data?.total_challans_completed ?? 0,
+    ],
+  },
+  {
+    name: "Pending",
+    data: [
+      data?.total_licenses_pending ?? 0,
+      data?.total_returns_pending ?? 0,
+      data?.total_registers_pending ?? 0,
+      data?.total_challans_pending ?? 0,
+    ],
+  },
+  // {
+  //   name: "Total",
+  //   data: [
+  //     data?.total_licenses ?? 0,
+  //     data?.total_returns ?? 0,
+  //     data?.total_registers ?? 0,
+  //     data?.total_challans ?? 0,
+  //   ],
+  // },
+];
 
   const toggleChartSelection = (chartId) => {
     if (!current?.user_name) {
@@ -303,10 +309,9 @@ const CockpitComplince = ({
   const handleSelect = (id) => {
     if (canSelect) toggleChartSelection(id);
   };
-  const handleOpenDrawer = (anchor, data = [], filterColumn) => {
+  const handleOpenDrawer = (anchor, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerOpen(true);
-    setDrawerData(data);
     setFilterColumns(filterColumn);
   };
   return (
@@ -917,7 +922,6 @@ const CockpitComplince = ({
             : isDetailPageDataFor === 'Registers' ? data?.data?.registers
               : data?.data?.returns} //direct array
         title={'Compliance Details - ' + isDetailPageDataFor}
-        chartXaxisCategory={chartXaxisCategory}
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         // this was pass for view detail page

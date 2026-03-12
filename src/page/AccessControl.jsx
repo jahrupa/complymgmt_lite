@@ -100,9 +100,9 @@ const AccessControl = () => {
 
   const [filters, setFilters] = useState({});
 
-  const [filterColumns, setFilterColumns] = useState([]);
+  // const [filterColumns, setFilterColumns] = useState([]);
 
-  const handleFilterApply = (newFilters,) => {
+  const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
   };
   const filteredRowData = useMemo(() => {
@@ -1589,8 +1589,7 @@ const AccessControl = () => {
             onInput={onFilterTextBoxChanged}
           />
           <MultiSelectFilter
-            rowData={filteredRowData}
-            filterColumns={filterColumns}
+            rowData={data}
             onFilterApply={handleFilterApply}
           />
           <div className="w-25 ms-auto">

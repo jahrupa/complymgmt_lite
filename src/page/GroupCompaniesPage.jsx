@@ -46,9 +46,6 @@ const GroupCompaniesPage = () => {
   });
 
   const [filters, setFilters] = useState({});
-
-  // const [filterColumns, setFilterColumns] = useState([]);
-  // console.log(filterColumns,'filterColumns')
   const handleFilterApply = (newFilters,) => {
     setFilters(newFilters);
   };
@@ -287,17 +284,6 @@ const GroupCompaniesPage = () => {
     )
   }
 
-  const getRoleColorForFileStatus = (status) => {
-    switch (status) {
-      case 1:
-        return { color: '#4CAF50' }; // green
-      case 0:
-        return { color: '#F44336' }; // brown
-      default:
-        return { color: '#41464b' }; // gray
-    }
-  };
-
   const handleCheckboxClick = async (rowId) => {
     const response = await updateGroupApprovalStatusById(rowId);
     const message = response?.message
@@ -529,22 +515,6 @@ const GroupCompaniesPage = () => {
             filterColumns={data.length > 0 ? Object.keys(data[0]) : []}
             onFilterApply={handleFilterApply}
           />
-          {/* <div className='d-lg-flex d-md-flex  justify-content-end mb-3'>
-            <div>
-              <button className='crud_btn w-100' onClick={openModal}>
-                <span><AddIcon /></span> <span className='button-style'>Add New Group Holding</span>
-              </button>
-
-            </div>
-            <button className="button approve" onClick={()=>handleApproveAll()}>
-              <span className="icon">
-                <svg viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12 3.41 13.41 9 19 21 7 19.59 5.59z" />
-                </svg>
-              </span>
-              <span className="text">Approve All</span>
-            </button>
-          </div> */}
         </div>
         <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>
           <AgGridReact
@@ -556,7 +526,6 @@ const GroupCompaniesPage = () => {
             editType="fullRow"
             rowSelection="single"
             pagination={true}
-            // rowBuffer={rowBuffer}
             onRowValueChanged={onRowValueChanged}
 
           />

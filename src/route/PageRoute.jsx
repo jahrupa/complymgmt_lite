@@ -22,7 +22,6 @@ import Snackbars from '../component/Snackbars.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
 import CreateNotificationTemplate from '../page/CreateNotificationTemplate.jsx';
-import DetailsPage from '../page/DetailsPage.jsx';
 import ServiceTrackerInnerPage from '../page/ServiceTrackerInnerPage.jsx';
 import ServiceTrackerAccess from '../page/ServiceTrackerAccess.jsx';
 import NotificationList from '../page/NotificationList.jsx';
@@ -35,7 +34,7 @@ import NotificationMainPage from '../component/notification/NotificationMainPage
 import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
-import DashboardDrawerGridDetailPage from '../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage.jsx';
+
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -131,7 +130,6 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             </Route>
 
             {/* notification sub-routes end*/}
-            <Route path="/details/:seriesName/:year" element={<DetailsPage />} />
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />

@@ -66,8 +66,6 @@ const Company = () => {
 
   const [filters, setFilters] = useState({});
 
-  const [filterColumns, setFilterColumns] = useState([]);
-
   const handleFilterApply = (newFilters,) => {
     setFilters(newFilters);
   };
@@ -687,8 +685,7 @@ const Company = () => {
             onInput={onFilterTextBoxChanged}
           />
            <MultiSelectFilter
-            rowData={data}
-            filterColumns={filterColumns}
+            rowData={filteredRowData}
             onFilterApply={handleFilterApply}
           />
         </div>
@@ -699,14 +696,12 @@ const Company = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={data}
+            rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
             rowSelection="single"
             pagination={true}
-          // rowBuffer={rowBuffer}
-          // onRowValueChanged={onRowValueChanged}
           />
         </div>
       </div>

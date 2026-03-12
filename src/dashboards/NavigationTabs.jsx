@@ -317,6 +317,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 message: response?.message || "Mapping updated successfully",
                 severityType: 'success'
             });
+            setSelectedCharts([]);
 
         } catch (error) {
             setIsSnackbarsOpen({
