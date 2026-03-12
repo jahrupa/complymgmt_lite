@@ -196,7 +196,7 @@ const PayrollServices = ({
     const [isDetailPageData, setIsDetailPageData] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
     const userRole = decryptData(localStorage.getItem("user_role"));
-    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory,isDetailData,filterColumn) => {
+    const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
         setDrawerOpen(true);
@@ -689,7 +689,7 @@ const PayrollServices = ({
 
                                 <div
                                     className="dashboard-icon ms-2"
-                                     onClick={(e) => {
+                                    onClick={(e) => {
                                         e.stopPropagation();
                                         handleOpenDrawer(
                                             "left",
@@ -839,7 +839,7 @@ const PayrollServices = ({
 
                                 <div
                                     className="dashboard-icon ms-2"
-                                   onClick={(e) => {
+                                    onClick={(e) => {
                                         e.stopPropagation();
                                         handleOpenDrawer(
                                             "left",
