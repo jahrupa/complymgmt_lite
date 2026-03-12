@@ -256,7 +256,7 @@ export default function DashboardDrawerGrid({
             rowData={filteredRowData}
             columnDefs={columnDefs}
             pagination={true}
-            paginationPageSize={50}
+            paginationPageSize={20}
             onPaginationChanged={onPaginationChanged}
 
           />
