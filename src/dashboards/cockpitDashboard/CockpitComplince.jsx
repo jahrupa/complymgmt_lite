@@ -201,7 +201,7 @@ const completionChartOptions = {
     stacked: true,
   },
 
-  colors: ["#43A047", "#FB8C00", "#1E88E5"],
+  colors: ["#43A047", "#FB8C00"],
 
   plotOptions: {
     bar: {
@@ -240,7 +240,6 @@ const completionChartOptions = {
 
       const completed = series[0][dataPointIndex];
       const pending = series[1][dataPointIndex];
-      const total = series[2][dataPointIndex];
 
       return `
         <div style="padding:10px; font-size:14px">
@@ -248,7 +247,6 @@ const completionChartOptions = {
           <div style="margin-top:6px">
             <div>✅ Completed: <b>${completed}</b></div>
             <div>⏳ Pending: <b>${pending}</b></div>
-            <div>📊 Total: <b>${total}</b></div>
           </div>
         </div>
       `;
@@ -275,15 +273,15 @@ const completionChartSeries = [
       data?.total_challans_pending ?? 0,
     ],
   },
-  {
-    name: "Total",
-    data: [
-      data?.total_licenses ?? 0,
-      data?.total_returns ?? 0,
-      data?.total_registers ?? 0,
-      data?.total_challans ?? 0,
-    ],
-  },
+  // {
+  //   name: "Total",
+  //   data: [
+  //     data?.total_licenses ?? 0,
+  //     data?.total_returns ?? 0,
+  //     data?.total_registers ?? 0,
+  //     data?.total_challans ?? 0,
+  //   ],
+  // },
 ];
 
   const toggleChartSelection = (chartId) => {

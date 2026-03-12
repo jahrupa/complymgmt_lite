@@ -606,7 +606,7 @@ const DocumentUpload = () => {
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
-            <button
+            {/* <button
               className="btn btn-sm"
               onClick={() => {
                 // setIsEditing(false);
@@ -616,7 +616,7 @@ const DocumentUpload = () => {
               }}
             >
               <AttachFileIcon fontSize="small" className="action_icon" />
-            </button>
+            </button> */}
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -869,8 +869,8 @@ const DocumentUpload = () => {
   const drawerFilePreviewHeader = () => {
     return (
       <div className="p-3 fs-14 fw-600">
-        <FilePresentIcon style={{ color: "deepskyblue" }} />
-        Document Preview
+        {/* <FilePresentIcon style={{ color: "deepskyblue" }} />
+        Document Preview */}
       </div>
     );
   };
@@ -1112,7 +1112,7 @@ const DocumentUpload = () => {
   const drawerFilePreviewBody = () => {
     return (
       <div className="p-3">
-        <div className="row mb-4">
+        {/* <div className="row mb-4">
           <div className="col col-4">
             <div className="pdf-tab">
               <div className="fs-12">Document2</div>
@@ -1137,9 +1137,9 @@ const DocumentUpload = () => {
               </div>
             </div>
           </div>
-        </div>
-        {/* history */}
-        <div className="mb-2 card_div p-3 w-auto card-border-blue">
+        </div> */}
+       
+        {/* <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
               <div
@@ -1168,9 +1168,9 @@ const DocumentUpload = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="mb-2 card_div p-3 w-auto card-border-blue">
+        {/* <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
               <div
@@ -1199,9 +1199,9 @@ const DocumentUpload = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="mb-2 card_div p-3 w-auto card-border-blue">
+        {/* <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
               <div
@@ -1230,7 +1230,7 @@ const DocumentUpload = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     );
   };

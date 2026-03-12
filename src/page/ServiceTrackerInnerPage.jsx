@@ -1,5 +1,5 @@
 import { ArrowLeft, Upload } from 'lucide-react';
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,6 +18,7 @@ import DeleteModal from '../component/DeleteModal';
 import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { decryptData } from './utils/encrypt';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
 
 // Register modules
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -51,6 +52,8 @@ const ServiceTrackerInnerPage = () => {
     // // console.log(current?.sheet_name?.[0], 'sheet_name');
     const [uploadStatus, setUploadStatus] = useState("idle");
     const [serviceTrackerSheet, setServiceTrackerSheet] = useState([]);
+    const [filters, setFilters] = useState({});
+
     const gridRef = useRef();
     const openModal = () => {
         setIsModalOpen(true);
@@ -150,7 +153,18 @@ const ServiceTrackerInnerPage = () => {
             });
         }
     };
+    const handleFilterApply = (newFilters,) => {
+        setFilters(newFilters);
+    };
+    const filteredRowData = useMemo(() => {
+        if (Object.keys(filters).length === 0) return rowData;
 
+        return rowData.filter((row) => {
+            return Object.entries(filters).every(([column, values]) => {
+                return values.includes(row[column]);
+            });
+        });
+    }, [rowData, filters]);
     // Fetch and Set Tracker Data
     const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
         try {
@@ -992,7 +1006,18 @@ const ServiceTrackerInnerPage = () => {
             <div className="client-onboarding-2">
                 <div className="table_div p-3">
                     <div className='d-lg-flex d-md-flex  justify-content-between'>
-                        <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                        <div className='d-flex'>
+                            <AnimatedSearchBar placeholder="Search..." type="text" id="filter-text-box" onInput={onFilterTextBoxChanged} />
+                            <div className='ps-3 mt-1'>
+                                <MultiSelectFilter
+                                    rowData={rowData}
+                                    filterColumns={rowData.length > 0 ? Object.keys(rowData[0]) : []}
+                                    onFilterApply={handleFilterApply}
+                                />
+                            </div>
+
+                        </div>
+
                         <div style={{ width: '250px' }}>
                             <SingleSelectTextField
                                 name="sheet_name"
@@ -1027,7 +1052,7 @@ const ServiceTrackerInnerPage = () => {
                         <AgGridReact
                             theme="legacy"
                             ref={gridRef}
-                            rowData={rowData || []}
+                            rowData={filteredRowData || []}
                             columnDefs={columnDefs}
                             defaultColDef={defaultColDef}
                             editType="fullRow"
