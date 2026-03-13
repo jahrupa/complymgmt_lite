@@ -147,8 +147,16 @@ export const CHANGE_TEMPORARY_PASSWORD_STATUS='/api/v1/view/temporary_password_s
 
 // forget password
 export const FORGET_PASSWORD='/api/v1/password/update/email_request';
-// Dashboard
+// Cockpit Dashboard updated api
+export const LICENSE_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/license'
+export const REGISTERS_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/register'
+export const CHALLAN_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/challan'
+export const RETURN_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/return'
+export const PAGINATED_RECORDS='/api/v1/dashboard/view/compliance/cockpit/records'
+export const CLIENT_DATA='/api/v1/dashboard/view/compliance/cockpit/client-data'
+export const CLIENT_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/client-compliance'
 
+// Cockpit Dashboard
 export const GET_GENERAL_COMPLIANCE_PORTFOLIO='/api/v1/dashboard/view/general/compliance/portfolio'
 export const GET_GENERAL_COMPLIANCE_BY_COMPANY='/api/v1/dashboard/view/general/compliance/'
 export const GET_COMPLIANCE_COCKPIT_BY_COMPANY ='/api/v1/dashboard/view/compliance/cockpit/'

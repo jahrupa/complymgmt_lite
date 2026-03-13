@@ -169,6 +169,13 @@ import {
   PROCESS_REGISTERS,
   GET_FILE_BY_TYPE,
   DOWNLOAD_FILE,
+  LICENSE_COMPLIANCE,
+  REGISTERS_COMPLIANCE,
+  CHALLAN_COMPLIANCE,
+  RETURN_COMPLIANCE,
+  PAGINATED_RECORDS,
+  CLIENT_DATA,
+  CLIENT_COMPLIANCE,
 
 } from "./Endpoint";
 
@@ -1433,6 +1440,76 @@ export const fetchGeneralComplianceByCompany = async (company_name) => {
   }
 };
 
+// cockpit updated api 
+export const fetchLicenseComplaince = async () => {
+  try {
+    const response = await API.get(LICENSE_COMPLIANCE);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+
+export const fetchRegistersCompliance = async () => {
+  try {
+    const response = await API.get(REGISTERS_COMPLIANCE);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+
+export const fetchChallanCompliance = async () => {
+  try {
+    const response = await API.get(CHALLAN_COMPLIANCE);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+
+export const fetchReturnCompliance = async () => {
+  try {
+    const response = await API.get(RETURN_COMPLIANCE);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+
+export const fetchPaginatedRecords = async () => {
+  try {
+    const response = await API.get(PAGINATED_RECORDS);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+
+export const fetchClientData = async () => {
+  try {
+    const response = await API.get(CLIENT_DATA);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+}
+export const fetchClientCompliance = async () => {
+  try {
+    const response = await API.get(CLIENT_COMPLIANCE);
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching all Client", error);
+    throw error;
+  }
+};
+// end cockpit updated api
 export const fetchComplainceCockpitByCompany = async (company_name) => {
   try {
     const response = await API.get(`${GET_COMPLIANCE_COCKPIT_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
@@ -1476,7 +1553,7 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
 };
 export const fetchComplianceCockpit = async (page,limit) => {
   try {
-    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}`);
+    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}?page=${1}&limit=${10}`);
     return response.data;
   } catch (error) {
     // console.error("Error fetching all Complaince Cockpit", error);

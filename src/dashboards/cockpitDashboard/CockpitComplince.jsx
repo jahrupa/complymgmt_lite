@@ -10,6 +10,15 @@ import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
 import { useNavigate } from "react-router-dom";
 import DashboardDrawerGrid from "../DashboardDrawer";
+import {
+  fetchChallanCompliance,
+  fetchClientCompliance,
+  fetchClientData,
+  fetchLicenseComplaince,
+  fetchPaginatedRecords,
+  fetchRegistersCompliance,
+  fetchReturnCompliance,
+} from "../../api/service";
 
 const CockpitComplince = ({
   data,
@@ -35,6 +44,16 @@ const CockpitComplince = ({
   const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [filterColumns, setFilterColumns] = useState([]);
+  const [cockpitData, setCockpitData] = useState({
+    licenseComplaince: [],
+    registersCompliance: [],
+    challanCompliance: [],
+    returnCompliance: [],
+    paginatedRecords: [],
+    clientData: [],
+    clientCompliance: [],
+  });
+  console.log(cockpitData,'cockpitData')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -53,6 +72,42 @@ const CockpitComplince = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [window.innerWidth]);
 
+  useEffect(() => {
+    const fetchCockpitData = async () => {
+      const results = await Promise.allSettled([
+        fetchLicenseComplaince(),
+        fetchRegistersCompliance(),
+        fetchChallanCompliance(),
+        fetchReturnCompliance(),
+        fetchPaginatedRecords(),
+        fetchClientData(),
+        fetchClientCompliance(),
+      ]);
+
+      const keys = [
+        "licenseComplaince",
+        "registersCompliance",
+        "challanCompliance",
+        "returnCompliance",
+        "paginatedRecords",
+        "clientData",
+        "clientCompliance",
+      ];
+
+      const updatedData = {};
+
+      results.forEach((res, index) => {
+        updatedData[keys[index]] =
+          res.status === "fulfilled" && Array.isArray(res.value)
+            ? res.value
+            : [];
+      });
+
+      setCockpitData(updatedData);
+    };
+
+    fetchCockpitData();
+  }, []);
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
@@ -100,7 +155,6 @@ const CockpitComplince = ({
       height: 350,
       events: {
         dataPointSelection(event, chartContext, opts) {
-
           const index = opts.dataPointIndex;
           if (index === undefined || index === -1) return;
 
@@ -117,12 +171,10 @@ const CockpitComplince = ({
                 index: index,
                 widget_name: "Compliance Cockpit - Overall Compliance Score",
               },
-            }
+            },
           );
         },
       },
-
-
     },
 
     colors: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
@@ -181,7 +233,6 @@ const CockpitComplince = ({
       },
     },
 
-
     labels: ["Licenses", "Returns", "Challans", "Registers", "Overall"],
   };
 
@@ -194,54 +245,54 @@ const CockpitComplince = ({
   ];
 
   // Completion Status Chart
-const completionChartOptions = {
-  chart: {
-    type: "bar",
-    height: 400,
-    stacked: true,
-  },
-
-  colors: ["#43A047", "#FB8C00"],
-
-  plotOptions: {
-    bar: {
-      horizontal: false,
-      columnWidth: "70%",
+  const completionChartOptions = {
+    chart: {
+      type: "bar",
+      height: 400,
+      stacked: true,
     },
-  },
 
-  dataLabels: {
-    enabled: true,
-  },
+    colors: ["#43A047", "#FB8C00"],
 
-  xaxis: {
-    categories: ["Licenses", "Returns", "Registers", "Challans"],
-  },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "70%",
+      },
+    },
 
-  yaxis: {
+    dataLabels: {
+      enabled: true,
+    },
+
+    xaxis: {
+      categories: ["Licenses", "Returns", "Registers", "Challans"],
+    },
+
+    yaxis: {
+      title: {
+        text: "Count",
+      },
+    },
+
+    legend: {
+      position: "top",
+    },
+
     title: {
-      text: "Count",
+      text: "Completion Status Across All Modules",
+      align: "center",
     },
-  },
 
-  legend: {
-    position: "top",
-  },
+    tooltip: {
+      enabled: true,
+      custom: function ({ series, dataPointIndex, w }) {
+        const category = w.globals.labels[dataPointIndex];
 
-  title: {
-    text: "Completion Status Across All Modules",
-    align: "center",
-  },
+        const completed = series[0][dataPointIndex];
+        const pending = series[1][dataPointIndex];
 
-  tooltip: {
-    enabled: true,
-    custom: function ({ series, dataPointIndex, w }) {
-      const category = w.globals.labels[dataPointIndex];
-
-      const completed = series[0][dataPointIndex];
-      const pending = series[1][dataPointIndex];
-
-      return `
+        return `
         <div style="padding:10px; font-size:14px">
           <strong>${category}</strong>
           <div style="margin-top:6px">
@@ -250,39 +301,39 @@ const completionChartOptions = {
           </div>
         </div>
       `;
+      },
     },
-  },
-};
+  };
 
-const completionChartSeries = [
-  {
-    name: "Completed",
-    data: [
-      data?.total_licenses_completed ?? 0,
-      data?.total_returns_completed ?? 0,
-      data?.total_registers_completed ?? 0,
-      data?.total_challans_completed ?? 0,
-    ],
-  },
-  {
-    name: "Pending",
-    data: [
-      data?.total_licenses_pending ?? 0,
-      data?.total_returns_pending ?? 0,
-      data?.total_registers_pending ?? 0,
-      data?.total_challans_pending ?? 0,
-    ],
-  },
-  // {
-  //   name: "Total",
-  //   data: [
-  //     data?.total_licenses ?? 0,
-  //     data?.total_returns ?? 0,
-  //     data?.total_registers ?? 0,
-  //     data?.total_challans ?? 0,
-  //   ],
-  // },
-];
+  const completionChartSeries = [
+    {
+      name: "Completed",
+      data: [
+        data?.total_licenses_completed ?? 0,
+        data?.total_returns_completed ?? 0,
+        data?.total_registers_completed ?? 0,
+        data?.total_challans_completed ?? 0,
+      ],
+    },
+    {
+      name: "Pending",
+      data: [
+        data?.total_licenses_pending ?? 0,
+        data?.total_returns_pending ?? 0,
+        data?.total_registers_pending ?? 0,
+        data?.total_challans_pending ?? 0,
+      ],
+    },
+    // {
+    //   name: "Total",
+    //   data: [
+    //     data?.total_licenses ?? 0,
+    //     data?.total_returns ?? 0,
+    //     data?.total_registers ?? 0,
+    //     data?.total_challans ?? 0,
+    //   ],
+    // },
+  ];
 
   const toggleChartSelection = (chartId) => {
     if (!current?.user_name) {
@@ -339,7 +390,6 @@ const completionChartSeries = [
           </div>
 
           <div className="header-stats">
-
             <div className="header-stat">
               <span className="stat-value">
                 {data?.total_clients?.toLocaleString()}
@@ -357,12 +407,13 @@ const completionChartSeries = [
               </span>
             </div>
             <div className="align-content-center">
-              <button className="btn btn-primary " onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDrawer(
-                  "left",
-                )
-              }}>
+              <button
+                className="btn btn-primary "
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer("left");
+                }}
+              >
                 View Details
               </button>
             </div>
@@ -403,7 +454,7 @@ const completionChartSeries = [
                         className="progress-fill"
                         style={{
                           width: `${(data?.total_licenses_completed /
-                            data?.total_licenses) *
+                              data?.total_licenses) *
                             100
                             }%`,
                         }}
@@ -450,7 +501,7 @@ const completionChartSeries = [
                         className="progress-fill"
                         style={{
                           width: `${(data.total_returns_completed /
-                            data.total_returns) *
+                              data.total_returns) *
                             100
                             }%`,
                         }}
@@ -497,7 +548,7 @@ const completionChartSeries = [
                         className="progress-fill"
                         style={{
                           width: `${(data.total_registers_completed /
-                            data.total_registers) *
+                              data.total_registers) *
                             100
                             }%`,
                         }}
@@ -544,7 +595,7 @@ const completionChartSeries = [
                         className="progress-fill"
                         style={{
                           width: `${(data.total_challans_completed /
-                            data.total_challans) *
+                              data.total_challans) *
                             100
                             }%`,
                         }}
@@ -915,25 +966,38 @@ const completionChartSeries = [
       <DashboardDrawerGrid
         anchor={drawerAnchor}
         open={drawerOpen}
-        onClose={() => { setDrawerOpen(false); setIsDetailPageDataFor("Returns"); }}
+        onClose={() => {
+          setDrawerOpen(false);
+          setIsDetailPageDataFor("Returns");
+        }}
         // this is wirking
-        data={isDetailPageDataFor === 'Challans' ? data?.data?.challans
-          : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
-            : isDetailPageDataFor === 'Registers' ? data?.data?.registers
-              : data?.data?.returns} //direct array
-        title={'Compliance Details - ' + isDetailPageDataFor}
+        data={
+          isDetailPageDataFor === "Challans"
+            ? data?.data?.challans
+            : isDetailPageDataFor === "Licenses"
+              ? data?.data?.licenses
+              : isDetailPageDataFor === "Registers"
+                ? data?.data?.registers
+                : data?.data?.returns
+        } //direct array
+        title={"Compliance Details - " + isDetailPageDataFor}
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         // this was pass for view detail page
-        isDetailPageData={isDetailPageDataFor === 'Challans' ? data?.data?.challans
-          : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
-            : isDetailPageDataFor === 'Registers' ? data?.data?.registers
-              : data?.data?.returns}  //direct array but not working properly
+        isDetailPageData={
+          isDetailPageDataFor === "Challans"
+            ? data?.data?.challans
+            : isDetailPageDataFor === "Licenses"
+              ? data?.data?.licenses
+              : isDetailPageDataFor === "Registers"
+                ? data?.data?.registers
+                : data?.data?.returns
+        } //direct array but not working properly
         filterColumns={filterColumns}
         isCockpitComplianceDetailPage={true}
         setIsDetailPageDataFor={setIsDetailPageDataFor}
         isDetailPageDataFor={isDetailPageDataFor}
-        buttons={['Returns','Challans', 'Licenses', 'Registers']}
+        buttons={["Returns", "Challans", "Licenses", "Registers"]}
         setPage={setPage}
         setLimit={setLimit}
       />
