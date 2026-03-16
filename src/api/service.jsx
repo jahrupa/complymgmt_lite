@@ -948,8 +948,8 @@ export const uploadFileGolang = async (filesArray, isAutoUpload) => {
     filesArray.forEach((file) => {
       formData.append("files", file);
     });
-    formData.append("is_ai_upload", isAutoUpload);
-    const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
+    // formData.append("is_ai_upload", isAutoUpload);
+    const response = await API.post(`${AUTO_FILE_UPLOAD_GOLANG}?is_ai_upload=${isAutoUpload}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
