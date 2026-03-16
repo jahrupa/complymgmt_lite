@@ -114,7 +114,7 @@ const CockpitComplince = ({
       document.getElementById("filter-text-box").value,
     );
   }, []);
-  if (!data || !data.client_info) {
+  if (!data || Object.keys(data).length === 0) {
     return (
       <div className="no-data">
         {data === 403 || data === 500 ? "No Data Found" : "Loading..."}
