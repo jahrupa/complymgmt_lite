@@ -8,15 +8,26 @@ import { Settings2 } from "lucide-react";
 import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
-import { Link, useNavigate } from "react-router-dom";
-import { fetchComplianceCockpit } from "../../api/service";
+import { useNavigate } from "react-router-dom";
+import DashboardDrawerGrid from "../DashboardDrawer";
+import {
+  fetchChallanCompliance,
+  fetchClientCompliance,
+  fetchClientData,
+  fetchLicenseComplaince,
+  fetchPaginatedRecords,
+  fetchRegistersCompliance,
+  fetchReturnCompliance,
+} from "../../api/service";
 
 const CockpitComplince = ({
-  // data,
+  data,
   selectedCharts,
   setSelectedCharts,
   current,
   shouldShow,
+  setPage,
+  setLimit,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -28,10 +39,25 @@ const CockpitComplince = ({
     message: "",
     severityType: "",
   });
-  const [data, setData] = useState([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerAnchor, setDrawerAnchor] = useState("right");
+  const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
+  const [isDetailPage, setIsDetailPage] = useState(false);
+  const [filterColumns, setFilterColumns] = useState([]);
+  const [cockpitData, setCockpitData] = useState({
+    licenseComplaince: [],
+    registersCompliance: [],
+    challanCompliance: [],
+    returnCompliance: [],
+    paginatedRecords: [],
+    clientData: [],
+    clientCompliance: [],
+  });
+  console.log(cockpitData,'cockpitData')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
+  const itemsPerPage = 10; // number of cards per page
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,32 +72,55 @@ const CockpitComplince = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [window.innerWidth]);
 
+  useEffect(() => {
+    const fetchCockpitData = async () => {
+      const results = await Promise.allSettled([
+        fetchLicenseComplaince(),
+        fetchRegistersCompliance(),
+        fetchChallanCompliance(),
+        fetchReturnCompliance(),
+        fetchPaginatedRecords(),
+        fetchClientData(),
+        fetchClientCompliance(),
+      ]);
+
+      const keys = [
+        "licenseComplaince",
+        "registersCompliance",
+        "challanCompliance",
+        "returnCompliance",
+        "paginatedRecords",
+        "clientData",
+        "clientCompliance",
+      ];
+
+      const updatedData = {};
+
+      results.forEach((res, index) => {
+        updatedData[keys[index]] =
+          res.status === "fulfilled" && Array.isArray(res.value)
+            ? res.value
+            : [];
+      });
+
+      setCockpitData(updatedData);
+    };
+
+    fetchCockpitData();
+  }, []);
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
       document.getElementById("filter-text-box").value,
     );
   }, []);
-
-  // if (!data || Object.keys(data).length === 0) {
-  //   return (
-  //     <div className="no-data">
-  //       {data === 403 || data === 500 ? "No Data Found" : "Loading..."}
-  //     </div>
-  //   );
-  // }
-
-   useEffect(() => {
-          const fetchCockpitData = async () => {
-              const [ b] = await Promise.allSettled([
-                  // fetchComplainceCockpitByCompany(selectedCompany),
-                  fetchComplianceCockpit()
-              ]);
-  
-              setData(b.status === "fulfilled" ? b.value : []);
-          };
-          fetchCockpitData();
-      }, []);
+  if (!data || Object.keys(data).length === 0) {
+    return (
+      <div className="no-data">
+        {data === 403 || data === 500 ? "No Data Found" : "Loading..."}
+      </div>
+    );
+  }
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -80,7 +129,24 @@ const CockpitComplince = ({
     setAnchorEl(null);
   };
 
- 
+  const sampleClients = Object.entries(data.compliance_info).map(
+    ([name, details]) => ({
+      name,
+      average_compliance_score: details.average_compliance_score || 0,
+      type:
+        Object.keys(details).find(
+          (key) => key !== "average_compliance_score",
+        ) || "general",
+    }),
+  );
+
+  // Step 2: Pagination logic
+  const totalPages = Math.ceil(sampleClients.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentClients = sampleClients.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   // Overall Compliance Chart
   const overallChartOptions = {
@@ -89,27 +155,26 @@ const CockpitComplince = ({
       height: 350,
       events: {
         dataPointSelection(event, chartContext, opts) {
-
           const index = opts.dataPointIndex;
           if (index === undefined || index === -1) return;
 
           const clickedLabel = opts.w.globals.labels[index];
           const clickedValue = opts.w.globals.series[index];
           if (clickedValue === 0) return;
+
           navigate(
-            "/compliance_cockpit/dashboard/overall_compliance_score",
+            // "/compliance_cockpit/dashboard/overall_compliance_score",
             {
               state: {
                 score: clickedValue,
                 seriesName: clickedLabel,
                 index: index,
+                widget_name: "Compliance Cockpit - Overall Compliance Score",
               },
-            }
+            },
           );
         },
       },
-
-
     },
 
     colors: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
@@ -168,7 +233,6 @@ const CockpitComplince = ({
       },
     },
 
-
     labels: ["Licenses", "Returns", "Challans", "Registers", "Overall"],
   };
 
@@ -186,50 +250,58 @@ const CockpitComplince = ({
       type: "bar",
       height: 400,
       stacked: true,
-      events: {
-        click(event, chartContext, opts) {
-          const seriesData = opts?.config?.series?.[opts?.seriesIndex]?.data?.[opts?.dataPointIndex];
-          const seriesName = opts?.config?.series?.[opts?.seriesIndex]?.name;
-
-          if (seriesData === undefined || seriesName === undefined) {
-            return; // exit early if data or name is missing
-          }
-          navigate(
-            "/compliance_cockpit/dashboard/completion_status_across_all_modules",
-            {
-              state: {
-                score: seriesData,
-                seriesName: seriesName,
-              },
-            },
-          );
-        },
-      },
     },
-    colors: ["#43A047", "#FB8C00", "#1E88E5"],
+
+    colors: ["#43A047", "#FB8C00"],
+
     plotOptions: {
       bar: {
         horizontal: false,
         columnWidth: "70%",
       },
     },
+
     dataLabels: {
       enabled: true,
     },
+
     xaxis: {
       categories: ["Licenses", "Returns", "Registers", "Challans"],
     },
+
     yaxis: {
       title: {
         text: "Count",
       },
     },
+
     legend: {
       position: "top",
     },
+
     title: {
       text: "Completion Status Across All Modules",
       align: "center",
+    },
+
+    tooltip: {
+      enabled: true,
+      custom: function ({ series, dataPointIndex, w }) {
+        const category = w.globals.labels[dataPointIndex];
+
+        const completed = series[0][dataPointIndex];
+        const pending = series[1][dataPointIndex];
+
+        return `
+        <div style="padding:10px; font-size:14px">
+          <strong>${category}</strong>
+          <div style="margin-top:6px">
+            <div>✅ Completed: <b>${completed}</b></div>
+            <div>⏳ Pending: <b>${pending}</b></div>
+          </div>
+        </div>
+      `;
+      },
     },
   };
 
@@ -237,42 +309,32 @@ const CockpitComplince = ({
     {
       name: "Completed",
       data: [
-        data?.total_licenses_completed,
-        data?.total_returns_completed,
-        data?.total_registers_completed,
-        data?.total_challans_completed,
+        data?.total_licenses_completed ?? 0,
+        data?.total_returns_completed ?? 0,
+        data?.total_registers_completed ?? 0,
+        data?.total_challans_completed ?? 0,
       ],
     },
     {
       name: "Pending",
       data: [
-        data.total_licenses_pending,
-        data.total_returns_pending,
-        data.total_registers_pending,
-        0, // challans don't have pending
+        data?.total_licenses_pending ?? 0,
+        data?.total_returns_pending ?? 0,
+        data?.total_registers_pending ?? 0,
+        data?.total_challans_pending ?? 0,
       ],
     },
-    {
-      name: "Total",
-      data: [
-        data?.total_licenses,
-        data?.total_returns,
-        data?.total_registers,
-        data?.total_challans,
-      ],
-    },
+    // {
+    //   name: "Total",
+    //   data: [
+    //     data?.total_licenses ?? 0,
+    //     data?.total_returns ?? 0,
+    //     data?.total_registers ?? 0,
+    //     data?.total_challans ?? 0,
+    //   ],
+    // },
   ];
-  const handleChartNavigate = () => {
-    if (!current?.user_name) {
-      navigate("/compliance_cockpit/dashboard/overall_compliance_score", {
-        state: {
-          score: overallChartSeries,
-          overallComplianceScore: data?.overall_compliance_score,
-        },
-      });
-    }
-    // alert("First you need to select a user");
-  };
+
   const toggleChartSelection = (chartId) => {
     if (!current?.user_name) {
       // alert("First you need to select a user");
@@ -298,7 +360,11 @@ const CockpitComplince = ({
   const handleSelect = (id) => {
     if (canSelect) toggleChartSelection(id);
   };
-
+  const handleOpenDrawer = (anchor, filterColumn) => {
+    setDrawerAnchor(anchor);
+    setDrawerOpen(true);
+    setFilterColumns(filterColumn);
+  };
   return (
     <div className="">
       <Snackbars
@@ -340,6 +406,17 @@ const CockpitComplince = ({
                 Overall Score
               </span>
             </div>
+            <div className="align-content-center">
+              <button
+                className="btn btn-primary "
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDrawer("left");
+                }}
+              >
+                View Details
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -377,7 +454,7 @@ const CockpitComplince = ({
                         className="progress-fill"
                         style={{
                           width: `${(data?.total_licenses_completed /
-                            data?.total_licenses) *
+                              data?.total_licenses) *
                             100
                             }%`,
                         }}
@@ -424,7 +501,7 @@ const CockpitComplince = ({
                         className="progress-fill"
                         style={{
                           width: `${(data.total_returns_completed /
-                            data.total_returns) *
+                              data.total_returns) *
                             100
                             }%`,
                         }}
@@ -471,7 +548,7 @@ const CockpitComplince = ({
                         className="progress-fill"
                         style={{
                           width: `${(data.total_registers_completed /
-                            data.total_registers) *
+                              data.total_registers) *
                             100
                             }%`,
                         }}
@@ -518,7 +595,7 @@ const CockpitComplince = ({
                         className="progress-fill"
                         style={{
                           width: `${(data.total_challans_completed /
-                            data.total_challans) *
+                              data.total_challans) *
                             100
                             }%`,
                         }}
@@ -680,7 +757,47 @@ const CockpitComplince = ({
               </div>
             ) : (
               /* CARD VIEW */
-              ''
+              <div className="performers-grid client-performance-table-sm">
+                {currentClients.map((client, index) => {
+                  const score = client.average_compliance_score || 0;
+
+                  const getClassName = (score) => {
+                    if (score > 300) return "excellent";
+                    if (score > 100 && score < 300) return "high-performer";
+                    if (score > 80 && score <= 100) return "compliant";
+                    if (score >= 50 && score <= 80) return "good";
+                    if (score > 0 && score < 50) return "moderate";
+                    if (score === 0) return "needs-attention";
+                    return "";
+                  };
+
+                  return (
+                    <div
+                      key={index}
+                      className={`performer-card ${getClassName(score)}`}
+                    >
+                      <div className="performer-header">
+                        <h4>{client.name}</h4>
+                        <span
+                          className={`performance-badge ${getClassName(score)}`}
+                        >
+                          Compliance Score
+                        </span>
+                      </div>
+
+                      <div className="performer-score">
+                        <span className="score-value">{score}%</span>
+                        <div className="score-bar">
+                          <div
+                            className="score-fill"
+                            style={{ width: `${Math.min(score, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
 
             {/* PAGINATION */}
@@ -699,7 +816,7 @@ const CockpitComplince = ({
                 </button>
 
                 <button
-                  // disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
                   style={{
                     background: "black",
@@ -846,6 +963,44 @@ const CockpitComplince = ({
           </div>
         )}
       </div>
+      <DashboardDrawerGrid
+        anchor={drawerAnchor}
+        open={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+          setIsDetailPageDataFor("Returns");
+        }}
+        // this is wirking
+        data={
+          isDetailPageDataFor === "Challans"
+            ? data?.data?.challans
+            : isDetailPageDataFor === "Licenses"
+              ? data?.data?.licenses
+              : isDetailPageDataFor === "Registers"
+                ? data?.data?.registers
+                : data?.data?.returns
+        } //direct array
+        title={"Compliance Details - " + isDetailPageDataFor}
+        isDetailPage={isDetailPage}
+        setIsDetailPage={setIsDetailPage}
+        // this was pass for view detail page
+        isDetailPageData={
+          isDetailPageDataFor === "Challans"
+            ? data?.data?.challans
+            : isDetailPageDataFor === "Licenses"
+              ? data?.data?.licenses
+              : isDetailPageDataFor === "Registers"
+                ? data?.data?.registers
+                : data?.data?.returns
+        } //direct array but not working properly
+        filterColumns={filterColumns}
+        isCockpitComplianceDetailPage={true}
+        setIsDetailPageDataFor={setIsDetailPageDataFor}
+        isDetailPageDataFor={isDetailPageDataFor}
+        buttons={["Returns", "Challans", "Licenses", "Registers"]}
+        setPage={setPage}
+        setLimit={setLimit}
+      />
     </div>
   );
 };

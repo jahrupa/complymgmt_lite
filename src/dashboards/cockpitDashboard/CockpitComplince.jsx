@@ -10,24 +10,17 @@ import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
 import { useNavigate } from "react-router-dom";
 import DashboardDrawerGrid from "../DashboardDrawer";
-import {
-  fetchChallanCompliance,
-  fetchClientCompliance,
-  fetchClientData,
-  fetchLicenseComplaince,
-  fetchPaginatedRecords,
-  fetchRegistersCompliance,
-  fetchReturnCompliance,
-} from "../../api/service";
+import { fetchChallanCompliance, fetchClientCompliance, fetchClientData, fetchLicenseComplaince, fetchPaginatedRecords, fetchRegistersCompliance, fetchReturnCompliance } from "../../api/service";
 
 const CockpitComplince = ({
-  data,
+  // data,
   selectedCharts,
   setSelectedCharts,
   current,
   shouldShow,
   setPage,
   setLimit,
+  selectedCompany,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -44,16 +37,15 @@ const CockpitComplince = ({
   const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [filterColumns, setFilterColumns] = useState([]);
-  const [cockpitData, setCockpitData] = useState({
-    licenseComplaince: [],
-    registersCompliance: [],
-    challanCompliance: [],
-    returnCompliance: [],
-    paginatedRecords: [],
-    clientData: [],
-    clientCompliance: [],
-  });
-  console.log(cockpitData,'cockpitData')
+   const [data, setData] = useState({
+         licenseComplaince: [],
+         registersCompliance: [],
+         challanCompliance: [],
+         returnCompliance: [],
+         paginatedRecords: [],
+         clientData: [],
+         clientCompliance: [],
+     });
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -72,52 +64,52 @@ const CockpitComplince = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [window.innerWidth]);
 
-  useEffect(() => {
-    const fetchCockpitData = async () => {
-      const results = await Promise.allSettled([
-        fetchLicenseComplaince(),
-        fetchRegistersCompliance(),
-        fetchChallanCompliance(),
-        fetchReturnCompliance(),
-        fetchPaginatedRecords(),
-        fetchClientData(),
-        fetchClientCompliance(),
-      ]);
-
-      const keys = [
-        "licenseComplaince",
-        "registersCompliance",
-        "challanCompliance",
-        "returnCompliance",
-        "paginatedRecords",
-        "clientData",
-        "clientCompliance",
-      ];
-
-      const updatedData = {};
-
-      results.forEach((res, index) => {
-        updatedData[keys[index]] =
-          res.status === "fulfilled" && Array.isArray(res.value)
-            ? res.value
-            : [];
-      });
-
-      setCockpitData(updatedData);
-    };
-
-    fetchCockpitData();
-  }, []);
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
       document.getElementById("filter-text-box").value,
     );
   }, []);
+
+     useEffect(() => {
+      const fetchCockpitData = async () => {
+          const results = await Promise.allSettled([
+              fetchLicenseComplaince(),
+              fetchRegistersCompliance(),
+              fetchChallanCompliance(),
+              fetchReturnCompliance(),
+              fetchPaginatedRecords(),
+              fetchClientData(),
+              fetchClientCompliance(),
+          ]);
+  
+          const keys = [
+              "licenseComplaince",
+              "registersCompliance",
+              "challanCompliance",
+              "returnCompliance",
+              "paginatedRecords",
+              "clientData",
+              "clientCompliance",
+          ];
+  
+          const updatedData = {};
+  
+          results.forEach((res, index) => {
+              updatedData[keys[index]] =
+                  res.status === "fulfilled" ? res.value : [];
+          });
+  
+          setData(updatedData);
+      };
+  
+      fetchCockpitData();
+  }, [selectedCompany]);
+
   if (!data || Object.keys(data).length === 0) {
     return (
       <div className="no-data">
-        {data === 403 || data === 500 ? "No Data Found" : "Loading..."}
+        {!data || Object.keys(data).length === 0 ? "No Data Found" : "Loading..."}
       </div>
     );
   }
@@ -129,211 +121,7 @@ const CockpitComplince = ({
     setAnchorEl(null);
   };
 
-  const sampleClients = Object.entries(data.compliance_info).map(
-    ([name, details]) => ({
-      name,
-      average_compliance_score: details.average_compliance_score || 0,
-      type:
-        Object.keys(details).find(
-          (key) => key !== "average_compliance_score",
-        ) || "general",
-    }),
-  );
 
-  // Step 2: Pagination logic
-  const totalPages = Math.ceil(sampleClients.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentClients = sampleClients.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
-
-  // Overall Compliance Chart
-  const overallChartOptions = {
-    chart: {
-      type: "radialBar",
-      height: 350,
-      events: {
-        dataPointSelection(event, chartContext, opts) {
-          const index = opts.dataPointIndex;
-          if (index === undefined || index === -1) return;
-
-          const clickedLabel = opts.w.globals.labels[index];
-          const clickedValue = opts.w.globals.series[index];
-          if (clickedValue === 0) return;
-
-          navigate(
-            // "/compliance_cockpit/dashboard/overall_compliance_score",
-            {
-              state: {
-                score: clickedValue,
-                seriesName: clickedLabel,
-                index: index,
-                widget_name: "Compliance Cockpit - Overall Compliance Score",
-              },
-            },
-          );
-        },
-      },
-    },
-
-    colors: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
-
-    title: {
-      text: "Overall Compliance Score",
-      align: "center",
-    },
-
-    plotOptions: {
-      radialBar: {
-        dataLabels: {
-          name: {
-            fontSize: "16px",
-          },
-          value: {
-            fontSize: "14px",
-          },
-          total: {
-            show: true,
-            label: "Overall Score",
-            formatter: () => `${data?.overall_compliance_score}%`,
-          },
-        },
-      },
-    },
-    tooltip: {
-      enabled: true,
-      custom: function ({ w }) {
-        const labels = w.globals.labels;
-        const series = w.globals.series;
-
-        let html = `<div style="padding:10px">`;
-
-        labels.forEach((label, index) => {
-          const value = series[index];
-
-          html += `
-        <div
-          style="
-            display:flex;
-            justify-content:space-between;
-            cursor:pointer;
-            padding:4px 0;
-          "
-          onclick="window.__apexTooltipClick(${index})"
-        >
-          <span>${label}</span>
-          <b>${value}%</b>
-        </div>
-      `;
-        });
-
-        html += `</div>`;
-        return html;
-      },
-    },
-
-    labels: ["Licenses", "Returns", "Challans", "Registers", "Overall"],
-  };
-
-  const overallChartSeries = [
-    data?.overall_license_compliance_score,
-    data?.overall_return_compliance_score,
-    data?.overall_challan_compliance_score,
-    data?.overall_register_compliance_score,
-    data?.overall_compliance_score,
-  ];
-
-  // Completion Status Chart
-  const completionChartOptions = {
-    chart: {
-      type: "bar",
-      height: 400,
-      stacked: true,
-    },
-
-    colors: ["#43A047", "#FB8C00"],
-
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "70%",
-      },
-    },
-
-    dataLabels: {
-      enabled: true,
-    },
-
-    xaxis: {
-      categories: ["Licenses", "Returns", "Registers", "Challans"],
-    },
-
-    yaxis: {
-      title: {
-        text: "Count",
-      },
-    },
-
-    legend: {
-      position: "top",
-    },
-
-    title: {
-      text: "Completion Status Across All Modules",
-      align: "center",
-    },
-
-    tooltip: {
-      enabled: true,
-      custom: function ({ series, dataPointIndex, w }) {
-        const category = w.globals.labels[dataPointIndex];
-
-        const completed = series[0][dataPointIndex];
-        const pending = series[1][dataPointIndex];
-
-        return `
-        <div style="padding:10px; font-size:14px">
-          <strong>${category}</strong>
-          <div style="margin-top:6px">
-            <div>✅ Completed: <b>${completed}</b></div>
-            <div>⏳ Pending: <b>${pending}</b></div>
-          </div>
-        </div>
-      `;
-      },
-    },
-  };
-
-  const completionChartSeries = [
-    {
-      name: "Completed",
-      data: [
-        data?.total_licenses_completed ?? 0,
-        data?.total_returns_completed ?? 0,
-        data?.total_registers_completed ?? 0,
-        data?.total_challans_completed ?? 0,
-      ],
-    },
-    {
-      name: "Pending",
-      data: [
-        data?.total_licenses_pending ?? 0,
-        data?.total_returns_pending ?? 0,
-        data?.total_registers_pending ?? 0,
-        data?.total_challans_pending ?? 0,
-      ],
-    },
-    // {
-    //   name: "Total",
-    //   data: [
-    //     data?.total_licenses ?? 0,
-    //     data?.total_returns ?? 0,
-    //     data?.total_registers ?? 0,
-    //     data?.total_challans ?? 0,
-    //   ],
-    // },
-  ];
 
   const toggleChartSelection = (chartId) => {
     if (!current?.user_name) {
@@ -392,7 +180,8 @@ const CockpitComplince = ({
           <div className="header-stats">
             <div className="header-stat">
               <span className="stat-value">
-                {data?.total_clients?.toLocaleString()}
+                1234567 missing
+                {/* {data?.total_clients?.toLocaleString()} */}
               </span>
               <span className="stat-label-cock-pit-complince">
                 Total Clients
@@ -400,7 +189,8 @@ const CockpitComplince = ({
             </div>
             <div className="header-stat">
               <span className="stat-value">
-                {data?.overall_compliance_score}%
+                {/* {data?.overall_compliance_score}% */}
+                8666665%
               </span>
               <span className="stat-label-cock-pit-complince">
                 Overall Score
@@ -447,26 +237,26 @@ const CockpitComplince = ({
 
                 <div className="metric-content">
                   <h3>Licenses</h3>
-                  <div className="metric-value">{data?.total_licenses}</div>
+                  <div className="metric-value">{data?.licenseComplaince?.total_license}</div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
                         style={{
-                          width: `${(data?.total_licenses_completed /
-                              data?.total_licenses) *
+                          width: `${(data?.licenseComplaince?.active_license  /
+                              data?.licenseComplaince?.total_license) *
                             100
                             }%`,
                         }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {data?.total_licenses_completed} / {data?.total_licenses}{" "}
-                      completed
+                      {data?.licenseComplaince?.active_license } / {data?.licenseComplaince?.total_license}{" "}
+                      completed 
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {data.overall_license_compliance_score}% compliance
+                    {data?.licenseComplaince?.overall_license_compliance_score}% compliance
                   </div>
                 </div>
               </div>
@@ -494,7 +284,10 @@ const CockpitComplince = ({
 
                 <div className="metric-content">
                   <h3>Returns</h3>
-                  <div className="metric-value">{data.total_returns}</div>
+                  <div className="metric-value">
+                    {/* {data.total_returns} */}
+                    1234567 total missing
+                    </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
@@ -508,12 +301,14 @@ const CockpitComplince = ({
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {data.total_returns_completed} / {data.total_returns}{" "}
+                      {/* {data.total_returns_completed} / {data.total_returns}{" "} */}
+                      1234567
                       completed
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {data.overall_return_compliance_score}% compliance
+                    {/* {data.overall_return_compliance_score}% compliance */}
+                    8666665%
                   </div>
                 </div>
               </div>
@@ -541,26 +336,31 @@ const CockpitComplince = ({
 
                 <div className="metric-content">
                   <h3>Registers</h3>
-                  <div className="metric-value">{data.total_registers}</div>
+                  <div className="metric-value">
+                    {/* {data.total_registers} */}
+                    1234567
+                  </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                        style={{
-                          width: `${(data.total_registers_completed /
-                              data.total_registers) *
-                            100
-                            }%`,
-                        }}
+                        // style={{
+                        //   width: `${(data.total_registers_completed /
+                        //       data.total_registers) *
+                        //     100
+                        //     }%`,
+                        // }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {data.total_registers_completed} / {data.total_registers}{" "}
+                      {/* {data.total_registers_completed} / {data.total_registers}{" "} */}
+                      1234567
                       completed
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {data.overall_register_compliance_score}% compliance
+                    {/* {data.overall_register_compliance_score}% compliance */}
+                    8666665%
                   </div>
                 </div>
               </div>
@@ -588,26 +388,30 @@ const CockpitComplince = ({
 
                 <div className="metric-content">
                   <h3>Challans</h3>
-                  <div className="metric-value">{data.total_challans}</div>
+                  <div className="metric-value">
+                    {/* {data.total_challans} */}
+                    1234567
+                  </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                        style={{
-                          width: `${(data.total_challans_completed /
-                              data.total_challans) *
-                            100
-                            }%`,
-                        }}
+                        // style={{
+                        //   width: `${(data.total_challans_completed /
+                        //       data.total_challans) *
+                        //     100
+                        //     }%`,
+                        // }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {data.total_challans_completed} / {data.total_challans}{" "}
-                      completed
+                      {/* {data.total_challans_completed} / {data.total_challans}{" "} */}
+                      1234567 completed
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {data.overall_challan_compliance_score}% compliance
+                    {/* {data.overall_challan_compliance_score}% compliance */}
+                    8666665%
                   </div>
                 </div>
               </div>
@@ -632,12 +436,12 @@ const CockpitComplince = ({
                   checked={selectedCharts.includes("cc-6")}
                 />
               )}
-              <Chart
+              {/* <Chart
                 options={overallChartOptions}
                 series={overallChartSeries}
                 type="radialBar"
                 height={350}
-              />
+              /> */}
             </div>
           )}
           {/* CC-7 */}
@@ -655,12 +459,12 @@ const CockpitComplince = ({
                   checked={selectedCharts.includes("cc-7")}
                 />
               )}
-              <Chart
+              {/* <Chart
                 options={completionChartOptions}
                 series={completionChartSeries}
                 type="bar"
                 height={400}
-              />
+              /> */}
             </div>
           )}
         </div>
@@ -758,7 +562,8 @@ const CockpitComplince = ({
             ) : (
               /* CARD VIEW */
               <div className="performers-grid client-performance-table-sm">
-                {currentClients.map((client, index) => {
+                clent card after implementation remove
+                {/* {currentClients.map((client, index) => {
                   const score = client.average_compliance_score || 0;
 
                   const getClassName = (score) => {
@@ -796,7 +601,7 @@ const CockpitComplince = ({
                       </div>
                     </div>
                   );
-                })}
+                })} */}
               </div>
             )}
 
@@ -816,7 +621,7 @@ const CockpitComplince = ({
                 </button>
 
                 <button
-                  disabled={currentPage === totalPages}
+                  // disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
                   style={{
                     background: "black",
@@ -869,7 +674,7 @@ const CockpitComplince = ({
                   )}
 
                   <div className="analytics-value">
-                    {(
+                    {/* {(
                       ((data.total_licenses_completed +
                         data.total_returns_completed +
                         data.total_challans_completed) /
@@ -877,7 +682,7 @@ const CockpitComplince = ({
                           data.total_returns +
                           data.total_challans)) *
                       100
-                    ).toFixed(1)}
+                    ).toFixed(1)} */}
                     %
                   </div>
                 </div>
@@ -903,9 +708,10 @@ const CockpitComplince = ({
                   )}
 
                   <div className="analytics-value">
-                    {data.total_licenses_pending +
+                    {/* {data.total_licenses_pending +
                       data.total_returns_pending +
-                      data.total_registers_pending}
+                      data.total_registers_pending} */}
+                    1234567
                   </div>
                 </div>
               </div>
@@ -930,7 +736,7 @@ const CockpitComplince = ({
                   )}
 
                   <div className="analytics-value">
-                    Challans ({data.overall_challan_compliance_score}%)
+                    {/* Challans ({data.overall_challan_compliance_score}%) */}
                   </div>
                 </div>
               </div>
@@ -955,7 +761,7 @@ const CockpitComplince = ({
                   )}
 
                   <div className="analytics-value">
-                    Registers ({data.overall_register_compliance_score}%)
+                    {/* Registers ({data.overall_register_compliance_score}%) */}
                   </div>
                 </div>
               </div>

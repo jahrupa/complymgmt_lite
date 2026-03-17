@@ -1,10 +1,11 @@
 import Chart from 'react-apexcharts';
 import '../../style/clientOnbordingDashboard.css';
 import { ArrowUpRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DashboardDrawerGrid from '../DashboardDrawer';
+import { fetchClientOnboardingPortfolio } from '../../api/service';
 
-const ClientOnbordingDashboard = ({ data }) => {
+const ClientOnbordingDashboard = ({ selectedCompany }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnchor, setDrawerAnchor] = useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
@@ -12,6 +13,19 @@ const ClientOnbordingDashboard = ({ data }) => {
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [isDetailPageData, setIsDetailPageData] = useState([]);
   const [filterColumns, setFilterColumns] = useState([]);
+  const [data, setData] = useState([])
+
+
+  useEffect(() => {
+    const fetchClientOnboardingPortfolioData = async () => {
+      const [a] = await Promise.allSettled([
+        fetchClientOnboardingPortfolio()
+      ]);
+
+      setData(a.status === "fulfilled" ? a.value : []);
+    };
+    fetchClientOnboardingPortfolioData();
+  }, [selectedCompany]);
   if (!data || Object.keys(data).length === 0) {
     return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
   }
