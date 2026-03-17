@@ -37,15 +37,15 @@ const CockpitComplince = ({
   const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [filterColumns, setFilterColumns] = useState([]);
-   const [data, setData] = useState({
-         licenseComplaince: [],
-         registersCompliance: [],
-         challanCompliance: [],
-         returnCompliance: [],
-         paginatedRecords: [],
-         clientData: [],
-         clientCompliance: [],
-     });
+  const [data, setData] = useState({
+    licenseComplaince: [],
+    registersCompliance: [],
+    challanCompliance: [],
+    returnCompliance: [],
+    paginatedRecords: [],
+    clientData: [],
+    clientCompliance: [],
+  });
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -70,40 +70,40 @@ const CockpitComplince = ({
       document.getElementById("filter-text-box").value,
     );
   }, []);
-console.log(data,'data')
-     useEffect(() => {
-      const fetchCockpitData = async () => {
-          const results = await Promise.allSettled([
-              fetchLicenseComplaince(),
-              fetchRegistersCompliance(),
-              fetchChallanCompliance(),
-              fetchReturnCompliance(),
-              fetchPaginatedRecords(),
-              fetchClientData(),
-              fetchClientCompliance(),
-          ]);
-  
-          const keys = [
-              "licenseComplaince",
-              "registersCompliance",
-              "challanCompliance",
-              "returnCompliance",
-              "paginatedRecords",
-              "clientData",
-              "clientCompliance",
-          ];
-  
-          const updatedData = {};
-  
-          results.forEach((res, index) => {
-              updatedData[keys[index]] =
-                  res.status === "fulfilled" ? res.value : [];
-          });
-  
-          setData(updatedData);
-      };
-  
-      fetchCockpitData();
+  console.log(data, 'data')
+  useEffect(() => {
+    const fetchCockpitData = async () => {
+      const results = await Promise.allSettled([
+        fetchLicenseComplaince(),
+        fetchRegistersCompliance(),
+        fetchChallanCompliance(),
+        fetchReturnCompliance(),
+        fetchPaginatedRecords(),
+        fetchClientData(),
+        fetchClientCompliance(),
+      ]);
+
+      const keys = [
+        "licenseComplaince",
+        "registersCompliance",
+        "challanCompliance",
+        "returnCompliance",
+        "paginatedRecords",
+        "clientData",
+        "clientCompliance",
+      ];
+
+      const updatedData = {};
+
+      results.forEach((res, index) => {
+        updatedData[keys[index]] =
+          res.status === "fulfilled" ? res.value : [];
+      });
+
+      setData(updatedData);
+    };
+
+    fetchCockpitData();
   }, [selectedCompany]);
 
   if (!data || Object.keys(data).length === 0) {
@@ -243,16 +243,16 @@ console.log(data,'data')
                       <div
                         className="progress-fill"
                         style={{
-                          width: `${(data?.licenseComplaince?.active_license  /
-                              data?.licenseComplaince?.total_license) *
+                          width: `${(data?.licenseComplaince?.active_license /
+                            data?.licenseComplaince?.total_license) *
                             100
                             }%`,
                         }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {data?.licenseComplaince?.active_license } / {data?.licenseComplaince?.total_license}{" "}
-                      completed 
+                      {data?.licenseComplaince?.active_license} / {data?.licenseComplaince?.total_license}{" "}
+                      completed
                     </span>
                   </div>
                   <div className="compliance-score">
@@ -285,15 +285,15 @@ console.log(data,'data')
                 <div className="metric-content">
                   <h3>Returns</h3>
                   <div className="metric-value">
-                    {data?.returnCompliance?.applicable_returns} total 
-                    </div>
+                    {data?.returnCompliance?.applicable_returns} total
+                  </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
                         style={{
                           width: `${(data?.returnCompliance?.completed_returns /
-                              data?.returnCompliance?.applicable_returns) *
+                            data?.returnCompliance?.applicable_returns) *
                             100
                             }%`,
                         }}
@@ -340,9 +340,9 @@ console.log(data,'data')
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                         style={{
+                        style={{
                           width: `${(data?.registersCompliance?.completed_registers /
-                             data?.registersCompliance?.applicable_registers) *
+                            data?.registersCompliance?.applicable_registers) *
                             100
                             }%`,
                         }}
@@ -391,7 +391,7 @@ console.log(data,'data')
                         className="progress-fill"
                         style={{
                           width: `${(data?.challanCompliance?.completed_challans /
-                              data.challanCompliance?.total_challans) *
+                            data.challanCompliance?.total_challans) *
                             100
                             }%`,
                         }}
@@ -399,7 +399,7 @@ console.log(data,'data')
                     </div>
                     <span className="progress-text">
                       {data?.challanCompliance?.completed_challans} / {data.challanCompliance?.total_challans}{" "}
-                       completed
+                      completed
                     </span>
                   </div>
                   <div className="compliance-score">
@@ -555,6 +555,7 @@ console.log(data,'data')
               /* CARD VIEW */
               <div className="performers-grid client-performance-table-sm">
                 clent card after implementation remove
+                
                 {/* {currentClients.map((client, index) => {
                   const score = client.average_compliance_score || 0;
 
@@ -666,6 +667,21 @@ console.log(data,'data')
                   )}
 
                   <div className="analytics-value">
+                    {(() => {
+                      const numerator =
+                        Number(data?.licenseCompliance?.active_license || 0) +
+                        Number(data?.returnCompliance?.completed_returns || 0) +
+                        Number(data?.challanCompliance?.completed_challans || 0);
+
+                      const denominator =
+                        Number(data?.licenseCompliance?.total_license || 0) +
+                        Number(data?.returnCompliance?.applicable_returns || 0) +
+                        Number(data?.challanCompliance?.total_challans || 0);
+
+                      return denominator === 0
+                        ? "0.0%"
+                        : ((numerator / denominator) * 100).toFixed(1) + "%";
+                    })()}
                     {/* {(
                       ((data.total_licenses_completed +
                         data.total_returns_completed +
@@ -674,8 +690,8 @@ console.log(data,'data')
                           data.total_returns +
                           data.total_challans)) *
                       100
-                    ).toFixed(1)} */}
-                    %
+                    ).toFixed(1)} % */}
+
                   </div>
                 </div>
               </div>
@@ -700,10 +716,16 @@ console.log(data,'data')
                   )}
 
                   <div className="analytics-value">
+                    {(
+                      Number(data?.licenseCompliance?.inprogress_license || 0) +
+                      Number(data?.registersCompliance?.pending_registers || 0) +
+                      Number(data?.registersCompliance?.total_registers_pending || 0)
+                    )}
+
                     {/* {data.total_licenses_pending +
                       data.total_returns_pending +
                       data.total_registers_pending} */}
-                    1234567
+
                   </div>
                 </div>
               </div>
@@ -728,6 +750,8 @@ console.log(data,'data')
                   )}
 
                   <div className="analytics-value">
+                    {`Challans (${data?.challanCompliance?.compliance_score || 0}%)`}
+
                     {/* Challans ({data.overall_challan_compliance_score}%) */}
                   </div>
                 </div>
@@ -753,6 +777,8 @@ console.log(data,'data')
                   )}
 
                   <div className="analytics-value">
+                    {`Registers (${Number(data?.registersCompliance?.compliance_score || 0).toFixed(1)}%)`}
+
                     {/* Registers ({data.overall_register_compliance_score}%) */}
                   </div>
                 </div>
