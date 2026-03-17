@@ -1481,9 +1481,9 @@ export const fetchReturnCompliance = async () => {
   }
 };
 
-export const fetchPaginatedRecords = async () => {
+export const fetchPaginatedRecords = async (page,limit) => {
   try {
-    const response = await API.get(PAGINATED_RECORDS);
+    const response = await API.get(`${PAGINATED_RECORDS}?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     // console.error("Error fetching all Client", error);

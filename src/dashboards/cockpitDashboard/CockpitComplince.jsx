@@ -21,6 +21,8 @@ const CockpitComplince = ({
   setPage,
   setLimit,
   selectedCompany,
+  page,
+  limit
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -46,6 +48,7 @@ const CockpitComplince = ({
          clientData: [],
          clientCompliance: [],
      });
+     console.log(data.paginatedRecords,'paginatedRecords')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -70,7 +73,6 @@ const CockpitComplince = ({
       document.getElementById("filter-text-box").value,
     );
   }, []);
-console.log(data,'data')
      useEffect(() => {
       const fetchCockpitData = async () => {
           const results = await Promise.allSettled([
@@ -78,7 +80,7 @@ console.log(data,'data')
               fetchRegistersCompliance(),
               fetchChallanCompliance(),
               fetchReturnCompliance(),
-              fetchPaginatedRecords(),
+              fetchPaginatedRecords(page,limit),
               fetchClientData(),
               fetchClientCompliance(),
           ]);
@@ -771,12 +773,12 @@ console.log(data,'data')
         // this is wirking
         data={
           isDetailPageDataFor === "Challans"
-            ? data?.data?.challans
+            ? data?.paginatedRecords?.challan?.records
             : isDetailPageDataFor === "Licenses"
-              ? data?.data?.licenses
+              ? data?.paginatedRecords?.license?.records
               : isDetailPageDataFor === "Registers"
-                ? data?.data?.registers
-                : data?.data?.returns
+                ? data?.paginatedRecords?.register?.records
+                : data?.paginatedRecords?.return?.records
         } //direct array
         title={"Compliance Details - " + isDetailPageDataFor}
         isDetailPage={isDetailPage}
@@ -784,12 +786,12 @@ console.log(data,'data')
         // this was pass for view detail page
         isDetailPageData={
           isDetailPageDataFor === "Challans"
-            ? data?.data?.challans
+            ? data?.paginatedRecords?.challan?.records
             : isDetailPageDataFor === "Licenses"
-              ? data?.data?.licenses
+              ? data?.paginatedRecords?.license?.records
               : isDetailPageDataFor === "Registers"
-                ? data?.data?.registers
-                : data?.data?.returns
+                ? data?.paginatedRecords?.register?.records
+                : data?.paginatedRecords?.return?.records
         } //direct array but not working properly
         filterColumns={filterColumns}
         isCockpitComplianceDetailPage={true}

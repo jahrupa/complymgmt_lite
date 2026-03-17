@@ -153,6 +153,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         setPage={setPage}
                         setLimit={setLimit}
                         selectedCompany={selectedCompany}
+                        page={page}
+                        limit={limit}
 
                     />
                 )
