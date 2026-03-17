@@ -70,7 +70,7 @@ const CockpitComplince = ({
       document.getElementById("filter-text-box").value,
     );
   }, []);
-
+console.log(data,'data')
      useEffect(() => {
       const fetchCockpitData = async () => {
           const results = await Promise.allSettled([
@@ -285,30 +285,27 @@ const CockpitComplince = ({
                 <div className="metric-content">
                   <h3>Returns</h3>
                   <div className="metric-value">
-                    {/* {data.total_returns} */}
-                    1234567 total missing
+                    {data?.returnCompliance?.applicable_returns} total 
                     </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
                         style={{
-                          width: `${(data.total_returns_completed /
-                              data.total_returns) *
+                          width: `${(data?.returnCompliance?.completed_returns /
+                              data?.returnCompliance?.applicable_returns) *
                             100
                             }%`,
                         }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {/* {data.total_returns_completed} / {data.total_returns}{" "} */}
-                      1234567
+                      {data?.returnCompliance?.completed_returns} / {data?.returnCompliance?.applicable_returns}{" "}
                       completed
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {/* {data.overall_return_compliance_score}% compliance */}
-                    8666665%
+                    {data?.returnCompliance?.compliance_score}% compliance
                   </div>
                 </div>
               </div>
@@ -337,30 +334,27 @@ const CockpitComplince = ({
                 <div className="metric-content">
                   <h3>Registers</h3>
                   <div className="metric-value">
-                    {/* {data.total_registers} */}
-                    1234567
+                    {data?.registersCompliance?.applicable_registers}
                   </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                        // style={{
-                        //   width: `${(data.total_registers_completed /
-                        //       data.total_registers) *
-                        //     100
-                        //     }%`,
-                        // }}
+                         style={{
+                          width: `${(data?.registersCompliance?.completed_registers /
+                             data?.registersCompliance?.applicable_registers) *
+                            100
+                            }%`,
+                        }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {/* {data.total_registers_completed} / {data.total_registers}{" "} */}
-                      1234567
+                      {data?.registersCompliance?.completed_registers} / {data?.registersCompliance?.applicable_registers}{" "}
                       completed
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {/* {data.overall_register_compliance_score}% compliance */}
-                    8666665%
+                    {data?.registersCompliance?.compliance_score}%
                   </div>
                 </div>
               </div>
@@ -389,29 +383,27 @@ const CockpitComplince = ({
                 <div className="metric-content">
                   <h3>Challans</h3>
                   <div className="metric-value">
-                    {/* {data.total_challans} */}
-                    1234567
+                    {data?.challanCompliance?.total_challans}
                   </div>
                   <div className="metric-progress">
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                        // style={{
-                        //   width: `${(data.total_challans_completed /
-                        //       data.total_challans) *
-                        //     100
-                        //     }%`,
-                        // }}
+                        style={{
+                          width: `${(data?.challanCompliance?.completed_challans /
+                              data.challanCompliance?.total_challans) *
+                            100
+                            }%`,
+                        }}
                       ></div>
                     </div>
                     <span className="progress-text">
-                      {/* {data.total_challans_completed} / {data.total_challans}{" "} */}
-                      1234567 completed
+                      {data?.challanCompliance?.completed_challans} / {data.challanCompliance?.total_challans}{" "}
+                       completed
                     </span>
                   </div>
                   <div className="compliance-score">
-                    {/* {data.overall_challan_compliance_score}% compliance */}
-                    8666665%
+                    {data?.challanCompliance?.compliance_score}% compliance
                   </div>
                 </div>
               </div>
