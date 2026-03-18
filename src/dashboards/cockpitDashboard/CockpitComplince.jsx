@@ -48,7 +48,6 @@ const CockpitComplince = ({
          clientData: [],
          clientCompliance: [],
      });
-     console.log(data.paginatedRecords,'paginatedRecords')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -800,6 +799,17 @@ const CockpitComplince = ({
         buttons={["Returns", "Challans", "Licenses", "Registers"]}
         setPage={setPage}
         setLimit={setLimit}
+        totalPage={
+          isDetailPageDataFor === "Challans"
+            ? data?.paginatedRecords?.challan?.total
+            : isDetailPageDataFor === "Licenses"
+              ? data?.paginatedRecords?.license?.total
+              : isDetailPageDataFor === "Registers"
+                ? data?.paginatedRecords?.register?.total
+                : data?.paginatedRecords?.return?.total
+        }
+        fetchPaginatedRecords={fetchPaginatedRecords}
+        isPaginatedRecords={true}
       />
     </div>
   );

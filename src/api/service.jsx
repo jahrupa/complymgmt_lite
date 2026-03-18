@@ -1420,9 +1420,9 @@ export const changeTemporaryPasswordStatus = async (user_credential) => {
   }
 }
 // Dashboard
-export const fetchGeneralCompaiancePortfolio = async () => {
+export const fetchGeneralCompaiancePortfolio = async (page,limit) => {
   try {
-    const response = await API.get(GET_GENERAL_COMPLIANCE_PORTFOLIO);
+    const response = await API.get(`${GET_GENERAL_COMPLIANCE_PORTFOLIO}?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     // console.error("Error fetching all notifications:", error);
