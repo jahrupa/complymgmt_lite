@@ -1,7 +1,7 @@
 // import React, { useState } from 'react';
 import Chart from "react-apexcharts";
 import "../../style/cockpitComplinceByCompany.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ClientComplianceTable from "./ClientComplianceTable";
 import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { Settings2 } from "lucide-react";
@@ -48,6 +48,7 @@ const CockpitComplince = ({
     clientData: [],
     clientCompliance: [],
   });
+  console.log(data.clientData,'data12')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -111,7 +112,42 @@ const CockpitComplince = ({
     setCurrentPage(1);
   }, [data?.clientCompliance]);
 
+const overallScore = useMemo(() => {
+  const license = data.licenseComplaince || {};
+  const registers = data.registersCompliance || {};
+  const challans = data.challanCompliance || {};
+  const returns = data.returnCompliance || {};
 
+  const categories = [
+    {
+      total: license.total_license || 0,
+      score: license.overall_license_compliance_score || 0,
+    },
+    {
+      total: registers.applicable_registers || 0,
+      score: registers.compliance_score || 0,
+    },
+    {
+      total: challans.total_challans || 0,
+      score: challans.compliance_score || 0,
+    },
+    {
+      total: returns.applicable_returns || 0,
+      score: returns.compliance_score || 0,
+    },
+  ];
+
+  const totalItems = categories.reduce((sum, item) => sum + item.total, 0);
+
+  if (!totalItems) return 0;
+
+  const weightedScore = categories.reduce(
+    (sum, item) => sum + item.score * item.total,
+    0
+  );
+
+  return (weightedScore / totalItems).toFixed(2);
+}, [data]);
 
   const overallChartSeries = [
     data?.licenseComplaince?.overall_license_compliance_score || 0,
@@ -417,7 +453,7 @@ const CockpitComplince = ({
           <div className="header-stats">
             <div className="header-stat">
               <span className="stat-value">
-                1234567 missing
+                {data?.clientData?.total_clients}
                 {/* {data?.total_clients?.toLocaleString()} */}
               </span>
               <span className="stat-label-cock-pit-complince">
@@ -427,7 +463,7 @@ const CockpitComplince = ({
             <div className="header-stat">
               <span className="stat-value">
                 {/* {data?.overall_compliance_score}% */}
-                8666665%
+               {overallScore}%
               </span>
               <span className="stat-label-cock-pit-complince">
                 Overall Score
