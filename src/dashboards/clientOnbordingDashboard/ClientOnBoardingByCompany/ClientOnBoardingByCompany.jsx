@@ -1,11 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import ModuleFilter from './ModuleFilter';
 import StatsPanel from './StatsPanel';
 import LocationList from './LocationList';
+import { fetchClientOnboardingByCompany } from '../../../api/service';
 
-function ClientOnBoardingByCompany({locationData}) {
+function ClientOnBoardingByCompany({selectedCompany}) {
 
   const [selectedModule, setSelectedModule] = useState('all');
+  const[locationData,setLocationData]=useState([]);
+   useEffect(() => {
+        const fetchClientOnboardingPortfolioData = async () => {
+            const [a] = await Promise.allSettled([
+                fetchClientOnboardingByCompany(selectedCompany),
+            ]);
+
+            setLocationData(a.status === "fulfilled" ? a.value : []);
+        };
+        fetchClientOnboardingPortfolioData();
+    }, [selectedCompany]);
   const filteredLocations = useMemo(() => {
     let locations = Object?.keys(locationData.location_module_map || {});
     if (selectedModule !== 'all') {

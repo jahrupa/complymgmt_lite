@@ -3,6 +3,7 @@ import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
 import DashboardDrawerGrid from '../DashboardDrawer';
+import { fetchGeneralCompaiancePortfolio } from '../../api/service';
 
 const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -16,6 +17,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
     const [drawerAnchor, setDrawerAnchor] = useState("right");
     const [filterColumns, setFilterColumns] = useState([]);
     const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
+    const[paginatedData,setPaginatedData] = useState([]);
 
     if (!data || Object.keys(data).length === 0) {
         return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
@@ -177,6 +179,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         setDrawerOpen(true);
         setFilterColumns(filterColumn);
     };
+    console.log(data?.data?.registers?.length, 'length')
     return (
         <>
             <Snackbars
@@ -307,6 +310,16 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 setIsDetailPageDataFor={setIsDetailPageDataFor}
                 isDetailPageDataFor={isDetailPageDataFor}
                 buttons={['Returns', 'Challans', 'Licenses', 'Registers']}
+                fetchPaginatedRecords={fetchGeneralCompaiancePortfolio}
+                totalPage={isDetailPageDataFor === 'Challans'
+                    ? data?.data?.challans?.length
+                    : isDetailPageDataFor === 'Licenses'
+                        ? data?.data?.licenses?.length
+                        : isDetailPageDataFor === 'Registers'
+                            ? data?.data?.registers?.length
+                            : data?.data?.returns?.length}
+
+
 
             />
         </>

@@ -12,6 +12,13 @@ import {
     fetchGeneralCompaiancePortfolio,
     fetchGeneralComplianceByCompany,
     fetchWidgetMappingById,
+    fetchLicenseComplaince,
+    fetchRegistersCompliance,
+    fetchChallanCompliance,
+    fetchReturnCompliance,
+    fetchPaginatedRecords,
+    fetchClientData,
+    fetchClientCompliance,
 } from "../api/service";
 import CockpitComplinceByCompany from "./cockpitDashboard/CockpitComplinceByCompany";
 import CockpitComplince from "./cockpitDashboard/CockpitComplince";
@@ -46,8 +53,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
-    const[page, setPage] = useState(1);
-    const[limit, setLimit] = useState(50);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(50);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -62,6 +69,15 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
 
     const [isDragging, setIsDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
+    const [cockpitComplainceData, setCockpitComplainceData] = useState({
+        licenseComplaince: [],
+        registersCompliance: [],
+        challanCompliance: [],
+        returnCompliance: [],
+        paginatedRecords: [],
+        clientData: [],
+        clientCompliance: [],
+    });
 
     // Start dragging
     const startDrag = (e) => {
@@ -128,13 +144,17 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         companyName={selectedCompany}
                         setSelectedCharts={setSelectedCharts} />
                 ) : (
-                    <CockpitComplince data={cockpitData ? cockpitData : []}
+                    <CockpitComplince 
+                    // data={cockpitComplainceData ? cockpitComplainceData : []}
                         current={current}
                         selectedCharts={selectedCharts}
                         setSelectedCharts={setSelectedCharts}
                         shouldShow={shouldShow}
                         setPage={setPage}
                         setLimit={setLimit}
+                        selectedCompany={selectedCompany}
+                        page={page}
+                        limit={limit}
 
                     />
                 )
@@ -157,11 +177,12 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             label: "Client Onboarding",
             content:
                 selectedCompany === "" ? (
-                    <ClientOnbordingDashboard data={clientOnboardingData} current={current} />
+                    <ClientOnbordingDashboard data={clientOnboardingData} current={current} selectedCompany={selectedCompany}/>
                 ) : (
                     <ClientOnBoardingByCompany
                         locationData={ClientOnBoardingByCompanyData}
                         current={current}
+                        selectedCompany={selectedCompany}
                     />
                 )
         });
@@ -261,32 +282,32 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             }
         };
         fetchGeneralDashboardData();
-    }, [selectedCompany,page,limit]);
+    }, [selectedCompany, page, limit]);
 
-    useEffect(() => {
-        const fetchCockpitData = async () => {
-            const [a, b] = await Promise.allSettled([
-                fetchComplainceCockpitByCompany(selectedCompany),
-                fetchComplianceCockpit(page,limit)
-            ]);
-            setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);
-            setCockpitData(b.status === "fulfilled" ? b.value : []);
-        };
-        fetchCockpitData();
-    }, [selectedCompany]);
+    // useEffect(() => {
+    //     const fetchCockpitData = async () => {
+    //         const [a, b] = await Promise.allSettled([
+    //             fetchComplainceCockpitByCompany(selectedCompany),
+    //             fetchComplianceCockpit(page, limit)
+    //         ]);
+    //         setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);
+    //         setCockpitData(b.status === "fulfilled" ? b.value : []);
+    //     };
+    //     fetchCockpitData();
+    // }, [selectedCompany]);
 
-    useEffect(() => {
-        const fetchClientOnboardingPortfolioData = async () => {
-            const [a, b] = await Promise.allSettled([
-                fetchClientOnboardingByCompany(selectedCompany),
-                fetchClientOnboardingPortfolio()
-            ]);
+    // useEffect(() => {
+    //     const fetchClientOnboardingPortfolioData = async () => {
+    //         const [a, b] = await Promise.allSettled([
+    //             fetchClientOnboardingByCompany(selectedCompany),
+    //             fetchClientOnboardingPortfolio()
+    //         ]);
 
-            setClientOnBoardingByCompanyData(a.status === "fulfilled" ? a.value : []);
-            setClientOnboardingData(b.status === "fulfilled" ? b.value : []);
-        };
-        fetchClientOnboardingPortfolioData();
-    }, [selectedCompany]);
+    //         setClientOnBoardingByCompanyData(a.status === "fulfilled" ? a.value : []);
+    //         setClientOnboardingData(b.status === "fulfilled" ? b.value : []);
+    //     };
+    //     fetchClientOnboardingPortfolioData();
+    // }, [selectedCompany]);
 
     useEffect(() => {
         const fetchWidgetsListData = async () => {
