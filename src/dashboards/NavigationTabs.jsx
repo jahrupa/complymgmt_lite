@@ -54,7 +54,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [widgetsList, setWidgetsList] = useState([]);
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(50);
+    const [limit, setLimit] = useState(20);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -166,6 +166,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    page={page}
+                    limit={limit}
 
                 />
             )

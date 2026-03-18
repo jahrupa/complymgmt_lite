@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
 import DashboardDrawerGrid from '../DashboardDrawer';
-import { fetchGeneralCompaiancePortfolio } from '../../api/service';
+import { fetchGeneralCompaiancePortfolio, fetchPaginatedRecords } from '../../api/service';
 
-const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow }) => {
+const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow, page, limit }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -17,7 +17,30 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
     const [drawerAnchor, setDrawerAnchor] = useState("right");
     const [filterColumns, setFilterColumns] = useState([]);
     const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
-    const[paginatedData,setPaginatedData] = useState([]);
+    const [paginatedData, setPaginatedData] = useState([]);
+    // console.log(paginatedData.paginatedRecords.challan.records, "paginatedData");
+    useEffect(() => {
+        const fetchGeneralComplianceData = async () => {
+            const results = await Promise.allSettled([
+                fetchPaginatedRecords(page, limit),
+            ]);
+
+            const keys = [
+                "paginatedRecords",
+            ];
+
+            const updatedData = {};
+
+            results.forEach((res, index) => {
+                updatedData[keys[index]] =
+                    res.status === "fulfilled" ? res.value : [];
+            });
+
+            setPaginatedData(updatedData);
+        };
+
+        fetchGeneralComplianceData();
+    }, []);
 
     if (!data || Object.keys(data).length === 0) {
         return <div className='no-data'>{data === 403 ? 'No Data Found' : 'Loading...'}</div>;
@@ -302,23 +325,34 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 filterColumns={filterColumns}
                 isCockpitComplianceDetailPage={true}
                 // this is wirking
-                data={isDetailPageDataFor === 'Challans' ? data?.data?.challans
-                    : isDetailPageDataFor === 'Licenses' ? data?.data?.licenses
-                        : isDetailPageDataFor === 'Registers' ? data?.data?.registers
-                            : data?.data?.returns} //direct array
+                data={isDetailPageDataFor === 'Challans' ? paginatedData?.paginatedRecords?.challan?.records
+                    : isDetailPageDataFor === 'Licenses' ? paginatedData?.paginatedRecords?.license?.records
+                        : isDetailPageDataFor === 'Registers' ? paginatedData?.paginatedRecords?.register?.records
+                            : paginatedData?.paginatedRecords?.return?.records} //direct array
+                isDetailPageData={
+                    isDetailPageDataFor === "Challans"
+                        ? paginatedData?.paginatedRecords?.challan?.records
+                        : isDetailPageDataFor === "Licenses"
+                            ? paginatedData?.paginatedRecords?.license?.records
+                            : isDetailPageDataFor === "Registers"
+                                ? paginatedData?.paginatedRecords?.register?.records
+                                : paginatedData?.paginatedRecords?.return?.records
+                }
                 title={'General Compliance - ' + isDetailPageDataFor}
                 setIsDetailPageDataFor={setIsDetailPageDataFor}
                 isDetailPageDataFor={isDetailPageDataFor}
                 buttons={['Returns', 'Challans', 'Licenses', 'Registers']}
-                fetchPaginatedRecords={fetchGeneralCompaiancePortfolio}
-                totalPage={isDetailPageDataFor === 'Challans'
-                    ? data?.data?.challans?.length
-                    : isDetailPageDataFor === 'Licenses'
-                        ? data?.data?.licenses?.length
-                        : isDetailPageDataFor === 'Registers'
-                            ? data?.data?.registers?.length
-                            : data?.data?.returns?.length}
-
+                fetchPaginatedRecords={fetchPaginatedRecords}
+                totalPage={
+                    isDetailPageDataFor === "Challans"
+                        ? paginatedData?.paginatedRecords?.challan?.total
+                        : isDetailPageDataFor === "Licenses"
+                            ? paginatedData?.paginatedRecords?.license?.total
+                            : isDetailPageDataFor === "Registers"
+                                ? paginatedData?.paginatedRecords?.register?.total
+                                : paginatedData?.paginatedRecords?.return?.total
+                }
+                isPaginatedRecords={true}
 
 
             />
