@@ -9,12 +9,12 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ClientComplianceTable = ({ data ,gridRef}) => {
     // Convert compliance_info object into array
-    const rowData = useMemo(() => {
-        return Object.entries(data?.compliance_info || {}).map(([name, client]) => ({
-            name,
-            average_compliance_score: client?.average_compliance_score || 0,
-        }));
-    }, [data]);
+const rowData = useMemo(() => {
+    return (data || []).map((client) => ({
+        name: client?.name || "",
+        average_compliance_score: client?.average_compliance_score || 0,
+    }));
+}, [data]);
 
     // Function to determine cell styles based on score
     const getCellStyle = (score) => {
