@@ -22,7 +22,8 @@ const CockpitComplince = ({
   setLimit,
   selectedCompany,
   page,
-  limit
+  limit,
+  setIsDrawerOpenGlobal
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -48,7 +49,7 @@ const CockpitComplince = ({
     clientData: [],
     clientCompliance: [],
   });
-  console.log(data.clientData,'data12')
+  console.log(data.clientData, 'data12')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -81,7 +82,7 @@ const CockpitComplince = ({
         fetchRegistersCompliance(),
         fetchChallanCompliance(),
         fetchReturnCompliance(),
-        fetchPaginatedRecords(page,limit),
+        fetchPaginatedRecords(page, limit),
         fetchClientData(),
         fetchClientCompliance(),
       ]);
@@ -112,42 +113,42 @@ const CockpitComplince = ({
     setCurrentPage(1);
   }, [data?.clientCompliance]);
 
-const overallScore = useMemo(() => {
-  const license = data.licenseComplaince || {};
-  const registers = data.registersCompliance || {};
-  const challans = data.challanCompliance || {};
-  const returns = data.returnCompliance || {};
+  const overallScore = useMemo(() => {
+    const license = data.licenseComplaince || {};
+    const registers = data.registersCompliance || {};
+    const challans = data.challanCompliance || {};
+    const returns = data.returnCompliance || {};
 
-  const categories = [
-    {
-      total: license.total_license || 0,
-      score: license.overall_license_compliance_score || 0,
-    },
-    {
-      total: registers.applicable_registers || 0,
-      score: registers.compliance_score || 0,
-    },
-    {
-      total: challans.total_challans || 0,
-      score: challans.compliance_score || 0,
-    },
-    {
-      total: returns.applicable_returns || 0,
-      score: returns.compliance_score || 0,
-    },
-  ];
+    const categories = [
+      {
+        total: license.total_license || 0,
+        score: license.overall_license_compliance_score || 0,
+      },
+      {
+        total: registers.applicable_registers || 0,
+        score: registers.compliance_score || 0,
+      },
+      {
+        total: challans.total_challans || 0,
+        score: challans.compliance_score || 0,
+      },
+      {
+        total: returns.applicable_returns || 0,
+        score: returns.compliance_score || 0,
+      },
+    ];
 
-  const totalItems = categories.reduce((sum, item) => sum + item.total, 0);
+    const totalItems = categories.reduce((sum, item) => sum + item.total, 0);
 
-  if (!totalItems) return 0;
+    if (!totalItems) return 0;
 
-  const weightedScore = categories.reduce(
-    (sum, item) => sum + item.score * item.total,
-    0
-  );
+    const weightedScore = categories.reduce(
+      (sum, item) => sum + item.score * item.total,
+      0
+    );
 
-  return (weightedScore / totalItems).toFixed(2);
-}, [data]);
+    return (weightedScore / totalItems).toFixed(2);
+  }, [data]);
 
   const overallChartSeries = [
     data?.licenseComplaince?.overall_license_compliance_score || 0,
@@ -425,6 +426,7 @@ const overallScore = useMemo(() => {
     setDrawerAnchor(anchor);
     setDrawerOpen(true);
     setFilterColumns(filterColumn);
+    setIsDrawerOpenGlobal(true);
   };
   return (
     <div className="">
@@ -463,7 +465,7 @@ const overallScore = useMemo(() => {
             <div className="header-stat">
               <span className="stat-value">
                 {/* {data?.overall_compliance_score}% */}
-               {overallScore}%
+                {overallScore}%
               </span>
               <span className="stat-label-cock-pit-complince">
                 Overall Score
@@ -1109,6 +1111,7 @@ const overallScore = useMemo(() => {
         onClose={() => {
           setDrawerOpen(false);
           setIsDetailPageDataFor("Returns");
+          setIsDrawerOpenGlobal(false);
         }}
         // this is wirking
         data={
