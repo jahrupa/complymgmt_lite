@@ -100,6 +100,7 @@ import {
   UPDATE_NOTIFICATION_STATUS_BY_ID,
   UPLOAD_BULK_NOTIFICATION,
   GET_SERVICE_TRACKER_BY_SUBMODULE_ID,
+  GET_SERVICE_TRACKER_BY_MODULE_ID,
   GET_DOCUMENT_DROPDOWNS_TYPES,
   GET_DOCUMENT_DROPDOWNS_STAGE,
   CHANGE_PASSWORD_AFTER_LOGIN,
@@ -737,7 +738,7 @@ export const fetchAllInnerPageServiceTracker = async (trackerName, sheetName) =>
   }
 };
 
-export const appendServiceTrackerInnerPageDAta= async (trackerName) => {
+export const appendServiceTrackerInnerPageDAta = async (trackerName) => {
   try {
     const url = `${APPEND_TRACKER}${encodeURIComponent(trackerName)}}`;
     const response = await API.post(url);
@@ -847,7 +848,6 @@ export const updateServiceTrackerApprovalStatusById = async (id) => {
   }
 };
 
-
 export const fetchServiceTrackerBySubModuleId = async (id) => {
   try {
     const response = await API.get(`${GET_SERVICE_TRACKER_BY_SUBMODULE_ID}${id}`);
@@ -856,7 +856,15 @@ export const fetchServiceTrackerBySubModuleId = async (id) => {
     // console.error("Error fetching service tracker by sub module ID:", error);
     throw error;
   }
-}
+};
+
+
+export const fetchServiceTrackerByModuleId = async (moduleId) => {
+  const response = await API.get(
+    `${GET_SERVICE_TRACKER_BY_MODULE_ID}${moduleId}`
+  );
+  return response.data;
+};
 // location To Module
 
 export const fetchLocationToModuleModule = async () => {
@@ -1420,7 +1428,7 @@ export const changeTemporaryPasswordStatus = async (user_credential) => {
   }
 }
 // Dashboard
-export const fetchGeneralCompaiancePortfolio = async (page,limit) => {
+export const fetchGeneralCompaiancePortfolio = async (page, limit) => {
   try {
     const response = await API.get(`${GET_GENERAL_COMPLIANCE_PORTFOLIO}?page=${page}&limit=${limit}`);
     return response.data;
@@ -1481,7 +1489,7 @@ export const fetchReturnCompliance = async () => {
   }
 };
 
-export const fetchPaginatedRecords = async (page,limit) => {
+export const fetchPaginatedRecords = async (page, limit) => {
   try {
     const response = await API.get(`${PAGINATED_RECORDS}?page=${page}&limit=${limit}`);
     return response.data;
@@ -1551,7 +1559,7 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
     throw error;
   }
 };
-export const fetchComplianceCockpit = async (page,limit) => {
+export const fetchComplianceCockpit = async (page, limit) => {
   try {
     const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}?page=${1}&limit=${10}`);
     return response.data;
@@ -2021,7 +2029,7 @@ export const fetchAllWidgetMappings = async (userId) => {
   }
 };
 
-export const createOrUpdateWidgetMapping = async (widgetData,userId) => {
+export const createOrUpdateWidgetMapping = async (widgetData, userId) => {
   try {
     const response = await API.post(`${CREATE_OR_UPDATE_WIDGET_MAPPING}?user_id=${userId}`, widgetData);
     return response.data;
@@ -2031,7 +2039,7 @@ export const createOrUpdateWidgetMapping = async (widgetData,userId) => {
   }
 };
 
-export const deleteWidgetMappingById = async (user_id,target_user_id) => {
+export const deleteWidgetMappingById = async (user_id, target_user_id) => {
   try {
     const response = await API.delete(`${DELETE_WIDGET_MAPPING_BY_ID}${user_id}&target_user_id=${target_user_id}`);
     return response.data;
@@ -2063,7 +2071,7 @@ export const fetchAllRegisterNames = async () => {
 };
 
 
-export const fetchRegisterMappingByName = async (register_id,doc_id) => {
+export const fetchRegisterMappingByName = async (register_id, doc_id) => {
   try {
     const response = await API.get(`${GET_REGISTER_MAPPING}${register_id}&document_id=${doc_id}`);
     return response.data;
