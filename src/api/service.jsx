@@ -860,10 +860,15 @@ export const fetchServiceTrackerBySubModuleId = async (id) => {
 
 
 export const fetchServiceTrackerByModuleId = async (moduleId) => {
-  const response = await API.get(
-    `${GET_SERVICE_TRACKER_BY_MODULE_ID}${moduleId}`
-  );
-  return response.data;
+  try {
+    const response = await API.get(
+      `${GET_SERVICE_TRACKER_BY_MODULE_ID}${moduleId}`
+    );
+    return response.data;
+  } catch (error) {
+    // console.error("Error fetching service tracker by module id:", error);
+    throw error;
+  }
 };
 // location To Module
 
