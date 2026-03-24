@@ -33,6 +33,7 @@ import {
   updateUserAccessLevelById,
   approveUserAccess,
   companyWiseAccess,
+  documentWiseAccess,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -267,6 +268,10 @@ const AccessControl = () => {
       company_name: current?.company_name,
       access_key: current?.access
     };
+    const documentWiseAccessPayload = {
+      user_id: current?.user_id,
+      access_key: current?.access
+    }
     const accessType = current?.access_type === "service_tracker_wise";
     const payload = {
       user_id: current?.user_id,
@@ -335,8 +340,13 @@ const AccessControl = () => {
         });
       } else {
         // Create new AccessControl
-        const response = current?.access_type === "company-wise" ? await companyWiseAccess(companyWiseAccessPayload) : await createUserAccessLevel(payload);
-        const message = response?.message || "create successfully";
+        const response =
+          current?.access_type === "company-wise"
+            ? await companyWiseAccess(companyWiseAccessPayload)
+            : current?.access_type === "document-wise"
+              ? await documentWiseAccess(documentWiseAccessPayload)
+              : await createUserAccessLevel(payload); 
+              const message = response?.message || "create successfully";
         // Show success snackbar
         setIsSnackbarsOpen({
           ...isSnackbarsOpen,

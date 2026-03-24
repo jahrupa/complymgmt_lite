@@ -177,6 +177,7 @@ import {
   PAGINATED_RECORDS,
   CLIENT_DATA,
   CLIENT_COMPLIANCE,
+  DOCUMENT_WISE_ACCESS,
 
 } from "./Endpoint";
 
@@ -961,8 +962,8 @@ export const uploadFileGolang = async (filesArray, isAutoUpload) => {
     filesArray.forEach((file) => {
       formData.append("files", file);
     });
-    formData.append("is_ai_upload", isAutoUpload);
-    const response = await API.post(AUTO_FILE_UPLOAD_GOLANG, formData, {
+    // formData.append("is_ai_upload", isAutoUpload);
+    const response = await API.post(`${AUTO_FILE_UPLOAD_GOLANG}?is_ai_upload=${isAutoUpload}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -1194,7 +1195,15 @@ export const companyWiseAccess = async (data) => {
     throw error;
   }
 };
-
+export const documentWiseAccess = async (data) => {
+  try {
+    const response = await API.post(`${DOCUMENT_WISE_ACCESS}`, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error rejecting user access:", error);
+    throw error;
+  }
+};
 // All pages
 export const fetchAllPages = async () => {
   try {
