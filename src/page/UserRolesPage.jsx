@@ -431,7 +431,7 @@ const UserRolesPage = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>

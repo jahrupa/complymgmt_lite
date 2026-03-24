@@ -345,7 +345,7 @@ const Company = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -382,7 +382,7 @@ const Company = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -492,7 +492,7 @@ const Company = () => {
                 // Optional: API Call
                 try {
                   await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                } catch  {
+                } catch {
                   // Revert if API fails
                   params.node.setDataValue(
                     "common_attributes.approval_status",
@@ -684,7 +684,7 @@ const Company = () => {
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
           />
-           <MultiSelectFilter
+          <MultiSelectFilter
             rowData={filteredRowData}
             onFilterApply={handleFilterApply}
           />

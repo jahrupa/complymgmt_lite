@@ -345,8 +345,8 @@ const AccessControl = () => {
             ? await companyWiseAccess(companyWiseAccessPayload)
             : current?.access_type === "document-wise"
               ? await documentWiseAccess(documentWiseAccessPayload)
-              : await createUserAccessLevel(payload); 
-              const message = response?.message || "create successfully";
+              : await createUserAccessLevel(payload);
+        const message = response?.message || "create successfully";
         // Show success snackbar
         setIsSnackbarsOpen({
           ...isSnackbarsOpen,
@@ -483,7 +483,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -949,7 +949,7 @@ const AccessControl = () => {
               label="Location To Module"
               value={current?.location_to_module || ""}
               isdisable={isEditing ? true : false}
-  
+
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedLocation = locationNameByCompanyId.find(
@@ -1108,7 +1108,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -1377,7 +1377,7 @@ const AccessControl = () => {
       ?.replace(/[^a-z0-9\s-]/g, "")
       ?.replace(/\s+/g, "_");
 
-    
+
 
 
     const fetchData = async () => {
