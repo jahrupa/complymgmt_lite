@@ -55,6 +55,8 @@ const AccessControl = () => {
     company_id: null,
     location_name: "",
     location_id: null,
+    location_to_module: "",
+    location_to_module_id: null,
     module_name: "",
     module_id: null,
     sub_module_name: "",
@@ -72,6 +74,8 @@ const AccessControl = () => {
     access_user_type_id: null,
     is_access_user_type_dropdown: false,
   });
+  console.log("🚀 ~ file: AccessControl.jsx:122 ~ AccessControl ~ current:", current)
+
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -82,6 +86,7 @@ const AccessControl = () => {
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [locationToModule, setLocationToModule] = useState([]);
+  console.log("🚀 ~ file: AccessControl.jsx:161 ~ AccessControl ~ locationToModule:", locationToModule)
   const [userNameListRes, setUserNameListRes] = useState([]);
   const [errors, setErrors] = useState({});
   const [accessTypeList, setAccessTypeList] = useState([]);
@@ -149,7 +154,10 @@ const AccessControl = () => {
       access_user_id: userData.entity_id || null,
       access_user_type: userData.entity_name || "",
       access_user_type_id: userData.entity_id || null,
+      location_to_module: userData.entity_name || "",
+      location_to_module_id: userData.entity_id || null,
     }));
+
     setIsEditing(true);
     setIsModalOpen(true);
   };
@@ -288,7 +296,8 @@ const AccessControl = () => {
           .replace(/\s+/g, "_") ||
         current?.page_name ||
         current?.service_tracker_wise ||
-        current?.assign_user_name,
+        current?.assign_user_name ||
+        current?.location_to_module,
       entity_type: current?.access_type,
       bo_user_id: currentUserId,
       access: Array.isArray(current?.access)
@@ -932,14 +941,26 @@ const AccessControl = () => {
             <SingleSelectTextField
               name="location_to_module"
               label="Location To Module"
-              value={current?.location_to_module}
+              value={current?.location_to_module || ""}
               isdisable={isEditing ? true : false}
-              onChange={(e) =>
+              // onChange={(e) =>
+              //   setCurrent((prev) => ({
+              //     ...prev,
+              //     location_to_module: e.target.value,
+
+              //   }))
+              // }
+              onChange={(e) => {
+                const selectedName = e.target.value;
+                const matchedLocation = locationNameByCompanyId.find(
+                  (g) => g.location_name === selectedName
+                );
                 setCurrent((prev) => ({
                   ...prev,
-                  location_to_module: e.target.value,
-                }))
-              }
+                  location_to_module: selectedName,
+                  location_to_module_id: matchedLocation?._id || null,
+                }));
+              }}
               names={locationToModule?.map((data) => ({
                 _id: data?._id,
                 name: data?.location_name,
@@ -1291,7 +1312,7 @@ const AccessControl = () => {
     },
 
     ...generateDynamicColDefs(data),
-    
+
     {
       headerName: "Status",
       field: "IsActive",
@@ -1359,9 +1380,18 @@ const AccessControl = () => {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   useEffect(() => {
-    const formattedTrackerName = current?.service_tracker
+    const trackerSource =
+      current?.service_tracker || current?.location_to_module;
+
+    const formattedTrackerName = trackerSource
       ?.toLowerCase()
+      ?.replace(/[^a-z0-9\s-]/g, "")
       ?.replace(/\s+/g, "_");
+
+    console.log("PATH:", formattedTrackerName);
+    console.log("SHEET:", current?.service_tracker);
+
+
     const fetchData = async () => {
       const [
         userAccessDataRes,
@@ -1449,6 +1479,10 @@ const AccessControl = () => {
     fetchData();
   }, [current]);
 
+  useEffect(() => {
+    console.log("API DATA 👉", data);
+  }, [data]);
+
   // fetch company by group id
   useEffect(() => {
     const fetchCompany = async () => {
@@ -1523,6 +1557,7 @@ const AccessControl = () => {
     const fetchLocationToModule = async () => {
       try {
         const data = await fetchLocationToModuleModule();
+        console.log("locationToModule API:", data);
         if (data) {
           setLocationToModule(data);
         }
