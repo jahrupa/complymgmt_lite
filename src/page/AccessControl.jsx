@@ -74,7 +74,6 @@ const AccessControl = () => {
     access_user_type_id: null,
     is_access_user_type_dropdown: false,
   });
-  console.log("🚀 ~ file: AccessControl.jsx:122 ~ AccessControl ~ current:", current)
 
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,7 +85,6 @@ const AccessControl = () => {
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [locationToModule, setLocationToModule] = useState([]);
-  console.log("🚀 ~ file: AccessControl.jsx:161 ~ AccessControl ~ locationToModule:", locationToModule)
   const [userNameListRes, setUserNameListRes] = useState([]);
   const [errors, setErrors] = useState({});
   const [accessTypeList, setAccessTypeList] = useState([]);
@@ -104,8 +102,6 @@ const AccessControl = () => {
   });
 
   const [filters, setFilters] = useState({});
-
-  // const [filterColumns, setFilterColumns] = useState([]);
 
   const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
@@ -943,13 +939,7 @@ const AccessControl = () => {
               label="Location To Module"
               value={current?.location_to_module || ""}
               isdisable={isEditing ? true : false}
-              // onChange={(e) =>
-              //   setCurrent((prev) => ({
-              //     ...prev,
-              //     location_to_module: e.target.value,
-
-              //   }))
-              // }
+  
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedLocation = locationNameByCompanyId.find(
@@ -1129,17 +1119,6 @@ const AccessControl = () => {
         </div>
       </div>
     );
-  };
-
-  const getRoleColorForFileStatus = (status) => {
-    switch (status) {
-      case 1:
-        return { color: "#4CAF50" }; // green
-      case 0:
-        return { color: "#F44336" }; // brown
-      default:
-        return { color: "#41464b" }; // gray
-    }
   };
 
   const handleCheckboxClick = async (id) => {
@@ -1388,8 +1367,7 @@ const AccessControl = () => {
       ?.replace(/[^a-z0-9\s-]/g, "")
       ?.replace(/\s+/g, "_");
 
-    console.log("PATH:", formattedTrackerName);
-    console.log("SHEET:", current?.service_tracker);
+    
 
 
     const fetchData = async () => {
@@ -1479,10 +1457,6 @@ const AccessControl = () => {
     fetchData();
   }, [current]);
 
-  useEffect(() => {
-    console.log("API DATA 👉", data);
-  }, [data]);
-
   // fetch company by group id
   useEffect(() => {
     const fetchCompany = async () => {
@@ -1557,7 +1531,6 @@ const AccessControl = () => {
     const fetchLocationToModule = async () => {
       try {
         const data = await fetchLocationToModuleModule();
-        console.log("locationToModule API:", data);
         if (data) {
           setLocationToModule(data);
         }
