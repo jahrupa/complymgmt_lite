@@ -75,7 +75,6 @@ const AccessControl = () => {
     access_user_type_id: null,
     is_access_user_type_dropdown: false,
   });
-
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -284,7 +283,8 @@ const AccessControl = () => {
         current?.service_tracker_id ||
         current?.page_id ||
         current?.service_tracker_inner_id ||
-        current?.assign_user_id,
+        current?.assign_user_id ||
+        current?.location_to_module_id,
       entity_name:
         current?.group_name ||
         current?.company_name ||
@@ -952,7 +952,7 @@ const AccessControl = () => {
 
               onChange={(e) => {
                 const selectedName = e.target.value;
-                const matchedLocation = locationNameByCompanyId.find(
+                const matchedLocation = locationToModule.find(
                   (g) => g.location_name === selectedName
                 );
                 setCurrent((prev) => ({
