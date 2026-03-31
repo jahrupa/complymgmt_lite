@@ -230,7 +230,16 @@ export const GET_REGISTER_MAPPING='/api/v1/register_processing/view/mapping/get?
 export const PROCESS_REGISTERS='/api/v1/register_processing/create/register';
 export const GET_FILE_BY_TYPE='/api/v1/document_repository/view/files/type?file_type=xlsx';
 
-
+export const CREATE_REGISTER='/api/v2/register_processing/create/register'
+export const CREATE_APPLICABILITY='/api/v1/register_processing/create/applicability'
+export const CREATE_MAPPING='/api/v2/register_processing/create/mapping'
+export const PROCESS_REGISTER='/api/v2/register_processing/create/process/register?by=group&location_id=69be5199ee491c947a2beae6&month=January&from=01-01-2026&to=31-01-2026&year=2026&company_id=69be50f85c668d15ca8c9ea6&branchCol=BranchName&group_id=69be4fedee491c947a2beae5&siteCol=SiteName'
+export const GET_APPLICABILITY_BY_LOCATION_ID='api/v2/register_processing/view/applicabilities/location/'
+export const GET_APPLICABILITY_BY_COMPANY_ID='/api/v2/register_processing/view/applicabilities/company/'
+export const GET_APPLICABILITY_BY_GROUP_ID='/api/v2/register_processing/view/applicabilities/group/'
+export const UPDATE_APPLICABILITY_BY_ID='/api/v2/register_processing/update/applicability/69c1702ba7812cd783d815dc'
+export const DELETE_APPLICABILITY_BY_ID='/api/v2/register_processing/delete/applicability/69c1702ba7812cd783d815dc'
+export const GET_REGISTER_APPLICABILITY_BY_ID='/api/v2/register_processing/view/applicability/69c1702ba7812cd783d815dc'
 
 
 

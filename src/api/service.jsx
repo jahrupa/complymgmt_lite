@@ -177,6 +177,16 @@ import {
   CLIENT_DATA,
   CLIENT_COMPLIANCE,
   DOCUMENT_WISE_ACCESS,
+  CREATE_REGISTER,
+  CREATE_APPLICABILITY,
+  CREATE_MAPPING,
+  PROCESS_REGISTER,
+  GET_APPLICABILITY_BY_LOCATION_ID,
+  GET_APPLICABILITY_BY_COMPANY_ID,
+  GET_APPLICABILITY_BY_GROUP_ID,
+  UPDATE_APPLICABILITY_BY_ID,
+  DELETE_APPLICABILITY_BY_ID,
+  GET_REGISTER_APPLICABILITY_BY_ID,
 
 } from "./Endpoint";
 
@@ -2101,6 +2111,98 @@ export const fetchFileByType = async () => {
     return response.data;
   } catch (error) {
     // console.error("Error fetching file by type:", error);
+    throw error;
+  }
+}
+
+export const createRegister = async (data) => {
+  try {
+    const response = await API.post(CREATE_REGISTER, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error creating register:", error);
+    throw error;
+  }
+}
+export const createApplicability = async (data) => {
+  try {
+    const response = await API.post(CREATE_APPLICABILITY, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error creating applicability:", error);
+    throw error;
+  }
+}
+export const createMapping = async (data) => {
+  try {
+    const response = await API.post(CREATE_MAPPING, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error creating mapping:", error);
+    throw error;
+  }
+}
+
+export const processRegister = async (data) => {
+  try {
+    const response = await API.post(PROCESS_REGISTER, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error creating mapping:", error);
+    throw error;
+  }
+}
+export const getApplicabilityByLocationId = async (location_id) => {
+  try {
+    const response = await API.get(`${GET_APPLICABILITY_BY_LOCATION_ID}${location_id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error geting applicability by location ID:", error);
+    throw error;
+  }
+}
+export const getApplicabilityByCompanyId = async (company_id) => {
+  try {
+    const response = await API.get(`${GET_APPLICABILITY_BY_COMPANY_ID}${company_id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error geting applicability by company ID:", error);
+    throw error;
+  }
+}
+export const getApplicabilityByGroupId = async (group_id) => {
+  try {
+    const response = await API.get(`${GET_APPLICABILITY_BY_GROUP_ID}${group_id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error geting applicability by group ID:", error);
+    throw error;
+  }
+}
+export const updateApplicabilityById = async (id, data) => {
+  try {
+    const response = await API.put(`${UPDATE_APPLICABILITY_BY_ID}${id}`, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error updating applicability by ID:", error);
+    throw error;
+  }
+}
+export const deleteApplicabilityById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_APPLICABILITY_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error deleting applicability by ID:", error);
+    throw error;
+  }
+}
+export const getApplicabilityById = async (id) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_APPLICABILITY_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error geting applicability by ID:", error);
     throw error;
   }
 }

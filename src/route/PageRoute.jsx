@@ -34,6 +34,8 @@ import NotificationMainPage from '../component/notification/NotificationMainPage
 import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
+import RegisterProcessingV2 from '../page/RegisterProcessing.jsx';
+
 
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
@@ -118,7 +120,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
-            
+            <Route path="/register_processing_v2" element={<RegisterProcessingV2 />} />
 
             {/* notification sub-routes */}
             <Route path="/notification" element={
