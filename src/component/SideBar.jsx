@@ -170,7 +170,7 @@ const handleDropdownToggle = (name) => {
                                     {openDropdown === 'registerProcessing' ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
                                 </span>
                                 <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
-                                    Service Tracker
+                                    Register Processing
                                 </span>
                             </div>
                             {openDropdown === 'registerProcessing' && (
