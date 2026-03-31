@@ -9,7 +9,7 @@ import MultiFileUpload from '../component/MultiFileUpload';
 import SmallSizeModal from '../component/SmallSizeModal';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const RegisterProcessing = () => {
+const RegisterProcessingViewPage = () => {
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
     const [locationName, setLocationName] = useState([])
@@ -391,4 +391,4 @@ const RegisterProcessing = () => {
     )
 }
 
-export default RegisterProcessing
+export default RegisterProcessingViewPage

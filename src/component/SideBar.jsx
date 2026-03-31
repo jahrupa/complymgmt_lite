@@ -22,6 +22,7 @@ import { decryptData } from '../page/utils/encrypt';
 function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
 
     const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState(null);
     const userRole = decryptData(localStorage.getItem("user_role"));
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
@@ -44,7 +45,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             : []
         ),
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing v2', link: 'register_processing_v2' },
+        // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing v2', link: 'register_processing_v2' },
 
 
     ];
@@ -59,7 +60,17 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             : []
         ),
     ];
+    const registerProcessing = [
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register', link: 'register' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Process Register', link: 'register/process_register' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Mapping', link: 'register/create_mapping' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'register/create_applicability' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Register', link: 'register/create_register' },
 
+    ];
+const handleDropdownToggle = (name) => {
+    setOpenDropdown(prev => (prev === name ? null : name));
+};
     return (
         <div>
             <div className={`${sidebarOpen ? "sidebar sidebar-open" : "sidebar sidebar-close"}`}>
@@ -106,18 +117,65 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
-                                onClick={() => setShowServiceTrackerDropdown?.(prev => !prev)}
+                               onClick={() => handleDropdownToggle('serviceTracker')}
                             >
                                 <span className='sidebar-close-icon-span'>
-                                    {showServiceTrackerDropdown ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
+                                    {openDropdown === 'serviceTracker' ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
                                 </span>
                                 <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
                                     Service Tracker
                                 </span>
                             </div>
-                            {showServiceTrackerDropdown && (
+                            {openDropdown === 'serviceTracker' && (
                                 <div className='pt-2'>
                                     {serviceTracker.map(({ icon, label, link }, i) => {
+                                        const isActive = activePage === label;
+                                        return (
+                                            <div key={i}>
+                                                <Link
+                                                    to={`/${link}`}
+                                                    onClick={() => {
+                                                        setActivePage(label);
+                                                        localStorage.setItem("activeItem", label);
+                                                        localStorage.setItem('active_url', link)
+                                                    }}
+                                                >
+                                                    <div
+                                                        className='d-flex d-inline-block mb-4'
+                                                        tabIndex="0"
+                                                        data-toggle="tooltip"
+                                                        title={label}
+                                                    >
+                                                        <span className={`sidebar-close-icon-span ${isActive ? 'side-bar-active-tab' : ''}`}>
+                                                            {icon(isActive)}
+                                                        </span>
+                                                        <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
+                                                            {label}
+                                                        </span>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                        </div>
+                        <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
+                            <div
+                                className="d-flex align-items-center cursor-pointer mb-4"
+                                onClick={() => handleDropdownToggle('registerProcessing')}
+                            >
+                                <span className='sidebar-close-icon-span'>
+                                    {openDropdown === 'registerProcessing' ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}
+                                </span>
+                                <span className={`${sidebarOpen ? 'ps-3 pe-2 side-bar-icon-text' : 'side-bar-close'}`}>
+                                    Service Tracker
+                                </span>
+                            </div>
+                            {openDropdown === 'registerProcessing' && (
+                                <div className='pt-2'>
+                                    {registerProcessing.map(({ icon, label, link }, i) => {
                                         const isActive = activePage === label;
                                         return (
                                             <div key={i}>
