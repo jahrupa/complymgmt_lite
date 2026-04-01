@@ -20,8 +20,6 @@ import { Layers, PanelsRightBottom, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 
 function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
-
-    const [showServiceTrackerDropdown, setShowServiceTrackerDropdown] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
     const userRole = decryptData(localStorage.getItem("user_role"));
     const menuItems = [
@@ -45,8 +43,6 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             : []
         ),
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
-        // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing v2', link: 'register_processing_v2' },
-
 
     ];
     const serviceTracker = [
@@ -62,10 +58,10 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
     ];
     const registerProcessing = [
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register', link: 'register' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Process Register', link: 'register/process_register' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Mapping', link: 'register/create_mapping' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'register/create_applicability' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Register', link: 'register/create_register' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Process Register', link: 'process_register' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Mapping', link: 'create_mapping' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'create_applicability' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Register', link: 'create_register' },
 
     ];
 const handleDropdownToggle = (name) => {

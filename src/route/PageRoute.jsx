@@ -135,16 +135,18 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
               <Route path="template_list" element={<NotificationList />} />
               <Route path="create_notification" element={<CreateNotification />} />
             </Route>
-            {/* register sub-routes */}
-            <Route path="/register" element={
-              <RegisterProcessingViewPage setUnreadCountNotification={setUnreadCountNotification} />
-            }>
-              <Route path="create_register" element={<CreateRegister />} />
-              <Route path="create_applicability" element={<RegisterApplicability />} />
-              <Route path="create_mapping" element={<RegisterMapping />} />
-              <Route path="process_register" element={<RegisterProcess />} />
-            </Route>
             {/* notification sub-routes end*/}
+
+            {/* register processing routes */}
+            <Route path="/register" element={
+              <RegisterProcessingViewPage />
+            } />
+            <Route path="create_register" element={<CreateRegister />} />
+            <Route path="create_applicability" element={<RegisterApplicability />} />
+            <Route path="create_mapping" element={<RegisterMapping />} />
+            <Route path="process_register" element={<RegisterProcess />} />
+            {/* register processing routes end */}
+
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
