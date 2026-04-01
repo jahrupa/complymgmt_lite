@@ -87,28 +87,31 @@ const RegisterProcessingViewPage = () => {
     }, []);
     useEffect(() => {
         const fetchCompany = async () => {
-            try {
-                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
-                const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
-                if (data) {
-                    setCompanyName(data);
-                    setDataById(prev => ({
-                        ...prev,
-                        applicabilityByGroupId: applicabilityByGroupId || []
-                    }));
-                    setSource("group");
-                }
-            } catch {
-                setDataById(prev => ({
-                    ...prev,
-                    applicabilityByGroupId: []
-                }));
-                // console.error("Failed to fetch company:", error);
-            }
+            const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
+            const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
+
+            setCompanyName(data || []);
+            setDataById(prev => ({
+                ...prev,
+                applicabilityByGroupId: applicabilityByGroupId || []
+            }));
+
+            setSource("group");
         };
 
         if (current?.group_holding_id) {
             fetchCompany();
+        } else {
+            // 🔥 Group None case
+            setSource(null);
+            setCompanyName([]);
+            setLocationName([]);
+            setDataById(prev => ({
+                ...prev,
+                applicabilityByGroupId: [],
+                applicabilityByCompanyId: [],
+                applicabilityByLocationId: []
+            }));
         }
     }, [current?.group_holding_id]);
 
@@ -466,12 +469,21 @@ const RegisterProcessingViewPage = () => {
                         const matchedCompany = companyName.find(
                             (g) => g.company_name === selectedName
                         );
+
                         setCurrent((prev) => ({
                             ...prev,
                             company_name: selectedName,
                             company_id: matchedCompany?._id || null,
+                            location_name: '',
+                            location_id: null,
                         }));
-                        dataById.applicabilityByCompanyId.length > 0 ? setSource("company") : "";
+
+                        // 🔥 Fallback
+                        if (matchedCompany?._id) {
+                            setSource("company");
+                        } else if (current?.group_holding_id) {
+                            setSource("group");
+                        }
                     }}
                     names={companyName.map((item) => ({
                         _id: item._id,
@@ -484,12 +496,21 @@ const RegisterProcessingViewPage = () => {
                         const matchedLocation = locationName.find(
                             (g) => g.location_name === selectedName
                         );
+
                         setCurrent((prev) => ({
                             ...prev,
                             location_name: selectedName,
                             location_id: matchedLocation?._id || null,
                         }));
-                        dataById.applicabilityByLocationId.length > 0 ? setSource("location") : "";
+
+                        // 🔥 Source fallback logic
+                        if (matchedLocation?._id) {
+                            setSource("location");
+                        } else if (current?.company_id) {
+                            setSource("company");
+                        } else if (current?.group_holding_id) {
+                            setSource("group");
+                        }
                     }}
                     names={locationName.map((item) => ({
                         _id: item._id,
