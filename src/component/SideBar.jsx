@@ -42,7 +42,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             }]
             : []
         ),
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
+        // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 
     ];
     const serviceTracker = [
