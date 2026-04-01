@@ -56,6 +56,8 @@ const AccessControl = () => {
     company_id: null,
     location_name: "",
     location_id: null,
+    location_to_module: "",
+    location_to_module_id: null,
     module_name: "",
     module_id: null,
     sub_module_name: "",
@@ -100,8 +102,6 @@ const AccessControl = () => {
   });
 
   const [filters, setFilters] = useState({});
-
-  // const [filterColumns, setFilterColumns] = useState([]);
 
   const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
@@ -150,7 +150,10 @@ const AccessControl = () => {
       access_user_id: userData.entity_id || null,
       access_user_type: userData.entity_name || "",
       access_user_type_id: userData.entity_id || null,
+      location_to_module: userData.entity_name || "",
+      location_to_module_id: userData.entity_id || null,
     }));
+
     setIsEditing(true);
     setIsModalOpen(true);
   };
@@ -280,7 +283,8 @@ const AccessControl = () => {
         current?.service_tracker_id ||
         current?.page_id ||
         current?.service_tracker_inner_id ||
-        current?.assign_user_id,
+        current?.assign_user_id ||
+        current?.location_to_module_id,
       entity_name:
         current?.group_name ||
         current?.company_name ||
@@ -293,7 +297,8 @@ const AccessControl = () => {
           .replace(/\s+/g, "_") ||
         current?.page_name ||
         current?.service_tracker_wise ||
-        current?.assign_user_name,
+        current?.assign_user_name ||
+        current?.location_to_module,
       entity_type: current?.access_type,
       bo_user_id: currentUserId,
       access: Array.isArray(current?.access)
@@ -340,8 +345,8 @@ const AccessControl = () => {
             ? await companyWiseAccess(companyWiseAccessPayload)
             : current?.access_type === "document-wise"
               ? await documentWiseAccess(documentWiseAccessPayload)
-              : await createUserAccessLevel(payload); 
-              const message = response?.message || "create successfully";
+              : await createUserAccessLevel(payload);
+        const message = response?.message || "create successfully";
         // Show success snackbar
         setIsSnackbarsOpen({
           ...isSnackbarsOpen,
@@ -478,7 +483,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -942,14 +947,20 @@ const AccessControl = () => {
             <SingleSelectTextField
               name="location_to_module"
               label="Location To Module"
-              value={current?.location_to_module}
+              value={current?.location_to_module || ""}
               isdisable={isEditing ? true : false}
-              onChange={(e) =>
+
+              onChange={(e) => {
+                const selectedName = e.target.value;
+                const matchedLocation = locationToModule.find(
+                  (g) => g.location_name === selectedName
+                );
                 setCurrent((prev) => ({
                   ...prev,
-                  location_to_module: e.target.value,
-                }))
-              }
+                  location_to_module: selectedName,
+                  location_to_module_id: matchedLocation?._id || null,
+                }));
+              }}
               names={locationToModule?.map((data) => ({
                 _id: data?._id,
                 name: data?.location_name,
@@ -1097,7 +1108,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -1118,17 +1129,6 @@ const AccessControl = () => {
         </div>
       </div>
     );
-  };
-
-  const getRoleColorForFileStatus = (status) => {
-    switch (status) {
-      case 1:
-        return { color: "#4CAF50" }; // green
-      case 0:
-        return { color: "#F44336" }; // brown
-      default:
-        return { color: "#41464b" }; // gray
-    }
   };
 
   const handleCheckboxClick = async (id) => {
@@ -1369,9 +1369,17 @@ const AccessControl = () => {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   useEffect(() => {
-    const formattedTrackerName = current?.service_tracker
+    const trackerSource =
+      current?.service_tracker || current?.location_to_module;
+
+    const formattedTrackerName = trackerSource
       ?.toLowerCase()
+      ?.replace(/[^a-z0-9\s-]/g, "")
       ?.replace(/\s+/g, "_");
+
+
+
+
     const fetchData = async () => {
       const [
         userAccessDataRes,
