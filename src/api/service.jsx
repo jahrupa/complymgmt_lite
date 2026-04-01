@@ -2137,26 +2137,16 @@ export const fetchFileByType = async () => {
 //     throw error;
 //   }
 // }
-export const createRegister = async (filesArray) => {
+
+export const createRegister = async (data) => {
   try {
-    const formData = new FormData();
-
-    filesArray.forEach((file) => {
-      formData.append("files", file);
-    });
-    // formData.append("is_ai_upload", isAutoUpload);
-    const response = await API.post(`${CREATE_REGISTER}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
+    const response = await API.post(CREATE_REGISTER, data);
     return response.data;
   } catch (error) {
-    // console.error("Upload failed:", error.response?.data || error);
+    // console.error("Error creating register:", error);
     throw error;
   }
-};
+}
 export const createApplicability = async (data) => {
   try {
     const response = await API.post(CREATE_APPLICABILITY, data);
@@ -2185,7 +2175,7 @@ export const processRegister = async (payload) => {
 
     const queryParams = new URLSearchParams({
       by: payload.by,
-      location_id: payload.by_id,
+      id: payload.by_id,
       month: payload.month,
       from: payload.start_date,
       to: payload.end_date,
@@ -2203,11 +2193,13 @@ export const processRegister = async (payload) => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        responseType: "text", // ✅ IMPORTANT (base64 aa raha hai)
+        responseType: "blob",          
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
       }
     );
 
-    return response; // ✅ pura response return karo
+    return response; 
   } catch (error) {
     throw error;
   }

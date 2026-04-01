@@ -32,7 +32,6 @@ const RegisterProcess = () => {
             by: '',
             by_id: null,
         });
-    console.log(current, 'current')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -77,6 +76,7 @@ const RegisterProcess = () => {
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
+
     // Handle File Upload
     const handleFileUpload = async (e) => {
         e?.preventDefault();
@@ -108,53 +108,55 @@ const RegisterProcess = () => {
         };
 
         try {
+            setUploadStatus("pending");
+
             const result = await processRegister(payload);
+            setUploadStatus("success");
 
-            // 👉 base64 string mil raha hai
-            const base64Data = result.data;
+            // ✅ direct blob
+            const blob = result.data;
 
-            // 👉 base64 ko binary me convert karo
-            const byteCharacters = atob(base64Data);
-            const byteNumbers = new Array(byteCharacters.length);
-
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-
-            const byteArray = new Uint8Array(byteNumbers);
-
-            // 👉 blob create
-            const blob = new Blob([byteArray], { type: "application/zip" });
-
-            // 👉 download trigger
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-
-            // filename from header
             const contentDisposition = result.headers["content-disposition"];
-            let fileName = "download.zip";
-
+            let downloadFileName = contentDisposition;
             if (contentDisposition) {
-                const match = contentDisposition.match(/filename="?(.+)"?/);
-                if (match?.[1]) fileName = match[1];
+                const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (match && match[1]) {
+                    downloadFileName = match[1].replace(/['"]/g, "");
+                }
             }
-
-            link.setAttribute("download", fileName);
+            link.setAttribute("download", downloadFileName);
             document.body.appendChild(link);
             link.click();
 
             link.remove();
             window.URL.revokeObjectURL(url);
 
-            // success message
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: "File downloaded successfully",
+                message: "File download started",
                 severityType: "success",
             });
-
+            setCurrent({
+                group_name: "",
+                group_holding_id: null,
+                company_name: "",
+                company_id: null,
+                location_name: "",
+                location_id: null,
+                branch_column_name: "",
+                site_column_name: "",
+                start_date: null,
+                end_date: null,
+                month: null,
+                year: null,
+                by: '',
+                by_id: null,
+            });
+            setFileName('');
         } catch (error) {
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -162,6 +164,8 @@ const RegisterProcess = () => {
                 message: "Download failed",
                 severityType: "error",
             });
+            setUploadStatus("error");
+
         }
     };
 
@@ -205,7 +209,6 @@ const RegisterProcess = () => {
                     setLocationName(data);
 
                 }
-                console.log(current?.company_id, 'current?.company_id')
             } catch {
                 // console.error("Failed to fetch location by company_id:", error);
             }
@@ -431,7 +434,7 @@ const RegisterProcess = () => {
                     <button type="button" className="btn btn-secondary w-100" onClick={handleCancle}>Cancel</button>
                 </div>
                 <div className="col-12 col-md-6 w-auto">
-                    <button type="submit" className="btn btn-primary w-100" disabled={uploadStatus === "pending"} onClick={handleFileUpload}>Save</button>
+                    <button type="submit" className="btn btn-primary w-100" style={{cursor: uploadStatus === "pending" ? "not-allowed" : "pointer"}} disabled={uploadStatus === "pending"} onClick={handleFileUpload}>{uploadStatus === "pending" ? "Processing..." : "Save"}</button>
                 </div>
             </div>
         </div>
