@@ -2128,15 +2128,35 @@ export const fetchFileByType = async () => {
   }
 }
 
-export const createRegister = async (data) => {
+// export const createRegister = async (data) => {
+//   try {
+//     const response = await API.post(CREATE_REGISTER, data);
+//     return response.data;
+//   } catch (error) {
+//     // console.error("Error creating register:", error);
+//     throw error;
+//   }
+// }
+export const createRegister = async (filesArray) => {
   try {
-    const response = await API.post(CREATE_REGISTER, data);
+    const formData = new FormData();
+
+    filesArray.forEach((file) => {
+      formData.append("files", file);
+    });
+    // formData.append("is_ai_upload", isAutoUpload);
+    const response = await API.post(`${CREATE_REGISTER}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     return response.data;
   } catch (error) {
-    // console.error("Error creating register:", error);
+    // console.error("Upload failed:", error.response?.data || error);
     throw error;
   }
-}
+};
 export const createApplicability = async (data) => {
   try {
     const response = await API.post(CREATE_APPLICABILITY, data);
@@ -2155,16 +2175,43 @@ export const createMapping = async (data) => {
     throw error;
   }
 }
-
-export const processRegister = async (data) => {
+export const processRegister = async (payload) => {
   try {
-    const response = await API.post(PROCESS_REGISTER, data);
-    return response.data;
+    const formData = new FormData();
+
+    payload.files.forEach((file) => {
+      formData.append("file", file);
+    });
+
+    const queryParams = new URLSearchParams({
+      by: payload.by,
+      location_id: payload.by_id,
+      month: payload.month,
+      from: payload.start_date,
+      to: payload.end_date,
+      year: payload.year,
+      company_id: payload.company_id,
+      branchCol: payload.branch_column_name,
+      group_id: payload.group_id,
+      siteCol: payload.site_column_name,
+    });
+
+    const response = await API.post(
+      `${PROCESS_REGISTER}?${queryParams.toString()}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        responseType: "text", // ✅ IMPORTANT (base64 aa raha hai)
+      }
+    );
+
+    return response; // ✅ pura response return karo
   } catch (error) {
-    // console.error("Error creating mapping:", error);
     throw error;
   }
-}
+};
 export const getApplicabilityByLocationId = async (location_id) => {
   try {
     const response = await API.get(`${GET_APPLICABILITY_BY_LOCATION_ID}${location_id}`);

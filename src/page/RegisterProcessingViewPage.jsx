@@ -436,7 +436,7 @@ const RegisterProcessingViewPage = () => {
     return (
         <div className="app-container">
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
-                <h1>Register Processing</h1>
+                <h1>Register</h1>
                 <button className="crud_btn" onClick={openModal}>
                     Pipeline
                 </button>
