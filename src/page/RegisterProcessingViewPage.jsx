@@ -1,4 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Toggle from '../component/Toggle';
+import { flattenObject } from '../../Utils/tableColUtils';
 import { fetchAllFiles, fetchAllGroupHolding, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, uploadFileGolang } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
@@ -7,6 +11,11 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import MultiFileUpload from '../component/MultiFileUpload';
 import SmallSizeModal from '../component/SmallSizeModal';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { useRef } from 'react';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const RegisterProcessingViewPage = () => {
@@ -38,6 +47,17 @@ const RegisterProcessingViewPage = () => {
     })
     console.log(dataById.applicabilityByLocationId.length, 'applicabilityByLocationId')
     const [source, setSource] = useState(null);
+
+    const gridRef = useRef();
+
+    const [filteredData, setFilteredData] = useState([]);
+    console.log(filteredData, 'filteredData');
+
+    const handleFilterApply = (data) => {
+        setFilteredData(data);
+    };
+
+
     console.log(source, 'source')
     // "location" | "company" | "group"
     // const [columnDefs, setColumnDefs] = useState([]);
@@ -67,28 +87,31 @@ const RegisterProcessingViewPage = () => {
     }, []);
     useEffect(() => {
         const fetchCompany = async () => {
-            try {
-                const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
-                const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
-                if (data) {
-                    setCompanyName(data);
-                    setDataById(prev => ({
-                        ...prev,
-                        applicabilityByGroupId: applicabilityByGroupId || []
-                    }));
-                    setSource("group");
-                }
-            } catch {
-                setDataById(prev => ({
-                    ...prev,
-                    applicabilityByGroupId: []
-                }));
-                // console.error("Failed to fetch company:", error);
-            }
+            const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
+            const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
+
+            setCompanyName(data || []);
+            setDataById(prev => ({
+                ...prev,
+                applicabilityByGroupId: applicabilityByGroupId || []
+            }));
+
+            setSource("group");
         };
 
         if (current?.group_holding_id) {
             fetchCompany();
+        } else {
+            // 🔥 Group None case
+            setSource(null);
+            setCompanyName([]);
+            setLocationName([]);
+            setDataById(prev => ({
+                ...prev,
+                applicabilityByGroupId: [],
+                applicabilityByCompanyId: [],
+                applicabilityByLocationId: []
+            }));
         }
     }, [current?.group_holding_id]);
 
@@ -138,18 +161,116 @@ const RegisterProcessingViewPage = () => {
         }
     }, [current?.location_id]);
 
+    const generateDynamicColDefs = (data) => {
+        if (!data || data.length === 0) return [];
+
+        const sample = flattenObject(data[0]);
+
+        return Object.keys(sample)
+            .map((key) => {
+                if (
+                    key === "_id" ||
+                    key === "common_attributes.is_deleted" ||
+                    key === "common_attributes.deleted_by" ||
+                    key === "common_attributes.deleted_at"
+                )
+                    return null;
+
+                return {
+                    field: key,
+                    headerName: key
+                        .split(".")
+                        .pop()
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase()),
+                    filter: true,
+                    editable: false,
+                    valueGetter: (params) => {
+                        return key
+                            .split(".")
+                            .reduce((acc, part) => acc?.[part], params.data);
+                    },
+                };
+            })
+            .filter(Boolean);
+    };
+
+    const handleEdit = (row) => {
+        console.log("EDIT ROW:", row);
+        // yaha tum modal open karogi baad me
+    };
+
+    const handleDelete = (row) => {
+        console.log("DELETE ROW:", row);
+    };
+
+    const actionCol = {
+        headerName: 'Actions',
+        field: 'actions',
+        width: 120,
+        pinned: 'left',
+        cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+        cellRenderer: (params) => (
+            <div className="d-flex justify-content-around align-items-center">
+                <EditIcon
+                    fontSize="small"
+                    className="action_icon"
+                    onClick={() => handleEdit(params.data)}
+                />
+                <DeleteIcon
+                    fontSize="small"
+                    className="action_icon"
+                    onClick={() => handleDelete(params.data)}
+                />
+            </div>
+        )
+    };
+
+    const statusCol = {
+        headerName: 'Status',
+        field: 'common_attributes.is_active',
+        pinned: 'right',
+        valueGetter: (params) =>
+            params.data?.common_attributes?.is_active,
+        cellRenderer: (params) => (
+            <Toggle checked={!!params.value} />
+        )
+    };
+
     const columnDefs = useMemo(() => {
         if (!data.length) return [];
 
-        return Object.keys(data[0]).map((key) => ({
-            headerName: key.replace(/_/g, " ").toUpperCase(),
-            field: key,
-            sortable: true,
-            filter: true,
-            resizable: true,
-            flex: 1,
-        }));
+        return [
+            actionCol,
+            ...generateDynamicColDefs(data),
+            statusCol
+        ];
     }, [data]);
+
+    const stateOnlyRowData = useMemo(() => {
+        const uniqueStates = [
+            ...new Set(
+                data
+                    .map(item => item.state)
+                    .filter(Boolean)
+            )
+        ];
+
+        return uniqueStates.map(s => ({ state: s }));
+    }, [data]);
+
+    // const columnDefs = useMemo(() => {
+    //     if (!data.length) return [];
+
+    //     return Object.keys(data[0]).map((key) => ({
+    //         headerName: key.replace(/_/g, " ").toUpperCase(),
+    //         field: key,
+    //         sortable: true,
+    //         filter: true,
+    //         resizable: true,
+    //         flex: 1,
+    //     }));
+    // }, [data]);
 
     useEffect(() => {
         console.log("SOURCE:", source);
@@ -277,7 +398,7 @@ const RegisterProcessingViewPage = () => {
                         <button
                             type="button"
                             className="btn btn-secondary w-100"
-                            onClick={''}
+                            onClick={closeModal}
                         >
                             Cancel
                         </button>
@@ -295,6 +416,23 @@ const RegisterProcessingViewPage = () => {
             </div>
         );
     };
+
+    const defaultColDef = {
+        sortable: true,
+        filter: true,
+        editable: true,
+        headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
+    };
+
+    const onFilterTextBoxChanged = useCallback(() => {
+        gridRef.current.api.setGridOption(
+            'quickFilterText',
+            document.getElementById('filter-text-box').value
+        );
+    }, []);
+    console.log(data?.map(item => item?.state));
+    console.log("FIRST ITEM:", data[0]);
+    console.log("ALL KEYS:", Object.keys(data[0] || {}));
     return (
         <div className="app-container">
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
@@ -331,12 +469,21 @@ const RegisterProcessingViewPage = () => {
                         const matchedCompany = companyName.find(
                             (g) => g.company_name === selectedName
                         );
+
                         setCurrent((prev) => ({
                             ...prev,
                             company_name: selectedName,
                             company_id: matchedCompany?._id || null,
+                            location_name: '',
+                            location_id: null,
                         }));
-                        dataById.applicabilityByCompanyId.length > 0 ? setSource("company") : "";
+
+                        // 🔥 Fallback
+                        if (matchedCompany?._id) {
+                            setSource("company");
+                        } else if (current?.group_holding_id) {
+                            setSource("group");
+                        }
                     }}
                     names={companyName.map((item) => ({
                         _id: item._id,
@@ -349,12 +496,21 @@ const RegisterProcessingViewPage = () => {
                         const matchedLocation = locationName.find(
                             (g) => g.location_name === selectedName
                         );
+
                         setCurrent((prev) => ({
                             ...prev,
                             location_name: selectedName,
                             location_id: matchedLocation?._id || null,
                         }));
-                        dataById.applicabilityByLocationId.length > 0 ? setSource("location") : "";
+
+                        // 🔥 Source fallback logic
+                        if (matchedLocation?._id) {
+                            setSource("location");
+                        } else if (current?.company_id) {
+                            setSource("company");
+                        } else if (current?.group_holding_id) {
+                            setSource("group");
+                        }
                     }}
                     names={locationName.map((item) => ({
                         _id: item._id,
@@ -362,21 +518,36 @@ const RegisterProcessingViewPage = () => {
                     }))}
                 />
             </div>
-            <div
-                className="ag-theme-quartz"
-                style={{ height: "600px", width: "100%", marginTop: "1rem" }}
-            >
-                <AgGridReact
-                    theme="legacy"
-                    // ref={gridRef}
-                    rowData={data || []}
-                    columnDefs={columnDefs}
-                    defaultColDef={''}
-                    editType="fullRow"
-                    rowSelection="single"
-                    pagination={true}
-                // rowBuffer={rowBuffer}
-                />
+            <div className='table_div p-3'>
+                <div className='d-flex align-items-center gap-2'>
+                    <AnimatedSearchBar
+                        placeholder="Search..."
+                        type="text"
+                        id="filter-text-box"
+                        onInput={onFilterTextBoxChanged}
+                    />
+
+                    <MultiSelectFilter
+                        rowData={stateOnlyRowData}
+                        onFilterApply={handleFilterApply}
+                    />
+                </div>
+
+                <div
+                    className="ag-theme-quartz"
+                    style={{ height: '600px', width: '100%', marginTop: '1rem' }}
+                >
+                    <AgGridReact
+                        theme="legacy"
+                        ref={gridRef}
+                        rowData={filteredData.length ? filteredData : data}
+                        columnDefs={columnDefs}
+                        defaultColDef={defaultColDef}
+                        editType="fullRow"
+                        rowSelection="single"
+                        pagination={true}
+                    />
+                </div>
             </div>
             <SmallSizeModal
                 crudForm={fileUploadForm}

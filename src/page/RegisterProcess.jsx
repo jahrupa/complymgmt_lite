@@ -260,6 +260,9 @@ const RegisterProcess = () => {
                             const matchedGroup = groupHoldingName.find(
                                 (g) => g.name === selectedName
                             );
+
+                            setCompanyName([]);   // ADD
+                            setLocationName([]);  // ADD
                             setCurrent((prev) => ({
                                 ...prev,
                                 group_name: selectedName,
@@ -283,14 +286,15 @@ const RegisterProcess = () => {
                             const matchedCompany = companyName.find(
                                 (g) => g.company_name === selectedName
                             );
+                            setLocationName([]); //ADD
                             setCurrent((prev) => ({
                                 ...prev,
                                 company_name: selectedName,
-                                company_id: matchedCompany?._id || null,
+                                company_id: matchedCompany?._id || null,   // ✅ fixed
                                 location_name: '',
                                 location_id: null,
-                                by: matchedCompany?._id ? 'company' : '',
-                                by_id: matchedCompany?._id || null,
+                                by: matchedCompany?._id ? 'company' : 'group',
+                                by_id: matchedCompany?._id || prev.group_holding_id,
                             }));
                         }}
                         names={companyName.map((item) => ({
@@ -306,12 +310,13 @@ const RegisterProcess = () => {
                             const matchedLocation = locationName.find(
                                 (g) => g.location_name === selectedName
                             );
+
                             setCurrent((prev) => ({
                                 ...prev,
                                 location_name: selectedName,
                                 location_id: matchedLocation?._id || null,
-                                by: matchedLocation?._id ? 'location' : '',
-                                by_id: matchedLocation?._id || null,
+                                by: matchedLocation?._id ? 'location' : 'company',
+                                by_id: matchedLocation?._id || prev.company_id,
                             }));
                         }}
                         names={locationName.map((item) => ({
