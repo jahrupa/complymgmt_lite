@@ -52,6 +52,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
+    const [isDrawerOpenGlobal, setIsDrawerOpenGlobal] = useState(false);
     const [widgetsList, setWidgetsList] = useState([]);
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(20);
@@ -144,8 +145,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         companyName={selectedCompany}
                         setSelectedCharts={setSelectedCharts} />
                 ) : (
-                    <CockpitComplince 
-                    // data={cockpitComplainceData ? cockpitComplainceData : []}
+                    <CockpitComplince
                         current={current}
                         selectedCharts={selectedCharts}
                         setSelectedCharts={setSelectedCharts}
@@ -155,7 +155,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         selectedCompany={selectedCompany}
                         page={page}
                         limit={limit}
-
+                        setIsDrawerOpenGlobal={setIsDrawerOpenGlobal}
                     />
                 )
         },
@@ -179,7 +179,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             label: "Client Onboarding",
             content:
                 selectedCompany === "" ? (
-                    <ClientOnbordingDashboard data={clientOnboardingData} current={current} selectedCompany={selectedCompany}/>
+                    <ClientOnbordingDashboard data={clientOnboardingData} current={current} selectedCompany={selectedCompany} />
                 ) : (
                     <ClientOnBoardingByCompany
                         locationData={ClientOnBoardingByCompanyData}
@@ -376,7 +376,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 ))}
             </Box>
 
-            {userType === "0" && (
+            {userType === "0" && !isDrawerOpenGlobal && (
                 <div className="navigation-wrapper">
                     <div
                         className="dashbord-user-access-btn"

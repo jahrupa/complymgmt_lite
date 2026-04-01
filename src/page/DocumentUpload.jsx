@@ -16,7 +16,7 @@ import {
   getLocationByCompanyId,
   fetchAllModulesNameByLocationId,
   fetchAllSubModuleNameByModuleId,
-  fetchServiceTrackerBySubModuleId,
+  fetchServiceTrackerByModuleId,
   fetchDocumentDropdownTypes,
   fetchDocumentDropdownStages,
   downloadFile,
@@ -60,6 +60,7 @@ const DocumentUpload = () => {
     stage: "",
     stage_id: null,
   });
+  console.log("current", current);
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -107,8 +108,8 @@ const DocumentUpload = () => {
     if (!current?.location_name)
       tempErrors.location_name = "Location is required";
     if (!current?.module_name) tempErrors.module_name = "Module is required";
-    if (!current?.sub_module_name)
-      tempErrors.sub_module_name = "Sub Module is required";
+    // if (!current?.sub_module_name)
+      // tempErrors.sub_module_name = "Sub Module is required";
     if (!current?.service_tracker_name)
       tempErrors.service_tracker_name = "Service Tracker is required";
     if (!current?.document_type_name)
@@ -421,23 +422,21 @@ const DocumentUpload = () => {
       fetchSubModuleByModuleId();
     }
   }, [current?.module_id]);
-  // Fetch service tracker by sub-module ID
+  // Fetch service tracker by module ID
   useEffect(() => {
-    const getServiceTrackerBySubModuleId = async (id) => {
+    const getServiceTrackerByModuleId = async (id) => {
       try {
-        const data = await fetchServiceTrackerBySubModuleId(id);
+        const data = await fetchServiceTrackerByModuleId(id);
         if (data) {
           setServiceTrackerName(data);
         }
-      } catch {
-        // Handle error silently
-      }
+      } catch { }
     };
 
-    if (current?.sub_module_id) {
-      getServiceTrackerBySubModuleId(current?.sub_module_id);
+    if (current?.module_id) {
+      getServiceTrackerByModuleId(current?.module_id);
     }
-  }, [current?.sub_module_id]);
+  }, [current?.module_id]);
 
   useEffect(() => {
     const getDocumentDropdownTypes = async (service_tracker_name) => {
@@ -644,7 +643,7 @@ const DocumentUpload = () => {
         );
       },
     },
-   
+
     {
       field: "file_path",
       headerName: "File Path",
@@ -706,7 +705,7 @@ const DocumentUpload = () => {
       editable: "false",
       field: "is_active",
       headerName: "Status",
-       pinned: "left",
+      pinned: "left",
       valueGetter: (params) => params.data?.is_active,
       cellRenderer: (params) => (
         <Toggle
@@ -1012,7 +1011,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = serviceTrackerName.find(
-                (g) => g.name === selectedName
+                (g) => g.service_tracker_name === selectedName
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1138,7 +1137,7 @@ const DocumentUpload = () => {
             </div>
           </div>
         </div> */}
-       
+
         {/* <div className="mb-2 card_div p-3 w-auto card-border-blue">
           <div className="row align-items-center">
             <div className="col-3 col-md-2">
