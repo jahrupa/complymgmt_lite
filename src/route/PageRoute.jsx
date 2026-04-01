@@ -34,6 +34,13 @@ import NotificationMainPage from '../component/notification/NotificationMainPage
 import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
+// import RegisterProcessingV2 from '../page/RegisterProcessing.jsx';
+import RegisterProcessingViewPage from '../page/RegisterProcessingViewPage.jsx';
+import CreateRegister from '../page/CreateRegister.jsx';
+import RegisterApplicability from '../page/RegisterApplicability.jsx';
+import RegisterMapping from '../page/RegisterMapping.jsx';
+import RegisterProcess from '../page/RegisterProcess.jsx';
+
 
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
@@ -118,7 +125,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<LocationToModule />} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
-            
+            {/* <Route path="/register_processing_v2" element={<RegisterProcessingV2 />} /> */}
 
             {/* notification sub-routes */}
             <Route path="/notification" element={
@@ -128,8 +135,18 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
               <Route path="template_list" element={<NotificationList />} />
               <Route path="create_notification" element={<CreateNotification />} />
             </Route>
-
             {/* notification sub-routes end*/}
+
+            {/* register processing routes */}
+            <Route path="/register" element={
+              <RegisterProcessingViewPage />
+            } />
+            <Route path="create_register" element={<CreateRegister />} />
+            <Route path="create_applicability" element={<RegisterApplicability />} />
+            <Route path="create_mapping" element={<RegisterMapping />} />
+            <Route path="process_register" element={<RegisterProcess />} />
+            {/* register processing routes end */}
+
             <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
