@@ -154,7 +154,6 @@ const series = dataArray.length
         }
       },
       stroke: { width: 1, colors: ['#fff'] },
-      title: { text: 'Escalation Counts' },
        xaxis: { categories: dataArray.map(item => item.returns || "") },
       yaxis: { title: { text: undefined } },
       legend: { position: 'top', horizontalAlign: 'left', offsetX: 40 }
