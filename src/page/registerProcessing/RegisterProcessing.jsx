@@ -48,7 +48,6 @@ function RegisterProcessing() {
     default: "",
     target: "",
   });
-  // console.log(current, "current");
   useEffect(() => {
     if (loadedFromApi) return;
     setIsSaved(false);
@@ -103,7 +102,7 @@ function RegisterProcessing() {
           setMappings([]);
         }
       } catch (err) {
-        console.error("Mapping fetch failed", err);
+        // console.error("Mapping fetch failed", err);
         setMappings([]);
       }
     };

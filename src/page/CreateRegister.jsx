@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import MuiTextField from '../component/MuiInputs/MuiTextField';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
+import { createRegister } from '../api/service';
+import Snackbars from '../component/Snackbars';
 
 const CreateRegister = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +12,13 @@ const CreateRegister = () => {
     type: "",
     headers: [""]
   });
-
+  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    open: false,
+    vertical: 'top',
+    horizontal: 'center',
+    message: '',
+    severityType: '',
+  });
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,10 +55,9 @@ const CreateRegister = () => {
     }));
   };
 
-  // Submit form
-  const handleSubmit = (e) => {
+  // Submit formasync 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const payload = {
       name: formData.name,
       state: formData.state,
@@ -58,20 +65,23 @@ const CreateRegister = () => {
       template_path: formData.template_path,
       type: formData.type
     };
-
-    console.log("Payload:", payload);
-
-    // Example API call
-    fetch("/api/save-form", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("Success:", data))
-      .catch((err) => console.error("Error:", err));
+    try {
+      let response;
+      // Create new company
+      response = await createRegister(payload);
+      // ✅ Get the message from response
+      const message = response?.message;
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
+      setFormData({
+        name: "",
+        state: "",
+        template_path: "",
+        type: "",
+        headers: [""]
+      });
+    } catch (error) {
+      setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
+    }
   };
   const fileType = [
     { name: "File", value: "file" },
@@ -80,6 +90,10 @@ const CreateRegister = () => {
   ];
   return (
     <div className="app-container">
+      <Snackbars
+        issnackbarsOpen={issnackbarsOpen}
+        setIsSnackbarsOpen={setIsSnackbarsOpen}
+      />
       <div className="service-tracker-inner-page-header d-flex justify-content-between">
         <h1>Create Register</h1>
       </div>
@@ -135,7 +149,7 @@ const CreateRegister = () => {
           // helperText={errors.type}
           />
         </div>
-        <div className="mapping-container d-lg-flex d-md-flex gap-3 flex-column">
+        <div className="mapping-container d-lg-flex d-md-flex gap-3 flex-column" style={{ maxHeight: 504, overflow: 'auto' }}>
           <div className='d-lg-flex d-md-flex align-content-center align-items-center justify-content-between'>
             <label className="fw-bold">Headers</label>
 
@@ -149,7 +163,7 @@ const CreateRegister = () => {
           </div>
 
           {formData.headers.map((header, index) => (
-            <div key={index} className="d-flex gap-2 align-items-center w-100">
+            <div key={index} className="d-flex gap-2 align-items-center w-100" >
 
               <MuiTextField
                 label={`Header ${index + 1}`}
@@ -159,20 +173,29 @@ const CreateRegister = () => {
                 value={header}
                 handleChange={(e) => handleHeaderChange(index, e.target.value)}
               />
+              <div className='pb-3'>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => removeHeader(index)}
+                >
+                  ❌
+                </button>
+              </div>
 
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => removeHeader(index)}
-              >
-                ❌
-              </button>
             </div>
           ))}
 
 
         </div>
-
+        <div className="row row-gap-2 mt-3 justify-content-lg-end justify-content-md-end justify-content-center">
+          <div className="col-12 col-md-6 w-auto">
+            <button type="button" className="btn btn-secondary w-100" >Cancel</button>
+          </div>
+          <div className="col-12 col-md-6 w-auto">
+            <button type="submit" className="btn btn-primary w-100" onClick={handleSubmit} >Save</button>
+          </div>
+        </div>
       </div>
 
       {/* <form onSubmit={handleSubmit}>
