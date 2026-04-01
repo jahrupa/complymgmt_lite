@@ -390,6 +390,10 @@ const AccessControl = () => {
     setErrors({});
   };
 
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
   const handleToggleChange = async (e, params) => {
     const newIsActive = {
       IsActive: e.target.checked,
@@ -483,7 +487,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-              onClick={() => setIsDeleteModalOpen(false)}
+             onClick={closeDeleteModal}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -1108,7 +1112,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setIsDeleteModalOpen(false)}
+              onClick={closeModal}
             >
               <span className="button-style">Cancel</span>
             </button>

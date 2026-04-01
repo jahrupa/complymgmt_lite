@@ -42,6 +42,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
     group_holdings_id: null,
@@ -109,7 +110,7 @@ const DocumentUpload = () => {
       tempErrors.location_name = "Location is required";
     if (!current?.module_name) tempErrors.module_name = "Module is required";
     // if (!current?.sub_module_name)
-      // tempErrors.sub_module_name = "Sub Module is required";
+    // tempErrors.sub_module_name = "Sub Module is required";
     if (!current?.service_tracker_name)
       tempErrors.service_tracker_name = "Service Tracker is required";
     if (!current?.document_type_name)
@@ -239,20 +240,27 @@ const DocumentUpload = () => {
       });
       return;
     }
+
     try {
+      setUploading(true); // ✅ WAIT start
+
       const result = await uploadFileGolang(uploadedFiles, isAutoUpload);
+
       setIsFileUploadModalModalOpen(false);
+
       const message = result?.message || "Status update successfully";
-      // Show success snackbar
+
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
         message,
         severityType: "success",
       });
+
       const updatedData = await fetchAllFiles();
       setData(updatedData);
       setUploadedFiles([]);
+
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -260,6 +268,8 @@ const DocumentUpload = () => {
         message: error?.response?.data?.message,
         severityType: "error",
       });
+    } finally {
+      setUploading(false); // ✅ WAIT end (very important)
     }
   };
 
@@ -816,8 +826,9 @@ const DocumentUpload = () => {
               type="submit"
               className="btn btn-primary w-100"
               onClick={handleFileUpload}
+              disabled={uploading}
             >
-              Upload
+              {uploading ? "Wait..." : "Upload"}
             </button>
           </div>
         </div>

@@ -365,7 +365,7 @@ const ServiceTrackers = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setIsDeleteModalOpen(false)}
+               onClick={closeModal}
             >
               <span className="button-style">Cancel</span>
             </button>

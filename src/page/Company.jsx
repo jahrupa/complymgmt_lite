@@ -227,8 +227,15 @@ const Company = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setErrors({});
-    setCurrent({});
     setIsEditing(false);
+    setCurrent({
+      _id: null,
+      group_name: '',
+      groups_holdings_id: null,
+      group_holding_account_owner: '',
+      created_at: '',
+      group_description: '',
+    });
   };
 
   useEffect(() => {
@@ -345,7 +352,7 @@ const Company = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setIsDeleteModalOpen(false)}
+              onClick={closeModal}
             >
               <span className="button-style">Cancel</span>
             </button>
