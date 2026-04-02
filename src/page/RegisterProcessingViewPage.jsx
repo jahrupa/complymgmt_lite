@@ -204,46 +204,46 @@ const RegisterProcessingViewPage = () => {
         console.log("DELETE ROW:", row);
     };
 
-    const actionCol = {
-        headerName: 'Actions',
-        field: 'actions',
-        width: 120,
-        pinned: 'left',
-        cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
-        cellRenderer: (params) => (
-            <div className="d-flex justify-content-around align-items-center">
-                <EditIcon
-                    fontSize="small"
-                    className="action_icon"
-                    onClick={() => handleEdit(params.data)}
-                />
-                <DeleteIcon
-                    fontSize="small"
-                    className="action_icon"
-                    onClick={() => handleDelete(params.data)}
-                />
-            </div>
-        )
-    };
+    // const actionCol = {
+    //     headerName: 'Actions',
+    //     field: 'actions',
+    //     width: 120,
+    //     pinned: 'left',
+    //     cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+    //     cellRenderer: (params) => (
+    //         <div className="d-flex justify-content-around align-items-center">
+    //             <EditIcon
+    //                 fontSize="small"
+    //                 className="action_icon"
+    //                 onClick={() => handleEdit(params.data)}
+    //             />
+    //             <DeleteIcon
+    //                 fontSize="small"
+    //                 className="action_icon"
+    //                 onClick={() => handleDelete(params.data)}
+    //             />
+    //         </div>
+    //     )
+    // };
 
-    const statusCol = {
-        headerName: 'Status',
-        field: 'common_attributes.is_active',
-        pinned: 'right',
-        valueGetter: (params) =>
-            params.data?.common_attributes?.is_active,
-        cellRenderer: (params) => (
-            <Toggle checked={!!params.value} />
-        )
-    };
+    // const statusCol = {
+    //     headerName: 'Status',
+    //     field: 'common_attributes.is_active',
+    //     pinned: 'right',
+    //     valueGetter: (params) =>
+    //         params.data?.common_attributes?.is_active,
+    //     cellRenderer: (params) => (
+    //         <Toggle checked={!!params.value} />
+    //     )
+    // };
 
     const columnDefs = useMemo(() => {
         if (!data.length) return [];
 
         return [
-            actionCol,
+            // actionCol,
             ...generateDynamicColDefs(data),
-            statusCol
+            // statusCol
         ];
     }, [data]);
 
@@ -437,9 +437,9 @@ const RegisterProcessingViewPage = () => {
         <div className="app-container">
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
                 <h1>Register</h1>
-                <button className="crud_btn" onClick={openModal}>
+                {/* <button className="crud_btn" onClick={openModal}>
                     Pipeline
-                </button>
+                </button> */}
             </div>
             <div className="mapping-container d-flex gap-3">
                 <SingleSelectTextField
@@ -549,7 +549,7 @@ const RegisterProcessingViewPage = () => {
                     />
                 </div>
             </div>
-            <SmallSizeModal
+            {/* <SmallSizeModal
                 crudForm={fileUploadForm}
                 crudTitle={"File Upload"}
                 isEditing={false}
@@ -557,7 +557,7 @@ const RegisterProcessingViewPage = () => {
                 isModalOpen={isFileUploadModalOpen}
                 setIsModalOpen={setIsFileUploadModalModalOpen}
                 closeModal={closeModal}
-            />
+            /> */}
         </div>
     )
 }
