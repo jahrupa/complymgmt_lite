@@ -106,7 +106,26 @@ function CreateNotificationTemplate() {
                 message,
                 severityType: 'success',
             });
+            // ✅ Form reset karo (reload nahi)
+            setNotification({
+                template_name: '',
+                type: '',
+                priority: '',
+                header: '',
+                content: '',
+                isActive: true,
+                in_app: true,
+                email: false,
+                textStyle: {
+                    bold: false,
+                    italic: false,
+                    fontSize: '16',
+                    color: '#374151',
+                    backgroundColor: '#ffffff'
+                }
+            });
         } catch (error) {
+            console.log("❌ STEP ERROR:", error);
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -297,7 +316,14 @@ function CreateNotificationTemplate() {
                         </div>
 
                         <div className="action-buttons">
-                            <button id="save-btn" onClick={handleSave} className="save-btn">
+                            <button
+                                id="save-btn"
+                                onClick={() => {
+                                    console.log("SAVE BUTTON CLICKED 🔥");
+                                    handleSave();
+                                }}
+                                className="save-btn"
+                            >
                                 <Save size={20} />
                                 Save Notification
                             </button>

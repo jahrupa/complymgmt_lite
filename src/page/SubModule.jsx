@@ -279,7 +279,7 @@ const SubModule = () => {
 
                 <div className="row row-gap-2 mt-4">
                     <div className='col-6'>
-                        <button type="button" className="btn-sm btn btn-secondary" onClick={closeModal}><span className='button-style'>Cancel</span></button>
+                        <button type="button" className="btn-sm btn btn-secondary" onClick={() => setIsDeleteModalOpen(false)}><span className='button-style'>Cancel</span></button>
                     </div>
                     <div className='col-6 d-flex justify-content-end'>
                         <button type="submit"
@@ -494,7 +494,7 @@ const SubModule = () => {
         },
 
         ...generateDynamicColDefs(data),
-        
+
         {
             headerName: 'Status',
             field: 'common_attributes.is_active',

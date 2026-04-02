@@ -365,7 +365,7 @@ const ServiceTrackers = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={closeModal}
+               onClick={closeModal}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -401,7 +401,7 @@ const ServiceTrackers = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-              onClick={closeModal}
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -604,7 +604,7 @@ const ServiceTrackers = () => {
         );
       },
     },
- {
+    {
       field: "service_tracker_name",
       headerName: "Service Tracker Name",
       filter: true,
@@ -627,7 +627,7 @@ const ServiceTrackers = () => {
       ),
     },
     ...generateDynamicColDefs(data),
-    
+
     {
       headerName: "Status",
       field: "common_attributes.is_active",
