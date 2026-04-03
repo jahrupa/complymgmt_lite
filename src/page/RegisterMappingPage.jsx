@@ -150,10 +150,10 @@ export default function RegisterMappingPage({
               <button type="submit" className="btn btn-primary w-100" onClick={handlePipelineformSubmit}>Save</button>
             </div>
           </div>
-          <div className="pb-json-section">
+          {/* <div className="pb-json-section">
             <div className="pb-json-title"><span>OUTPUT JSON</span></div>
             <pre className="pb-pre">{JSON.stringify({ steps }, null, 2)}</pre>
-          </div>
+          </div> */}
         </div>
        
       </Box>
