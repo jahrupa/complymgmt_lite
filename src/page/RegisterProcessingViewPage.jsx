@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Toggle from '../component/Toggle';
 import { flattenObject } from '../../Utils/tableColUtils';
-import { fetchAllFiles, fetchAllGroupHolding, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, uploadFileGolang } from '../api/service'
+import { createMapping, fetchAllFiles, fetchAllGroupHolding, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, uploadFileGolang } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css";
@@ -14,6 +14,9 @@ import SmallSizeModal from '../component/SmallSizeModal';
 import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
 import { useRef } from 'react';
 import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { Plus } from 'lucide-react';
+import RegisterMappingPage from './RegisterMappingPage';
+import Snackbars from '../component/Snackbars';
 
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -30,6 +33,7 @@ const RegisterProcessingViewPage = () => {
             company_id: null,
             location_name: "",
             location_id: null,
+            applicability_id: null,
         });
     const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -45,8 +49,9 @@ const RegisterProcessingViewPage = () => {
         applicabilityByCompanyId: [],
         applicabilityByGroupId: [],
     })
-    console.log(dataById.applicabilityByLocationId.length, 'applicabilityByLocationId')
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [source, setSource] = useState(null);
+  const [steps, setSteps] = useState([]);
 
     const gridRef = useRef();
 
@@ -204,27 +209,38 @@ const RegisterProcessingViewPage = () => {
         console.log("DELETE ROW:", row);
     };
 
-    // const actionCol = {
-    //     headerName: 'Actions',
-    //     field: 'actions',
-    //     width: 120,
-    //     pinned: 'left',
-    //     cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
-    //     cellRenderer: (params) => (
-    //         <div className="d-flex justify-content-around align-items-center">
-    //             <EditIcon
-    //                 fontSize="small"
-    //                 className="action_icon"
-    //                 onClick={() => handleEdit(params.data)}
-    //             />
-    //             <DeleteIcon
-    //                 fontSize="small"
-    //                 className="action_icon"
-    //                 onClick={() => handleDelete(params.data)}
-    //             />
-    //         </div>
-    //     )
-    // };
+    const actionCol = {
+        headerName: 'Actions',
+        field: 'actions',
+        width: 120,
+        pinned: 'left',
+        cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+        cellRenderer: (params) => (
+            <div className="d-flex justify-content-around align-items-center">
+                <EditIcon
+                    fontSize="small"
+                    className="action_icon"
+                    onClick={() => handleEdit(params.data)}
+                />
+                <Plus
+                    fontSize="small"
+                    className="action_icon"
+                    onClick={() =>{
+                        setCurrent((prev) => ({
+                            ...prev,
+                           applicability_id: params.data.applicability_id
+                        }));
+                        setIsModalOpen(true)
+                    } }
+                />
+                <DeleteIcon
+                    fontSize="small"
+                    className="action_icon"
+                    onClick={() => handleDelete(params.data.applicability_id)}
+                />
+            </div>
+        )
+    };
 
     // const statusCol = {
     //     headerName: 'Status',
@@ -241,7 +257,7 @@ const RegisterProcessingViewPage = () => {
         if (!data.length) return [];
 
         return [
-            // actionCol,
+            actionCol,
             ...generateDynamicColDefs(data),
             // statusCol
         ];
@@ -433,8 +449,34 @@ const RegisterProcessingViewPage = () => {
     console.log(data?.map(item => item?.state));
     console.log("FIRST ITEM:", data[0]);
     console.log("ALL KEYS:", Object.keys(data[0] || {}));
+     const handlePipelineformSubmit = async () => {
+          const payload = { applicability_id: current?.applicability_id, steps };
+          try{
+           const result = await createMapping(payload);
+            setIsSnackbarsOpen({
+              open: true,
+              vertical: "top",
+              horizontal: "center",
+              message: result?.message || "Mapping created successfully!",
+              severityType: "success",
+            });
+              setIsModalOpen(false);
+          }catch(e){
+            setIsSnackbarsOpen({
+              open: true,
+              vertical: "top",
+              horizontal: "center",
+              message: e?.message || "Failed to create mapping.",
+              severityType: "error",
+            });
+          }
+        };
     return (
         <div className="app-container">
+             <Snackbars
+                issnackbarsOpen={issnackbarsOpen}
+                setIsSnackbarsOpen={setIsSnackbarsOpen}
+              />
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
                 <h1>Register</h1>
                 {/* <button className="crud_btn" onClick={openModal}>
@@ -549,6 +591,13 @@ const RegisterProcessingViewPage = () => {
                     />
                 </div>
             </div>
+            <RegisterMappingPage
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                setSteps={setSteps}
+                steps={steps}
+                handlePipelineformSubmit={handlePipelineformSubmit}
+            />
             {/* <SmallSizeModal
                 crudForm={fileUploadForm}
                 crudTitle={"File Upload"}

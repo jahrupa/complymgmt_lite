@@ -1,77 +1,89 @@
-import { useState } from "react";
-import "../style/registerMapping.css";
-import { createMapping } from "../api/service";
-import Snackbars from "../component/Snackbars";
-export default function RegisterMapping() {
-  const [steps, setSteps] = useState([]);
-  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-    open: false,
-    vertical: "top",
-    horizontal: "center",
-    message: "",
-    severityType: "",
-  });
-  const addStep = () => setSteps([...steps, { type: "", config: {} }]);
-  const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
+import * as React from "react";
+import Drawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import { ArrowLeft, X } from "lucide-react";
+// import { createMapping } from "../api/service";
+// import { useState } from "react";
+// import Snackbars from "../component/Snackbars";
 
-  const handleTypeChange = (index, type) => {
-    let config = {};
-    if (type === "transform") config = { transform: { mappings: [] } };
-    else if (type === "filter") config = { filter: { expression: "" } };
-    else if (type === "pivot")
-      config = { pivot: { row_fields: [], value_fields: [], field_aggregations: {}, column_names: {} } };
-    const updated = [...steps];
-    updated[index] = { type, config };
-    setSteps(updated);
-  };
-
-  const updateStep = (index, newStep) => {
-    const updated = [...steps];
-    updated[index] = newStep;
-    setSteps(updated);
-  };
-
-  const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
-  const handleSubmit = async () => {
-    const payload = { steps };
-    try{
-     const result = await createMapping(payload);
-      setIsSnackbarsOpen({
-        open: true,
-        vertical: "top",
-        horizontal: "center",
-        message: result?.message || "Mapping created successfully!",
-        severityType: "success",
-      });
-    }catch(e){
-      setIsSnackbarsOpen({
-        open: true,
-        vertical: "top",
-        horizontal: "center",
-        message: e?.message || "Failed to create mapping.",
-        severityType: "error",
-      });
-    }
-  };
+export default function RegisterMappingPage({
+  anchor = "right",
+  open,
+  onClose,
+  steps,
+  setSteps,
+  handlePipelineformSubmit
+  
+}) {
+//   const [steps, setSteps] = useState([]);
+    // const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+    //   open: false,
+    //   vertical: "top",
+    //   horizontal: "center",
+    //   message: "",
+    //   severityType: "",
+    // });
+    const addStep = () => setSteps([...steps, { type: "", config: {} }]);
+    const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
+  
+    const handleTypeChange = (index, type) => {
+      let config = {};
+      if (type === "transform") config = { transform: { mappings: [] } };
+      else if (type === "filter") config = { filter: { expression: "" } };
+      else if (type === "pivot")
+        config = { pivot: { row_fields: [], value_fields: [], field_aggregations: {}, column_names: {} } };
+      const updated = [...steps];
+      updated[index] = { type, config };
+      setSteps(updated);
+    };
+  
+    const updateStep = (index, newStep) => {
+      const updated = [...steps];
+      updated[index] = newStep;
+      setSteps(updated);
+    };
+  
+    const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
+    // const handleSubmit = async () => {
+    //   const payload = { steps };
+    //   try{
+    //    const result = await createMapping(payload);
+    //     setIsSnackbarsOpen({
+    //       open: true,
+    //       vertical: "top",
+    //       horizontal: "center",
+    //       message: result?.message || "Mapping created successfully!",
+    //       severityType: "success",
+    //     });
+    //   }catch(e){
+    //     setIsSnackbarsOpen({
+    //       open: true,
+    //       vertical: "top",
+    //       horizontal: "center",
+    //       message: e?.message || "Failed to create mapping.",
+    //       severityType: "error",
+    //     });
+    //   }
+    // };
   return (
-    <>
-      <Snackbars
-        issnackbarsOpen={issnackbarsOpen}
-        setIsSnackbarsOpen={setIsSnackbarsOpen}
-      />
-      <div className="app-container">
-        <div className="service-tracker-inner-page-header d-flex justify-content-between">
+    <Drawer
+      anchor={anchor}
+      open={open}
+      onClose={onClose}
+      PaperProps={{ sx: { width: "100vw" } }}
+    >
+      <Box sx={{ width: "100%", padding: "10px" }}>
+        {/* HEADER */}
+   
+      <div className="service-tracker-inner-page-header d-flex justify-content-between">
+         {/* <Snackbars
+                issnackbarsOpen={issnackbarsOpen}
+                setIsSnackbarsOpen={setIsSnackbarsOpen}
+              /> */}
           <div className="pb-header">
             <div className="pb-header-icon">
-              <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="4" cy="4" r="2" fill="#0d0d0f" />
-                <circle cx="14" cy="4" r="2" fill="#0d0d0f" />
-                <circle cx="4" cy="14" r="2" fill="#0d0d0f" />
-                <circle cx="14" cy="14" r="2" fill="#0d0d0f" />
-                <line x1="4" y1="6" x2="4" y2="12" stroke="#0d0d0f" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="6" y1="4" x2="12" y2="4" stroke="#0d0d0f" strokeWidth="1.5" strokeLinecap="round" />
-                <line x1="6" y1="14" x2="12" y2="14" stroke="#0d0d0f" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
+                <ArrowLeft size={20} onClick={() => window.history.back()} className="cursor-pointer" />
             </div>
             <div>
               <h1>Pipeline Builder</h1>
@@ -80,6 +92,10 @@ export default function RegisterMapping() {
           <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
           
         </div>
+
+        <Divider className="mb-3" />
+
+        {/* Error Message */}
         <div >
           <div className="pb-steps">
             {steps.length === 0 && (
@@ -131,20 +147,19 @@ export default function RegisterMapping() {
               <button type="button" className="btn btn-secondary w-100" >Cancel</button>
             </div>
             <div className="col-12 col-md-6 w-auto">
-              <button type="submit" className="btn btn-primary w-100" onClick={handleSubmit}>Save</button>
+              <button type="submit" className="btn btn-primary w-100" onClick={handlePipelineformSubmit}>Save</button>
             </div>
           </div>
-          {/* <div className="pb-json-section">
+          <div className="pb-json-section">
             <div className="pb-json-title"><span>OUTPUT JSON</span></div>
             <pre className="pb-pre">{JSON.stringify({ steps }, null, 2)}</pre>
-          </div> */}
+          </div>
         </div>
-      </div>
-
-    </>
+       
+      </Box>
+    </Drawer>
   );
 }
-
 function ArrayInput({ label, values = [], onChange }) {
   const addItem = () => onChange([...values, ""]);
   const updateItem = (i, val) => { const u = [...values]; u[i] = val; onChange(u); };
