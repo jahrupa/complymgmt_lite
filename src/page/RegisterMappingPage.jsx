@@ -14,7 +14,7 @@ export default function RegisterMappingPage({
   steps,
   setSteps,
   handlePipelineformSubmit
-  
+
 }) {
     const addStep = () => setSteps([...steps, { type: "", config: {} }]);
     const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
@@ -51,14 +51,14 @@ export default function RegisterMappingPage({
       <div className="service-tracker-inner-page-header d-flex justify-content-between">
           <div className="pb-header">
             <div className="pb-header-icon">
-                <ArrowLeft size={20} onClick={() => window.history.back()} className="cursor-pointer" />
+              <ArrowLeft size={20} onClick={() => onClose(false)} className="cursor-pointer" />
             </div>
             <div>
               <h1>Pipeline Builder</h1>
             </div>
           </div>
           <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
-          
+
         </div>
 
         <Divider className="mb-3" />
@@ -112,7 +112,13 @@ export default function RegisterMappingPage({
           </div>
           <div className="row row-gap-2 mt-3 justify-content-lg-end justify-content-md-end justify-content-center">
             <div className="col-12 col-md-6 w-auto">
-              <button type="button" className="btn btn-secondary w-100" >Cancel</button>
+              <button
+                type="button"
+                className="btn btn-secondary w-100"
+                onClick={onClose}
+              >
+                Cancel
+              </button>
             </div>
             <div className="col-12 col-md-6 w-auto">
               <button type="submit" className="btn btn-primary w-100" onClick={handlePipelineformSubmit}>Save</button>
@@ -123,7 +129,7 @@ export default function RegisterMappingPage({
             <pre className="pb-pre">{JSON.stringify({ steps }, null, 2)}</pre>
           </div> */}
         </div>
-       
+
       </Box>
     </Drawer>
   );

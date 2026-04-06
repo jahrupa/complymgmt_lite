@@ -405,3 +405,19 @@
   flex-shrink: 0;
   font-size: 14px;
 }
+
+/* AG Grid Action Icons Perfect Center */
+.ag-cell .action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* center inside cell */
+  gap: 10px;
+  /* spacing between icons */
+  width: 100%;
+}
+
+.ag-cell .action_icon {
+  cursor: pointer;
+  font-size: 18px;
+}

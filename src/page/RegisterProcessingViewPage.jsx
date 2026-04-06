@@ -236,7 +236,7 @@ const RegisterProcessingViewPage = () => {
         pinned: 'left',
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
         cellRenderer: (params) => (
-            <div className="d-flex justify-content-around align-items-center">
+            <div className="action-icons">
                 <EditIcon
                     fontSize="small"
                     className="action_icon"
@@ -485,7 +485,7 @@ const RegisterProcessingViewPage = () => {
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
-                <h1>Register</h1>
+                <h1>Register Applicability</h1>
                 <button className="crud_btn" onClick={openModal}>
                     Create Applicability
                 </button>
