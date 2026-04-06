@@ -16,14 +16,6 @@ export default function RegisterMappingPage({
   handlePipelineformSubmit
   
 }) {
-//   const [steps, setSteps] = useState([]);
-    // const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-    //   open: false,
-    //   vertical: "top",
-    //   horizontal: "center",
-    //   message: "",
-    //   severityType: "",
-    // });
     const addStep = () => setSteps([...steps, { type: "", config: {} }]);
     const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
   
@@ -45,27 +37,7 @@ export default function RegisterMappingPage({
     };
   
     const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
-    // const handleSubmit = async () => {
-    //   const payload = { steps };
-    //   try{
-    //    const result = await createMapping(payload);
-    //     setIsSnackbarsOpen({
-    //       open: true,
-    //       vertical: "top",
-    //       horizontal: "center",
-    //       message: result?.message || "Mapping created successfully!",
-    //       severityType: "success",
-    //     });
-    //   }catch(e){
-    //     setIsSnackbarsOpen({
-    //       open: true,
-    //       vertical: "top",
-    //       horizontal: "center",
-    //       message: e?.message || "Failed to create mapping.",
-    //       severityType: "error",
-    //     });
-    //   }
-    // };
+   
   return (
     <Drawer
       anchor={anchor}
@@ -77,10 +49,6 @@ export default function RegisterMappingPage({
         {/* HEADER */}
    
       <div className="service-tracker-inner-page-header d-flex justify-content-between">
-         {/* <Snackbars
-                issnackbarsOpen={issnackbarsOpen}
-                setIsSnackbarsOpen={setIsSnackbarsOpen}
-              /> */}
           <div className="pb-header">
             <div className="pb-header-icon">
                 <ArrowLeft size={20} onClick={() => window.history.back()} className="cursor-pointer" />
