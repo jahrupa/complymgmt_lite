@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Toggle from '../component/Toggle';
 import { flattenObject } from '../../Utils/tableColUtils';
-import { createMapping, fetchAllFiles, fetchAllGroupHolding, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, uploadFileGolang } from '../api/service'
+import { createApplicability, createMapping, deleteApplicabilityById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, updateApplicabilityById, uploadFileGolang } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css";
@@ -24,7 +24,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const RegisterProcessingViewPage = () => {
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
+    const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([])
     const [locationName, setLocationName] = useState([])
+    const [registerName, setRegisterName] = useState([]);
     const [current, setCurrent] = useState(
         {
             group_name: "",
@@ -34,8 +36,11 @@ const RegisterProcessingViewPage = () => {
             location_name: "",
             location_id: null,
             applicability_id: null,
+            register_id: null,
+            register_name: "",
         });
-    const [isFileUploadModalOpen, setIsFileUploadModalModalOpen] = useState(false);
+    const [applicabilityModal, setApplicabilityModal] = useState(false);
+    const[isEditing, setIsEditing] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -51,19 +56,17 @@ const RegisterProcessingViewPage = () => {
     })
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [source, setSource] = useState(null);
-  const [steps, setSteps] = useState([]);
+    const [steps, setSteps] = useState([]);
 
     const gridRef = useRef();
 
     const [filteredData, setFilteredData] = useState([]);
-    console.log(filteredData, 'filteredData');
 
     const handleFilterApply = (data) => {
         setFilteredData(data);
     };
 
 
-    console.log(source, 'source')
     // "location" | "company" | "group"
     // const [columnDefs, setColumnDefs] = useState([]);
     const data = useMemo(() => {
@@ -83,6 +86,10 @@ const RegisterProcessingViewPage = () => {
             try {
                 const data = await fetchAllGroupHolding();
                 setGroupHoldingName(data);
+                const locationNameData = await fetchAllLocationName();
+                setLocationName(locationNameData || []);
+                const registerNameData = await fetchAllRegisterNames();
+                setRegisterName(registerNameData || []);
             } catch (error) {
                 // console.error("Error fetching data:", error);
             }
@@ -110,7 +117,7 @@ const RegisterProcessingViewPage = () => {
             // 🔥 Group None case
             setSource(null);
             setCompanyName([]);
-            setLocationName([]);
+            setLocationNameByCompanyId([]);
             setDataById(prev => ({
                 ...prev,
                 applicabilityByGroupId: [],
@@ -126,7 +133,7 @@ const RegisterProcessingViewPage = () => {
                 const data = await getLocationByCompanyId(current?.company_id);
                 const applicabilityByCompanyId = await getApplicabilityByCompanyId(current?.company_id);
                 if (data) {
-                    setLocationName(data);
+                    setLocationNameByCompanyId(data);
                     setDataById((prev) => ({ ...prev, applicabilityByCompanyId: applicabilityByCompanyId || [] }));
                     setSource("company");
                 }
@@ -200,13 +207,24 @@ const RegisterProcessingViewPage = () => {
             .filter(Boolean);
     };
 
-    const handleEdit = (row) => {
-        console.log("EDIT ROW:", row);
-        // yaha tum modal open karogi baad me
-    };
-
-    const handleDelete = (row) => {
-        console.log("DELETE ROW:", row);
+  
+    const handleDelete = async (row) => {
+        try {     
+            const result= await deleteApplicabilityById(row); 
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message:result?.message|| "Applicability deleted successfully!",
+                severityType: "success",
+            });
+        } catch (error) {
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message|| "Failed to delete applicability.",
+                severityType: "error",
+            });
+        }
     };
 
     const actionCol = {
@@ -220,18 +238,22 @@ const RegisterProcessingViewPage = () => {
                 <EditIcon
                     fontSize="small"
                     className="action_icon"
-                    onClick={() => handleEdit(params.data)}
+                    onClick={() => {
+                        setIsEditing(true);
+                        setApplicabilityModal(true);
+                        setCurrent((prev) => ({ ...prev, applicability_id: params.data.applicability_id }));
+                    }}
                 />
                 <Plus
                     fontSize="small"
                     className="action_icon"
-                    onClick={() =>{
+                    onClick={() => {
                         setCurrent((prev) => ({
                             ...prev,
-                           applicability_id: params.data.applicability_id
+                            applicability_id: params.data.applicability_id
                         }));
                         setIsModalOpen(true)
-                    } }
+                    }}
                 />
                 <DeleteIcon
                     fontSize="small"
@@ -288,102 +310,82 @@ const RegisterProcessingViewPage = () => {
     //     }));
     // }, [data]);
 
-    useEffect(() => {
-        console.log("SOURCE:", source);
-        console.log("FINAL DATA:", data);
-        console.log("FULL STATE:", dataById);
-    }, [dataById, source]);
+
     const openModal = () => {
-        setIsFileUploadModalModalOpen(true);
+        setApplicabilityModal(true);
     };
 
     const closeModal = () => {
-        setIsFileUploadModalModalOpen(false);
-        setUploadedFiles([]);
-
+        setApplicabilityModal(false);
+        setCurrent({});
     };
-    const handleFileUpload = async () => {
-        if (!uploadedFiles?.length) {
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "Please select at least one file.",
-                severityType: "warning",
-            });
-            return;
-        }
-        try {
-            const result = await uploadFileGolang(uploadedFiles);
-            setIsFileUploadModalModalOpen(false);
-            const message = result?.message || "Status update successfully";
-            // Show success snackbar
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message,
-                severityType: "success",
-            });
-            const updatedData = await fetchAllFiles();
-            // setData(updatedData);
-            setUploadedFiles([]);
-        } catch (error) {
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: error?.response?.data?.message,
-                severityType: "error",
-            });
-        }
+   const handleApplicability = async () => {
+    const payload = {
+        location_id: current?.location_id,
+        register_id: current?.register_id,
     };
 
-    const fileUploadForm = () => {
+    try {
+        let result;
+
+        if (isEditing && current?.applicability_id) {
+            result = await updateApplicabilityById(
+                current.applicability_id,
+                payload
+            );
+        } else {
+            result = await createApplicability(payload);
+        }
+
+        const message =
+            result?.message ||
+            (isEditing
+                ? "Applicability updated successfully!"
+                : "Applicability created successfully!");
+
+        setIsSnackbarsOpen({
+            ...issnackbarsOpen,
+            open: true,
+            message,
+            severityType: "success",
+        });
+    } catch (error) {
+        setIsSnackbarsOpen({
+            ...issnackbarsOpen,
+            open: true,
+            message:
+                error?.response?.data?.message ||
+                (isEditing
+                    ? "Failed to update applicability."
+                    : "Failed to create applicability."),
+            severityType: "error",
+        });
+    }
+
+    setCurrent({
+        location_id: null,
+        register_id: null,
+        location_name: "",
+        register_name: "",
+    });
+
+    setApplicabilityModal(false);
+};
+
+    const applicabilityForm = () => {
         return (
             <div>
-                <div className="d-flex align-items-center">
+                <div className="">
                     <span>
-                        <div className="mapping-container d-flex gap-3">
+                        <div className="d-flex gap-3">
                             <SingleSelectTextField
-                                name="group_name"
-                                label="Group Holding"
-                                value={current.group_name}
-                                onChange={(e) => {
-                                    const selectedName = e.target.value;
-                                    const matchedGroup = groupHoldingName.find(
-                                        (g) => g.name === selectedName
-                                    );
-                                    setCurrent((prev) => ({
-                                        ...prev,
-                                        group_name: selectedName,
-                                        group_holding_id: matchedGroup?._id || null,
-                                        company_name: '',
-                                        location_name: '',
-                                    }));
-                                }}
-                                names={groupHoldingName}
-                            />
-
-                            <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
-                                onChange={(e) => {
-                                    const selectedName = e.target.value;
-                                    const matchedCompany = companyName.find(
-                                        (g) => g.company_name === selectedName
-                                    );
-                                    setCurrent((prev) => ({
-                                        ...prev,
-                                        company_name: selectedName,
-                                        company_id: matchedCompany?._id || null,
-                                    }));
-                                }}
-                                names={companyName.map((item) => ({
-                                    _id: item._id,
-                                    name: item.company_name,
-                                }))}
-                            />
-                            <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
+                                name="location_name"
+                                label="Location"
+                                value={current.location_name}
                                 onChange={(e) => {
                                     const selectedName = e.target.value;
                                     const matchedLocation = locationName.find(
-                                        (g) => g.location_name === selectedName
+                                        (g) => g.name === selectedName
                                     );
                                     setCurrent((prev) => ({
                                         ...prev,
@@ -391,22 +393,29 @@ const RegisterProcessingViewPage = () => {
                                         location_id: matchedLocation?._id || null,
                                     }));
                                 }}
-                                names={locationName.map((item) => ({
+                                names={locationName}
+                            />
+
+                            <SingleSelectTextField name="register_name" label="Register" value={current?.register_name}
+                                onChange={(e) => {
+                                    const selectedName = e.target.value;
+                                    const matchedRegister = registerName.find(
+                                        (g) => g.register_name === selectedName
+                                    );
+                                    setCurrent((prev) => ({
+                                        ...prev,
+                                        register_name: selectedName,
+                                        register_id: matchedRegister?._id || null,
+                                    }));
+                                }}
+                                names={registerName.map((item) => ({
                                     _id: item._id,
-                                    name: item.location_name,
+                                    name: item.register_name,
                                 }))}
                             />
+
                         </div>
                     </span>
-                </div>
-
-                <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
-                    <div className="button-wrap">
-                        <MultiFileUpload
-                            setUploadedFiles={setUploadedFiles}
-                            uploadedFiles={uploadedFiles}
-                        />
-                    </div>
                 </div>
 
                 <div className="row row-gap-2">
@@ -423,9 +432,9 @@ const RegisterProcessingViewPage = () => {
                         <button
                             type="submit"
                             className="btn btn-primary w-100"
-                            onClick={handleFileUpload}
+                            onClick={handleApplicability}
                         >
-                            Upload
+                            Save
                         </button>
                     </div>
                 </div>
@@ -446,42 +455,39 @@ const RegisterProcessingViewPage = () => {
             document.getElementById('filter-text-box').value
         );
     }, []);
-    console.log(data?.map(item => item?.state));
-    console.log("FIRST ITEM:", data[0]);
-    console.log("ALL KEYS:", Object.keys(data[0] || {}));
-     const handlePipelineformSubmit = async () => {
-          const payload = { applicability_id: current?.applicability_id, steps };
-          try{
-           const result = await createMapping(payload);
+    const handlePipelineformSubmit = async () => {
+        const payload = { applicability_id: current?.applicability_id, steps };
+        try {
+            const result = await createMapping(payload);
             setIsSnackbarsOpen({
-              open: true,
-              vertical: "top",
-              horizontal: "center",
-              message: result?.message || "Mapping created successfully!",
-              severityType: "success",
+                open: true,
+                vertical: "top",
+                horizontal: "center",
+                message: result?.message || "Mapping created successfully!",
+                severityType: "success",
             });
-              setIsModalOpen(false);
-          }catch(e){
+            setIsModalOpen(false);
+        } catch (e) {
             setIsSnackbarsOpen({
-              open: true,
-              vertical: "top",
-              horizontal: "center",
-              message: e?.message || "Failed to create mapping.",
-              severityType: "error",
+                open: true,
+                vertical: "top",
+                horizontal: "center",
+                message: e?.message || "Failed to create mapping.",
+                severityType: "error",
             });
-          }
-        };
+        }
+    };
     return (
         <div className="app-container">
-             <Snackbars
+            <Snackbars
                 issnackbarsOpen={issnackbarsOpen}
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
-              />
+            />
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
                 <h1>Register</h1>
-                {/* <button className="crud_btn" onClick={openModal}>
-                    Pipeline
-                </button> */}
+                <button className="crud_btn" onClick={openModal}>
+                    Create Applicability
+                </button>
             </div>
             <div className="mapping-container d-flex gap-3">
                 <SingleSelectTextField
@@ -535,7 +541,7 @@ const RegisterProcessingViewPage = () => {
                 <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
                     onChange={(e) => {
                         const selectedName = e.target.value;
-                        const matchedLocation = locationName.find(
+                        const matchedLocation = locationNameByCompanyId.find(
                             (g) => g.location_name === selectedName
                         );
 
@@ -554,7 +560,7 @@ const RegisterProcessingViewPage = () => {
                             setSource("group");
                         }
                     }}
-                    names={locationName.map((item) => ({
+                    names={locationNameByCompanyId.map((item) => ({
                         _id: item._id,
                         name: item.location_name,
                     }))}
@@ -598,15 +604,15 @@ const RegisterProcessingViewPage = () => {
                 steps={steps}
                 handlePipelineformSubmit={handlePipelineformSubmit}
             />
-            {/* <SmallSizeModal
-                crudForm={fileUploadForm}
-                crudTitle={"File Upload"}
-                isEditing={false}
-                editCrudTitle={""}
-                isModalOpen={isFileUploadModalOpen}
-                setIsModalOpen={setIsFileUploadModalModalOpen}
+            <SmallSizeModal
+                crudForm={applicabilityForm}
+                crudTitle={"Create Applicability"}
+                isEditing={isEditing}
+                editCrudTitle={"Edit Applicability"}
+                isModalOpen={applicabilityModal}
+                setIsModalOpen={setApplicabilityModal}
                 closeModal={closeModal}
-            /> */}
+            />
         </div>
     )
 }

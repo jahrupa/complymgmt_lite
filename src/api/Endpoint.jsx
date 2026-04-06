@@ -232,14 +232,14 @@ export const PROCESS_REGISTERS='/api/v1/register_processing/create/register';
 export const GET_FILE_BY_TYPE='/api/v1/document_repository/view/files/type?file_type=xlsx';
 
 export const CREATE_REGISTER='/api/v2/register_processing/create/register'
-export const CREATE_APPLICABILITY='/api/v1/register_processing/create/applicability'
+export const CREATE_APPLICABILITY='/api/v2/register_processing/create/applicability'
 export const CREATE_MAPPING='/api/v2/register_processing/create/mapping'
 export const PROCESS_REGISTER='/api/v2/register_processing/create/process/register'
 export const GET_APPLICABILITY_BY_LOCATION_ID='api/v2/register_processing/view/applicabilities/location/'
 export const GET_APPLICABILITY_BY_COMPANY_ID='/api/v2/register_processing/view/applicabilities/company/'
 export const GET_APPLICABILITY_BY_GROUP_ID='/api/v2/register_processing/view/applicabilities/group/'
-export const UPDATE_APPLICABILITY_BY_ID='/api/v2/register_processing/update/applicability/69c1702ba7812cd783d815dc'
-export const DELETE_APPLICABILITY_BY_ID='/api/v2/register_processing/delete/applicability/69c1702ba7812cd783d815dc'
+export const UPDATE_APPLICABILITY_BY_ID='api/v2/register_processing/update/applicability/'
+export const DELETE_APPLICABILITY_BY_ID='/api/v2/register_processing/delete/applicability/'
 export const GET_REGISTER_APPLICABILITY_BY_ID='/api/v2/register_processing/view/applicability/69c1702ba7812cd783d815dc'
 
 
