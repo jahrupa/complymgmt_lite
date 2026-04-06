@@ -188,6 +188,7 @@ import {
   UPDATE_APPLICABILITY_BY_ID,
   DELETE_APPLICABILITY_BY_ID,
   GET_REGISTER_APPLICABILITY_BY_ID,
+  GET_PIPELINE_BY_APPLICABILITY_ID,
 
 } from "./Endpoint";
 
@@ -2255,6 +2256,16 @@ export const getApplicabilityById = async (id) => {
     return response.data;
   } catch (error) {
     // console.error("Error geting applicability by ID:", error);
+    throw error;
+  }
+}
+
+export const getPipelineByApplicabilityId = async (applicability_id) => {
+  try {
+    const response = await API.get(`${GET_PIPELINE_BY_APPLICABILITY_ID}${applicability_id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error geting pipeline by applicability ID:", error);
     throw error;
   }
 }

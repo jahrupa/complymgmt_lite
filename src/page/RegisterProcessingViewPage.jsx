@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Toggle from '../component/Toggle';
 import { flattenObject } from '../../Utils/tableColUtils';
-import { createApplicability, createMapping, deleteApplicabilityById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, updateApplicabilityById, uploadFileGolang } from '../api/service'
+import { createApplicability, createMapping, deleteApplicabilityById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, getPipelineByApplicabilityId, updateApplicabilityById, uploadFileGolang } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css";
@@ -90,6 +90,8 @@ const RegisterProcessingViewPage = () => {
                 setLocationName(locationNameData || []);
                 const registerNameData = await fetchAllRegisterNames();
                 setRegisterName(registerNameData || []);
+                const pipelinebyApplicabilityIdData = await getPipelineByApplicabilityId(current?.applicability_id);
+                setSteps(pipelinebyApplicabilityIdData || []);
             } catch (error) {
                 // console.error("Error fetching data:", error);
             }
