@@ -234,9 +234,13 @@ const RegisterProcessingViewPage = () => {
         pinned: 'left',
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
         cellRenderer: (params) => (
-            <div className="action-icons">
+            <div
+                className="d-flex justify-content-around align-items-center"
+                style={{ height: "100%", width: "100%" }}
+            >
                 <EditIcon
                     fontSize="small"
+                    style={{ cursor: "pointer" }}
                     className="action_icon"
                     onClick={() => {
                         setIsEditing(true);
@@ -246,6 +250,7 @@ const RegisterProcessingViewPage = () => {
                 />
                 <Plus
                     fontSize="small"
+                    style={{ cursor: "pointer" }}
                     className="action_icon"
                     onClick={() => {
                         setCurrent((prev) => ({
@@ -257,6 +262,7 @@ const RegisterProcessingViewPage = () => {
                 />
                 <DeleteIcon
                     fontSize="small"
+                    style={{ cursor: "pointer" }}
                     className="action_icon"
                     onClick={() => handleDelete(params.data.applicability_id)}
                 />
