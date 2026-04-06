@@ -83,7 +83,7 @@ export default function RegisterMappingPage({
               /> */}
           <div className="pb-header">
             <div className="pb-header-icon">
-              <ArrowLeft size={20} onClick={() => window.history.back()} className="cursor-pointer" />
+              <ArrowLeft size={20} onClick={() => onClose(false)} className="cursor-pointer" />
             </div>
             <div>
               <h1>Pipeline Builder</h1>
