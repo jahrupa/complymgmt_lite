@@ -14,58 +14,58 @@ export default function RegisterMappingPage({
   steps,
   setSteps,
   handlePipelineformSubmit
-  
+
 }) {
-//   const [steps, setSteps] = useState([]);
-    // const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-    //   open: false,
-    //   vertical: "top",
-    //   horizontal: "center",
-    //   message: "",
-    //   severityType: "",
-    // });
-    const addStep = () => setSteps([...steps, { type: "", config: {} }]);
-    const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
-  
-    const handleTypeChange = (index, type) => {
-      let config = {};
-      if (type === "transform") config = { transform: { mappings: [] } };
-      else if (type === "filter") config = { filter: { expression: "" } };
-      else if (type === "pivot")
-        config = { pivot: { row_fields: [], value_fields: [], field_aggregations: {}, column_names: {} } };
-      const updated = [...steps];
-      updated[index] = { type, config };
-      setSteps(updated);
-    };
-  
-    const updateStep = (index, newStep) => {
-      const updated = [...steps];
-      updated[index] = newStep;
-      setSteps(updated);
-    };
-  
-    const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
-    // const handleSubmit = async () => {
-    //   const payload = { steps };
-    //   try{
-    //    const result = await createMapping(payload);
-    //     setIsSnackbarsOpen({
-    //       open: true,
-    //       vertical: "top",
-    //       horizontal: "center",
-    //       message: result?.message || "Mapping created successfully!",
-    //       severityType: "success",
-    //     });
-    //   }catch(e){
-    //     setIsSnackbarsOpen({
-    //       open: true,
-    //       vertical: "top",
-    //       horizontal: "center",
-    //       message: e?.message || "Failed to create mapping.",
-    //       severityType: "error",
-    //     });
-    //   }
-    // };
+  //   const [steps, setSteps] = useState([]);
+  // const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
+  //   open: false,
+  //   vertical: "top",
+  //   horizontal: "center",
+  //   message: "",
+  //   severityType: "",
+  // });
+  const addStep = () => setSteps([...steps, { type: "", config: {} }]);
+  const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
+
+  const handleTypeChange = (index, type) => {
+    let config = {};
+    if (type === "transform") config = { transform: { mappings: [] } };
+    else if (type === "filter") config = { filter: { expression: "" } };
+    else if (type === "pivot")
+      config = { pivot: { row_fields: [], value_fields: [], field_aggregations: {}, column_names: {} } };
+    const updated = [...steps];
+    updated[index] = { type, config };
+    setSteps(updated);
+  };
+
+  const updateStep = (index, newStep) => {
+    const updated = [...steps];
+    updated[index] = newStep;
+    setSteps(updated);
+  };
+
+  const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
+  // const handleSubmit = async () => {
+  //   const payload = { steps };
+  //   try{
+  //    const result = await createMapping(payload);
+  //     setIsSnackbarsOpen({
+  //       open: true,
+  //       vertical: "top",
+  //       horizontal: "center",
+  //       message: result?.message || "Mapping created successfully!",
+  //       severityType: "success",
+  //     });
+  //   }catch(e){
+  //     setIsSnackbarsOpen({
+  //       open: true,
+  //       vertical: "top",
+  //       horizontal: "center",
+  //       message: e?.message || "Failed to create mapping.",
+  //       severityType: "error",
+  //     });
+  //   }
+  // };
   return (
     <Drawer
       anchor={anchor}
@@ -75,22 +75,22 @@ export default function RegisterMappingPage({
     >
       <Box sx={{ width: "100%", padding: "10px" }}>
         {/* HEADER */}
-   
-      <div className="service-tracker-inner-page-header d-flex justify-content-between">
-         {/* <Snackbars
+
+        <div className="service-tracker-inner-page-header d-flex justify-content-between">
+          {/* <Snackbars
                 issnackbarsOpen={issnackbarsOpen}
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
               /> */}
           <div className="pb-header">
             <div className="pb-header-icon">
-                <ArrowLeft size={20} onClick={() => window.history.back()} className="cursor-pointer" />
+              <ArrowLeft size={20} onClick={() => window.history.back()} className="cursor-pointer" />
             </div>
             <div>
               <h1>Pipeline Builder</h1>
             </div>
           </div>
           <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
-          
+
         </div>
 
         <Divider className="mb-3" />
@@ -144,7 +144,13 @@ export default function RegisterMappingPage({
           </div>
           <div className="row row-gap-2 mt-3 justify-content-lg-end justify-content-md-end justify-content-center">
             <div className="col-12 col-md-6 w-auto">
-              <button type="button" className="btn btn-secondary w-100" >Cancel</button>
+              <button
+                type="button"
+                className="btn btn-secondary w-100"
+                onClick={onClose}
+              >
+                Cancel
+              </button>
             </div>
             <div className="col-12 col-md-6 w-auto">
               <button type="submit" className="btn btn-primary w-100" onClick={handlePipelineformSubmit}>Save</button>
@@ -155,7 +161,7 @@ export default function RegisterMappingPage({
             <pre className="pb-pre">{JSON.stringify({ steps }, null, 2)}</pre>
           </div> */}
         </div>
-       
+
       </Box>
     </Drawer>
   );

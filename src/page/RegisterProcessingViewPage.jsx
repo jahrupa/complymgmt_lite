@@ -40,7 +40,7 @@ const RegisterProcessingViewPage = () => {
             register_name: "",
         });
     const [applicabilityModal, setApplicabilityModal] = useState(false);
-    const[isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -207,21 +207,21 @@ const RegisterProcessingViewPage = () => {
             .filter(Boolean);
     };
 
-  
+
     const handleDelete = async (row) => {
-        try {     
-            const result= await deleteApplicabilityById(row); 
+        try {
+            const result = await deleteApplicabilityById(row);
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message:result?.message|| "Applicability deleted successfully!",
+                message: result?.message || "Applicability deleted successfully!",
                 severityType: "success",
             });
         } catch (error) {
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: error?.response?.data?.message|| "Failed to delete applicability.",
+                message: error?.response?.data?.message || "Failed to delete applicability.",
                 severityType: "error",
             });
         }
@@ -234,7 +234,7 @@ const RegisterProcessingViewPage = () => {
         pinned: 'left',
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
         cellRenderer: (params) => (
-            <div className="d-flex justify-content-around align-items-center">
+            <div className="action-icons">
                 <EditIcon
                     fontSize="small"
                     className="action_icon"
@@ -319,58 +319,58 @@ const RegisterProcessingViewPage = () => {
         setApplicabilityModal(false);
         setCurrent({});
     };
-   const handleApplicability = async () => {
-    const payload = {
-        location_id: current?.location_id,
-        register_id: current?.register_id,
-    };
+    const handleApplicability = async () => {
+        const payload = {
+            location_id: current?.location_id,
+            register_id: current?.register_id,
+        };
 
-    try {
-        let result;
+        try {
+            let result;
 
-        if (isEditing && current?.applicability_id) {
-            result = await updateApplicabilityById(
-                current.applicability_id,
-                payload
-            );
-        } else {
-            result = await createApplicability(payload);
+            if (isEditing && current?.applicability_id) {
+                result = await updateApplicabilityById(
+                    current.applicability_id,
+                    payload
+                );
+            } else {
+                result = await createApplicability(payload);
+            }
+
+            const message =
+                result?.message ||
+                (isEditing
+                    ? "Applicability updated successfully!"
+                    : "Applicability created successfully!");
+
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: "success",
+            });
+        } catch (error) {
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message:
+                    error?.response?.data?.message ||
+                    (isEditing
+                        ? "Failed to update applicability."
+                        : "Failed to create applicability."),
+                severityType: "error",
+            });
         }
 
-        const message =
-            result?.message ||
-            (isEditing
-                ? "Applicability updated successfully!"
-                : "Applicability created successfully!");
-
-        setIsSnackbarsOpen({
-            ...issnackbarsOpen,
-            open: true,
-            message,
-            severityType: "success",
+        setCurrent({
+            location_id: null,
+            register_id: null,
+            location_name: "",
+            register_name: "",
         });
-    } catch (error) {
-        setIsSnackbarsOpen({
-            ...issnackbarsOpen,
-            open: true,
-            message:
-                error?.response?.data?.message ||
-                (isEditing
-                    ? "Failed to update applicability."
-                    : "Failed to create applicability."),
-            severityType: "error",
-        });
-    }
 
-    setCurrent({
-        location_id: null,
-        register_id: null,
-        location_name: "",
-        register_name: "",
-    });
-
-    setApplicabilityModal(false);
-};
+        setApplicabilityModal(false);
+    };
 
     const applicabilityForm = () => {
         return (
@@ -484,7 +484,7 @@ const RegisterProcessingViewPage = () => {
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
-                <h1>Register</h1>
+                <h1>Register Applicability</h1>
                 <button className="crud_btn" onClick={openModal}>
                     Create Applicability
                 </button>
