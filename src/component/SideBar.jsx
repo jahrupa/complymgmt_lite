@@ -18,7 +18,61 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Layers, PanelsRightBottom, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
+export const RegisterApplicabilityIcon = ({ active }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <path d="M9 12l2 2 4-4" />
+  </svg>
+);
 
+export const ProcessRegisterIcon = ({ active }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <path d="M3 12h18M12 3v18" />
+    <path d="M6 6l12 12" />
+  </svg>
+);
+
+export const CreateRegisterIcon = ({ active }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <line x1="12" y1="8" x2="12" y2="16" />
+    <line x1="8" y1="12" x2="16" y2="12" />
+  </svg>
+);
 function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
     const [openDropdown, setOpenDropdown] = useState(null);
     const userRole = decryptData(localStorage.getItem("user_role"));
@@ -56,12 +110,14 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             : []
         ),
     ];
+    // Icons.js
+
     const registerProcessing = [
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Applicability', link: 'register' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Process Register', link: 'process_register' },
-        // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Mapping', link: 'create_mapping' },
-        // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'create_applicability' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Register', link: 'create_register' },
+        { icon: (active) => <CreateRegisterIcon active={active} />, label: 'Create Register', link: 'create_register' },
+        { icon: (active) => <RegisterApplicabilityIcon active={active} />, label: 'Register Applicability', link: 'register' },
+        { icon: (active) => <ProcessRegisterIcon active={active} />, label: 'Process Register', link: 'process_register' },
+        // { icon: (active) => <CreateMappingIcon active={active} />, label: 'Create Mapping', link: 'create_mapping' },
+        // { icon: (active) => <CreateApplicabilityIcon active={active} />, label: 'Create Applicability', link: 'create_applicability' },
 
     ];
     const handleDropdownToggle = (name) => {
