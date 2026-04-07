@@ -57,16 +57,16 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         ),
     ];
     const registerProcessing = [
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register', link: 'register' },
+        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Applicability', link: 'register' },
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Process Register', link: 'process_register' },
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Mapping', link: 'create_mapping' },
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'create_applicability' },
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Register', link: 'create_register' },
 
     ];
-const handleDropdownToggle = (name) => {
-    setOpenDropdown(prev => (prev === name ? null : name));
-};
+    const handleDropdownToggle = (name) => {
+        setOpenDropdown(prev => (prev === name ? null : name));
+    };
     return (
         <div>
             <div className={`${sidebarOpen ? "sidebar sidebar-open" : "sidebar sidebar-close"}`}>
@@ -113,7 +113,7 @@ const handleDropdownToggle = (name) => {
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
-                               onClick={() => handleDropdownToggle('serviceTracker')}
+                                onClick={() => handleDropdownToggle('serviceTracker')}
                             >
                                 <span className='sidebar-close-icon-span'>
                                     {openDropdown === 'serviceTracker' ? <KeyboardArrowDownIcon className='side-bar-icon' /> : <KeyboardArrowRightIcon className='side-bar-icon' />}

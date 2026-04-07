@@ -51,7 +51,7 @@ export default function RegisterMappingPage({
             setSteps([]);
           }}>
             <div className="pb-header-icon">
-              <ArrowLeft size={20}  className="cursor-pointer" />
+              <ArrowLeft size={20} onClick={() => onClose(false)} className="cursor-pointer" style={{ cursor: "pointer" }} />
             </div>
             <div>
               <h1>Pipeline Builder</h1>

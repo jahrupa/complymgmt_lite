@@ -248,9 +248,13 @@ console.log(isEditing,steps?.length,"isEditing")
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
         editable: false,
         cellRenderer: (params) => (
-            <div className="action-icons">
+            <div
+                className="d-flex justify-content-around align-items-center"
+                style={{ height: "100%", width: "100%" }}
+            >
                 <EditIcon
                     fontSize="small"
+                    style={{ cursor: "pointer" }}
                     className="action_icon"
                     onClick={() => {
                         setIsEditing(true);
@@ -260,6 +264,7 @@ console.log(isEditing,steps?.length,"isEditing")
                 />
                 <Plus
                     fontSize="small"
+                    style={{ cursor: "pointer" }}
                     className="action_icon"
                     onClick={() => {
                         setCurrent((prev) => ({
@@ -272,6 +277,7 @@ console.log(isEditing,steps?.length,"isEditing")
                 />
                 <DeleteIcon
                     fontSize="small"
+                    style={{ cursor: "pointer" }}
                     className="action_icon"
                     onClick={() => handleDelete(params.data.applicability_id)}
                 />
