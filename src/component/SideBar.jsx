@@ -60,7 +60,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Applicability', link: 'register' },
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Process Register', link: 'process_register' },
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Mapping', link: 'create_mapping' },
-        { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'create_applicability' },
+        // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Applicability', link: 'create_applicability' },
         { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create Register', link: 'create_register' },
 
     ];
