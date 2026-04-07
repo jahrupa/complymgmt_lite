@@ -47,7 +47,8 @@ export default function RegisterMappingPage({
 
         <div className="service-tracker-inner-page-header d-flex justify-content-between">
           <div className="pb-header" onClick={() => {
-            onClose(false)
+            onClose(false);
+            setSteps([]);
           }}>
             <div className="pb-header-icon">
               <ArrowLeft size={20}  className="cursor-pointer" />
@@ -115,7 +116,7 @@ export default function RegisterMappingPage({
                 type="button"
                 className="btn btn-secondary w-100"
                 onClick={() => {
-                  // setSteps([]);
+                  setSteps([]);
                   onClose(false)
                 }}
               >

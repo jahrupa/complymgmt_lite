@@ -189,6 +189,8 @@ import {
   DELETE_APPLICABILITY_BY_ID,
   GET_REGISTER_APPLICABILITY_BY_ID,
   GET_PIPELINE_BY_APPLICABILITY_ID,
+  DELETE_MAPPING_BY_ID,
+  UPDATE_MAPPING_BY_ID,
 
 } from "./Endpoint";
 
@@ -2266,6 +2268,24 @@ export const getPipelineByApplicabilityId = async (applicability_id) => {
     return response.data;
   } catch (error) {
     // console.error("Error geting pipeline by applicability ID:", error);
+    throw error;
+  }
+}
+export const deleteMappingById = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_MAPPING_BY_ID}${id}`);
+    return response.data;
+  } catch (error) {
+    // console.error("Error deleting mapping by ID:", error);
+    throw error;
+  }
+}
+export const updateMappingById = async (id, data) => {
+  try {
+    const response = await API.put(`${UPDATE_MAPPING_BY_ID}${id}`, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error updating mapping by ID:", error);
     throw error;
   }
 }
