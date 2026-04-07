@@ -3,9 +3,6 @@ import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { ArrowLeft, X } from "lucide-react";
-// import { createMapping } from "../api/service";
-// import { useState } from "react";
-// import Snackbars from "../component/Snackbars";
 
 export default function RegisterMappingPage({
   anchor = "right",
@@ -13,31 +10,31 @@ export default function RegisterMappingPage({
   onClose,
   steps,
   setSteps,
-  handlePipelineformSubmit
+  handlePipelineformSubmit,
 
 }) {
-    const addStep = () => setSteps([...steps, { type: "", config: {} }]);
-    const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
-  
-    const handleTypeChange = (index, type) => {
-      let config = {};
-      if (type === "transform") config = { transform: { mappings: [] } };
-      else if (type === "filter") config = { filter: { expression: "" } };
-      else if (type === "pivot")
-        config = { pivot: { row_fields: [], value_fields: [], field_aggregations: {}, column_names: {} } };
-      const updated = [...steps];
-      updated[index] = { type, config };
-      setSteps(updated);
-    };
-  
-    const updateStep = (index, newStep) => {
-      const updated = [...steps];
-      updated[index] = newStep;
-      setSteps(updated);
-    };
-  
-    const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
-   
+  const addStep = () => setSteps([...steps, { type: "", config: {} }]);
+  const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
+
+  const handleTypeChange = (index, type) => {
+    let config = {};
+    if (type === "transform") config = { transform: { mappings: [] } };
+    else if (type === "filter") config = { filter: { expression: "" } };
+    else if (type === "pivot")
+      config = { pivot: { row_fields: [], value_fields: [], field_aggregations: {}, column_names: {} } };
+    const updated = [...steps];
+    updated[index] = { type, config };
+    setSteps(updated);
+  };
+
+  const updateStep = (index, newStep) => {
+    const updated = [...steps];
+    updated[index] = newStep;
+    setSteps(updated);
+  };
+
+  const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
+
   return (
     <Drawer
       anchor={anchor}
@@ -47,11 +44,13 @@ export default function RegisterMappingPage({
     >
       <Box sx={{ width: "100%", padding: "10px" }}>
         {/* HEADER */}
-   
-      <div className="service-tracker-inner-page-header d-flex justify-content-between">
-          <div className="pb-header">
+
+        <div className="service-tracker-inner-page-header d-flex justify-content-between">
+          <div className="pb-header" onClick={() => {
+            onClose(false)
+          }}>
             <div className="pb-header-icon">
-              <ArrowLeft size={20} onClick={() => onClose(false)} className="cursor-pointer" />
+              <ArrowLeft size={20}  className="cursor-pointer" />
             </div>
             <div>
               <h1>Pipeline Builder</h1>
@@ -115,7 +114,10 @@ export default function RegisterMappingPage({
               <button
                 type="button"
                 className="btn btn-secondary w-100"
-                onClick={onClose}
+                onClick={() => {
+                  // setSteps([]);
+                  onClose(false)
+                }}
               >
                 Cancel
               </button>

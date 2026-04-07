@@ -19,6 +19,7 @@
   align-items: center;
   gap: 14px;
   margin-bottom: 36px;
+  cursor: pointer;
 }
 
 .pb-header-icon {

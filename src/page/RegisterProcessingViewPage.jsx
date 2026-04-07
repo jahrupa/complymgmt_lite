@@ -90,8 +90,6 @@ const RegisterProcessingViewPage = () => {
                 setLocationName(locationNameData || []);
                 const registerNameData = await fetchAllRegisterNames();
                 setRegisterName(registerNameData || []);
-                const pipelinebyApplicabilityIdData = await getPipelineByApplicabilityId(current?.applicability_id);
-                setSteps(pipelinebyApplicabilityIdData || []);
             } catch (error) {
                 // console.error("Error fetching data:", error);
             }
@@ -99,6 +97,19 @@ const RegisterProcessingViewPage = () => {
 
         fetchData();
     }, []);
+    useEffect(() => {
+        if (current?.applicability_id) {
+            const fetchPipeline = async () => {
+                try {
+                    const pipelineData = await getPipelineByApplicabilityId(current.applicability_id);
+                    setSteps(pipelineData?.config?.steps || []);
+                } catch (error) {
+                    // console.error("Error fetching pipeline data:", error);
+                }
+            }
+            fetchPipeline();
+        }
+    }, [current?.applicability_id])
     useEffect(() => {
         const fetchCompany = async () => {
             const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
@@ -235,6 +246,7 @@ const RegisterProcessingViewPage = () => {
         width: 120,
         pinned: 'left',
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+        editable: false,
         cellRenderer: (params) => (
             <div className="action-icons">
                 <EditIcon
@@ -600,7 +612,9 @@ const RegisterProcessingViewPage = () => {
             </div>
             <RegisterMappingPage
                 open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    setIsModalOpen(false);
+                }}
                 setSteps={setSteps}
                 steps={steps}
                 handlePipelineformSubmit={handlePipelineformSubmit}
