@@ -260,6 +260,7 @@ console.log(isEditing,steps?.length,"isEditing")
                 className="d-flex justify-content-around align-items-center"
                 style={{ height: "100%", width: "100%" }}
             >
+                
                 <EditIcon
                     fontSize="small"
                     style={{ cursor: "pointer" }}
