@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Toggle from '../component/Toggle';
 import { flattenObject } from '../../Utils/tableColUtils';
-import { createApplicability, createMapping, deleteApplicabilityById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, getPipelineByApplicabilityId, updateApplicabilityById, updateMappingById, uploadFileGolang } from '../api/service'
+import { createApplicability, createMapping, deleteApplicabilityById, deleteMappingById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, getPipelineByApplicabilityId, updateApplicabilityById, updateMappingById, uploadFileGolang } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css";
@@ -58,7 +58,7 @@ const RegisterProcessingViewPage = () => {
     const [source, setSource] = useState(null);
     const [steps, setSteps] = useState([]);
     const gridRef = useRef();
-console.log(isEditing,steps?.length,"isEditing")
+    console.log(steps, "isEditing")
     const [filteredData, setFilteredData] = useState([]);
 
     const handleFilterApply = (data) => {
@@ -98,18 +98,29 @@ console.log(isEditing,steps?.length,"isEditing")
     }, []);
 
     useEffect(() => {
+        if (isModalOpen === false) {
+            setCurrent((prev) => ({
+                ...prev,
+                applicability_id: null,
+            }));
+            setSteps([]);
+        }
         if (current?.applicability_id) {
             const fetchPipeline = async () => {
                 try {
                     const pipelineData = await getPipelineByApplicabilityId(current.applicability_id);
                     setSteps(pipelineData?.config?.steps || []);
+                    setIsEditing(pipelineData?.config?.steps?.length > 0);
+                    console.log(pipelineData?.config?.steps?.length,'pipelineData?.config?.steps?.length')
                 } catch (error) {
                     // console.error("Error fetching pipeline data:", error);
+                    setSteps([]);
+                    setIsEditing(false);
                 }
             }
             fetchPipeline();
         }
-    }, [current?.applicability_id]);
+    }, [current?.applicability_id, isModalOpen]);
     useEffect(() => {
         const fetchCompany = async () => {
             const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
@@ -161,6 +172,12 @@ console.log(isEditing,steps?.length,"isEditing")
         }
     }, [current?.company_id]);
 
+    // useEffect(() => {
+    //     if (steps.length > 0) {
+    //         setIsEditing(true);
+    //     }
+    // }, [steps.length])
+
     useEffect(() => {
         const fetchApplicabilityByLocationId = async () => {
             try {
@@ -185,6 +202,10 @@ console.log(isEditing,steps?.length,"isEditing")
             fetchApplicabilityByLocationId();
         }
     }, [current?.location_id]);
+
+    // useEffect(() => {
+    //     setIsEditing(steps.length > 0 ? true : false);
+    // }, [steps]);
 
     const generateDynamicColDefs = (data) => {
         if (!data || data.length === 0) return [];
@@ -243,44 +264,43 @@ console.log(isEditing,steps?.length,"isEditing")
     const actionCol = {
         headerName: 'Actions',
         field: 'actions',
-        width: 120,
+        width: 130,
         pinned: 'left',
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
         editable: false,
         cellRenderer: (params) => (
             <div
                 className="d-flex justify-content-around align-items-center"
-                style={{ height: "100%", width: "100%" }}
             >
-                <EditIcon
-                    fontSize="small"
-                    style={{ cursor: "pointer" }}
-                    className="action_icon"
+                <button
+                    className="btn btn-sm"
                     onClick={() => {
                         setIsEditing(true);
                         setApplicabilityModal(true);
                         setCurrent((prev) => ({ ...prev, applicability_id: params.data.applicability_id }));
                     }}
-                />
-                <Plus
-                    fontSize="small"
-                    style={{ cursor: "pointer" }}
-                    className="action_icon"
+                >
+                    <EditIcon fontSize="small" className="action_icon" />
+                </button>
+
+                <button
+                    className="btn btn-sm"
                     onClick={() => {
                         setCurrent((prev) => ({
                             ...prev,
                             applicability_id: params.data.applicability_id
                         }));
-                        setIsModalOpen(true)
-                        setIsEditing(steps?.length > 0 ? true : false);
+                        setIsModalOpen(true);
                     }}
-                />
-                <DeleteIcon
-                    fontSize="small"
-                    style={{ cursor: "pointer" }}
-                    className="action_icon"
+                >
+                    <Plus fontSize="small" className="action_icon" />
+                </button>
+                <button
+                    className="btn btn-sm"
                     onClick={() => handleDelete(params.data.applicability_id)}
-                />
+                >
+                    <DeleteIcon fontSize="small" className="action_icon" />
+                </button>
             </div>
         )
     };
@@ -476,10 +496,10 @@ console.log(isEditing,steps?.length,"isEditing")
         );
     }, []);
     const handlePipelineformSubmit = async () => {
-        const payload = { applicability_id: current?.applicability_id, steps };
+        const payload = { applicability_id: current?.applicability_id,config:{steps} };
         try {
-            isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
-            const result = await createMapping(payload);
+           const result = isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
+            // const result = await createMapping(payload);
             setIsSnackbarsOpen({
                 open: true,
                 vertical: "top",
@@ -493,6 +513,28 @@ console.log(isEditing,steps?.length,"isEditing")
                 vertical: "top",
                 horizontal: "center",
                 message: e?.response?.data?.message || "Failed to create mapping.",
+                severityType: "error",
+            });
+        }
+        setIsModalOpen(false);
+
+    };
+    const handleDeletePipeline = async () => {
+        try {
+            const result = await deleteMappingById(current?.applicability_id,);
+            setIsSnackbarsOpen({
+                open: true,
+                vertical: "top",
+                horizontal: "center",
+                message: result?.message || "Mapping deleted successfully!",
+                severityType: "success",
+            });
+        } catch (e) {
+            setIsSnackbarsOpen({
+                open: true,
+                vertical: "top",
+                horizontal: "center",
+                message: e?.response?.data?.message || "Failed to delete mapping.",
                 severityType: "error",
             });
         }
@@ -627,6 +669,8 @@ console.log(isEditing,steps?.length,"isEditing")
                 setSteps={setSteps}
                 steps={steps}
                 handlePipelineformSubmit={handlePipelineformSubmit}
+                handleDeletePipeline={handleDeletePipeline}
+                setCurrent={setCurrent}
             />
             <SmallSizeModal
                 crudForm={applicabilityForm}

@@ -11,6 +11,7 @@ export default function RegisterMappingPage({
   steps,
   setSteps,
   handlePipelineformSubmit,
+  handleDeletePipeline
 
 }) {
   const addStep = () => setSteps([...steps, { type: "", config: {} }]);
@@ -57,14 +58,19 @@ export default function RegisterMappingPage({
               <h1>Pipeline Builder</h1>
             </div>
           </div>
-          <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
-
+          <div className="d-flex gap-2">
+            <div>
+              <button type="submit" className="crud_btn" onClick={handleDeletePipeline}> Delete All</button>
+            </div>
+            <div>
+              <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
+            </div>
+          </div>
         </div>
-
         <Divider className="mb-3" />
 
         {/* Error Message */}
-        <div >
+        <div className="">
           <div className="pb-steps">
             {steps.length === 0 && (
               <div className="pb-empty">
