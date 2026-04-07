@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteModal from '../component/DeleteModal';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Toggle from '../component/Toggle';
 import { flattenObject } from '../../Utils/tableColUtils';
@@ -26,6 +27,8 @@ const RegisterProcessingViewPage = () => {
     const [companyName, setCompanyName] = useState([])
     const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([])
     const [locationName, setLocationName] = useState([])
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [applicabilityIdToDelete, setApplicabilityIdToDelete] = useState(null);
     const [registerName, setRegisterName] = useState([]);
     const [current, setCurrent] = useState(
         {
@@ -208,15 +211,19 @@ const RegisterProcessingViewPage = () => {
     };
 
 
-    const handleDelete = async (row) => {
+    const handleDelete = async () => {
         try {
-            const result = await deleteApplicabilityById(row);
+            const result = await deleteApplicabilityById(applicabilityIdToDelete);
+
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
                 message: result?.message || "Applicability deleted successfully!",
                 severityType: "success",
             });
+
+            setIsDeleteModalOpen(false);
+
         } catch (error) {
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -225,6 +232,7 @@ const RegisterProcessingViewPage = () => {
                 severityType: "error",
             });
         }
+        setIsDeleteModalOpen(false)
     };
 
     const actionCol = {
@@ -264,7 +272,10 @@ const RegisterProcessingViewPage = () => {
                     fontSize="small"
                     style={{ cursor: "pointer" }}
                     className="action_icon"
-                    onClick={() => handleDelete(params.data.applicability_id)}
+                    onClick={() => {
+                        setApplicabilityIdToDelete(params.data.applicability_id);
+                        setIsDeleteModalOpen(true);
+                    }}
                 />
             </div>
         )
@@ -483,11 +494,47 @@ const RegisterProcessingViewPage = () => {
             });
         }
     };
+    const deleteModal = () => {
+        return (
+            <div>
+                <div className='delete_message p-4'>
+                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this applicability?
+                </div>
+
+                <div className="row row-gap-2 mt-4">
+                    <div className='col-6'>
+                        <button
+                            type="button"
+                            className="btn-sm btn btn-secondary"
+                            onClick={() => setIsDeleteModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                    <div className='col-6 d-flex justify-content-end'>
+                        <button
+                            type="button"
+                            className="btn-sm btn btn-primary"
+                            onClick={handleDelete}
+                        >
+                            Yes, I'm sure
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
     return (
         <div className="app-container">
             <Snackbars
                 issnackbarsOpen={issnackbarsOpen}
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
+            />
+            <DeleteModal
+                deleteForm={deleteModal}
+                deleteTitle='Delete Applicability'
+                isModalOpen={isDeleteModalOpen}
+                setIsModalOpen={setIsDeleteModalOpen}
             />
             <div className="service-tracker-inner-page-header d-flex justify-content-between">
                 <h1>Register Applicability</h1>
