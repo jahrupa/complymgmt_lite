@@ -241,6 +241,8 @@ export const GET_APPLICABILITY_BY_GROUP_ID='/api/v2/register_processing/view/app
 export const UPDATE_APPLICABILITY_BY_ID='api/v2/register_processing/update/applicability/'
 export const DELETE_APPLICABILITY_BY_ID='/api/v2/register_processing/delete/applicability/'
 export const GET_REGISTER_APPLICABILITY_BY_ID='/api/v2/register_processing/view/applicability/69c1702ba7812cd783d815dc'
-
+export const GET_PIPELINE_BY_APPLICABILITY_ID='/api/v2/register_processing/view/mapping/'
+export const DELETE_MAPPING_BY_ID='/api/v2/register_processing/delete/mapping/'
+export const UPDATE_MAPPING_BY_ID='/api/v2/register_processing/update/mapping/'
 
 

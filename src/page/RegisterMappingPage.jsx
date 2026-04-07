@@ -3,9 +3,6 @@ import Drawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { ArrowLeft, X } from "lucide-react";
-// import { createMapping } from "../api/service";
-// import { useState } from "react";
-// import Snackbars from "../component/Snackbars";
 
 export default function RegisterMappingPage({
   anchor = "right",
@@ -13,17 +10,9 @@ export default function RegisterMappingPage({
   onClose,
   steps,
   setSteps,
-  handlePipelineformSubmit
+  handlePipelineformSubmit,
 
 }) {
-  //   const [steps, setSteps] = useState([]);
-  // const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-  //   open: false,
-  //   vertical: "top",
-  //   horizontal: "center",
-  //   message: "",
-  //   severityType: "",
-  // });
   const addStep = () => setSteps([...steps, { type: "", config: {} }]);
   const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
 
@@ -45,27 +34,7 @@ export default function RegisterMappingPage({
   };
 
   const typeLabel = { transform: "TRANSFORM", filter: "FILTER", pivot: "PIVOT" };
-  // const handleSubmit = async () => {
-  //   const payload = { steps };
-  //   try{
-  //    const result = await createMapping(payload);
-  //     setIsSnackbarsOpen({
-  //       open: true,
-  //       vertical: "top",
-  //       horizontal: "center",
-  //       message: result?.message || "Mapping created successfully!",
-  //       severityType: "success",
-  //     });
-  //   }catch(e){
-  //     setIsSnackbarsOpen({
-  //       open: true,
-  //       vertical: "top",
-  //       horizontal: "center",
-  //       message: e?.message || "Failed to create mapping.",
-  //       severityType: "error",
-  //     });
-  //   }
-  // };
+
   return (
     <Drawer
       anchor={anchor}
@@ -77,11 +46,10 @@ export default function RegisterMappingPage({
         {/* HEADER */}
 
         <div className="service-tracker-inner-page-header d-flex justify-content-between">
-          {/* <Snackbars
-                issnackbarsOpen={issnackbarsOpen}
-                setIsSnackbarsOpen={setIsSnackbarsOpen}
-              /> */}
-          <div className="pb-header">
+          <div className="pb-header" onClick={() => {
+            onClose(false);
+            setSteps([]);
+          }}>
             <div className="pb-header-icon">
               <ArrowLeft size={20} onClick={() => onClose(false)} className="cursor-pointer" style={{ cursor: "pointer" }} />
             </div>
@@ -147,7 +115,10 @@ export default function RegisterMappingPage({
               <button
                 type="button"
                 className="btn btn-secondary w-100"
-                onClick={onClose}
+                onClick={() => {
+                  setSteps([]);
+                  onClose(false)
+                }}
               >
                 Cancel
               </button>

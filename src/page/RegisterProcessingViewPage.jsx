@@ -4,7 +4,7 @@ import DeleteModal from '../component/DeleteModal';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Toggle from '../component/Toggle';
 import { flattenObject } from '../../Utils/tableColUtils';
-import { createApplicability, createMapping, deleteApplicabilityById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, updateApplicabilityById, uploadFileGolang } from '../api/service'
+import { createApplicability, createMapping, deleteApplicabilityById, fetchAllFiles, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, getPipelineByApplicabilityId, updateApplicabilityById, updateMappingById, uploadFileGolang } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css";
@@ -60,9 +60,8 @@ const RegisterProcessingViewPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [source, setSource] = useState(null);
     const [steps, setSteps] = useState([]);
-
     const gridRef = useRef();
-
+console.log(isEditing,steps?.length,"isEditing")
     const [filteredData, setFilteredData] = useState([]);
 
     const handleFilterApply = (data) => {
@@ -100,6 +99,20 @@ const RegisterProcessingViewPage = () => {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (current?.applicability_id) {
+            const fetchPipeline = async () => {
+                try {
+                    const pipelineData = await getPipelineByApplicabilityId(current.applicability_id);
+                    setSteps(pipelineData?.config?.steps || []);
+                } catch (error) {
+                    // console.error("Error fetching pipeline data:", error);
+                }
+            }
+            fetchPipeline();
+        }
+    }, [current?.applicability_id]);
     useEffect(() => {
         const fetchCompany = async () => {
             const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
@@ -241,6 +254,7 @@ const RegisterProcessingViewPage = () => {
         width: 120,
         pinned: 'left',
         cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
+        editable: false,
         cellRenderer: (params) => (
             <div
                 className="d-flex justify-content-around align-items-center"
@@ -266,6 +280,7 @@ const RegisterProcessingViewPage = () => {
                             applicability_id: params.data.applicability_id
                         }));
                         setIsModalOpen(true)
+                        setIsEditing(steps?.length > 0 ? true : false);
                     }}
                 />
                 <DeleteIcon
@@ -334,7 +349,6 @@ const RegisterProcessingViewPage = () => {
 
     const closeModal = () => {
         setApplicabilityModal(false);
-        setCurrent({});
     };
     const handleApplicability = async () => {
         const payload = {
@@ -475,6 +489,7 @@ const RegisterProcessingViewPage = () => {
     const handlePipelineformSubmit = async () => {
         const payload = { applicability_id: current?.applicability_id, steps };
         try {
+            isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
             const result = await createMapping(payload);
             setIsSnackbarsOpen({
                 open: true,
@@ -483,16 +498,17 @@ const RegisterProcessingViewPage = () => {
                 message: result?.message || "Mapping created successfully!",
                 severityType: "success",
             });
-            setIsModalOpen(false);
         } catch (e) {
             setIsSnackbarsOpen({
                 open: true,
                 vertical: "top",
                 horizontal: "center",
-                message: e?.message || "Failed to create mapping.",
+                message: e?.response?.data?.message || "Failed to create mapping.",
                 severityType: "error",
             });
         }
+        setIsModalOpen(false);
+
     };
     const deleteModal = () => {
         return (
@@ -652,7 +668,9 @@ const RegisterProcessingViewPage = () => {
             </div>
             <RegisterMappingPage
                 open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => {
+                    setIsModalOpen(false);
+                }}
                 setSteps={setSteps}
                 steps={steps}
                 handlePipelineformSubmit={handlePipelineformSubmit}
