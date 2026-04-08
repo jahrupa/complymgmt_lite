@@ -25,35 +25,34 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
-import SmallSizeModal from "../component/SmallSizeModal";
-import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
-import { useRef } from "react";
-import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
-import { Plus } from "lucide-react";
-import RegisterMappingPage from "./RegisterMappingPage";
-import Snackbars from "../component/Snackbars";
-
+import SmallSizeModal from '../component/SmallSizeModal';
+import { AnimatedSearchBar } from '../component/AnimatedSearchBar';
+import { useRef } from 'react';
+import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import { Plus } from 'lucide-react';
+import RegisterMappingPage from './RegisterMappingPage';
+import Snackbars from '../component/Snackbars';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const RegisterProcessingViewPage = () => {
-  const [groupHoldingName, setGroupHoldingName] = useState([]);
-  const [companyName, setCompanyName] = useState([]);
-  const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
-  const [locationName, setLocationName] = useState([]);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [applicabilityIdToDelete, setApplicabilityIdToDelete] = useState(null);
+  const [groupHoldingName, setGroupHoldingName] = useState([])
+  const [companyName, setCompanyName] = useState([])
+  const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([])
+  const [locationName, setLocationName] = useState([])
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [registerName, setRegisterName] = useState([]);
-  const [current, setCurrent] = useState({
-    group_name: "",
-    group_holding_id: null,
-    company_name: "",
-    company_id: null,
-    location_name: "",
-    location_id: null,
-    applicability_id: null,
-    register_id: null,
-    register_name: "",
-  });
+  const [current, setCurrent] = useState(
+    {
+      group_name: "",
+      group_holding_id: null,
+      company_name: "",
+      company_id: null,
+      location_name: "",
+      location_id: null,
+      applicability_id: null,
+      register_id: null,
+      register_name: "",
+    });
   const [applicabilityModal, setApplicabilityModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -67,18 +66,17 @@ const RegisterProcessingViewPage = () => {
     applicabilityByLocationId: [],
     applicabilityByCompanyId: [],
     applicabilityByGroupId: [],
-  });
+  })
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [source, setSource] = useState(null);
   const [steps, setSteps] = useState([]);
   const gridRef = useRef();
-  console.log(steps, "isEditing");
   const [filteredData, setFilteredData] = useState([]);
-  console.log(filteredData, "filteredData");
+
   const handleFilterApply = (data) => {
-    console.log(data, "data1");
     setFilteredData(data);
   };
+
 
   // "location" | "company" | "group"
   // const [columnDefs, setColumnDefs] = useState([]);
@@ -93,7 +91,7 @@ const RegisterProcessingViewPage = () => {
       return [];
     }
   }, [source, dataById]);
-  console.log(data, "data");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -127,10 +125,6 @@ const RegisterProcessingViewPage = () => {
           );
           setSteps(pipelineData?.config?.steps || []);
           setIsEditing(pipelineData?.config?.steps?.length > 0);
-          console.log(
-            pipelineData?.config?.steps?.length,
-            "pipelineData?.config?.steps?.length",
-          );
         } catch (error) {
           // console.error("Error fetching pipeline data:", error);
           setSteps([]);
@@ -139,18 +133,16 @@ const RegisterProcessingViewPage = () => {
       };
       fetchPipeline();
     }
-  }, [current?.applicability_id, isModalOpen]);
+  }, [isModalOpen]);
   useEffect(() => {
     const fetchCompany = async () => {
       const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
-      const applicabilityByGroupId = await getApplicabilityByGroupId(
-        current?.group_holding_id,
-      );
+      const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
 
       setCompanyName(data || []);
-      setDataById((prev) => ({
+      setDataById(prev => ({
         ...prev,
-        applicabilityByGroupId: applicabilityByGroupId || [],
+        applicabilityByGroupId: applicabilityByGroupId || []
       }));
 
       setSource("group");
@@ -159,15 +151,15 @@ const RegisterProcessingViewPage = () => {
     if (current?.group_holding_id) {
       fetchCompany();
     } else {
-      // 🔥 Group None case
+      //Group None case
       setSource(null);
       setCompanyName([]);
       setLocationNameByCompanyId([]);
-      setDataById((prev) => ({
+      setDataById(prev => ({
         ...prev,
         applicabilityByGroupId: [],
         applicabilityByCompanyId: [],
-        applicabilityByLocationId: [],
+        applicabilityByLocationId: []
       }));
     }
   }, [current?.group_holding_id]);
@@ -176,15 +168,10 @@ const RegisterProcessingViewPage = () => {
     const fetchLocationByCompanyId = async () => {
       try {
         const data = await getLocationByCompanyId(current?.company_id);
-        const applicabilityByCompanyId = await getApplicabilityByCompanyId(
-          current?.company_id,
-        );
+        const applicabilityByCompanyId = await getApplicabilityByCompanyId(current?.company_id);
         if (data) {
           setLocationNameByCompanyId(data);
-          setDataById((prev) => ({
-            ...prev,
-            applicabilityByCompanyId: applicabilityByCompanyId || [],
-          }));
+          setDataById((prev) => ({ ...prev, applicabilityByCompanyId: applicabilityByCompanyId || [] }));
           setSource("company");
         }
       } catch {
@@ -198,12 +185,6 @@ const RegisterProcessingViewPage = () => {
     }
   }, [current?.company_id]);
 
-  // useEffect(() => {
-  //     if (steps.length > 0) {
-  //         setIsEditing(true);
-  //     }
-  // }, [steps.length])
-
   useEffect(() => {
     const fetchApplicabilityByLocationId = async () => {
       try {
@@ -211,14 +192,14 @@ const RegisterProcessingViewPage = () => {
 
         setDataById((prev) => ({
           ...prev,
-          applicabilityByLocationId: data || [],
+          applicabilityByLocationId: data || []
         }));
 
         setSource("location");
       } catch {
         setDataById((prev) => ({
           ...prev,
-          applicabilityByLocationId: [],
+          applicabilityByLocationId: []
         }));
         // setSource("");
       }
@@ -228,10 +209,6 @@ const RegisterProcessingViewPage = () => {
       fetchApplicabilityByLocationId();
     }
   }, [current?.location_id]);
-
-  // useEffect(() => {
-  //     setIsEditing(steps.length > 0 ? true : false);
-  // }, [steps]);
 
   const generateDynamicColDefs = (data) => {
     if (!data || data.length === 0) return [];
@@ -267,34 +244,37 @@ const RegisterProcessingViewPage = () => {
       .filter(Boolean);
   };
 
-  const handleDelete = async (row) => {
+
+  const handleDelete = async () => {
     try {
-      const result = await deleteApplicabilityById(row);
+      const result = await deleteApplicabilityById(current?.applicability_id);
+
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
         message: result?.message || "Applicability deleted successfully!",
         severityType: "success",
       });
-       setIsDeleteModalOpen(false);
+
+      setIsDeleteModalOpen(false);
+
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message:
-          error?.response?.data?.message || "Failed to delete applicability.",
+        message: error?.response?.data?.message || "Failed to delete applicability.",
         severityType: "error",
       });
     }
-     setIsDeleteModalOpen(false)
+    setIsDeleteModalOpen(false)
   };
 
   const actionCol = {
-    headerName: "Actions",
-    field: "actions",
+    headerName: 'Actions',
+    field: 'actions',
     width: 130,
-    pinned: "left",
-    cellStyle: { backgroundColor: "rgb(252 229 205 / 64%)" },
+    pinned: 'left',
+    cellStyle: { backgroundColor: 'rgb(252 229 205 / 64%)' },
     editable: false,
     cellRenderer: (params) => (
       <div className="d-flex justify-content-around align-items-center">
@@ -326,24 +306,19 @@ const RegisterProcessingViewPage = () => {
         </button>
         <button
           className="btn btn-sm"
-          onClick={() => handleDelete(params.data.applicability_id)}
+          onClick={() => {
+            setCurrent((prev) => ({
+              ...prev,
+              applicability_id: params.data.applicability_id,
+            }));
+            setIsDeleteModalOpen(true);
+          }}
         >
           <DeleteIcon fontSize="small" className="action_icon" />
         </button>
       </div>
-    ),
+    )
   };
-
-  // const statusCol = {
-  //     headerName: 'Status',
-  //     field: 'common_attributes.is_active',
-  //     pinned: 'right',
-  //     valueGetter: (params) =>
-  //         params.data?.common_attributes?.is_active,
-  //     cellRenderer: (params) => (
-  //         <Toggle checked={!!params.value} />
-  //     )
-  // };
 
   const columnDefs = useMemo(() => {
     if (!data.length) return [];
@@ -355,30 +330,17 @@ const RegisterProcessingViewPage = () => {
     ];
   }, [data]);
 
-  // const stateOnlyRowData = useMemo(() => {
-  //     const uniqueStates = [
-  //         ...new Set(
-  //             data
-  //                 .map(item => item.state)
-  //                 .filter(Boolean)
-  //         )
-  //     ];
+  const stateOnlyRowData = useMemo(() => {
+    const uniqueStates = [
+      ...new Set(
+        data
+          .map(item => item.state)
+          .filter(Boolean)
+      )
+    ];
 
-  //     return uniqueStates.map(s => ({ state: s }));
-  // }, [data]);
-
-  // const columnDefs = useMemo(() => {
-  //     if (!data.length) return [];
-
-  //     return Object.keys(data[0]).map((key) => ({
-  //         headerName: key.replace(/_/g, " ").toUpperCase(),
-  //         field: key,
-  //         sortable: true,
-  //         filter: true,
-  //         resizable: true,
-  //         flex: 1,
-  //     }));
-  // }, [data]);
+    return uniqueStates.map(s => ({ state: s }));
+  }, [data]);
 
   const openModal = () => {
     setApplicabilityModal(true);
@@ -392,14 +354,13 @@ const RegisterProcessingViewPage = () => {
       location_id: current?.location_id,
       register_id: current?.register_id,
     };
-
     try {
       let result;
 
-      if (isEditing && current?.applicability_id) {
+      if (isEditing) {
         result = await updateApplicabilityById(
           current.applicability_id,
-          payload,
+          payload
         );
       } else {
         result = await createApplicability(payload);
@@ -453,7 +414,7 @@ const RegisterProcessingViewPage = () => {
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedLocation = locationName.find(
-                    (g) => g.name === selectedName,
+                    (g) => g.name === selectedName
                   );
                   setCurrent((prev) => ({
                     ...prev,
@@ -464,14 +425,11 @@ const RegisterProcessingViewPage = () => {
                 names={locationName}
               />
 
-              <SingleSelectTextField
-                name="register_name"
-                label="Register"
-                value={current?.register_name}
+              <SingleSelectTextField name="register_name" label="Register" value={current?.register_name}
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedRegister = registerName.find(
-                    (g) => g.register_name === selectedName,
+                    (g) => g.register_name === selectedName
                   );
                   setCurrent((prev) => ({
                     ...prev,
@@ -484,6 +442,7 @@ const RegisterProcessingViewPage = () => {
                   name: item.register_name,
                 }))}
               />
+
             </div>
           </span>
         </div>
@@ -516,25 +475,20 @@ const RegisterProcessingViewPage = () => {
     sortable: true,
     filter: true,
     editable: true,
-    headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
+    headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
 
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
-      "quickFilterText",
-      document.getElementById("filter-text-box").value,
+      'quickFilterText',
+      document.getElementById('filter-text-box').value
     );
   }, []);
   const handlePipelineformSubmit = async () => {
-    const payload = {
-      applicability_id: current?.applicability_id,
-      config: { steps },
-    };
+    const payload = { applicability_id: current?.applicability_id, steps };
     try {
-      const result = isEditing
-        ? await updateMappingById(current?.applicability_id, payload)
-        : await createMapping(payload);
-      // const result = await createMapping(payload);
+      isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
+      const result = await createMapping(payload);
       setIsSnackbarsOpen({
         open: true,
         vertical: "top",
@@ -552,6 +506,7 @@ const RegisterProcessingViewPage = () => {
       });
     }
     setIsModalOpen(false);
+
   };
   const handleDeletePipeline = async () => {
     try {
@@ -609,15 +564,18 @@ const RegisterProcessingViewPage = () => {
         issnackbarsOpen={issnackbarsOpen}
         setIsSnackbarsOpen={setIsSnackbarsOpen}
       />
-       <DeleteModal
-                deleteForm={deleteModal}
-                deleteTitle='Delete Applicability'
-                isModalOpen={isDeleteModalOpen}
-                setIsModalOpen={setIsDeleteModalOpen}
-            />
+      <DeleteModal
+        deleteForm={deleteModal}
+        deleteTitle='Delete Applicability'
+        isModalOpen={isDeleteModalOpen}
+        setIsModalOpen={setIsDeleteModalOpen}
+      />
       <div className="service-tracker-inner-page-header d-flex justify-content-between">
         <h1>Register Applicability</h1>
-        <button className="crud_btn" onClick={openModal}>
+        <button className="crud_btn" onClick={() => {
+          setIsEditing(false);
+          openModal();
+        }}>
           Create Applicability
         </button>
       </div>
@@ -629,37 +587,32 @@ const RegisterProcessingViewPage = () => {
           onChange={(e) => {
             const selectedName = e.target.value;
             const matchedGroup = groupHoldingName.find(
-              (g) => g.name === selectedName,
+              (g) => g.name === selectedName
             );
             setCurrent((prev) => ({
               ...prev,
               group_name: selectedName,
               group_holding_id: matchedGroup?._id || null,
-              company_name: "",
-              location_name: "",
+              company_name: '',
+              location_name: '',
             }));
-            dataById.applicabilityByGroupId.length > 0
-              ? setSource("group")
-              : "";
+            dataById.applicabilityByGroupId.length > 0 ? setSource("group") : "";
           }}
           names={groupHoldingName}
         />
 
-        <SingleSelectTextField
-          name="company_name"
-          label="Company Name"
-          value={current?.company_name}
+        <SingleSelectTextField name="company_name" label="Company Name" value={current?.company_name}
           onChange={(e) => {
             const selectedName = e.target.value;
             const matchedCompany = companyName.find(
-              (g) => g.company_name === selectedName,
+              (g) => g.company_name === selectedName
             );
 
             setCurrent((prev) => ({
               ...prev,
               company_name: selectedName,
               company_id: matchedCompany?._id || null,
-              location_name: "",
+              location_name: '',
               location_id: null,
             }));
 
@@ -675,14 +628,11 @@ const RegisterProcessingViewPage = () => {
             name: item.company_name,
           }))}
         />
-        <SingleSelectTextField
-          name="location_name"
-          label="Location"
-          value={current?.location_name}
+        <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
           onChange={(e) => {
             const selectedName = e.target.value;
             const matchedLocation = locationNameByCompanyId.find(
-              (g) => g.location_name === selectedName,
+              (g) => g.location_name === selectedName
             );
 
             setCurrent((prev) => ({
@@ -706,8 +656,8 @@ const RegisterProcessingViewPage = () => {
           }))}
         />
       </div>
-      <div className="table_div p-3">
-        <div className="d-flex align-items-center gap-2">
+      <div className='table_div p-3'>
+        <div className='d-flex align-items-center gap-2'>
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
@@ -716,14 +666,14 @@ const RegisterProcessingViewPage = () => {
           />
 
           <MultiSelectFilter
-            rowData={filteredData.length ? filteredData : data}
+            rowData={stateOnlyRowData}
             onFilterApply={handleFilterApply}
           />
         </div>
 
         <div
           className="ag-theme-quartz"
-          style={{ height: "600px", width: "100%", marginTop: "1rem" }}
+          style={{ height: '600px', width: '100%', marginTop: '1rem' }}
         >
           <AgGridReact
             theme="legacy"
@@ -745,8 +695,6 @@ const RegisterProcessingViewPage = () => {
         setSteps={setSteps}
         steps={steps}
         handlePipelineformSubmit={handlePipelineformSubmit}
-        handleDeletePipeline={handleDeletePipeline}
-        setCurrent={setCurrent}
       />
       <SmallSizeModal
         crudForm={applicabilityForm}
@@ -758,7 +706,7 @@ const RegisterProcessingViewPage = () => {
         closeModal={closeModal}
       />
     </div>
-  );
-};
+  )
+}
 
-export default RegisterProcessingViewPage;
+export default RegisterProcessingViewPage
