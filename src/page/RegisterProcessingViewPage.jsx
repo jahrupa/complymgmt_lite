@@ -3,7 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteModal from '../component/DeleteModal';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { flattenObject } from '../../Utils/tableColUtils';
-import { createApplicability, createMapping, deleteApplicabilityById, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, getPipelineByApplicabilityId, updateApplicabilityById, updateMappingById, uploadFileGolang } from '../api/service'
+import { createApplicability, createMapping, deleteApplicabilityById, fetchAllGroupHolding, fetchAllLocationName, fetchAllRegisterNames, fetchCompaniesNameByGroupId, getApplicabilityByCompanyId, getApplicabilityByGroupId, getApplicabilityByLocationId, getLocationByCompanyId, getPipelineByApplicabilityId, updateApplicabilityById, updateMappingById } from '../api/service'
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css";
@@ -24,8 +24,6 @@ const RegisterProcessingViewPage = () => {
   const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([])
   const [locationName, setLocationName] = useState([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [applicabilityIdToDelete, setApplicabilityIdToDelete] = useState(null);
-  console.log(applicabilityIdToDelete, 'applicabilityIdToDelete')
   const [registerName, setRegisterName] = useState([]);
   const [current, setCurrent] = useState(
     {
@@ -39,10 +37,8 @@ const RegisterProcessingViewPage = () => {
       register_id: null,
       register_name: "",
     });
-  console.log(current, 'current')
   const [applicabilityModal, setApplicabilityModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  console.log(isEditing, 'isEditing')
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: "top",
