@@ -3,6 +3,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { createRegister } from '../api/service';
 import Snackbars from '../component/Snackbars';
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const CreateRegister = () => {
   const [formData, setFormData] = useState({
@@ -155,10 +156,11 @@ const CreateRegister = () => {
 
             <button
               type="button"
-              className="btn btn-success"
+              
+              className="btn btn-primary"
               onClick={addHeader}
             >
-              ➕ Add Header
+              + Add Header
             </button>
           </div>
 
@@ -179,7 +181,7 @@ const CreateRegister = () => {
                   className="btn"
                   onClick={() => removeHeader(index)}
                 >
-                  ❌
+                   <DeleteIcon fontSize="small"style={{fontSize:20,color:'#0a5881'}} />
                 </button>
               </div>
 
