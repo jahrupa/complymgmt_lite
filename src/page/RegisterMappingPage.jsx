@@ -11,7 +11,8 @@ export default function RegisterMappingPage({
   steps,
   setSteps,
   handlePipelineformSubmit,
-  handleDeletePipeline
+  handleDeletePipeline,
+  isEditing,
 
 }) {
   const addStep = () => setSteps([...steps, { type: "", config: {} }]);
@@ -60,7 +61,7 @@ export default function RegisterMappingPage({
           </div>
           <div className="d-flex gap-2">
             <div>
-              <button type="submit" className="crud_btn" onClick={handleDeletePipeline}> Delete All</button>
+              <button type="submit" className="crud_btn" style={isEditing === false ? { cursor: "not-allowed" } : {}} onClick={handleDeletePipeline} disabled={isEditing === false}> Delete All</button>
             </div>
             <div>
               <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
