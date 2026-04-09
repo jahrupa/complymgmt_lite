@@ -485,7 +485,7 @@ const RegisterProcessingViewPage = () => {
     );
   }, []);
   const handlePipelineformSubmit = async () => {
-    const payload = { applicability_id: current?.applicability_id, steps };
+    const payload = { applicability_id: current?.applicability_id, config: { steps } };
     try {
       isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
       const result = await createMapping(payload);
