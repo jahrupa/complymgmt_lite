@@ -1,6 +1,6 @@
-import React, { useState, } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../style/sidebar.css';
-import { Link, Outlet, } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import DomainAddOutlinedIcon from '@mui/icons-material/DomainAddOutlined';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
@@ -19,59 +19,59 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Layers, PanelsRightBottom, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 export const RegisterApplicabilityIcon = ({ active }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    <path d="M9 12l2 2 4-4" />
-  </svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <path d="M9 12l2 2 4-4" />
+    </svg>
 );
 
 export const ProcessRegisterIcon = ({ active }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    <path d="M3 12h18M12 3v18" />
-    <path d="M6 6l12 12" />
-  </svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <path d="M3 12h18M12 3v18" />
+        <path d="M6 6l12 12" />
+    </svg>
 );
 
 export const CreateRegisterIcon = ({ active }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    <line x1="12" y1="8" x2="12" y2="16" />
-    <line x1="8" y1="12" x2="16" y2="12" />
-  </svg>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={active ? 'side-bar-icon-active' : 'side-bar-icon'}
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
+    </svg>
 );
 function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
     const [openDropdown, setOpenDropdown] = useState(null);
@@ -99,27 +99,38 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 
     ];
-    const serviceTracker = [
-        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers' },
+    const serviceTracker = useMemo(() => [
+        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers', parent: 'serviceTracker' },
         ...(userRole === 'Admin' || userRole === 'Super-Admin'
             ? [{
                 icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
                 label: 'Tracker Access',
-                link: 'service_tracker_access'
+                link: 'service_tracker_access',
+                parent: 'serviceTracker'
             }]
             : []
         ),
-    ];
+    ], []);
     // Icons.js
 
-    const registerProcessing = [
-        { icon: (active) => <CreateRegisterIcon active={active} />, label: 'Create Register', link: 'create_register' },
-        { icon: (active) => <RegisterApplicabilityIcon active={active} />, label: 'Register Applicability', link: 'register' },
-        { icon: (active) => <ProcessRegisterIcon active={active} />, label: 'Process Register', link: 'process_register' },
+    const registerProcessing = useMemo(() => [
+        { icon: (active) => <CreateRegisterIcon active={active} />, label: 'Create Register', link: 'create_register', parent: 'registerProcessing' },
+        { icon: (active) => <RegisterApplicabilityIcon active={active} />, label: 'Register Applicability', link: 'register', parent: 'registerProcessing' },
+        { icon: (active) => <ProcessRegisterIcon active={active} />, label: 'Process Register', link: 'process_register', parent: 'registerProcessing' },
         // { icon: (active) => <CreateMappingIcon active={active} />, label: 'Create Mapping', link: 'create_mapping' },
         // { icon: (active) => <CreateApplicabilityIcon active={active} />, label: 'Create Applicability', link: 'create_applicability' },
 
-    ];
+    ], []);
+    useEffect(() => {
+        const allMenus = [...serviceTracker, ...registerProcessing];
+
+        const current = allMenus.find(item =>
+            location.pathname.includes(item.link)
+        );
+
+        setOpenDropdown(current?.parent || null);
+    }, [location.pathname, serviceTracker, registerProcessing]);
+
     const handleDropdownToggle = (name) => {
         setOpenDropdown(prev => (prev === name ? null : name));
     };
