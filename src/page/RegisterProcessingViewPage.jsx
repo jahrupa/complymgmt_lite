@@ -57,7 +57,6 @@ const RegisterProcessingViewPage = () => {
     });
   const [applicabilityModal, setApplicabilityModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  console.log(isEditing,'isEditing')
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: "top",

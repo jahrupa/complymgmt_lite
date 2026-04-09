@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../style/sidebar.css';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import DomainAddOutlinedIcon from '@mui/icons-material/DomainAddOutlined';
 import DashboardCustomizeOutlinedIcon from '@mui/icons-material/DashboardCustomizeOutlined';
@@ -16,7 +16,7 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { Layers, PanelsRightBottom, ScanEye } from 'lucide-react';
+import { Layers, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 export const RegisterApplicabilityIcon = ({ active }) => (
     <svg
