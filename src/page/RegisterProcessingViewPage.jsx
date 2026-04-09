@@ -529,35 +529,36 @@ const RegisterProcessingViewPage = () => {
     }
     setIsModalOpen(false);
   };
-   const deleteModal = () => {
-        return (
-            <div>
-                <div className='delete_message p-4'>
-                    Are you sure you want to delete <DeleteIcon className='action_icon' /> this applicability?
-                </div>
+  const deleteModal = () => {
+    return (
+      <div>
+        <div className='delete_message p-4'>
+          Are you sure you want to delete <DeleteIcon className='action_icon' /> this applicability?
+        </div>
 
-                <div className="row row-gap-2 mt-4">
-                    <div className='col-6'>
-                        <button
-                            type="button"
-                            className="btn-sm btn btn-secondary"
-                            onClick={() => setIsDeleteModalOpen(false)}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                    <div className='col-6 d-flex justify-content-end'>
-                        <button
-                            type="button"
-                            className="btn-sm btn btn-primary"
-                            onClick={handleDelete}
-                        >
-                            Yes, I'm sure
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );    };
+        <div className="row row-gap-2 mt-4">
+          <div className='col-6'>
+            <button
+              type="button"
+              className="btn-sm btn btn-secondary"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              Cancel
+            </button>
+          </div>
+          <div className='col-6 d-flex justify-content-end'>
+            <button
+              type="button"
+              className="btn-sm btn btn-primary"
+              onClick={handleDelete}
+            >
+              Yes, I'm sure
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   return (
     <div className="app-container">
       <Snackbars
