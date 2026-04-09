@@ -52,9 +52,12 @@ const RegisterProcessingViewPage = () => {
       applicability_id: null,
       register_id: null,
       register_name: "",
+      applicability_location_name: "",
+      applicability_location_id: null,
     });
   const [applicabilityModal, setApplicabilityModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  console.log(isEditing,'isEditing')
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: "top",
@@ -348,10 +351,18 @@ const RegisterProcessingViewPage = () => {
 
   const closeModal = () => {
     setApplicabilityModal(false);
+     setCurrent((prev) => ({
+      ...prev,
+      applicability_location_name: "",
+      applicability_location_id: "",
+      register_name: "",
+      register_id: "",
+      applicability_id: "",
+    }));
   };
   const handleApplicability = async () => {
     const payload = {
-      location_id: current?.location_id,
+      location_id: current?.applicability_location_id,
       register_id: current?.register_id,
     };
     try {
@@ -391,12 +402,14 @@ const RegisterProcessingViewPage = () => {
       });
     }
 
-    setCurrent({
-      location_id: null,
-      register_id: null,
-      location_name: "",
+    setCurrent((prev) => ({
+      ...prev,
+      applicability_location_name: "",
+      applicability_location_id: "",
       register_name: "",
-    });
+      register_id: "",
+      applicability_id: "",
+    }));
 
     setApplicabilityModal(false);
   };
@@ -408,9 +421,9 @@ const RegisterProcessingViewPage = () => {
           <span>
             <div className="d-flex gap-3">
               <SingleSelectTextField
-                name="location_name"
+                name="applicability_location_name"
                 label="Location"
-                value={current.location_name}
+                value={current.applicability_location_name}
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedLocation = locationName.find(
@@ -418,8 +431,8 @@ const RegisterProcessingViewPage = () => {
                   );
                   setCurrent((prev) => ({
                     ...prev,
-                    location_name: selectedName,
-                    location_id: matchedLocation?._id || null,
+                    applicability_location_name: selectedName,
+                    applicability_location_id: matchedLocation?._id || null,
                   }));
                 }}
                 names={locationName}
@@ -487,8 +500,7 @@ const RegisterProcessingViewPage = () => {
   const handlePipelineformSubmit = async () => {
     const payload = { applicability_id: current?.applicability_id, config: { steps } };
     try {
-      isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
-      const result = await createMapping(payload);
+       const result= isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
       setIsSnackbarsOpen({
         open: true,
         vertical: "top",
@@ -696,6 +708,8 @@ const RegisterProcessingViewPage = () => {
         setSteps={setSteps}
         steps={steps}
         handlePipelineformSubmit={handlePipelineformSubmit}
+        handleDeletePipeline={handleDeletePipeline}
+        isEditing={isEditing}
       />
       <SmallSizeModal
         crudForm={applicabilityForm}
