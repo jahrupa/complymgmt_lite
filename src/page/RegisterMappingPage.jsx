@@ -187,6 +187,8 @@ function AggregationInput({ value = {}, onChange }) {
                   <option value="COUNT">COUNT</option>
                   <option value="AVERAGE">AVERAGE</option>
                   <option value="SUM">SUM</option>
+                  <option value="MIN">MIN</option>
+                  <option value="MAX">MAX</option>
                 </select>
                 <button className="pb-delete-btn" style={{ width: 28, height: 28, fontSize: 12 }} onClick={() => removeAgg(key, j)}>✕</button>
               </div>
@@ -259,6 +261,9 @@ function TransformUI({ step, update }) {
             <option value="DIRECT">DIRECT</option>
             <option value="CONCAT">CONCAT</option>
             <option value="ARITHMETIC">ARITHMETIC</option>
+            <option value="DEFAULT">DEFAULT</option>
+            <option value="EXPRESSION">EXPRESSION</option>
+            <option value="LOOKUP">LOOKUP</option>
           </select>
           <label className="pb-label">Expression</label>
           <input className="pb-input" placeholder="e.g. field1 + field2" value={map.expression} onChange={(e) => updateMapping(i, "expression", e.target.value)} />
