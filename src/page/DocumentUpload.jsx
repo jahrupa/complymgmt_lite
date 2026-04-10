@@ -804,6 +804,10 @@ const DocumentUpload = () => {
 
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
+            <div style={{ fontSize: 14, marginBottom: 7, color: 'gray' }}>
+              <span>Note: </span>
+              <span>You can upload a maximum of 5 files at a time.</span>
+            </div>
             <MultiFileUpload
               setUploadedFiles={setUploadedFiles}
               uploadedFiles={uploadedFiles}

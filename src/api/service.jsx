@@ -191,6 +191,7 @@ import {
   GET_PIPELINE_BY_APPLICABILITY_ID,
   DELETE_MAPPING_BY_ID,
   UPDATE_MAPPING_BY_ID,
+  GENERATE_AI_MAPPING_SUCCESS,
 
 } from "./Endpoint";
 
@@ -2286,6 +2287,29 @@ export const updateMappingById = async (id, data) => {
     return response.data;
   } catch (error) {
     // console.error("Error updating mapping by ID:", error);
+    throw error;
+  }
+}
+
+
+
+export const generateAIMapping = async (filesArray,id) => {
+  try {
+    const formData = new FormData();
+
+    filesArray.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const response = await API.post(`${GENERATE_AI_MAPPING_SUCCESS}${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    // console.error("Upload failed:", error.response?.data || error);
     throw error;
   }
 }

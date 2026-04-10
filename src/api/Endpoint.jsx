@@ -244,5 +244,6 @@ export const GET_REGISTER_APPLICABILITY_BY_ID='/api/v2/register_processing/view/
 export const GET_PIPELINE_BY_APPLICABILITY_ID='/api/v2/register_processing/view/mapping/'
 export const DELETE_MAPPING_BY_ID='/api/v2/register_processing/delete/mapping/'
 export const UPDATE_MAPPING_BY_ID='/api/v2/register_processing/update/mapping/'
+export const GENERATE_AI_MAPPING_SUCCESS='/api/v2/register_processing/create/mapping/ai/'
 
 
