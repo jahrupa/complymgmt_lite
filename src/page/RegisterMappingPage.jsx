@@ -13,7 +13,9 @@ export default function RegisterMappingPage({
   handlePipelineformSubmit,
   handleDeletePipeline,
   isEditing,
-
+  setIsGeneratePipeline,
+  isGeneratePipeline,
+  
 }) {
   const addStep = () => setSteps([...steps, { type: "", config: {} }]);
   const deleteStep = (index) => setSteps(steps.filter((_, i) => i !== index));
@@ -64,15 +66,18 @@ export default function RegisterMappingPage({
               <button type="submit" className="crud_btn" style={isEditing === false ? { cursor: "not-allowed" } : {}} onClick={handleDeletePipeline} disabled={isEditing === false}> Delete All</button>
             </div>
             <div>
-              <button type="submit" className="crud_btn" onClick={addStep}> + Add Step</button>
+              <button type="submit" className="crud_btn" onClick={() => setIsGeneratePipeline(true)}> Generate Pipeline</button>
+            </div>
+            <div>
+              <button type="submit" className="crud_btn"style={isGeneratePipeline === true ? { cursor: "not-allowed" } : {}}  disabled={isGeneratePipeline === true} onClick={addStep}> + Add Step</button>
             </div>
           </div>
         </div>
         <Divider className="mb-3" />
-
+ 
         {/* Error Message */}
         <div className="">
-          <div className="pb-steps">
+           <div className="pb-steps">
             {steps.length === 0 && (
               <div className="pb-empty">
                 <div className="pb-empty-icon">⬡</div>
@@ -117,6 +122,7 @@ export default function RegisterMappingPage({
               </div>
             ))}
           </div>
+          
           <div className="row row-gap-2 mt-3 justify-content-lg-end justify-content-md-end justify-content-center">
             <div className="col-12 col-md-6 w-auto">
               <button
@@ -125,13 +131,17 @@ export default function RegisterMappingPage({
                 onClick={() => {
                   setSteps([]);
                   onClose(false)
+                  setIsGeneratePipeline(false);
                 }}
               >
                 Cancel
               </button>
             </div>
             <div className="col-12 col-md-6 w-auto">
-              <button type="submit" className="btn btn-primary w-100" onClick={handlePipelineformSubmit}>Save</button>
+              <button type="submit" className="btn btn-primary w-100" onClick={()=>{
+                  handlePipelineformSubmit();
+                  setIsGeneratePipeline(false);
+              }}>Save</button>
             </div>
           </div>
           {/* <div className="pb-json-section">

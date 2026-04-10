@@ -12,6 +12,7 @@ import {
   fetchAllLocationName,
   fetchAllRegisterNames,
   fetchCompaniesNameByGroupId,
+  generateAIMapping,
   getApplicabilityByCompanyId,
   getApplicabilityByGroupId,
   getApplicabilityByLocationId,
@@ -32,6 +33,7 @@ import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter
 import { Plus } from 'lucide-react';
 import RegisterMappingPage from './RegisterMappingPage';
 import Snackbars from '../component/Snackbars';
+import RegisterMappingPageWithAi from "./RegisterMappingPageWithAi";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const RegisterProcessingViewPage = () => {
@@ -40,7 +42,9 @@ const RegisterProcessingViewPage = () => {
   const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([])
   const [locationName, setLocationName] = useState([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isGeneratePipeline, setIsGeneratePipeline] = useState(false);
   const [registerName, setRegisterName] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [current, setCurrent] = useState(
     {
       group_name: "",
@@ -57,7 +61,6 @@ const RegisterProcessingViewPage = () => {
     });
   const [applicabilityModal, setApplicabilityModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  console.log(isEditing,'isEditing')
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: "top",
@@ -351,7 +354,7 @@ const RegisterProcessingViewPage = () => {
 
   const closeModal = () => {
     setApplicabilityModal(false);
-     setCurrent((prev) => ({
+    setCurrent((prev) => ({
       ...prev,
       applicability_location_name: "",
       applicability_location_id: "",
@@ -359,6 +362,7 @@ const RegisterProcessingViewPage = () => {
       register_id: "",
       applicability_id: "",
     }));
+    setUploadedFiles([]);
   };
   const handleApplicability = async () => {
     const payload = {
@@ -500,7 +504,11 @@ const RegisterProcessingViewPage = () => {
   const handlePipelineformSubmit = async () => {
     const payload = { applicability_id: current?.applicability_id, config: { steps } };
     try {
-       const result= isEditing ? await updateMappingById(current?.applicability_id, payload) : await createMapping(payload);
+      const result = isGeneratePipeline
+        ? await generateAIMapping(uploadedFiles, current?.applicability_id)
+        : isEditing
+          ? await updateMappingById(current?.applicability_id, payload)
+          : await createMapping(payload);
       setIsSnackbarsOpen({
         open: true,
         vertical: "top",
@@ -508,6 +516,9 @@ const RegisterProcessingViewPage = () => {
         message: result?.message || "Mapping created successfully!",
         severityType: "success",
       });
+      setIsGeneratePipeline(false);
+      isGeneratePipeline && setSteps(result?.config?.steps || []);
+
     } catch (e) {
       setIsSnackbarsOpen({
         open: true,
@@ -517,7 +528,9 @@ const RegisterProcessingViewPage = () => {
         severityType: "error",
       });
     }
-    setIsModalOpen(false);
+
+    { isGeneratePipeline ? setIsModalOpen(true) : setIsModalOpen(false); }
+
 
   };
   const handleDeletePipeline = async () => {
@@ -700,17 +713,39 @@ const RegisterProcessingViewPage = () => {
           />
         </div>
       </div>
-      <RegisterMappingPage
-        open={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-        setSteps={setSteps}
-        steps={steps}
-        handlePipelineformSubmit={handlePipelineformSubmit}
-        handleDeletePipeline={handleDeletePipeline}
-        isEditing={isEditing}
-      />
+      {isGeneratePipeline ? (
+        <RegisterMappingPageWithAi
+          open={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+          handlePipelineformSubmit={handlePipelineformSubmit}
+          handleDeletePipeline={handleDeletePipeline}
+          isEditing={isEditing}
+          setIsGeneratePipeline={setIsGeneratePipeline}
+          isGeneratePipeline={isGeneratePipeline}
+          setUploadedFiles={setUploadedFiles}
+          uploadedFiles={uploadedFiles}
+        />
+      ) : (
+        <RegisterMappingPage
+          open={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+          setSteps={setSteps}
+          steps={steps}
+          handlePipelineformSubmit={handlePipelineformSubmit}
+          handleDeletePipeline={handleDeletePipeline}
+          isEditing={isEditing}
+          setIsGeneratePipeline={setIsGeneratePipeline}
+          isGeneratePipeline={isGeneratePipeline}
+          setUploadedFiles={setUploadedFiles}
+          uploadedFiles={uploadedFiles}
+        />
+      )}
+
+
       <SmallSizeModal
         crudForm={applicabilityForm}
         crudTitle={"Create Applicability"}
