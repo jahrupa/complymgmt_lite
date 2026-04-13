@@ -3,12 +3,9 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const MAX_COUNT = 5;
-const MAX_SIZE_MB = 5;
-
-export default function MultiFileUpload({ uploadedFiles, setUploadedFiles }) {
+export default function MultiFileUpload({ uploadedFiles, setUploadedFiles,MAX_COUNT=5, MAX_SIZE_MB=5, setProgress,progress}) {
   const [dragActive, setDragActive] = useState(false);
-  const [progress, setProgress] = useState({});
+  // const [progress, setProgress] = useState({});
   const inputRef = useRef();
 
   const validateFile = (file) => {

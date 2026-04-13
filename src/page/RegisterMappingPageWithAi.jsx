@@ -4,21 +4,23 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import { ArrowLeft, X } from "lucide-react";
 import MultiFileUpload from "../component/MultiFileUpload";
+import { useState } from "react";
 
 export default function RegisterMappingPageWithAi({
     anchor = "right",
     open,
     onClose,
     handlePipelineformSubmit,
-    handleDeletePipeline,
-    isEditing,
     setIsGeneratePipeline,
     setUploadedFiles,
     uploadedFiles,
 
 }) {
-
-
+    const [progress, setProgress] = useState({});
+console.log(progress,'progress')
+const isUploadComplete =
+  Object.values(progress).length > 0 &&
+  Object.values(progress).every((p) => p !== 100);
     return (
         <Drawer
             anchor={anchor}
@@ -44,27 +46,28 @@ export default function RegisterMappingPageWithAi({
                             <h1>Pipeline Builder</h1>
                         </div>
                     </div>
-                    {/* <div className="d-flex gap-2">
-                        <div>
-                            <button type="submit" className="crud_btn" style={isEditing === false ? { cursor: "not-allowed" } : {}} onClick={handleDeletePipeline} disabled={isEditing === false}> Delete All</button>
-                        </div>
-                        <div>
-                            <button type="submit" className="crud_btn" onClick={() => setIsGeneratePipeline(true)}> Generate Pipeline</button>
-                        </div>
-                        <div>
-                        </div>
-                    </div> */}
+                    <div>
+                        <button type="submit" className="crud_btn" onClick={() => setIsGeneratePipeline(false)}><ArrowLeft size={20} /> Back</button>
+                    </div>
                 </div>
                 <Divider className="mb-3" />
 
                 {/* Error Message */}
                 <div className="">
-
                     <div className="p-5 ">
+                        <div style={{ fontSize: 14, marginBottom: 7, color: 'gray' }}>
+                            <span>Note: </span>
+                            <span>You can upload multiple files at a time</span>
+                        </div>
+                        <div></div>
+
                         <MultiFileUpload
                             setUploadedFiles={setUploadedFiles}
                             uploadedFiles={uploadedFiles}
-                            fileLImitTitle={"You can upload multiple files at a time."}
+                            MAX_COUNT={1000}
+                            MAX_SIZE_MB={5}
+                            setProgress={setProgress}
+                            progress={progress}
                         />
                         {/* Generating pipeline... This may take a moment. */}
                     </div>
@@ -88,7 +91,7 @@ export default function RegisterMappingPageWithAi({
                             <button type="submit" className="btn btn-primary w-100" onClick={() => {
                                 handlePipelineformSubmit();
                                 setIsGeneratePipeline(false);
-                            }}>Generate</button>
+                            }} disabled={isUploadComplete}>Generate</button>
                         </div>
                     </div>
                 </div>
