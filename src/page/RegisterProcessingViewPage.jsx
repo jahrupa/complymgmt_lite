@@ -699,6 +699,7 @@ const RegisterProcessingViewPage = () => {
               location_name: '',
               location_id: null,
             }));
+            setLocationNameByCompanyId([]);   //  Clear location dropdown
 
             // 🔥 Fallback
             if (matchedCompany?._id) {

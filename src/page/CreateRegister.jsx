@@ -20,10 +20,22 @@ const CreateRegister = () => {
     message: '',
     severityType: '',
   });
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    let tempErrors = {};
+    if (!formData?.name) tempErrors.name = "Name is required";
+    if (!formData?.state) tempErrors.state = "State is required";
+    if (!formData?.template_path) tempErrors.template_path = "Template path is required";
+    if (!formData?.type) tempErrors.type = "Type is required";
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
   };
 
   // Handle header change
@@ -58,6 +70,7 @@ const CreateRegister = () => {
 
   // Submit formasync 
   const handleSubmit = async (e) => {
+    if (!validate()) return; // Don't proceed if validation fails
     e.preventDefault();
     const payload = {
       name: formData.name,
@@ -106,9 +119,9 @@ const CreateRegister = () => {
             isRequired={true}
             fieldName="name"
             handleChange={handleChange}
-          // value={formData.name}
-          // error={!!errors.name}
-          // helperText={errors.name}
+            value={formData.name}
+            error={!!errors.name}
+            helperText={errors.name}
           />
           <MuiTextField
             label="State"
@@ -116,9 +129,9 @@ const CreateRegister = () => {
             isRequired={true}
             fieldName="state"
             handleChange={handleChange}
-          // value={formData.state}
-          // error={!!errors.state}
-          // helperText={errors.state}
+            value={formData.state}
+            error={!!errors.state}
+            helperText={errors.state}
           />
           <MuiTextField
             label="Template Path"
@@ -126,9 +139,9 @@ const CreateRegister = () => {
             isRequired={true}
             fieldName="template_path"
             handleChange={handleChange}
-          // value={formData.template_path}
-          // error={!!errors.template_path}
-          // helperText={errors.template_path}
+            value={formData.template_path}
+            error={!!errors.template_path}
+            helperText={errors.template_path}
           />
           <SingleSelectTextField
             name="type"
@@ -141,13 +154,14 @@ const CreateRegister = () => {
                 type: selectedName,
 
               }));
+              setErrors(prevErrors => ({ ...prevErrors, type: '' }));
             }}
             names={fileType.map((item) => ({
               _id: item.value,
               name: item.name,
             }))}
-          // error={!!errors.type}
-          // helperText={errors.type}
+            error={!!errors.type}
+            helperText={errors.type}
           />
         </div>
         <div className="mapping-container d-lg-flex d-md-flex gap-3 flex-column" style={{ maxHeight: 504, overflow: 'auto' }}>
@@ -156,7 +170,7 @@ const CreateRegister = () => {
 
             <button
               type="button"
-              
+
               className="btn btn-primary"
               onClick={addHeader}
             >
@@ -181,7 +195,7 @@ const CreateRegister = () => {
                   className="btn"
                   onClick={() => removeHeader(index)}
                 >
-                   <DeleteIcon fontSize="small"style={{fontSize:20,color:'#0a5881'}} />
+                  <DeleteIcon fontSize="small" style={{ fontSize: 20, color: '#0a5881' }} />
                 </button>
               </div>
 
