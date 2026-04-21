@@ -21,6 +21,9 @@ const NoticeDashboard = ({
     selectedCharts,
     setSelectedCharts,
     shouldShow,
+    activeDrawer,
+    setActiveDrawer,
+
 }) => {
     const [NoticeDistributionByAuthority, setNoticeDistributionByAuthority] =
         React.useState([]);
@@ -578,7 +581,6 @@ const NoticeDashboard = ({
         message: "",
         severityType: "",
     });
-    const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [drawerAnchor, setDrawerAnchor] = React.useState("right");
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
@@ -586,11 +588,11 @@ const NoticeDashboard = ({
     const [isDetailPage, setIsDetailPage] = useState(false);
     const [isDetailPageData, setIsDetailPageData] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
-    console.log(filterColumns,'filterColumns')
+    console.log(filterColumns, 'filterColumns')
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
-        setDrawerOpen(true);
+        setActiveDrawer("noticeDashboard");
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
         setFilterColumns(filterColumn);
@@ -949,8 +951,8 @@ const NoticeDashboard = ({
                                         numberOfNoticesAssignedToEachTeamMember?.rest_counts?.map(
                                             (item) => item.assigned_to
                                         ),
-                                       numberOfNoticesAssignedToEachTeamMember?.notice_records,
-                                       numberOfNoticesAssignedToEachTeamMember?.columns
+                                        numberOfNoticesAssignedToEachTeamMember?.notice_records,
+                                        numberOfNoticesAssignedToEachTeamMember?.columns
                                     )
                                 }
 
@@ -1125,8 +1127,8 @@ const NoticeDashboard = ({
             </div>
             <DashboardDrawerGrid
                 anchor={drawerAnchor}
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
+                open={activeDrawer === "noticeDashboard"}
+                onClose={() => setActiveDrawer(null)}
                 data={drawerData} //direct array
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}

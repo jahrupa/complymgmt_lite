@@ -5,7 +5,7 @@ import { decryptData } from '../../page/utils/encrypt';
 import DashboardDrawerGrid from '../DashboardDrawer';
 import { fetchGeneralCompaiancePortfolio, fetchPaginatedRecords } from '../../api/service';
 
-const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow, page, limit }) => {
+const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow, page, limit, setActiveDrawer }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -201,6 +201,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         setDrawerAnchor(anchor);
         setDrawerOpen(true);
         setFilterColumns(filterColumn);
+        setActiveDrawer("GeneralComplianceDashboard");
     };
     console.log(data?.data?.registers?.length, 'length')
     return (
@@ -321,7 +322,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
             <DashboardDrawerGrid
                 anchor={drawerAnchor}
                 open={drawerOpen}
-                onClose={() => { setDrawerOpen(false); setIsDetailPageDataFor("Returns"); }}
+                onClose={() => { setDrawerOpen(false); setIsDetailPageDataFor("Returns"); setActiveDrawer(null); }}
                 filterColumns={filterColumns}
                 isCockpitComplianceDetailPage={true}
                 // this is wirking
