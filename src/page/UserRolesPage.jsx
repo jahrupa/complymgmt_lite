@@ -34,6 +34,7 @@ import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField"
 import { decryptData } from "./utils/encrypt";
 import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
 import { flattenObject } from "../../Utils/tableColUtils";
+import { getUserRoleLabel } from "../../Utils/userRole";
 
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -302,7 +303,7 @@ const UserRolesPage = () => {
           <SingleSelectTextField
             name="User Type"
             label="User Type"
-            value={current.user_type}
+            value={getUserRoleLabel(current.user_type)}
             onChange={(e) => {
               const selectedName = e.target.value;
               //  // console.log(matchedGroup,'matchedGroup')
@@ -472,6 +473,22 @@ const UserRolesPage = () => {
 
     return Object.keys(sample)
       .map((key) => {
+        // ✅ Special case for User Type column
+        if (key.toLowerCase().includes("user_type")) {
+          return {
+            field: key,
+            headerName: "User Type",
+            filter: true,
+            editable: false,
+            valueGetter: (params) => {
+              const value = key
+                .split(".")
+                .reduce((acc, part) => acc?.[part], params.data);
+
+              return getUserRoleLabel(value);
+            },
+          };
+        }
         // Skip unwanted fields
         if (
           key === "_id" ||
