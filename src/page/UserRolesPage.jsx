@@ -90,7 +90,7 @@ const UserRolesPage = () => {
     });
   }, [data, filters]);
 
-  console.log(filteredRowData, "filteredRowData");
+
   const gridRef = useRef();
   const userType = [
     { id: 0, value: "Internal" },
@@ -143,7 +143,6 @@ const UserRolesPage = () => {
 
       //  Get the message from response
       const message = response?.message;
-      // console.log(response, 'response')
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
@@ -155,7 +154,6 @@ const UserRolesPage = () => {
       const updatedData = await fetchAllUser();
       setData(updatedData);
     } catch (error) {
-      // console.error("Error saving user:", error);
 
       // Extract message from error response if available
       const errorMessage =
@@ -201,7 +199,6 @@ const UserRolesPage = () => {
         severityType: "success",
       });
     } catch (error) {
-      // console.error("Error deleting user:", error);
 
       // Extract error message safely
       const errorMessage =
@@ -250,7 +247,6 @@ const UserRolesPage = () => {
     fetchData();
   }, []);
 
-  console.log(filteredRowData, "filterRowData");
 
   const crudForm = () => {
     return (
@@ -305,7 +301,6 @@ const UserRolesPage = () => {
             value={current.user_type}
             onChange={(e) => {
               const selectedName = e.target.value;
-              //  // console.log(matchedGroup,'matchedGroup')
               const userId =
                 userType.find((g) => g.value === selectedName) || {};
               setCurrent((prev) => ({
@@ -636,7 +631,6 @@ const UserRolesPage = () => {
   };
 
   const onRowValueChanged = () => {
-    //  // console.log('Row updated:', event.data);
   };
 
   const onFilterTextBoxChanged = useCallback(() => {

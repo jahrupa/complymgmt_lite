@@ -15,7 +15,6 @@ export default function ServiceTrackerAccess() {
     const [trackerKeys, setTrackerKeys] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    console.log(trackers, 'trackers')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -33,7 +32,7 @@ export default function ServiceTrackerAccess() {
         const getTrackers = async () => {
             try {
                 const data = await fetchAllServiceTrackerName()
-                setTrackers(data || [])
+                setTrackers(data || []) 
             } catch (err) {
                 console.error(err)
             }

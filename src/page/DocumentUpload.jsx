@@ -61,7 +61,6 @@ const DocumentUpload = () => {
     stage: "",
     stage_id: null,
   });
-  console.log("current", current);
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);

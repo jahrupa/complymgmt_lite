@@ -147,7 +147,6 @@ const RegisterProcessingViewPage = () => {
                     setSteps(pipelineData?.config?.steps || []);
                     setIsEditing(pipelineData?.config?.steps?.length > 0);
                 } catch (error) {
-                    // console.error("Error fetching pipeline data:", error);
                     setSteps([]);
                     setIsEditing(false);
                 }
@@ -197,7 +196,6 @@ const RegisterProcessingViewPage = () => {
                 }
             } catch {
                 setDataById((prev) => ({ ...prev, applicabilityByCompanyId: [] }));
-                // console.error("Failed to fetch location by company_id:", error);
             }
         };
 
