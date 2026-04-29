@@ -47,7 +47,7 @@ const UserRolesPage = () => {
     full_name: "",
     username: "",
     email: "",
-    role_name: "",
+    user_role: "",
     role_id: null,
     password: "",
     status: "Active",
@@ -59,6 +59,7 @@ const UserRolesPage = () => {
     company_id: null,
     location_name: "",
     location_id: "",
+    UserAccessLevel: null
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,7 +103,7 @@ const UserRolesPage = () => {
     let tempErrors = {};
     if (!current?.full_name) tempErrors.full_name = "Full name is required";
     if (!current?.email) tempErrors.email = "Email is required";
-    if (!current?.username) tempErrors.username = "Username is required";
+    if (!current?.username) tempErrors.username = "username is required";
     if (!current?.password) tempErrors.password = "Password is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -126,12 +127,14 @@ const UserRolesPage = () => {
       FullName: current?.full_name,
       Email: current.email,
       UserDescription: current?.user_description,
-      Username: current?.username,
+      username: current?.username,
       Password: current?.password,
-      UserType: current?.user_id,
+      UserType: current?.user_type === "Internal" ? 0 : 1,
       CommonAttributes: CommonAttributes,
-      UserRole: current?.role_name,
+      UserRole: current?.user_role,
+      // UserAccessLevel:current?.UserAccessLevel
     };
+
     try {
       let response;
       if (isEditing) {
@@ -289,7 +292,7 @@ const UserRolesPage = () => {
             helperText={errors.password}
           />
           <MuiTextField
-            label="UserName"
+            label="username"
             type="text"
             isRequired={true}
             fieldName="username"
@@ -303,17 +306,15 @@ const UserRolesPage = () => {
           <SingleSelectTextField
             name="User Type"
             label="User Type"
-            value={getUserRoleLabel(current.user_type)}
+            value={current.user_type || ""}
             onChange={(e) => {
               const selectedName = e.target.value;
-              //  // console.log(matchedGroup,'matchedGroup')
-              const userId =
-                userType.find((g) => g.value === selectedName) || {};
+
               setCurrent((prev) => ({
                 ...prev,
                 user_type: selectedName,
-                user_id: userId.id || null,
               }));
+
               setErrors((prevErrors) => ({ ...prevErrors, user_type: "" }));
             }}
             names={userType?.map((item) => ({
@@ -327,11 +328,11 @@ const UserRolesPage = () => {
             label="Role Name"
             type="text"
             isRequired={true}
-            fieldName="role_name"
+            fieldName="user_role"
             handleChange={handleChange}
-            value={current.role_name}
-            error={!!errors.role_name}
-            helperText={errors.role_name}
+            value={current.user_role}
+            error={!!errors.user_role}
+            helperText={errors.user_role}
           />
         </div>
         <div className="">
@@ -608,10 +609,16 @@ const UserRolesPage = () => {
             <button
               className="btn btn-sm"
               onClick={() => {
-                setCurrent(params.data);
+                const row = params.data;
+
+                setCurrent({
+                  ...row,
+                  user_type: getUserRoleLabel(row.user_type), //  number → string
+                });
+
                 setIsEditing(true);
                 setIsModalOpen(true);
-                setUserId(params.data._id); // OR .user_id based on your data
+                setUserId(row._id);
               }}
             >
               <EditIcon fontSize="small" className="action_icon" />

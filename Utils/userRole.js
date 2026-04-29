@@ -5,6 +5,6 @@ export const getUserRoleLabel = (userType) => {
     case 1:
       return "External";
     default:
-      return "Unknown";
+      return "";
   }
 };
