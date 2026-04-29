@@ -17,6 +17,8 @@ const GeneralHelpdesk = ({
     selectedCharts,
     setSelectedCharts,
     widgetsList,
+    activeDrawer,
+    setActiveDrawer,
 }) => {
     const [closedVsOpenCases, setClosedVsOpenCases] = React.useState([]);
     const closedVsOpenCasesFormat = {
@@ -327,7 +329,6 @@ const GeneralHelpdesk = ({
         severityType: "",
     });
 
-    const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [drawerAnchor, setDrawerAnchor] = React.useState("right");
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
@@ -339,7 +340,7 @@ const GeneralHelpdesk = ({
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
-        setDrawerOpen(true);
+        setActiveDrawer("generalHelpdesk");
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
         setIsDetailPageData(isDetailData);
@@ -641,15 +642,15 @@ const GeneralHelpdesk = ({
             </div>
             <DashboardDrawerGrid
                 anchor={drawerAnchor}
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
+                open={activeDrawer === "generalHelpdesk"}
+                onClose={() => setActiveDrawer(null)}
                 data={drawerData} //direct array
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}
                 isDetailPage={isDetailPage}
                 setIsDetailPage={setIsDetailPage}
                 isDetailPageData={isDetailPageData}
-                 filterColumns={filterColumns}
+                filterColumns={filterColumns}
             />
         </div>
     );

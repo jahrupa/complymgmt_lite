@@ -23,7 +23,7 @@ const CockpitComplince = ({
   selectedCompany,
   page,
   limit,
-  setIsDrawerOpenGlobal
+  setActiveDrawer
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -426,7 +426,7 @@ const CockpitComplince = ({
     setDrawerAnchor(anchor);
     setDrawerOpen(true);
     setFilterColumns(filterColumn);
-    setIsDrawerOpenGlobal(true);
+    setActiveDrawer("cockpit");
   };
   return (
     <div className="">
@@ -1111,7 +1111,7 @@ const CockpitComplince = ({
         onClose={() => {
           setDrawerOpen(false);
           setIsDetailPageDataFor("Returns");
-          setIsDrawerOpenGlobal(false);
+          setActiveDrawer(null);
         }}
         // this is wirking
         data={

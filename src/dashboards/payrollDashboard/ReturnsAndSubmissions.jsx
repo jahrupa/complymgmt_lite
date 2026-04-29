@@ -26,6 +26,8 @@ const ReturnsAndSubmissions = ({
   selectedCharts,
   setSelectedCharts,
   shouldShow,
+  activeDrawer,
+  setActiveDrawer,
 }) => {
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -51,7 +53,6 @@ const ReturnsAndSubmissions = ({
     );
   };
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerAnchor, setDrawerAnchor] = useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState([]);
@@ -62,7 +63,7 @@ const ReturnsAndSubmissions = ({
   const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategories = [], isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
-    setDrawerOpen(true);
+    setActiveDrawer("returnsAndSubmissions");
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategories);
     setIsDetailPageData(isDetailData);
@@ -123,11 +124,11 @@ const ReturnsAndSubmissions = ({
     },
   };
 
-  
-const dataArray = applicableReturnsRaw?.top_count || [];
 
-const series = dataArray.length
-  ? Object.keys(dataArray[0])
+  const dataArray = applicableReturnsRaw?.top_count || [];
+
+  const series = dataArray.length
+    ? Object.keys(dataArray[0])
       .filter(key => key.startsWith("count_"))
       .map(key => ({
         name: key
@@ -136,7 +137,7 @@ const series = dataArray.length
           .replace(/\b\w/g, l => l.toUpperCase()),
         data: dataArray.map(item => item[key] || 0)
       }))
-  : [];
+    : [];
 
   const applicableReturnsByLocationFormat = {
     series: series,
@@ -154,7 +155,7 @@ const series = dataArray.length
         }
       },
       stroke: { width: 1, colors: ['#fff'] },
-       xaxis: { categories: dataArray.map(item => item.returns || "") },
+      xaxis: { categories: dataArray.map(item => item.returns || "") },
       yaxis: { title: { text: undefined } },
       legend: { position: 'top', horizontalAlign: 'left', offsetX: 40 }
     }
@@ -336,7 +337,7 @@ const series = dataArray.length
                       (item) => item.pending_from
                     ),
                     comparisonOfReturnApplicability?.returns_records,
-                    comparisonOfReturnApplicability?.columns 
+                    comparisonOfReturnApplicability?.columns
                   )
                 }
 
@@ -437,7 +438,7 @@ const series = dataArray.length
                     ),
                     applicableReturnsRaw?.returns_records,
                     applicableReturnsRaw?.columns
-                    
+
                   )
                 }
 
@@ -617,8 +618,8 @@ const series = dataArray.length
 
       <DashboardDrawerGrid
         anchor={drawerAnchor}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={activeDrawer === "returnsAndSubmissions"}
+        onClose={() => setActiveDrawer(null)}
         data={drawerData}
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}

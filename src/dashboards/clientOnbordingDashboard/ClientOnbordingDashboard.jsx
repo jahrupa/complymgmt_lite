@@ -5,8 +5,7 @@ import { useEffect, useState } from 'react';
 import DashboardDrawerGrid from '../DashboardDrawer';
 import { fetchClientOnboardingPortfolio } from '../../api/service';
 
-const ClientOnbordingDashboard = ({ selectedCompany }) => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+const ClientOnbordingDashboard = ({ selectedCompany, activeDrawer, setActiveDrawer }) => {
   const [drawerAnchor, setDrawerAnchor] = useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
   const [chartXaxisCategory, setChartXaxisCategory] = useState("");
@@ -167,10 +166,10 @@ const ClientOnbordingDashboard = ({ selectedCompany }) => {
   const handleOpenDrawer = (anchor, title, chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
-    setDrawerOpen(true);
     setChartXaxisCategory(chartXaxisCategory);
     setIsDetailPageData(isDetailData);
     setFilterColumns(filterColumn);
+    setActiveDrawer("clientOnboarding");
   };
   return (
     <div className="">
@@ -198,6 +197,10 @@ const ClientOnbordingDashboard = ({ selectedCompany }) => {
             e.stopPropagation();
             handleOpenDrawer(
               "left",
+              "Client Details",
+              [],
+              [],
+              []
             )
           }}>
             View Details
@@ -239,8 +242,8 @@ const ClientOnbordingDashboard = ({ selectedCompany }) => {
       {/* )} */}
       <DashboardDrawerGrid
         anchor={drawerAnchor}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={activeDrawer === "clientOnboarding"}
+        onClose={() => setActiveDrawer(null)}
         data={data?.company_details} //direct array
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}

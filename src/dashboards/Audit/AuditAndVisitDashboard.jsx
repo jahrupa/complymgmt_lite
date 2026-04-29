@@ -22,6 +22,8 @@ const AuditAndVisitDashboard = ({
   selectedCharts,
   setSelectedCharts,
   shouldShow,
+  activeDrawer,
+  setActiveDrawer,
 }) => {
   const [AuditCountByServiceType, setAuditCountByServiceType] = React.useState(
     []
@@ -107,7 +109,6 @@ const AuditAndVisitDashboard = ({
   });
   const [isDetailPage, setIsDetailPage] = useState(false);
   const [isDetailPageData, setIsDetailPageData] = useState([]);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState("");
@@ -116,7 +117,7 @@ const AuditAndVisitDashboard = ({
   const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
-    setDrawerOpen(true);
+    setActiveDrawer("auditVisit");
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
     setFilterColumns(filterColumn);
@@ -822,7 +823,7 @@ const AuditAndVisitDashboard = ({
               />
               <div
                 className="dashboard-icon ms-2"
-               onClick={(e) => {
+                onClick={(e) => {
                   e.stopPropagation();
                   handleOpenDrawer(
                     "right",
@@ -1082,15 +1083,15 @@ const AuditAndVisitDashboard = ({
       </div>
       <DashboardDrawerGrid
         anchor={drawerAnchor}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={activeDrawer === "auditVisit"}
+        onClose={() => setActiveDrawer(null)}
         data={drawerData} //direct array
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}
         isDetailPage={isDetailPage}
         setIsDetailPage={setIsDetailPage}
         isDetailPageData={isDetailPageData}
-         filterColumns={filterColumns}
+        filterColumns={filterColumns}
       />
     </div>
   );
