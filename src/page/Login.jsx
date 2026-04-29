@@ -42,6 +42,8 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                 // sessionStorage.setItem('browserSessionActive', 'true'); // <--- add this
                 setIsAuthenticated(true);
                 navigate('/dashboard');
+                localStorage.setItem("activeItem", 'Dashboard');
+                localStorage.setItem('active_url', '/dashboard');
                 setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message, severityType: 'success' });
             } else {
                 alert('Login failed: Token missing');
