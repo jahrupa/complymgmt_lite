@@ -52,7 +52,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
-    const [isDrawerOpenGlobal, setIsDrawerOpenGlobal] = useState(false);
+    const [activeDrawer, setActiveDrawer] = useState(null);
     const [widgetsList, setWidgetsList] = useState([]);
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(20);
@@ -155,7 +155,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                         selectedCompany={selectedCompany}
                         page={page}
                         limit={limit}
-                        setIsDrawerOpenGlobal={setIsDrawerOpenGlobal}
+                        setActiveDrawer={setActiveDrawer}
                     />
                 )
         },
@@ -168,6 +168,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     shouldShow={shouldShow}
                     page={page}
                     limit={limit}
+                    setActiveDrawer={setActiveDrawer}
 
                 />
             )
@@ -179,12 +180,19 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             label: "Client Onboarding",
             content:
                 selectedCompany === "" ? (
-                    <ClientOnbordingDashboard data={clientOnboardingData} current={current} selectedCompany={selectedCompany} />
-                ) : (
+                    <ClientOnbordingDashboard
+                        data={clientOnboardingData}
+                        current={current}
+                        selectedCompany={selectedCompany}
+                        activeDrawer={activeDrawer}
+                        setActiveDrawer={setActiveDrawer}
+                    />) : (
                     <ClientOnBoardingByCompany
                         locationData={ClientOnBoardingByCompanyData}
                         current={current}
                         selectedCompany={selectedCompany}
+                        activeDrawer={activeDrawer}
+                        setActiveDrawer={setActiveDrawer}
                     />
                 )
         });
@@ -200,6 +208,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
                 />
             )
         },
@@ -212,6 +222,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
                 />
             )
         },
@@ -224,6 +236,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
 
                 />
             )
@@ -237,6 +251,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     widgetsList={widgetsList}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
                 />
             )
         },
@@ -249,6 +265,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
                 />
             )
         },
@@ -262,6 +280,8 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     widgetsList={widgetsList}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
                 />
             )
         }
@@ -376,7 +396,7 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                 ))}
             </Box>
 
-            {userType === "0" && !isDrawerOpenGlobal && (
+            {userType === "0" && activeDrawer === null && (
                 <div className="navigation-wrapper">
                     <div
                         className="dashbord-user-access-btn"

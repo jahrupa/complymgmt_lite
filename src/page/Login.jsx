@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import '../style/login.css'
 import { useNavigate } from 'react-router-dom';
 import complyn_mgmt_logo from '../assets/complymgmt_logo.png'
@@ -14,6 +14,18 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const { setToken } = useToken();
+    const formRef = useRef(null);
+
+    useEffect(() => {
+        const handleEnter = (e) => {
+            if (e.key === 'Enter') {
+                formRef.current?.requestSubmit();
+            }
+        };
+
+        document.addEventListener('keydown', handleEnter);
+        return () => document.removeEventListener('keydown', handleEnter);
+    }, []);
 
     // Login handler
     const handleSubmit = async (e) => {
@@ -76,7 +88,7 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                 </div>
                 <div className='d-lg-flex d-md-flex login_form_v2'>
                     <div className=''>
-                        {/* <form onSubmit={handleSubmit}> */}
+                         <form ref={formRef} onSubmit={handleSubmit}>
                         <div className="container login_form_container">
                             <div className='d-flex justify-content-center mb-3 mt-4'>
                                 <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
@@ -113,7 +125,7 @@ const Login = ({ setIsAuthenticated, issnackbarsOpen, setIsSnackbarsOpen, setIsC
                             {/* <div className='karma-logon-text_v2'>New to complymgmt?<span className='karma_logo_text_span_v2'> Create account</span></div> */}
 
                         </div>
-                        {/* </form> */}
+                        </form>
                     </div>
                 </div>
 

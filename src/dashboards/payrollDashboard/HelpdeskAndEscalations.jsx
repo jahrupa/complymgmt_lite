@@ -23,6 +23,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   selectedCharts,
   setSelectedCharts,
   shouldShow,
+  activeDrawer,
+  setActiveDrawer,
 }) => {
   const [closedVsOpenCases, setCloseVsOpenCases] = React.useState([]);
   const closeVsOpenIssueFormat = {
@@ -568,7 +570,6 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
     message: "",
     severityType: "",
   });
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [drawerAnchor, setDrawerAnchor] = React.useState("right");
   const [drawerTitle, setDrawerTitle] = useState("");
   const [drawerData, setDrawerData] = useState("");
@@ -579,7 +580,7 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
   const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
     setDrawerAnchor(anchor);
     setDrawerTitle(title);
-    setDrawerOpen(true);
+    setActiveDrawer("helpdeskEscalations");
     setDrawerData(data);
     setChartXaxisCategory(chartXaxisCategory);
     setIsDetailPageData(isDetailData);
@@ -1045,8 +1046,8 @@ const HelpdeskAndEscalations = ({ selectedCompany, current,
       </div>
       <DashboardDrawerGrid
         anchor={drawerAnchor}
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={activeDrawer === "helpdeskEscalations"}
+        onClose={() => setActiveDrawer(null)}
         data={drawerData} //direct array
         title={drawerTitle}
         chartXaxisCategory={chartXaxisCategory}

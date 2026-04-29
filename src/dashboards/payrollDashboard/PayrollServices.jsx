@@ -29,6 +29,8 @@ const PayrollServices = ({
     setSelectedCharts,
     selectedCharts,
     shouldShow,
+    activeDrawer,
+    setActiveDrawer,
 }) => {
     const [payrollOverviewData, setPayrollOverviewData] = useState({
         total_employees: 0,
@@ -187,7 +189,6 @@ const PayrollServices = ({
         severityType: "",
     });
 
-    const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [drawerAnchor, setDrawerAnchor] = React.useState("right");
     const [drawerTitle, setDrawerTitle] = useState("");
     const [drawerData, setDrawerData] = useState("");
@@ -199,11 +200,12 @@ const PayrollServices = ({
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
-        setDrawerOpen(true);
+        setActiveDrawer("payrollServices");
         setDrawerData(data);
         setChartXaxisCategory(chartXaxisCategory);
         setFilterColumns(filterColumn);
         setIsDetailPageData(isDetailData);
+        setActiveDrawer("payrollServices");
     };
     const columnDefs = useMemo(
         () => [
@@ -892,8 +894,8 @@ const PayrollServices = ({
             </div>
             <DashboardDrawerGrid
                 anchor={drawerAnchor}
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
+                open={activeDrawer === "payrollServices"}
+                onClose={() => setActiveDrawer(null)}
                 data={drawerData}
                 title={drawerTitle}
                 chartXaxisCategory={chartXaxisCategory}
