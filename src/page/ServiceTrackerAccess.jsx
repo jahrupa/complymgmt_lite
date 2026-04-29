@@ -205,7 +205,7 @@ export default function ServiceTrackerAccess() {
                     {/*Step 2 */}
                     {selectedTracker && (
                         <div className="card-section keys-section">
-                            <div className="section-label">Step 2 — Select Category</div>
+                            <div className="section-label">Step 2 — Select Sheet</div>
 
                             {loading ? (
                                 <div className="loading-spinner">Loading...</div>
