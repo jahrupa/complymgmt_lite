@@ -1,8 +1,9 @@
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { LinearProgress } from '@mui/material';
 
-export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadStatus,customeMessage }) {
+export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadStatus, customeMessage }) {
   const { vertical, horizontal, open, message, severityType } = issnackbarsOpen;
 
   const handleClose = (event, reason) => {
@@ -14,43 +15,47 @@ export default function Snackbars({ issnackbarsOpen, setIsSnackbarsOpen, uploadS
 
   return (
     <>
-      {uploadStatus === "pending" ? 
-      <Snackbar
-        open={open} // ✅ FIXED: this should be a boolean
-        // autoHideDuration={2000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical, horizontal }}
-        key={vertical + horizontal}
-      >
-        <Alert
+      {uploadStatus === "pending" ?
+        <Snackbar
+          open={open} // ✅ FIXED: this should be a boolean
+          // autoHideDuration={2000}
           onClose={handleClose}
-          severity={severityType}
-          variant="filled"
-          sx={{ width: '100%' }}
+          anchorOrigin={{ vertical, horizontal }}
+          key={vertical + horizontal}
         >
-          {message || customeMessage || ''}
+          <Alert
+            onClose={handleClose}
+            severity={severityType}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {message || customeMessage || ''}
+            {issnackbarsOpen.showProgress && (
+              <LinearProgress style={{ marginTop: 8 }} />
+            )}
+          </Alert>
+        </Snackbar>
+        :
 
-        </Alert>
-      </Snackbar>
-      : 
-      <Snackbar
-        open={open} // ✅ FIXED: this should be a boolean
-        autoHideDuration={2000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical, horizontal }}
-        key={vertical + horizontal}
-      >
-        <Alert
+        <Snackbar
+          open={open} // ✅ FIXED: this should be a boolean
+          autoHideDuration={2000}
           onClose={handleClose}
-          severity={severityType}
-          variant="filled"
-          sx={{ width: '100%' }}
+          anchorOrigin={{ vertical, horizontal }}
+          key={vertical + horizontal}
         >
-          {message}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={handleClose}
+            severity={severityType}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {message}
+
+          </Alert>
+        </Snackbar>
       }
-    
+
     </>
   );
 }

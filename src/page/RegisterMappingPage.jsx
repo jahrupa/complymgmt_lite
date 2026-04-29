@@ -15,6 +15,7 @@ export default function RegisterMappingPage({
   isEditing,
   setIsGeneratePipeline,
   isGeneratePipeline,
+  uploadStatus,
   
 }) {
   const addStep = () => setSteps([...steps, { type: "", config: {} }]);
@@ -54,8 +55,16 @@ export default function RegisterMappingPage({
             onClose(false);
             setSteps([]);
           }}>
-            <div className="pb-header-icon">
-              <ArrowLeft size={20} onClick={() => onClose(false)} className="cursor-pointer" style={{ cursor: "pointer" }} />
+            <div >
+              <button
+              onClick={() => onClose(false)}
+              className="pb-header-icon"
+              disabled={uploadStatus === 'pending'}
+              style={uploadStatus === 'pending' ? { cursor: "not-allowed" } : { cursor: "pointer" }}
+              >
+              <ArrowLeft size={20}  />
+
+              </button>
             </div>
             <div>
               <h1>Pipeline Builder</h1>
@@ -63,13 +72,13 @@ export default function RegisterMappingPage({
           </div>
           <div className="d-flex gap-2">
             <div>
-              <button type="submit" className="crud_btn" style={isEditing === false ? { cursor: "not-allowed" } : {}} onClick={handleDeletePipeline} disabled={isEditing === false}> Delete All</button>
+              <button type="submit" className="crud_btn" style={isEditing === false ? { cursor: "not-allowed" } : {}} onClick={handleDeletePipeline} disabled={isEditing === false || uploadStatus === 'pending'}> Delete All</button>
             </div>
             <div>
-              <button type="submit" className="crud_btn" onClick={() => setIsGeneratePipeline(true)}> Generate Pipeline</button>
+              <button type="submit" className="crud_btn" onClick={() => setIsGeneratePipeline(true)} disabled={uploadStatus === 'pending'}> Generate Pipeline</button>
             </div>
             <div>
-              <button type="submit" className="crud_btn"style={isGeneratePipeline === true ? { cursor: "not-allowed" } : {}}  disabled={isGeneratePipeline === true} onClick={addStep}> + Add Step</button>
+              <button type="submit" className="crud_btn"style={isGeneratePipeline === true ? { cursor: "not-allowed" } : {}}  disabled={isGeneratePipeline === true || uploadStatus === 'pending'} onClick={addStep}> + Add Step</button>
             </div>
           </div>
         </div>
@@ -133,6 +142,7 @@ export default function RegisterMappingPage({
                   onClose(false)
                   setIsGeneratePipeline(false);
                 }}
+                disabled={uploadStatus === 'pending'}
               >
                 Cancel
               </button>
@@ -141,7 +151,7 @@ export default function RegisterMappingPage({
               <button type="submit" className="btn btn-primary w-100" onClick={()=>{
                   handlePipelineformSubmit();
                   setIsGeneratePipeline(false);
-              }}>Save</button>
+              }}disabled={uploadStatus === 'pending'}>Save</button>
             </div>
           </div>
           {/* <div className="pb-json-section">
