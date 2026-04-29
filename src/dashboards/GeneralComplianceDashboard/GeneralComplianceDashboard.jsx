@@ -18,7 +18,6 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
     const [filterColumns, setFilterColumns] = useState([]);
     const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
     const [paginatedData, setPaginatedData] = useState([]);
-    // console.log(paginatedData.paginatedRecords.challan.records, "paginatedData");
     useEffect(() => {
         const fetchGeneralComplianceData = async () => {
             const results = await Promise.allSettled([
@@ -202,7 +201,6 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         setDrawerOpen(true);
         setFilterColumns(filterColumn);
     };
-    console.log(data?.data?.registers?.length, 'length')
     return (
         <>
             <Snackbars
