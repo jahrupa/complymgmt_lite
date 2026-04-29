@@ -49,7 +49,6 @@ const CockpitComplince = ({
     clientData: [],
     clientCompliance: [],
   });
-  console.log(data.clientData, 'data12')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));
@@ -74,7 +73,6 @@ const CockpitComplince = ({
       document.getElementById("filter-text-box").value,
     );
   }, []);
-  console.log(data, 'data')
   useEffect(() => {
     const fetchCockpitData = async () => {
       const results = await Promise.allSettled([
@@ -379,7 +377,6 @@ const CockpitComplince = ({
         ...compliance,
       };
     });
-  console.log("clients:", clients);
 
   const totalPages = Math.ceil(clients.length / itemsPerPage);
 

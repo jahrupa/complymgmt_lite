@@ -195,7 +195,6 @@ export default function DashboardDrawerGrid({
       const limit = 20;
 
       const response = await fetchPaginatedRecords(page, limit);
-      console.log(response, "response");
       const rows = response.return?.records;
       const totalRows = totalPage; // 👈 total count API se lao
 
