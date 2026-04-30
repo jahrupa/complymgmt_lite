@@ -3,8 +3,9 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function MultiFileUpload({ uploadedFiles, setUploadedFiles,MAX_COUNT=5, MAX_SIZE_MB=5, setProgress,progress}) {
+export default function MultiFileUpload({ uploadedFiles, setUploadedFiles, MAX_COUNT = 5, MAX_SIZE_MB = 5, }) {
   const [dragActive, setDragActive] = useState(false);
+  const [progress, setProgress] = useState({});
   // const [progress, setProgress] = useState({});
   const inputRef = useRef();
 
@@ -140,7 +141,7 @@ export default function MultiFileUpload({ uploadedFiles, setUploadedFiles,MAX_CO
               >
                 <div
                   style={{
-                    width: `${progress[file.name] || 0}%`,
+                    width: `${progress?.[file.name] || 0}%`,
                     height: "100%",
                     background: "#4caf50",
                     borderRadius: 4,
