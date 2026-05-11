@@ -64,8 +64,6 @@ const MultiSelectFilter = ({ rowData, onFilterApply, filterColumns = [] }) => {
   const handleClearAll = () => {
     setFilters({});
     onFilterApply({});
-    setIsOpen(false);
-    setSelectedColumn(null);
   };
 
   const getTotalSelectedCount = () => {
