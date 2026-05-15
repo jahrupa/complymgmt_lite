@@ -193,6 +193,8 @@ import {
   UPDATE_MAPPING_BY_ID,
   GENERATE_AI_MAPPING_SUCCESS,
   CREATE_ENTITY,
+  GET_MULTIPLE_ENTITIES,
+  UPDATE_APPROVAL_STATUS,
 
 } from "./Endpoint";
 
@@ -2321,6 +2323,28 @@ export const createEntity = async (data) => {
     return response.data;
   } catch (error) {
     // console.error("Error creating entity:", error);
+    throw error;
+  }
+};
+
+export const fetchAllEntities = async () => {
+  try {
+    const response = await API.get(GET_MULTIPLE_ENTITIES);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const approveEntity = async (id) => {
+  try {
+    const response = await API.put(
+      `${UPDATE_APPROVAL_STATUS}${id}`
+    );
+
+    return response.data;
+
+  } catch (error) {
     throw error;
   }
 };

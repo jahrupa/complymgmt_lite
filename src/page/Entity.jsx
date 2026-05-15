@@ -25,40 +25,18 @@ import {
     AllCommunityModule,
 } from "ag-grid-community";
 import {
+    bulkApproveAllPageData,
     createEntity,
     fetchAllCompanies,
-
+    fetchAllEntities,
+    approveEntity,
 } from "../api/service";
+import { AppWindowMac } from "lucide-react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Entity = () => {
-
-    // =========================
-    // STATES
-    // =========================
-
-    const [data, setData] = useState([
-        {
-            _id: 1,
-            entity_name: "Entity One",
-            entity_code: "ENT001",
-            entity_type: "Private",
-            entity_description: "Sample description",
-            is_active: true,
-            approval_status: 0,
-        },
-        {
-            _id: 2,
-            entity_name: "Entity Two",
-            entity_code: "ENT002",
-            entity_type: "Government",
-            entity_description: "Another sample description",
-            is_active: false,
-            approval_status: 1,
-        },
-    ]);
-
+    const [data, setData] = useState([]);
     const [current, setCurrent] = useState({
         _id: null,
         entity_name: "",
@@ -133,9 +111,7 @@ const Entity = () => {
         }));
     };
 
-    // =========================
-    // OPEN MODAL
-    // =========================
+
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -148,8 +124,10 @@ const Entity = () => {
             try {
 
                 const response = await fetchAllCompanies();
+                const entities = await fetchAllEntities() || [];
 
                 setCompanyList(response || []);
+                setData(entities);
 
             } catch (error) {
 
@@ -161,10 +139,6 @@ const Entity = () => {
         getCompanies();
 
     }, []);
-
-    // =========================
-    // CLOSE MODAL
-    // =========================
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -278,21 +252,17 @@ const Entity = () => {
     };
 
     const generateDynamicColDefs = (data) => {
+
         if (!data || data.length === 0) return [];
 
         const sample = flattenObject(data[0]);
 
-        return Object.keys(sample)
+        const dynamicCols = Object.keys(sample)
             .map((key) => {
-
-                // Skip unwanted fields
                 if (key === "_id") return null;
 
-                // =========================
-                // APPROVAL STATUS COLUMN
-                // =========================
-
                 if (key === "approval_status") {
+
                     return {
                         field: key,
                         headerName: "Approval Status",
@@ -360,12 +330,8 @@ const Entity = () => {
                         },
                     };
                 }
-
-                // =========================
-                // STATUS COLUMN
-                // =========================
-
                 if (key === "is_active") {
+
                     return {
                         headerName: "Status",
                         field: key,
@@ -383,10 +349,6 @@ const Entity = () => {
                         ),
                     };
                 }
-
-                // =========================
-                // DEFAULT DYNAMIC COLUMN
-                // =========================
 
                 return {
                     field: key,
@@ -418,27 +380,93 @@ const Entity = () => {
                 };
             })
             .filter(Boolean);
+
+        // =========================
+        // ACTION COLUMN
+        // =========================
+
+        return [
+            {
+                headerName: "Actions",
+                field: "actions",
+                pinned: "left",
+                width: 130,
+                filter: false,
+                editable: false,
+                cellStyle: {
+                    backgroundColor: "rgb(252 229 205 / 64%)",
+                },
+
+                cellRenderer: (params) => (
+                    <div className="d-flex justify-content-around align-items-center">
+
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setCurrent(params.data);
+                                setIsEditing(true);
+                                setIsModalOpen(true);
+                                setEntityId(params.data._id);
+                            }}
+                        >
+                            <EditIcon
+                                fontSize="small"
+                                className="action_icon"
+                            />
+                        </button>
+
+                        <button
+                            className="btn btn-sm"
+                            onClick={() => {
+                                setEntityId(params.data._id);
+                                setIsDeleteModalOpen(true);
+                            }}
+                        >
+                            <DeleteIcon
+                                fontSize="small"
+                                className="action_icon"
+                            />
+                        </button>
+
+                    </div>
+                ),
+            },
+
+            ...dynamicCols,
+        ];
     };
 
-    // =========================
-    // APPROVE ALL
-    // =========================
+    const handleApproveAll = async () => {
 
-    const handleApproveAll = () => {
+        try {
 
-        const updatedData = data.map((item) => ({
-            ...item,
-            approval_status: 1,
-        }));
+            const response =
+                await bulkApproveAllPageData("entity");
 
-        setData(updatedData);
+            const message =
+                response?.message ||
+                "Status update successfully";
 
-        setIsSnackbarsOpen({
-            ...issnackbarsOpen,
-            open: true,
-            message: "All entities approved",
-            severityType: "success",
-        });
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message,
+                severityType: "success",
+            });
+
+        } catch (error) {
+
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message,
+                severityType: "error",
+            });
+        }
+
+        const updatedData = await fetchAllEntities();
+
+        setData(updatedData || []);
     };
 
     // =========================
@@ -477,55 +505,7 @@ const Entity = () => {
     // COLUMN DEFINITIONS
     // =========================
 
-    const colDefs = [
-        {
-            headerName: "Actions",
-            field: "actions",
-            pinned: "left",
-            width: 130,
-            minWidth: 110,
-            maxWidth: 110,
-            filter: false,
-            editable: false,
-            cellStyle: { backgroundColor: "rgb(252 229 205 / 64%)" },
 
-            cellRenderer: (params) => (
-                <div className="d-flex justify-content-around align-items-center">
-
-                    <button
-                        className="btn btn-sm"
-                        onClick={() => {
-                            setCurrent(params.data);
-                            setIsEditing(true);
-                            setIsModalOpen(true);
-                            setEntityId(params.data._id);
-                        }}
-                    >
-                        <EditIcon
-                            fontSize="small"
-                            className="action_icon"
-                        />
-                    </button>
-
-                    <button
-                        className="btn btn-sm"
-                        onClick={() => {
-                            setEntityId(params.data._id);
-                            setIsDeleteModalOpen(true);
-                        }}
-                    >
-                        <DeleteIcon
-                            fontSize="small"
-                            className="action_icon"
-                        />
-                    </button>
-
-                </div>
-            ),
-        },
-
-        ...generateDynamicColDefs(data),
-    ];
 
     // =========================
     // DEFAULT COLUMN DEF
@@ -820,7 +800,7 @@ const Entity = () => {
                         ref={gridRef}
                         theme="legacy"
                         rowData={filteredRowData}
-                        columnDefs={colDefs}
+                        columnDefs={generateDynamicColDefs(data)}
                         defaultColDef={defaultColDef}
                         pagination={true}
                         rowSelection="single"
