@@ -192,6 +192,7 @@ import {
   DELETE_MAPPING_BY_ID,
   UPDATE_MAPPING_BY_ID,
   GENERATE_AI_MAPPING_SUCCESS,
+  CREATE_ENTITY,
 
 } from "./Endpoint";
 
@@ -2197,13 +2198,13 @@ export const processRegister = async (payload) => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        responseType: "blob",          
+        responseType: "blob",
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
       }
     );
 
-    return response; 
+    return response;
   } catch (error) {
     throw error;
   }
@@ -2293,7 +2294,7 @@ export const updateMappingById = async (id, data) => {
 
 
 
-export const generateAIMapping = async (filesArray,id) => {
+export const generateAIMapping = async (filesArray, id) => {
   try {
     const formData = new FormData();
 
@@ -2313,3 +2314,14 @@ export const generateAIMapping = async (filesArray,id) => {
     throw error;
   }
 }
+
+export const createEntity = async (data) => {
+  try {
+    const response = await API.post(CREATE_ENTITY, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error creating entity:", error);
+    throw error;
+  }
+};
+

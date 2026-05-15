@@ -24,7 +24,11 @@ import {
     ModuleRegistry,
     AllCommunityModule,
 } from "ag-grid-community";
-import { fetchAllCompanies } from "../api/service";
+import {
+    createEntity,
+    fetchAllCompanies,
+
+} from "../api/service";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -184,33 +188,31 @@ const Entity = () => {
     // SUBMIT
     // =========================
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validate()) return;
+        // if (!validate()) return;
 
+        const payload = {
+            name: current.name || "",
+            common_name: current.common_name || "",
+            description: current.description || "",
+            address: current.address || "",
+            company_id: current.company_id || null,
+        };
 
-        if (isEditing) {
-            const updatedData = data.map((item) =>
-                item._id === entityId
-                    ? {
-                        ...item,
-                        ...current,
-                    }
-                    : item
-            );
+        try {
 
-            setData(updatedData);
+            const response = await createEntity(payload);
 
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: "Entity updated successfully",
+                message: response?.message || "Entity created successfully",
                 severityType: "success",
             });
 
-        } else {
-
+            // Optional local table update
             const newEntity = {
                 ...current,
                 _id: Date.now(),
@@ -218,17 +220,21 @@ const Entity = () => {
                 approval_status: 0,
             };
 
-            setData([...data, newEntity]);
+            setData((prev) => [...prev, newEntity]);
+
+            closeModal();
+
+        } catch (error) {
 
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
-                message: "Entity created successfully",
-                severityType: "success",
+                message:
+                    error?.response?.data?.message ||
+                    "Failed to create entity",
+                severityType: "error",
             });
         }
-
-        closeModal();
     };
 
     // =========================
@@ -614,7 +620,10 @@ const Entity = () => {
                             company_name: "",
                         }));
                     }}
-                    names={companyList}
+                    names={companyList.map((company) => ({
+                        ...company,
+                        name: company.company_name,
+                    }))}
                     error={!!errors.company_name}
                     helperText={errors.company_name}
                 />
