@@ -29,7 +29,8 @@ import {
     createEntity,
     fetchAllCompanies,
     fetchAllEntities,
-    approveEntity,
+    deleteEntity,
+    updateEntity,
 } from "../api/service";
 import { AppWindowMac } from "lucide-react";
 
@@ -48,7 +49,7 @@ const Entity = () => {
     });
 
     const [isEditing, setIsEditing] = useState(false);
-
+    console.log(isEditing, "isEditing");
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -166,7 +167,9 @@ const Entity = () => {
         e.preventDefault();
 
         // if (!validate()) return;
-
+        const CommonAttributes = {
+            IsActive: current.is_active !== undefined ? current.is_active : true,
+        };
         const payload = {
             name: current.name || "",
             common_name: current.common_name || "",
@@ -174,10 +177,18 @@ const Entity = () => {
             address: current.address || "",
             company_id: current.company_id || null,
         };
-
+        const updateEntityPayload = {
+            ...payload,
+            common_attributes: CommonAttributes,
+        };
+        let response;
         try {
+            if (isEditing) {
+                response = await updateEntity(current._id, updateEntityPayload);
 
-            const response = await createEntity(payload);
+            } else {
+                response = await createEntity(payload);
+            }
 
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -186,15 +197,8 @@ const Entity = () => {
                 severityType: "success",
             });
 
-            // Optional local table update
-            const newEntity = {
-                ...current,
-                _id: Date.now(),
-                is_active: true,
-                approval_status: 0,
-            };
-
-            setData((prev) => [...prev, newEntity]);
+      const data = fetchAllEntities();
+            setData(data || []);
 
             closeModal();
 
@@ -215,22 +219,30 @@ const Entity = () => {
     // DELETE
     // =========================
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
+        try {
+            const response = await deleteEntity(entityId);
 
-        const updatedData = data.filter(
-            (item) => item._id !== entityId
-        );
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: response?.message || "Entity deleted successfully",
+                severityType: "success",
+            });
 
-        setData(updatedData);
+            const updatedEntities = await fetchAllEntities();
+            setData(updatedEntities || []);
 
-        setIsDeleteModalOpen(false);
+            setIsDeleteModalOpen(false);
 
-        setIsSnackbarsOpen({
-            ...issnackbarsOpen,
-            open: true,
-            message: "Entity deleted successfully",
-            severityType: "success",
-        });
+        } catch (error) {
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message: error?.response?.data?.message || "Delete failed",
+                severityType: "error",
+            });
+        }
     };
 
     // =========================
@@ -403,10 +415,11 @@ const Entity = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
+                                // const originalRow = params.data;   //  important
                                 setCurrent(params.data);
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setEntityId(params.data._id);
+                                setEntityId(params.data.id);
                             }}
                         >
                             <EditIcon
@@ -418,7 +431,7 @@ const Entity = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setEntityId(params.data._id);
+                                setEntityId(params.data.id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >

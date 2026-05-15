@@ -195,6 +195,7 @@ import {
   CREATE_ENTITY,
   GET_MULTIPLE_ENTITIES,
   UPDATE_APPROVAL_STATUS,
+  DELETE_ENTITY,
 
 } from "./Endpoint";
 
@@ -2336,14 +2337,24 @@ export const fetchAllEntities = async () => {
   }
 };
 
-export const approveEntity = async (id) => {
+export const updateEntity = async (id, data) => {
   try {
     const response = await API.put(
-      `${UPDATE_APPROVAL_STATUS}${id}`
+      `${UPDATE_ENTITY}${id}`,
+      data
     );
 
     return response.data;
 
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteEntity = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_ENTITY}/${id}`);
+    return response.data;
   } catch (error) {
     throw error;
   }

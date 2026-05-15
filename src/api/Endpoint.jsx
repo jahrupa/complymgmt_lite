@@ -248,5 +248,6 @@ export const GENERATE_AI_MAPPING_SUCCESS='/api/v2/register_processing/create/map
 export const CREATE_ENTITY = "/api/v1/entity/create";
 export const GET_MULTIPLE_ENTITIES = "/api/v1/entity/view/multiple";
 export const UPDATE_APPROVAL_STATUS = "/api/v1/entity/update/approval_status/";
+export const DELETE_ENTITY = "/api/v1/entity/delete";
 
 
