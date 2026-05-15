@@ -16,7 +16,7 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { Layers, ScanEye } from 'lucide-react';
+import { AlignCenterVertical, Layers, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 export const RegisterApplicabilityIcon = ({ active }) => (
     <svg
@@ -81,6 +81,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
         { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Group/Holding', link: 'group_holding' },
         { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
+        { icon: (active) => <AlignCenterVertical className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Entity', link: 'entity' },
         { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Subscribe Module & Sub-Module ', link: 'location_to_module' },
