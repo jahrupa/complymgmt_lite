@@ -261,7 +261,7 @@ const Entity = () => {
             .map((key) => {
                 if (key === "_id") return null;
 
-                if (key === "approval_status") {
+                if (key === "common_attributes.Approval_Status") {
 
                     return {
                         field: key,
@@ -330,7 +330,7 @@ const Entity = () => {
                         },
                     };
                 }
-                if (key === "is_active") {
+                if (key === "common_attributes.IsActive") {
 
                     return {
                         headerName: "Status",
