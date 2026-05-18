@@ -31,6 +31,7 @@ import {
     fetchAllEntities,
     deleteEntity,
     updateEntity,
+    updateApprovalStatus,
 } from "../api/service";
 import { AppWindowMac } from "lucide-react";
 
@@ -82,9 +83,6 @@ const Entity = () => {
 
         if (!current.common_name)
             tempErrors.common_name = "Common name is required";
-
-        if (!current.description)
-            tempErrors.description = "Description is required";
 
         if (!current.address)
             tempErrors.address = "Address is required";
@@ -292,20 +290,40 @@ const Entity = () => {
                                 >
                                     <input
                                         type="checkbox"
-                                        checked={status === 1}
+                                        checked={Number(status) === 1}
                                         disabled={status === 1}
-                                        onChange={() => {
+                                        onChange={async () => {
 
-                                            const updatedData = data.map((item) =>
-                                                item._id === params.data._id
-                                                    ? {
-                                                        ...item,
-                                                        approval_status: 1,
-                                                    }
-                                                    : item
-                                            );
+                                            try {
 
-                                            setData(updatedData);
+                                                const response = await updateApprovalStatus(
+                                                    params.data._id
+                                                );
+
+                                                setIsSnackbarsOpen({
+                                                    ...issnackbarsOpen,
+                                                    open: true,
+                                                    message:
+                                                        response?.message ||
+                                                        "Entity approved successfully",
+                                                    severityType: "success",
+                                                });
+
+                                                const updatedData = await fetchAllEntities();
+
+                                                setData(updatedData || []);
+
+                                            } catch (error) {
+
+                                                setIsSnackbarsOpen({
+                                                    ...issnackbarsOpen,
+                                                    open: true,
+                                                    message:
+                                                        error?.response?.data?.message ||
+                                                        "Approval failed",
+                                                    severityType: "error",
+                                                });
+                                            }
                                         }}
                                         style={{
                                             width: 15,

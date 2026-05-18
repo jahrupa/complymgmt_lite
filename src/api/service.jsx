@@ -2360,3 +2360,14 @@ export const deleteEntity = async (id) => {
   }
 };
 
+export const updateApprovalStatus = async (id) => {
+  try {
+    const response = await API.put(
+      `${UPDATE_APPROVAL_STATUS}${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
