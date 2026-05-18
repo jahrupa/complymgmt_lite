@@ -90,7 +90,7 @@ const Entity = () => {
             tempErrors.address = "Address is required";
 
         if (!current.company_id)
-           tempErrors.company_name = "Company is required";
+            tempErrors.company_name = "Company is required";
 
         setErrors(tempErrors);
 
@@ -405,12 +405,21 @@ const Entity = () => {
 
                 cellRenderer: (params) => (
                     <div className="d-flex justify-content-around align-items-center">
-
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                // const originalRow = params.data;   //  important
-                                setCurrent(params.data);
+
+                                const matchedCompany = companyList.find(
+                                    (company) =>
+                                        company._id === params.data.company_id
+                                );
+
+                                setCurrent({
+                                    ...params.data,
+                                    company_name:
+                                        matchedCompany?.company_name || "",
+                                });
+
                                 setIsEditing(true);
                                 setIsModalOpen(true);
                                 setEntityId(params.data.id);
