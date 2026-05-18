@@ -40,10 +40,10 @@ const Entity = () => {
     const [data, setData] = useState([]);
     const [current, setCurrent] = useState({
         _id: null,
-        entity_name: "",
-        entity_code: "",
-        entity_type: "",
-        entity_description: "",
+        name: "",
+        common_name: "",
+        description: "",
+        address: "",
         company_name: "",
         company_id: null,
     });
@@ -77,14 +77,20 @@ const Entity = () => {
     const validate = () => {
         let tempErrors = {};
 
-        if (!current.entity_name)
-            tempErrors.entity_name = "Entity name is required";
+        if (!current.name)
+            tempErrors.name = "Name is required";
 
-        if (!current.entity_code)
-            tempErrors.entity_code = "Entity code is required";
+        if (!current.common_name)
+            tempErrors.common_name = "Common name is required";
 
-        if (!current.entity_type)
-            tempErrors.entity_type = "Entity type is required";
+        if (!current.description)
+            tempErrors.description = "Description is required";
+
+        if (!current.address)
+            tempErrors.address = "Address is required";
+
+        if (!current.company_id)
+            tempErrors.company_id = "Company is required";
 
         setErrors(tempErrors);
 
@@ -141,10 +147,10 @@ const Entity = () => {
 
         setCurrent({
             _id: null,
-            entity_name: "",
-            entity_code: "",
-            entity_type: "",
-            entity_description: "",
+            name: "",
+            common_name: "",
+            description: "",
+            address: "",
             company_name: "",
             company_id: null,
         });
@@ -159,7 +165,7 @@ const Entity = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // if (!validate()) return;
+        if (!validate()) return;
         const CommonAttributes = {
             IsActive: current.is_active !== undefined ? current.is_active : true,
         };
@@ -190,8 +196,8 @@ const Entity = () => {
                 severityType: "success",
             });
 
-      const data = fetchAllEntities();
-            setData(data || []);
+            const updatedData = await fetchAllEntities();
+            setData(updatedData || []);
 
             closeModal();
 
@@ -209,7 +215,7 @@ const Entity = () => {
     };
 
     // DELETE
-    
+
     const handleDelete = async () => {
         try {
             const response = await deleteEntity(entityId);
@@ -382,7 +388,7 @@ const Entity = () => {
             })
             .filter(Boolean);
 
-       
+
         // ACTION COLUMN
 
         return [
@@ -510,7 +516,7 @@ const Entity = () => {
     };
 
     // CRUD FORM
-   
+
     const crudForm = () => {
         return (
             <div>
