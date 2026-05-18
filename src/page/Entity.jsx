@@ -72,10 +72,7 @@ const Entity = () => {
         severityType: "",
     });
 
-
-    // =========================
     // VALIDATION
-    // =========================
 
     const validate = () => {
         let tempErrors = {};
@@ -94,9 +91,7 @@ const Entity = () => {
         return Object.keys(tempErrors).length === 0;
     };
 
-    // =========================
     // HANDLE CHANGE
-    // =========================
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -159,9 +154,7 @@ const Entity = () => {
         setIsEditing(false);
     };
 
-    // =========================
     // SUBMIT
-    // =========================
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -215,10 +208,8 @@ const Entity = () => {
         }
     };
 
-    // =========================
     // DELETE
-    // =========================
-
+    
     const handleDelete = async () => {
         try {
             const response = await deleteEntity(entityId);
@@ -245,9 +236,7 @@ const Entity = () => {
         }
     };
 
-    // =========================
     // STATUS TOGGLE
-    // =========================
 
     const handleToggleChange = (params) => {
 
@@ -393,9 +382,8 @@ const Entity = () => {
             })
             .filter(Boolean);
 
-        // =========================
+       
         // ACTION COLUMN
-        // =========================
 
         return [
             {
@@ -482,9 +470,7 @@ const Entity = () => {
         setData(updatedData || []);
     };
 
-    // =========================
     // FILTER
-    // =========================
 
     const handleFilterApply = (newFilters) => {
         setFilters(newFilters);
@@ -501,9 +487,7 @@ const Entity = () => {
                 );
             });
 
-    // =========================
     // SEARCH
-    // =========================
 
     const onFilterTextBoxChanged = useCallback(() => {
 
@@ -514,15 +498,7 @@ const Entity = () => {
 
     }, []);
 
-    // =========================
-    // COLUMN DEFINITIONS
-    // =========================
-
-
-
-    // =========================
     // DEFAULT COLUMN DEF
-    // =========================
 
     const defaultColDef = {
         sortable: true,
@@ -533,10 +509,8 @@ const Entity = () => {
         minWidth: 150,
     };
 
-    // =========================
     // CRUD FORM
-    // =========================
-
+   
     const crudForm = () => {
         return (
             <div>
@@ -655,9 +629,7 @@ const Entity = () => {
         );
     };
 
-    // =========================
     // DELETE MODAL
-    // =========================
 
     const deleteModal = () => {
         return (
@@ -700,9 +672,7 @@ const Entity = () => {
         );
     };
 
-    // =========================
     // RETURN UI
-    // =========================
 
     return (
         <div>
