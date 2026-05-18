@@ -90,7 +90,7 @@ const Entity = () => {
             tempErrors.address = "Address is required";
 
         if (!current.company_id)
-            tempErrors.company_id = "Company is required";
+           tempErrors.company_name = "Company is required";
 
         setErrors(tempErrors);
 
