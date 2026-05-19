@@ -34,6 +34,7 @@ import {
   approveUserAccess,
   companyWiseAccess,
   documentWiseAccess,
+  fetchEntityById,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -54,6 +55,8 @@ const AccessControl = () => {
     group_name_id: null,
     company_name: "",
     company_id: null,
+    entity_name: "",
+    entity_id: null,
     location_name: "",
     location_id: null,
     location_to_module: "",
@@ -82,6 +85,7 @@ const AccessControl = () => {
   const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] =
     useState([]);
   const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
+  const [entityData, setEntityData] = useState([]);
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [locationToModule, setLocationToModule] = useState([]);
@@ -487,7 +491,7 @@ const AccessControl = () => {
             <button
               type="button"
               className="btn-sm btn btn-secondary"
-             onClick={closeDeleteModal}
+              onClick={closeDeleteModal}
             >
               <span className="button-style">Cancel</span>
             </button>
@@ -528,6 +532,8 @@ const AccessControl = () => {
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
+
+    const showEntity = current.access_type === "company_location";
     const showLocation =
       ["company_location"].includes(current.access_type) &&
       !showOnlyModule &&
@@ -717,6 +723,34 @@ const AccessControl = () => {
               }))}
               error={!!errors.company_name}
               helperText={errors.company_name}
+            />
+          )}
+
+          {showEntity && (
+            <SingleSelectTextField
+              name="entity_name"
+              label="Entity"
+              value={current?.entity_name}
+              isdisable={isEditing ? true : false}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+
+                const matchedEntity = entityData.find(
+                  (g) => g.entity_name === selectedName
+                );
+
+                setCurrent((prev) => ({
+                  ...prev,
+                  entity_name: selectedName,
+                  entity_id: matchedEntity?._id || null,
+                }));
+              }}
+              names={entityData?.map((data) => ({
+                _id: data?._id,
+                name: data?.entity_name,
+              }))}
+              error={!!errors.entity_name}
+              helperText={errors.entity_name}
             />
           )}
         </div>
@@ -1504,6 +1538,24 @@ const AccessControl = () => {
 
     if (current?.company_id) {
       fetchLocationByCompanyId();
+    }
+  }, [current?.company_id]);
+
+  useEffect(() => {
+    const fetchEntityData = async () => {
+      try {
+        const data = await fetchEntityById(current?.company_id);
+
+        if (data) {
+          setEntityData(data);
+        }
+      } catch {
+        // handle error silently
+      }
+    };
+
+    if (current?.company_id) {
+      fetchEntityData();
     }
   }, [current?.company_id]);
 
