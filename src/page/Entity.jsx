@@ -48,7 +48,7 @@ const Entity = () => {
         company_name: "",
         company_id: null,
     });
-
+console.log(current,'current');
     const [isEditing, setIsEditing] = useState(false);
     console.log(isEditing, "isEditing");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -181,7 +181,7 @@ const Entity = () => {
         let response;
         try {
             if (isEditing) {
-                response = await updateEntity(current._id, updateEntityPayload);
+                response = await updateEntity(current.id, updateEntityPayload);
 
             } else {
                 response = await createEntity(payload);
@@ -297,7 +297,7 @@ const Entity = () => {
                                             try {
 
                                                 const response = await updateApprovalStatus(
-                                                    params.data._id
+                                                    params.data.id
                                                 );
 
                                                 setIsSnackbarsOpen({

@@ -196,6 +196,7 @@ import {
   GET_MULTIPLE_ENTITIES,
   UPDATE_APPROVAL_STATUS,
   DELETE_ENTITY,
+  UPDATE_ENTITY,
 
 } from "./Endpoint";
 
