@@ -7,7 +7,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, fetchAllEntities, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById, } from '../api/service';
+import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, fetchEntityById, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById, } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -37,6 +37,7 @@ const Location = () => {
             updated_at: '',
             city: '',
             state: '',
+            location_address: '',
             location_description: ''
         });
     const [isEditing, setIsEditing] = useState(false);
@@ -228,14 +229,12 @@ const Location = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [locationData, groupHolding, entities] = await Promise.all([
+                const [locationData, groupHolding,] = await Promise.all([
                     fetchAllLocation(),
                     fetchAllGroupHolding(),
-                    fetchAllEntities(),
                 ]);
                 setData(locationData);
                 setGroupHoldinData(groupHolding);
-                setEntityList(entities || []);
 
             } catch {
                 // handle error silently
@@ -260,6 +259,24 @@ const Location = () => {
             fetchCompany();
         }
     }, [current?.group_holding_id]);
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            try {
+                const data = await fetchEntityById(current?.company_id);
+
+                if (data) {
+                    setEntityList(data);
+                }
+            } catch {
+                // handle error silently
+            }
+        };
+
+        if (current?.company_id) {
+            fetchEntities();
+        }
+    }, [current?.company_id]);
 
     const handleToggleChange = async (e, params) => {
         const newIsActive = {
@@ -326,6 +343,10 @@ const Location = () => {
                                 ...prev,
                                 company_name: selectedName,
                                 company_id: matchedGroup._id || null,
+
+                                // reset entity
+                                entity_name: '',
+                                entity_id: null,
                             }));
                             setErrors(prevErrors => ({ ...prevErrors, company_name: '' }));
                         }}

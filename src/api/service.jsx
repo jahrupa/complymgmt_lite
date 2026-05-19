@@ -197,6 +197,7 @@ import {
   UPDATE_APPROVAL_STATUS,
   DELETE_ENTITY,
   UPDATE_ENTITY,
+  GET_ENTITIES_BY_COMPANY_ID
 
 } from "./Endpoint";
 
@@ -2372,3 +2373,16 @@ export const updateApprovalStatus = async (id) => {
     throw error;
   }
 };
+
+export const fetchEntityById = async (id) => {
+  try {
+    const response = await API.get(
+      `${GET_ENTITIES_BY_COMPANY_ID}${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+

@@ -252,5 +252,6 @@ export const GET_MULTIPLE_ENTITIES = "/api/v1/entity/view/multiple";
 export const UPDATE_APPROVAL_STATUS = "/api/v1/entity/update/approval_status/";
 export const DELETE_ENTITY = "/api/v1/entity/delete";
 export const UPDATE_ENTITY = "/api/v1/entity/update/";
+export const GET_ENTITIES_BY_COMPANY_ID = "/api/v1/entity/view/company_id/";
 
 
