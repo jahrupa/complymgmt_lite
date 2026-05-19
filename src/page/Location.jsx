@@ -7,7 +7,7 @@ import MuiTextField from '../component/MuiInputs/MuiTextField';
 import AddIcon from '@mui/icons-material/Add';
 import SmallSizeModal from '../component/SmallSizeModal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById } from '../api/service';
+import { bulkApproveAllPageData, createLocation, deleteLocationById, fetchAllGroupHolding, fetchAllLocation, fetchCompaniesNameByGroupId, fetchAllEntities, updateLocationById, updateLocationStatusById, updateCompanyApprovalStatusById, updateCompanyLocationApprovalStatusById, } from '../api/service';
 import DeleteModal from '../component/DeleteModal';
 import Snackbars from '../component/Snackbars';
 import { AgGridReact } from 'ag-grid-react';
@@ -28,6 +28,8 @@ const Location = () => {
             group_holding_id: null,
             company_name: '',
             company_id: null,
+            entity_name: '',
+            entity_id: null,
             group_name: '',
             created_at: '',
             location_name: "",
@@ -66,6 +68,7 @@ const Location = () => {
     }, [data, filters]);
     const [locationId, setLocationId] = useState(null);
     const [companyNameByGroupHoldingId, setCompanyNameByGroupHoldingId] = useState([])
+    const [entityList, setEntityList] = useState([])
     const [errors, setErrors] = useState({});
 
     const validate = () => {
@@ -125,12 +128,15 @@ const Location = () => {
         const payload = {
             "GroupHoldingsID": current?.group_holding_id,
             "CompanyID": current?.company_id,
+            "EntityID": current?.entity_id,
             "LocationName": current?.location_name,
             "LocationDescription": current?.location_description,
+            "LocationAddress": current?.location_address,
             "City": current?.city,
             "State": current?.state,
             "CommonAttributes": CommonAttributes
         };
+        console.log(payload);
         try {
             if (isEditing) {
                 // Update existing location
@@ -161,11 +167,14 @@ const Location = () => {
             setCurrent({
                 company_id: null,
                 company_name: '',
+                entity_name: '',
+                entity_id: null,
                 group_name: '',
                 group_holding_id: null,
                 created_at: '',
                 updated_at: '',
                 location_description: '',
+                location_address: '',
             });
 
             setIsEditing(false);
@@ -219,13 +228,14 @@ const Location = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [locationData, groupHolding, companyName,] = await Promise.all([
+                const [locationData, groupHolding, entities] = await Promise.all([
                     fetchAllLocation(),
                     fetchAllGroupHolding(),
+                    fetchAllEntities(),
                 ]);
                 setData(locationData);
                 setGroupHoldinData(groupHolding);
-                setCompanyNameData(companyName);
+                setEntityList(entities || []);
 
             } catch {
                 // handle error silently
@@ -328,6 +338,39 @@ const Location = () => {
                         helperText={errors.company_name}
                     />
                 </div>
+
+                <div>
+                    <SingleSelectTextField
+                        name="entity_name"
+                        label="Entity"
+                        value={current?.entity_name || ''}
+                        onChange={(e) => {
+
+                            const selectedEntity = e.target.value;
+
+                            const matchedEntity = entityList.find(
+                                (entity) => entity.name === selectedEntity
+                            ) || {};
+
+                            setCurrent((prev) => ({
+                                ...prev,
+                                entity_name: selectedEntity,
+                                entity_id: matchedEntity._id || null,
+                            }));
+
+                            setErrors(prevErrors => ({
+                                ...prevErrors,
+                                entity_name: ''
+                            }));
+                        }}
+                        names={entityList?.map((entity) => ({
+                            _id: entity?._id,
+                            name: entity?.name
+                        }))}
+                        error={!!errors.entity_name}
+                        helperText={errors.entity_name}
+                    />
+                </div>
                 <div>
                     <MuiTextField
                         label="Location"
@@ -366,6 +409,21 @@ const Location = () => {
                         helperText={errors.state}
                     />
                 </div>
+
+
+                <div>
+                    <MuiTextField
+                        label="Address"
+                        type="text"
+                        isRequired={true}
+                        fieldName="location_address"
+                        handleChange={handleChange}
+                        value={current?.location_address || ''}
+                        error={!!errors.location_address}
+                        helperText={errors.location_address}
+                    />
+                </div>
+
                 <div>
                     <MuiTextField
                         label="Description"
