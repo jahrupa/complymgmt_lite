@@ -48,9 +48,9 @@ const Entity = () => {
         company_name: "",
         company_id: null,
     });
-console.log(current,'current');
+
     const [isEditing, setIsEditing] = useState(false);
-    console.log(isEditing, "isEditing");
+    
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
