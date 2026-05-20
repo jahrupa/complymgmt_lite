@@ -50,7 +50,7 @@ const Entity = () => {
     });
 
     const [isEditing, setIsEditing] = useState(false);
-    
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -575,17 +575,6 @@ const Entity = () => {
                 </div>
 
                 <MuiTextField
-                    label="Description"
-                    type="text"
-                    fieldName="description"
-                    handleChange={handleChange}
-                    value={current.description}
-                    error={!!errors.description}
-                    helperText={errors.description}
-                    isRequired={true}
-                />
-
-                <MuiTextField
                     label="Address"
                     type="text"
                     fieldName="address"
@@ -626,6 +615,17 @@ const Entity = () => {
                     }))}
                     error={!!errors.company_name}
                     helperText={errors.company_name}
+                />
+
+                <MuiTextField
+                    label="Description"
+                    type="text"
+                    fieldName="description"
+                    handleChange={handleChange}
+                    value={current.description}
+                    error={!!errors.description}
+                    helperText={errors.description}
+                    isRequired={true}
                 />
 
                 <div className="row row-gap-2 mt-3">

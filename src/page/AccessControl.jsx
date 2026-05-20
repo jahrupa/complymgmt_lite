@@ -745,10 +745,10 @@ const AccessControl = () => {
                   entity_id: matchedEntity?._id || null,
                 }));
               }}
-              names={entityData?.map((data) => ({
-                _id: data?._id,
-                name: data?.entity_name,
-              }))}
+              names={entityData?.map((entity) => ({
+                            _id: entity?._id,
+                            name: entity?.name,
+                        }))}
               error={!!errors.entity_name}
               helperText={errors.entity_name}
             />

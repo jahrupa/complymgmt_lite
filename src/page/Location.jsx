@@ -40,6 +40,7 @@ const Location = () => {
             location_address: '',
             location_description: ''
         });
+        console.log("current", current);
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
@@ -267,9 +268,12 @@ const Location = () => {
 
                 if (data) {
                     setEntityList(data);
+                }else {
+                    setEntityList([]);
                 }
             } catch {
                 // handle error silently
+                setEntityList([]);
             }
         };
 
@@ -376,7 +380,7 @@ const Location = () => {
                             setCurrent((prev) => ({
                                 ...prev,
                                 entity_name: selectedEntity,
-                                entity_id: matchedEntity._id || null,
+                                entity_id: matchedEntity.id || null,
                             }));
 
                             setErrors(prevErrors => ({
@@ -385,7 +389,7 @@ const Location = () => {
                             }));
                         }}
                         names={entityList?.map((entity) => ({
-                            _id: entity?._id,
+                            _id: entity?.id,
                             name: entity?.name
                         }))}
                         error={!!errors.entity_name}

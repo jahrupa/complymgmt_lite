@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateLocationToModulesApprovalStatusById, fetchEntityById, } from '../api/service';
+import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateLocationToModulesApprovalStatusById, fetchEntityById, getAllCompanyLocationByEntityId } from '../api/service';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -282,11 +282,14 @@ const LocationToModule = () => {
 
                 if (data) {
                     setEntityList(data);
+
                 } else {
                     setEntityList([]);
+
                 }
             } catch {
                 setEntityList([]);
+
             }
         };
 
@@ -364,7 +367,7 @@ const LocationToModule = () => {
                         name="entity_name"
                         label="Entity"
                         value={current?.entity_name || ''}
-                        onChange={(e) => {
+                        onChange={async (e) => {
 
                             const selectedEntity = e.target.value;
 
@@ -372,29 +375,65 @@ const LocationToModule = () => {
                                 (entity) => entity.name === selectedEntity
                             ) || {};
 
+                            const selectedEntityId = matchedEntity.id || null;
+
+                            // entity set karo
                             setCurrent((prev) => ({
                                 ...prev,
                                 entity_name: selectedEntity,
-                                entity_id: matchedEntity._id || null,
+                                entity_id: selectedEntityId,
+
+                                // location reset
+                                location_name: '',
+                                location_id: null,
                             }));
+
+                            // agar entity remove kiya
+                            if (!selectedEntityId) {
+
+                                const allLocations =
+                                    await getLocationByCompanyId(current?.company_id);
+
+                                setLocationName(allLocations || []);
+
+                                return;
+                            }
+
+                            try {
+
+                                // selected entity ke locations lao
+                                const entityLocations =
+                                    await getAllCompanyLocationByEntityId(selectedEntityId);
+
+                                // sirf wahi locations dropdown mai dikhao
+                                setLocationName(entityLocations || []);
+
+                            } catch {
+
+                                setLocationName([]);
+                            }
                         }}
+
                         names={entityList?.map((entity) => ({
-                            _id: entity?._id,
+                            _id: entity?.id,
                             name: entity?.name,
                         }))}
                     />
                     <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
                         onChange={(e) => {
                             const selectedName = e.target.value;
+
                             const matchedLocation = locationName.find(
                                 (g) => g.location_name === selectedName
                             );
+
                             setCurrent((prev) => ({
                                 ...prev,
                                 location_name: selectedName,
                                 location_id: matchedLocation?._id || null,
                             }));
                         }}
+
                         names={locationName.map((item) => ({
                             _id: item._id,
                             name: item.location_name,
