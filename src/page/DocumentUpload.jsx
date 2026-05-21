@@ -20,6 +20,8 @@ import {
   fetchDocumentDropdownTypes,
   fetchDocumentDropdownStages,
   downloadFile,
+  fetchEntityById,
+  getAllCompanyLocationByEntityId,
 } from "../api/service";
 import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
@@ -48,6 +50,8 @@ const DocumentUpload = () => {
     group_holdings_id: null,
     company_name: "",
     company_id: null,
+    entity_name: "",
+    entity_id: null,
     location_name: "",
     location_id: null,
     module_name: "",
@@ -95,6 +99,7 @@ const DocumentUpload = () => {
   const [groupHoldingName, setGroupHoldingName] = useState([]);
   const [companyName, setCompanyName] = useState([]);
   const [locationName, setLocationName] = useState([]);
+  const [entityName, setEntityName] = useState([]);
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [serviceTrackerName, setServiceTrackerName] = useState([]);
@@ -377,6 +382,26 @@ const DocumentUpload = () => {
       fetchCompany();
     }
   }, [current?.group_holdings_id]);
+
+  useEffect(() => {
+    const fetchEntities = async () => {
+      try {
+        const data = await fetchEntityById(current?.company_id);
+
+        if (data) {
+          setEntityName(data);
+        } else {
+          setEntityName([]);
+        }
+      } catch {
+        setEntityName([]);
+      }
+    };
+
+    if (current?.company_id) {
+      fetchEntities();
+    }
+  }, [current?.company_id]);
 
   useEffect(() => {
     const fetchLocationByCompanyId = async () => {
@@ -905,8 +930,25 @@ const DocumentUpload = () => {
                 group_name: selectedName,
                 group_holdings_id: matchedGroup?._id || null,
                 company_name: "",
+                company_id: null,
+                entity_name: "",
+                entity_id: null,
                 location_name: "",
+                location_id: null,
+                module_name: "",
+                module_id: null,
+                sub_module_name: "",
+                sub_module_id: null,
+                service_tracker_name: "",
+                service_tracker_id: null,
               }));
+
+              setCompanyName([]);
+              setEntityName([]);
+              setLocationName([]);
+              setModuleName([]);
+              setSubModuleName([]);
+              setServiceTrackerName([]);
               setErrors((prevErrors) => ({ ...prevErrors, group_name: "" }));
             }}
             names={groupHoldingName.map((item) => ({
@@ -929,7 +971,23 @@ const DocumentUpload = () => {
                 ...prev,
                 company_name: selectedName,
                 company_id: matchedCompany?._id || null,
+                entity_name: "",
+                entity_id: null,
+                location_name: "",
+                location_id: null,
+                module_name: "",
+                module_id: null,
+                sub_module_name: "",
+                sub_module_id: null,
+                service_tracker_name: "",
+                service_tracker_id: null,
               }));
+
+              setEntityName([]);
+              setLocationName([]);
+              setModuleName([]);
+              setSubModuleName([]);
+              setServiceTrackerName([]);
               setErrors((prevErrors) => ({ ...prevErrors, company_name: "" }));
             }}
             names={companyName.map((item) => ({
@@ -941,7 +999,64 @@ const DocumentUpload = () => {
             helperText={errors.company_name}
           />
         </div>
+
         <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <SingleSelectTextField
+            name="entity_name"
+            label="Entity"
+            value={current?.entity_name || ""}
+            onChange={async (e) => {
+              const selectedEntity = e.target.value;
+
+              const matchedEntity =
+                entityName.find(
+                  (entity) => entity.name === selectedEntity
+                ) || {};
+
+              const selectedEntityId = matchedEntity.id || null;
+
+              setCurrent((prev) => ({
+                ...prev,
+                entity_name: selectedEntity,
+                entity_id: selectedEntityId,
+                location_name: "",
+                location_id: null,
+                module_name: "",
+                module_id: null,
+                sub_module_name: "",
+                sub_module_id: null,
+                service_tracker_name: "",
+                service_tracker_id: null,
+              }));
+
+              setModuleName([]);
+              setSubModuleName([]);
+              setServiceTrackerName([]);
+              if (!selectedEntityId) {
+                const allLocations =
+                  await getLocationByCompanyId(current?.company_id);
+
+                setLocationName(allLocations || []);
+
+                return;
+              }
+
+              try {
+                const entityLocations =
+                  await getAllCompanyLocationByEntityId(
+                    selectedEntityId
+                  );
+
+                setLocationName(entityLocations || []);
+              } catch {
+                setLocationName([]);
+              }
+            }}
+            names={entityName?.map((entity) => ({
+              _id: entity?.id,
+              name: entity?.name,
+            }))}
+          />
           <SingleSelectTextField
             name="location_name"
             label="Location"
@@ -988,6 +1103,7 @@ const DocumentUpload = () => {
             helperText={errors.module_name}
           />
         </div>
+
         <div className="d-lg-flex d-md-flex gap-3 mb-3">
           <SingleSelectTextField
             name="sub_module_name"
