@@ -48,9 +48,9 @@ const Entity = () => {
         company_name: "",
         company_id: null,
     });
-console.log(current,'current');
+
     const [isEditing, setIsEditing] = useState(false);
-    console.log(isEditing, "isEditing");
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -551,7 +551,7 @@ console.log(current,'current');
                 <div className="d-lg-flex d-md-flex gap-3">
 
                     <MuiTextField
-                        label="Name"
+                        label="Entity Name"
                         type="text"
                         fieldName="name"
                         handleChange={handleChange}
@@ -573,17 +573,6 @@ console.log(current,'current');
                     />
 
                 </div>
-
-                <MuiTextField
-                    label="Description"
-                    type="text"
-                    fieldName="description"
-                    handleChange={handleChange}
-                    value={current.description}
-                    error={!!errors.description}
-                    helperText={errors.description}
-                    isRequired={true}
-                />
 
                 <MuiTextField
                     label="Address"
@@ -626,6 +615,17 @@ console.log(current,'current');
                     }))}
                     error={!!errors.company_name}
                     helperText={errors.company_name}
+                />
+
+                <MuiTextField
+                    label="Description"
+                    type="text"
+                    fieldName="description"
+                    handleChange={handleChange}
+                    value={current.description}
+                    error={!!errors.description}
+                    helperText={errors.description}
+                    isRequired={true}
                 />
 
                 <div className="row row-gap-2 mt-3">

@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
-import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateLocationToModulesApprovalStatusById, } from '../api/service';
+import { bulkApproveAllPageData, createsLocationToModule, deleteLocationToModuleByStatusId, fetchAllGroupHolding, fetchAllModulesName, fetchAllSubModuleNameByModuleId, fetchCompaniesNameByGroupId, fetchLocationToModuleModule, getLocationByCompanyId, updateLocationToModuleById, updateLocationToModuleByStatusId, updateLocationToModulesApprovalStatusById, fetchEntityById, getAllCompanyLocationByEntityId } from '../api/service';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
@@ -35,6 +35,8 @@ const LocationToModule = () => {
             group_holding_id: null,
             company_name: "",
             company_id: null,
+            entity_name: '',
+            entity_id: null,
             location_name: "",
             location_id: null,
             module_name: '',
@@ -49,6 +51,7 @@ const LocationToModule = () => {
     const [groupHoldingName, setGroupHoldingName] = useState([])
     const [companyName, setCompanyName] = useState([])
     const [locationName, setLocationName] = useState([])
+    const [entityList, setEntityList] = useState([])
     const [moduleName, setModuleName] = useState([])
     const [subModuleName, setSubModuleName] = useState([])
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -117,6 +120,7 @@ const LocationToModule = () => {
         };
         const payload = {
             "CompanyID": current?.company_id,
+            "EntityID": current?.entity_id,
             "LocationID": current?.location_id,
             "ModuleID": current?.module_id,
             "SubmoduleID": current?.sub_module_id,
@@ -148,6 +152,8 @@ const LocationToModule = () => {
             group_holding_id: null,
             company_name: "",
             company_id: null,
+            entity_name: '',
+            entity_id: null,
             location_name: "",
             location_id: null,
             module_name: '',
@@ -202,6 +208,8 @@ const LocationToModule = () => {
             group_holding_id: null,
             company_name: "",
             company_id: null,
+            entity_name: '',
+            entity_id: null,
             location_name: "",
             location_id: null,
             module_name: '',
@@ -268,6 +276,29 @@ const LocationToModule = () => {
     }, [current?.group_holding_id]);
 
     useEffect(() => {
+        const fetchEntities = async () => {
+            try {
+                const data = await fetchEntityById(current?.company_id);
+
+                if (data) {
+                    setEntityList(data);
+
+                } else {
+                    setEntityList([]);
+
+                }
+            } catch {
+                setEntityList([]);
+
+            }
+        };
+
+        if (current?.company_id) {
+            fetchEntities();
+        }
+    }, [current?.company_id]);
+
+    useEffect(() => {
         const fetchLocationByCompanyId = async () => {
             try {
                 const data = await getLocationByCompanyId(current?.company_id);
@@ -318,6 +349,10 @@ const LocationToModule = () => {
                                 ...prev,
                                 company_name: selectedName,
                                 company_id: matchedCompany?._id || null,
+
+
+                                entity_name: '',
+                                entity_id: null,
                             }));
                         }}
                         names={companyName.map((item) => ({
@@ -327,18 +362,78 @@ const LocationToModule = () => {
                         error={!!errors.company_name}
                         helperText={errors.company_name}
                     />
+
+                    <SingleSelectTextField
+                        name="entity_name"
+                        label="Entity"
+                        value={current?.entity_name || ''}
+                        onChange={async (e) => {
+
+                            const selectedEntity = e.target.value;
+
+                            const matchedEntity = entityList.find(
+                                (entity) => entity.name === selectedEntity
+                            ) || {};
+
+                            const selectedEntityId = matchedEntity.id || null;
+
+                            // entity set karo
+                            setCurrent((prev) => ({
+                                ...prev,
+                                entity_name: selectedEntity,
+                                entity_id: selectedEntityId,
+
+                                // location reset
+                                location_name: '',
+                                location_id: null,
+                            }));
+
+                            // agar entity remove kiya
+                            if (!selectedEntityId) {
+
+                                const allLocations =
+                                    await getLocationByCompanyId(current?.company_id);
+
+                                setLocationName(allLocations || []);
+
+                                return;
+                            }
+
+                            try {
+
+                                // selected entity ke locations lao
+                                const entityLocations =
+                                    await getAllCompanyLocationByEntityId(selectedEntityId);
+
+                                // sirf wahi locations dropdown mai dikhao
+                                setLocationName(entityLocations || []);
+
+                            } catch {
+
+                                setLocationName([]);
+                            }
+                        }}
+
+                        names={entityList?.map((entity) => ({
+                            _id: entity?.id,
+                            name: entity?.name,
+                        }))}
+                    />
                     <SingleSelectTextField name="location_name" label="Location" value={current?.location_name}
                         onChange={(e) => {
                             const selectedName = e.target.value;
+
                             const matchedLocation = locationName.find(
                                 (g) => g.location_name === selectedName
                             );
+
                             setCurrent((prev) => ({
                                 ...prev,
                                 location_name: selectedName,
                                 location_id: matchedLocation?._id || null,
                             }));
                         }}
+
                         names={locationName.map((item) => ({
                             _id: item._id,
                             name: item.location_name,

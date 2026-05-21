@@ -197,6 +197,8 @@ import {
   UPDATE_APPROVAL_STATUS,
   DELETE_ENTITY,
   UPDATE_ENTITY,
+  GET_ENTITIES_BY_COMPANY_ID,
+  GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID
 
 } from "./Endpoint";
 
@@ -2372,3 +2374,28 @@ export const updateApprovalStatus = async (id) => {
     throw error;
   }
 };
+
+export const fetchEntityById = async (id) => {
+  try {
+    const response = await API.get(
+      `${GET_ENTITIES_BY_COMPANY_ID}${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllCompanyLocationByEntityId = async (id) => {
+  try {
+    const response = await API.get(
+      `${GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID}${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
