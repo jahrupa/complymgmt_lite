@@ -192,6 +192,11 @@ import {
   DELETE_MAPPING_BY_ID,
   UPDATE_MAPPING_BY_ID,
   GENERATE_AI_MAPPING_SUCCESS,
+  CREATE_ENTITY,
+  GET_MULTIPLE_ENTITIES,
+  UPDATE_APPROVAL_STATUS,
+  DELETE_ENTITY,
+  UPDATE_ENTITY,
 
 } from "./Endpoint";
 
@@ -2197,13 +2202,13 @@ export const processRegister = async (payload) => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        responseType: "blob",          
+        responseType: "blob",
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
       }
     );
 
-    return response; 
+    return response;
   } catch (error) {
     throw error;
   }
@@ -2293,7 +2298,7 @@ export const updateMappingById = async (id, data) => {
 
 
 
-export const generateAIMapping = async (filesArray,id) => {
+export const generateAIMapping = async (filesArray, id) => {
   try {
     const formData = new FormData();
 
@@ -2313,3 +2318,57 @@ export const generateAIMapping = async (filesArray,id) => {
     throw error;
   }
 }
+
+export const createEntity = async (data) => {
+  try {
+    const response = await API.post(CREATE_ENTITY, data);
+    return response.data;
+  } catch (error) {
+    // console.error("Error creating entity:", error);
+    throw error;
+  }
+};
+
+export const fetchAllEntities = async () => {
+  try {
+    const response = await API.get(GET_MULTIPLE_ENTITIES);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateEntity = async (id, data) => {
+  try {
+    const response = await API.put(
+      `${UPDATE_ENTITY}${id}`,
+      data
+    );
+
+    return response.data;
+
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteEntity = async (id) => {
+  try {
+    const response = await API.delete(`${DELETE_ENTITY}/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateApprovalStatus = async (id) => {
+  try {
+    const response = await API.put(
+      `${UPDATE_APPROVAL_STATUS}${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

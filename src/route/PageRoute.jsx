@@ -40,6 +40,7 @@ import CreateRegister from '../page/CreateRegister.jsx';
 import RegisterApplicability from '../page/RegisterApplicability.jsx';
 import RegisterMapping from '../page/RegisterMapping.jsx';
 import RegisterProcess from '../page/RegisterProcess.jsx';
+import Entity from '../page/Entity.jsx';
 
 
 
@@ -112,6 +113,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/create_user_role" element={<UserRolesPage />} />
             <Route path="/add_user" element={<AddUser />} />
             <Route path="/company" element={<Company />} />
+            <Route path="/entity" element={<Entity />} />
             <Route path="/group_holding" element={<GroupCompaniesPage />} />
             <Route path="/location" element={<Location />} />
             <Route path="/module" element={<Module />} />
