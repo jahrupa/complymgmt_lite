@@ -2,20 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X, Filter } from 'lucide-react';
 import './MultiSelectFilter.css';
 
-const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
+const MultiSelectFilter = ({ rowData, onFilterApply, filterColumns = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState(null);
   const [filters, setFilters] = useState({});
   const dropdownRef = useRef(null);
 
   const columns = rowData.length > 0
-  ? Object.keys(rowData[0]).filter(key => {
-    // key === 'common_attributes' is a nested object that we don't want to show as a filter option
-      if (key === '_id' || key === 'common_attributes'|| key === 'ai_data') return false;
+    ? Object.keys(rowData[0]).filter(key => {
+      // key === 'common_attributes' is a nested object that we don't want to show as a filter option
+      if (key === '_id' || key === 'common_attributes' || key === 'ai_data') return false;
       if (!filterColumns.length) return true;
       return filterColumns.includes(key);
     })
-  : [];
+    : [];
 
 
   const getUniqueValues = (columnName) => {
@@ -55,22 +55,6 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
     });
   };
 
-  const handleRemoveFilter = (column, value) => {
-    setFilters(prev => {
-      if (value) {
-        const newValues = (prev[column] || []).filter(v => v !== value);
-        if (newValues.length === 0) {
-          const { [column]: _, ...rest } = prev;
-          return rest;
-        }
-        return { ...prev, [column]: newValues };
-      } else {
-        const { [column]: _, ...rest } = prev;
-        return rest;
-      }
-    });
-  };
-
   const handleApply = () => {
     onFilterApply(filters);
     setIsOpen(false);
@@ -103,27 +87,7 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
         <ChevronDown className={`chevron-icon ${isOpen ? 'rotate' : ''}`} />
       </button>
 
-      {Object.keys(filters).length > 0 && (
-        <div className="filter-tags">
-          {Object.entries(filters).map(([column, values]) =>
-            values.map(value => (
-              <div key={`${column}-${value}`} className="filter-tag">
-                <span className="filter-tag-column">{formatColumnName(column)}:</span>
-                <span className="filter-tag-value">{value}</span>
-                <button
-                  className="filter-tag-remove-btn"
-                  onClick={() => handleRemoveFilter(column, value)}
-                >
-                  <X className="filter-tag-remove-icon" />
-                </button>
-              </div>
-            ))
-          )}
-          <button className="clear-all-btn" onClick={handleClearAll}>
-            Clear All
-          </button>
-        </div>
-      )}
+
 
       {isOpen && (
         <div className="filter-dropdown">
@@ -152,10 +116,22 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
 
             <div className="dropdown-values">
               <div className="dropdown-header">
-                <h3 className="dropdown-header-title">
-                  {selectedColumn ? formatColumnName(selectedColumn) : 'Select a column'}
-                </h3>
+                <div className="dropdown-header-top">
+                  <h3 className="dropdown-header-title">
+                    {selectedColumn ? formatColumnName(selectedColumn) : 'Select a column'}
+                  </h3>
+
+                  {Object.keys(filters).length > 0 && (
+                    <button
+                      className="header-clear-btn"
+                      onClick={handleClearAll}
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
               </div>
+
               <div className="dropdown-values-body">
                 {selectedColumn ? (
                   <div className="dropdown-values-list">
@@ -179,10 +155,12 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
                   </div>
                 )}
               </div>
+
               <div className="dropdown-footer">
                 <button className="dropdown-apply-btn" onClick={handleApply}>
                   Apply Filters
                 </button>
+
                 <button
                   className="dropdown-cancel-btn"
                   onClick={() => {
@@ -196,8 +174,9 @@ const MultiSelectFilter = ({ rowData, onFilterApply ,filterColumns = []}) => {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 

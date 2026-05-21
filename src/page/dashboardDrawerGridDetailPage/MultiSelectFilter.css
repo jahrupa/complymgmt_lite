@@ -292,3 +292,28 @@
   height: 1rem;
   color: #4b5563;
 }
+
+
+.dropdown-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.dropdown-header-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0;
+}
+
+.header-clear-btn {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
