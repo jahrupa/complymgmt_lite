@@ -551,7 +551,7 @@ const Entity = () => {
                 <div className="d-lg-flex d-md-flex gap-3">
 
                     <MuiTextField
-                        label="Name"
+                        label="Entity Name"
                         type="text"
                         fieldName="name"
                         handleChange={handleChange}
