@@ -258,6 +258,12 @@ const Location = () => {
 
         if (current?.group_holding_id) {
             fetchCompany();
+        } else {
+            // clear company dropdown
+            setCompanyNameByGroupHoldingId([]);
+
+            // clear entity dropdown
+            setEntityList([]);
         }
     }, [current?.group_holding_id]);
 
@@ -332,8 +338,21 @@ const Location = () => {
                                 ...prev,
                                 group_name: selectedName,
                                 group_holding_id: matchedGroup._id || null,
+
+                                // reset company
                                 company_name: '',
+                                company_id: null,
+
+                                // reset entity
+                                entity_name: '',
+                                entity_id: null,
                             }));
+
+
+                            // clear dropdown data
+                            setCompanyNameByGroupHoldingId([]);
+                            setEntityList([]);
+
                             setErrors(prevErrors => ({ ...prevErrors, group_name: '' }));
                         }}
                         names={groupHoldingData}
