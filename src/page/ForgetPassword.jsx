@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { forgetPassword } from '../api/service';
 import '../style/login.css'
 import complyn_mgmt_logo from '../assets/complymgmt_logo.png'
@@ -14,6 +14,7 @@ const ForgetPassword = () => {
         severityType: '',
     });
     const navigate = useNavigate();
+    const formRef = useRef(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,7 +25,16 @@ const ForgetPassword = () => {
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: error?.response?.data?.message, severityType: 'error' });
         }
     };
+ useEffect(() => {
+        const handleEnter = (e) => {
+            if (e.key === 'Enter') {
+                formRef.current?.requestSubmit();
+            }
+        };
 
+        document.addEventListener('keydown', handleEnter);
+        return () => document.removeEventListener('keydown', handleEnter);
+    }, []);
     return (
         <div className='centered-container ps-3 pe-3 page_bg'>
             <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
@@ -40,7 +50,7 @@ const ForgetPassword = () => {
                 <div className='d-lg-flex d-md-flex login_form_v2'>
 
                     <div className=''>
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit} ref={formRef}>
                             <div className="container login_form_container">
                                 <div className='d-flex justify-content-center mb-3 mt-4'>
                                     <img src={complyn_mgmt_logo} alt="Avatar" style={{ width: '50%' }} />
@@ -57,7 +67,7 @@ const ForgetPassword = () => {
                                     required
                                 />
                                 <div className='d-flex justify-content-between gap-3'>
-                                    <button type="submit" className='login_btn_style_v2  mt-2 mb-2' onClick={() => navigate('/')}><span className='login_btn forgot_password'>Back to Login</span></button>
+                                    <button type="button" className='login_btn_style_v2  mt-2 mb-2' onClick={() => navigate('/')}><span className='login_btn forgot_password'>Back to Login</span></button>
 
                                     <button type="submit" className='login_btn_style_v2  mt-2 mb-2'><span className='login_btn '>Submit</span></button>
                                 </div>
