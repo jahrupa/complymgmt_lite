@@ -67,6 +67,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
       localStorage.removeItem('username')
       localStorage.removeItem('user_id')
       setIsAuthenticated(false)
+      setActivePage('Dashboard')
     }
   }, [tokenId])
 

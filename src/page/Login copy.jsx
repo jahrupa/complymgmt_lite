@@ -12,7 +12,6 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle login logic here
-         // console.log('Login submitted:', { username, password, rememberMe });
 
         navigate('/dashboard'); // Change this to your desired path
     };

@@ -125,7 +125,6 @@ function CreateNotificationTemplate() {
                 }
             });
         } catch (error) {
-            console.log("❌ STEP ERROR:", error);
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
                 open: true,
@@ -319,7 +318,7 @@ function CreateNotificationTemplate() {
                             <button
                                 id="save-btn"
                                 onClick={() => {
-                                    console.log("SAVE BUTTON CLICKED 🔥");
+
                                     handleSave();
                                 }}
                                 className="save-btn"

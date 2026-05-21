@@ -305,15 +305,12 @@ const PendingDocument = () => {
 
             // ✅ Get the message from response
             const message = response?.message;
-            //  // console.log(message, 'message')
             setIsSnackbarsOpen({ ...issnackbarsOpen, open: true, message: message, severityType: 'success' });
 
             // Refresh data
             const updatedData = await fetchAllUser();
             setData(updatedData);
         } catch (error) {
-            // console.error("Error saving user:", error);
-
             // Extract message from error response if available
             const errorMessage =
                 error?.response?.data?.message || // for Axios
@@ -361,7 +358,6 @@ const PendingDocument = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // console.error("Error deleting user:", error);
 
             // Extract error message safely
             const errorMessage =
@@ -413,7 +409,6 @@ const PendingDocument = () => {
 
             // Read second sheet (index 1)
             const sheetName = workbook.SheetNames[0];
-            //  // console.log('Sheet Name:', sheetName);
             if (!sheetName) {
                 alert('The workbook does not have a second sheet.');
                 return;

@@ -72,8 +72,6 @@ const LocationToModule = () => {
             });
         });
     }, [data, filters]);
-    console.log("🚀 ~ file: LocationToModule.jsx:122 ~ filteredRowData:", filteredRowData)
-
     const [errors, setErrors] = useState({});
     const crudTitle = "Tag Subscribe Modules & Sub-Modules"
     const editCrudTitle = "Edit Tagged Subscribe Modules & Sub-Modules"
@@ -466,7 +464,6 @@ const LocationToModule = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // // console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||
@@ -684,7 +681,6 @@ const LocationToModule = () => {
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     };
     const onRowValueChanged = () => {
-        // console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {

@@ -213,8 +213,6 @@ const GroupCompaniesPage = () => {
           fetchAllGroup(),
         ]);
         setData(GroupData);
-        console.log("Total Records:", GroupData.length);
-        console.log("Group Names:", GroupData.map(r => r.group_name));
       } catch {
         // Handle error silently
       }

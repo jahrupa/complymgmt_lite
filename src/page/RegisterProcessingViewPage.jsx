@@ -132,35 +132,34 @@ const RegisterProcessingViewPage = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (isModalOpen === false) {
-      setCurrent((prev) => ({
-        ...prev,
-        applicability_id: null,
-      }));
-      setSteps([]);
-    }
-    if (current?.applicability_id) {
-      const fetchPipeline = async () => {
-        try {
-          const pipelineData = await getPipelineByApplicabilityId(
-            current.applicability_id,
-          );
-          setSteps(pipelineData?.config?.steps || []);
-          setIsEditing(pipelineData?.config?.steps?.length > 0);
-        } catch (error) {
-          // console.error("Error fetching pipeline data:", error);
-          setSteps([]);
-          setIsEditing(false);
+    useEffect(() => {
+        if (isModalOpen === false) {
+            setCurrent((prev) => ({
+                ...prev,
+                applicability_id: null,
+            }));
+            setSteps([]);
         }
-      };
-      fetchPipeline();
-    }
-  }, [isModalOpen]);
-  useEffect(() => {
-    const fetchCompany = async () => {
-      const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
-      const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
+        if (current?.applicability_id) {
+            const fetchPipeline = async () => {
+                try {
+                    const pipelineData = await getPipelineByApplicabilityId(
+                        current.applicability_id,
+                    );
+                    setSteps(pipelineData?.config?.steps || []);
+                    setIsEditing(pipelineData?.config?.steps?.length > 0);
+                } catch (error) {
+                    setSteps([]);
+                    setIsEditing(false);
+                }
+            };
+            fetchPipeline();
+        }
+    }, [isModalOpen]);
+    useEffect(() => {
+        const fetchCompany = async () => {
+            const data = await fetchCompaniesNameByGroupId(current?.group_holding_id);
+            const applicabilityByGroupId = await getApplicabilityByGroupId(current?.group_holding_id);
 
       setCompanyName(data || []);
       setDataById(prev => ({
@@ -187,21 +186,20 @@ const RegisterProcessingViewPage = () => {
     }
   }, [current?.group_holding_id]);
 
-  useEffect(() => {
-    const fetchLocationByCompanyId = async () => {
-      try {
-        const data = await getLocationByCompanyId(current?.company_id);
-        const applicabilityByCompanyId = await getApplicabilityByCompanyId(current?.company_id);
-        if (data) {
-          setLocationNameByCompanyId(data);
-          setDataById((prev) => ({ ...prev, applicabilityByCompanyId: applicabilityByCompanyId || [] }));
-          setSource("company");
-        }
-      } catch {
-        setDataById((prev) => ({ ...prev, applicabilityByCompanyId: [] }));
-        // console.error("Failed to fetch location by company_id:", error);
-      }
-    };
+    useEffect(() => {
+        const fetchLocationByCompanyId = async () => {
+            try {
+                const data = await getLocationByCompanyId(current?.company_id);
+                const applicabilityByCompanyId = await getApplicabilityByCompanyId(current?.company_id);
+                if (data) {
+                    setLocationNameByCompanyId(data);
+                    setDataById((prev) => ({ ...prev, applicabilityByCompanyId: applicabilityByCompanyId || [] }));
+                    setSource("company");
+                }
+            } catch {
+                setDataById((prev) => ({ ...prev, applicabilityByCompanyId: [] }));
+            }
+        };
 
     if (current?.company_id) {
       fetchLocationByCompanyId();

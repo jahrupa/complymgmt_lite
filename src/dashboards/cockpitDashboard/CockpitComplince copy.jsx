@@ -53,7 +53,6 @@ const CockpitComplince = ({
     clientData: [],
     clientCompliance: [],
   });
-  console.log(cockpitData,'cockpitData')
   const gridRef = useRef();
   const navigate = useNavigate();
   const userRole = decryptData(localStorage.getItem("user_role"));

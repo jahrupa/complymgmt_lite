@@ -110,7 +110,6 @@ const ServiceTrackerInnerPage = () => {
                 horizontal: 'center'
             });
         } catch (error) {
-            // console.error("Error deleting user:", error);
             const errorMessage = error?.response?.data?.message || error?.message || "Failed to delete user";
             setIsSnackbarsOpen({
                 open: true,
@@ -267,11 +266,11 @@ const ServiceTrackerInnerPage = () => {
     //    const fetchAndSetTrackerData = async (trackerName, sheetName = null) => {
     //     try {
     //         const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
-    //          // console.log("Fetched response:", response);
+    //     
     //         setRowData(response || []);
 
     //         const dataSample = response?.[0];
-    //          // console.log("dataSample:", dataSample);
+    //          
 
     //         if (!dataSample || Object.keys(dataSample).length === 0) {
     //             setColumnDefs([]);
@@ -317,9 +316,9 @@ const ServiceTrackerInnerPage = () => {
     //         };
 
     //         setColumnDefs([...dynamicCols, actionCol]);
-    //          // console.log("ColumnDefs set:", [...dynamicCols, actionCol]);
+    //          
     //     } catch (error) {
-    //         // console.error("Error fetching tracker data:", error);
+    //        
     //         setColumnDefs([]);
     //     }
     // };
@@ -489,7 +488,6 @@ const ServiceTrackerInnerPage = () => {
     };
 
     const onRowValueChanged = (event) => {
-        //  // console.log('Row updated:', event.data);
     };
 
     const onFilterTextBoxChanged = useCallback(() => {
@@ -808,7 +806,6 @@ const ServiceTrackerInnerPage = () => {
     }, [current]);
 
     const onFilterOpened = (params) => {
-        // console.log("Filter opened");
         const field = params.column.getColId();
 
         const rowData = [];
@@ -821,7 +818,7 @@ const ServiceTrackerInnerPage = () => {
 
         const uniqueValues = [...new Set(rowData)];
 
-        // console.log({ [field]: uniqueValues });
+       
 
         const filterComponent = document.querySelectorAll('.ag-filter')
 

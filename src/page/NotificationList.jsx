@@ -24,8 +24,6 @@ const NotificationList = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isNotificationCreated, setIsNotificationCreated] = useState(false);
   const [editMode, setEditMode] = useState(null); // 'template' | 'notification' | 'create'
-  //  // console.log(editMode, 'editMode')
-  //  // console.log(isNotificationCreated, 'isNotificationCreated')
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: 'top',
@@ -34,7 +32,6 @@ const NotificationList = () => {
     severityType: '',
   });
   const { template_id } = useParams();
-  //  // console.log(editForm, 'editForm');
   const filteredTemplates = templates?.filter(template => {
     const matchesSearch = template.template_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.template_subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -124,7 +121,6 @@ const NotificationList = () => {
         message: error?.response?.data?.message,
         severityType: 'error',
       });
-      // console.error("Update failed:", error);
     }
 
     setEditForm({});
@@ -169,7 +165,6 @@ const NotificationList = () => {
         message: error?.response?.data?.message,
         severityType: 'error',
       });
-      // console.error("Update failed:", error);
     }
 
     setEditForm({});
@@ -200,7 +195,6 @@ const NotificationList = () => {
         severityType: 'success',
       });
     } catch (error) {
-      //  // console.log(error, 'error');
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,

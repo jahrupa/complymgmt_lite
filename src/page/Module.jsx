@@ -40,7 +40,6 @@ const Module = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [moduleId, setModuleId] = useState(null)
-    //  // console.log(moduleId, 'moduleId')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: 'top',
@@ -297,7 +296,6 @@ const Module = () => {
                 severityType: 'success',
             });
         } catch (error) {
-            // // console.error("Error:", error);
             const errorMessage =
                 error?.response?.data?.message ||
                 error?.message ||

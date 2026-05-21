@@ -11,6 +11,7 @@
     "build-prod": "vite build --mode prod",
     "demo-mode": "vite --mode demo",
     "prod-mode": "vite --mode prod",
+    "stage-mode": "vite --mode stage",
     "dev-mode": "vite --mode dev"
   },
   "dependencies": {

@@ -69,7 +69,6 @@ function RegisterProcessing() {
         if (filesRes.status === "fulfilled") setFiles(filesRes.value || []);
       } catch {
         // Handle error
-        // console.error("Error fetching data:", error);
       }
     };
 
@@ -102,7 +101,6 @@ function RegisterProcessing() {
           setMappings([]);
         }
       } catch (err) {
-        // console.error("Mapping fetch failed", err);
         setMappings([]);
       }
     };
