@@ -40,7 +40,7 @@ const Location = () => {
             location_address: '',
             location_description: ''
         });
-        console.log("current", current);
+    console.log("current", current);
     const [isEditing, setIsEditing] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [groupHoldingData, setGroupHoldinData] = useState([])
@@ -268,7 +268,7 @@ const Location = () => {
 
                 if (data) {
                     setEntityList(data);
-                }else {
+                } else {
                     setEntityList([]);
                 }
             } catch {
@@ -279,6 +279,14 @@ const Location = () => {
 
         if (current?.company_id) {
             fetchEntities();
+        } else {
+            setEntityList([]);
+
+            setCurrent((prev) => ({
+                ...prev,
+                entity_name: '',
+                entity_id: null,
+            }));
         }
     }, [current?.company_id]);
 
