@@ -35,6 +35,7 @@ import {
   companyWiseAccess,
   documentWiseAccess,
   fetchEntityById,
+  getAllCompanyLocationByEntityId
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -669,15 +670,44 @@ const AccessControl = () => {
               isdisable={isEditing ? true : false}
               onChange={(e) => {
                 const selectedName = e.target.value;
+
+                // reset when none selected
+                if (!selectedName) {
+                  setCurrent((prev) => ({
+                    ...prev,
+                    group_name: "",
+                    group_name_id: null,
+                    company_name: "",
+                    company_id: null,
+                    entity_name: "",
+                    entity_id: null,
+                    location_name: "",
+                    location_id: null,
+                    module_name: "",
+                    module_id: null,
+                    sub_module_name: "",
+                    sub_module_id: null,
+                  }));
+
+                  setCompanyNameByGroupHoldingId([]);
+                  setEntityData([]);
+                  setLocationNameByCompanyId([]);
+
+                  return;
+                }
+
                 const matchedGroup = groupHoldingData.find(
                   (g) => g.name === selectedName
                 );
+
                 setCurrent((prev) => ({
                   ...prev,
                   group_name: selectedName,
                   group_name_id: matchedGroup?._id || null,
                   company_name: "",
                   company_id: null,
+                  entity_name: "",
+                  entity_id: null,
                   location_name: "",
                   location_id: null,
                   module_name: "",
@@ -685,6 +715,9 @@ const AccessControl = () => {
                   sub_module_name: "",
                   sub_module_id: null,
                 }));
+
+                setEntityData([]);
+                setLocationNameByCompanyId([]);
               }}
               names={groupHoldingData.map((item) => ({
                 _id: item._id,
@@ -702,13 +735,39 @@ const AccessControl = () => {
               isdisable={isEditing ? true : false}
               onChange={(e) => {
                 const selectedName = e.target.value;
+
+                // reset when company cleared
+                if (!selectedName) {
+                  setCurrent((prev) => ({
+                    ...prev,
+                    company_name: "",
+                    company_id: null,
+                    entity_name: "",
+                    entity_id: null,
+                    location_name: "",
+                    location_id: null,
+                    module_name: "",
+                    module_id: null,
+                    sub_module_name: "",
+                    sub_module_id: null,
+                  }));
+
+                  setEntityData([]);
+                  setLocationNameByCompanyId([]);
+
+                  return;
+                }
+
                 const matchedCompany = companyNameByGroupHoldingId.find(
                   (g) => g.company_name === selectedName
                 );
+
                 setCurrent((prev) => ({
                   ...prev,
                   company_name: selectedName,
                   company_id: matchedCompany?._id || null,
+                  entity_name: "",
+                  entity_id: null,
                   location_name: "",
                   location_id: null,
                   module_name: "",
@@ -716,6 +775,8 @@ const AccessControl = () => {
                   sub_module_name: "",
                   sub_module_id: null,
                 }));
+
+                setLocationNameByCompanyId([]);
               }}
               names={companyNameByGroupHoldingId?.map((data) => ({
                 _id: data?._id,
@@ -732,23 +793,58 @@ const AccessControl = () => {
               label="Entity"
               value={current?.entity_name}
               isdisable={isEditing ? true : false}
-              onChange={(e) => {
-                const selectedName = e.target.value;
+              onChange={async (e) => {
+
+                const selectedEntity = e.target.value;
 
                 const matchedEntity = entityData.find(
-                  (g) => g.entity_name === selectedName
-                );
+                  (entity) => entity.name === selectedEntity
+                ) || {};
+
+                const selectedEntityId = matchedEntity.id || null;
 
                 setCurrent((prev) => ({
                   ...prev,
-                  entity_name: selectedName,
-                  entity_id: matchedEntity?._id || null,
+
+                  entity_name: selectedEntity,
+                  entity_id: selectedEntityId,
+
+                  // reset location
+                  location_name: "",
+                  location_id: null,
                 }));
+
+
+                // entity remove kiya
+                if (!selectedEntityId) {
+
+                  const allLocations =
+                    await getLocationByCompanyId(current?.company_id);
+
+                  setLocationNameByCompanyId(allLocations || []);
+
+                  return;
+                }
+
+                try {
+
+                  // entity wise locations
+                  const entityLocations =
+                    await getAllCompanyLocationByEntityId(
+                      selectedEntityId
+                    );
+
+                  setLocationNameByCompanyId(entityLocations || []);
+
+                } catch {
+
+                  setLocationNameByCompanyId([]);
+                }
               }}
               names={entityData?.map((entity) => ({
-                            _id: entity?._id,
-                            name: entity?.name,
-                        }))}
+                _id: entity?.id,
+                name: entity?.name,
+              }))}
               error={!!errors.entity_name}
               helperText={errors.entity_name}
             />
