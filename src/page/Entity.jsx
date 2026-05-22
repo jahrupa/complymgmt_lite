@@ -48,23 +48,14 @@ const Entity = () => {
         company_name: "",
         company_id: null,
     });
-console.log(current,'current');
     const [isEditing, setIsEditing] = useState(false);
-    console.log(isEditing, "isEditing");
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
     const [entityId, setEntityId] = useState(null);
-
     const [errors, setErrors] = useState({});
-
     const [filters, setFilters] = useState({});
-
     const [companyList, setCompanyList] = useState([]);
-
     const gridRef = useRef();
-
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -242,18 +233,56 @@ console.log(current,'current');
 
     // STATUS TOGGLE
 
-    const handleToggleChange = (params) => {
+    const handleToggleChange = async (params) => {
 
-        const updatedData = data.map((item) =>
-            item._id === params.data._id
-                ? {
-                    ...item,
-                    is_active: !item.is_active,
-                }
-                : item
-        );
+        const updatedStatus =
+            !params.data.common_attributes?.IsActive;
 
-        setData(updatedData);
+        const payload = {
+            name: params.data.name || "",
+            common_name: params.data.common_name || "",
+            description: params.data.description || "",
+            address: params.data.address || "",
+            company_id: params.data.company_id || null,
+
+            common_attributes: {
+                ...params.data.common_attributes,
+                IsActive: updatedStatus,
+            },
+        };
+
+        try {
+
+            const response = await updateEntity(
+                params.data.id,
+                payload
+            );
+
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message:
+                    response?.message ||
+                    "Entity status updated successfully",
+                severityType: "success",
+            });
+
+            const updatedEntities =
+                await fetchAllEntities();
+
+            setData(updatedEntities || []);
+
+        } catch (error) {
+
+            setIsSnackbarsOpen({
+                ...issnackbarsOpen,
+                open: true,
+                message:
+                    error?.response?.data?.message ||
+                    "Failed to update status",
+                severityType: "error",
+            });
+        }
     };
 
     const generateDynamicColDefs = (data) => {
