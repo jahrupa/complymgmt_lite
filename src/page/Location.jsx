@@ -609,7 +609,7 @@ const Location = () => {
                                     <input
                                         type="checkbox"
                                         checked={status === 1}
-                                        disabled={status === 1} // Approved hone ke baad disable
+                                        disabled={status === 1} // Disable if already approved
                                         onChange={handleChange}
                                         style={{
                                             width: 15,

@@ -377,7 +377,7 @@ const LocationToModule = () => {
 
                             const selectedEntityId = matchedEntity.id || null;
 
-                            // entity set karo
+                            // set entity
                             setCurrent((prev) => ({
                                 ...prev,
                                 entity_name: selectedEntity,
@@ -388,7 +388,7 @@ const LocationToModule = () => {
                                 location_id: null,
                             }));
 
-                            // agar entity remove kiya
+                            // if entity remove
                             if (!selectedEntityId) {
 
                                 const allLocations =
@@ -401,11 +401,11 @@ const LocationToModule = () => {
 
                             try {
 
-                                // selected entity ke locations lao
+                                // give selected entity id and get locations of that entity and show in dropdown.
                                 const entityLocations =
                                     await getAllCompanyLocationByEntityId(selectedEntityId);
 
-                                // sirf wahi locations dropdown mai dikhao
+                                // only this entity locations show in location dropdown.
                                 setLocationName(entityLocations || []);
 
                             } catch {
