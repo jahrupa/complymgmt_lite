@@ -1449,50 +1449,6 @@ const AccessControl = () => {
         />
       ),
     },
-    // { field: 'IsActive', headerName: 'Is Active', filter: true, editable: false },
-    {
-      field: "Created_By",
-      headerName: "Created By",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Created_At",
-      headerName: "Created At",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Updated_By",
-      headerName: "Updated By",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Updated_At",
-      headerName: "Updated At",
-      filter: true,
-      editable: false,
-    },
-
-    {
-      field: "Approval_Status",
-      headerName: "Approval Status",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Approved_By",
-      headerName: "Approved By",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Approved_At",
-      headerName: "Approved At",
-      filter: true,
-      editable: false,
-    },
   ];
 
   const gridRef = useRef();
