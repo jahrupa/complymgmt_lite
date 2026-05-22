@@ -322,6 +322,10 @@ const AccessControl = () => {
       payload.entity_id = current?.location_id;
       payload.entity_name = current?.location_name;
     }
+    if (current?.access_type === "entity") {
+      payload.entity_id = current?.entity_id;
+      payload.entity_name = current?.entity_name;
+    }
     if (current?.access_type === "user_access") {
       payload.entity_id = current?.access_user_type_id;
       payload.entity_name = current?.access_user_name;
@@ -523,18 +527,19 @@ const AccessControl = () => {
     const showUser_access = current.access_type === "user_access";
 
     const showGroup =
-      ["group", "company", "company_location", "company-wise"].includes(current.access_type) &&
+      ["group", "company", "company_location", "company-wise", "entity"].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
     const showCompany =
-      ["company", "company_location", "company-wise"].includes(current.access_type) &&
+      ["company", "company_location", "company-wise", "entity"].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
-    const showEntity = current.access_type === "company_location";
+    const showEntity =
+      ["company_location", "entity"].includes(current.access_type);
     const showLocation =
       ["company_location"].includes(current.access_type) &&
       !showOnlyModule &&
