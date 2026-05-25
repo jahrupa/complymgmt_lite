@@ -1438,7 +1438,7 @@ const AccessControl = () => {
 
     {
       headerName: "Status",
-      field: "IsActive",
+      field: 'common_attributes.is_active',
       editable: false,
       pinned: "right",
       valueGetter: (params) => params.data?.IsActive,
