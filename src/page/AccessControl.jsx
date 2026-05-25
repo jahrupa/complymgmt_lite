@@ -782,6 +782,7 @@ const AccessControl = () => {
                 }));
 
                 setLocationNameByCompanyId([]);
+                setEntityData([]);
               }}
               names={companyNameByGroupHoldingId?.map((data) => ({
                 _id: data?._id,
@@ -1654,6 +1655,7 @@ const AccessControl = () => {
         // handle error silently
       }
     };
+    setEntityData([]);
 
     if (current?.company_id) {
       fetchEntityData();
