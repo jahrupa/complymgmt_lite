@@ -1178,6 +1178,7 @@ const AccessControl = () => {
                     const filterUpdateData = await fetchAllUserAccessLevels({
                       system_user_id: matchedUser._id,
                     });
+                    console.log(filterUpdateData,'filterUpdateData')
                     setData(filterUpdateData);
                   } catch {
                     // handle error silently
@@ -1299,7 +1300,6 @@ const AccessControl = () => {
     if (!data || data.length === 0) return [];
 
     const sample = flattenObject(data[0]);
-
     return Object.keys(sample)
       .map((key) => {
         // Skip unwanted fields
@@ -1313,73 +1313,72 @@ const AccessControl = () => {
           return null;
 
         // ✅ Special case for approval_status
-        if (key === "common_attributes.approval_status") {
-          return {
-            field: key,
-            headerName: "Approval Status",
-            filter: true,
-            editable: false,
-            valueGetter: (params) =>
-              params.data?.common_attributes?.approval_status,
-            cellRenderer: (params) => {
-              const status = params.value ?? 0;
+       if (key === "Approval_Status") {
+                    return {
+                        field: key,
+                        headerName: "Approval Status",
+                        filter: true,
+                        editable: false,
+                        valueGetter: (params) =>
+                            params.data?.Approval_Status,
+                        cellRenderer: (params) => {
+                            const status = params.value ?? 0;
 
-              const handleChange = async (e) => {
-                const checked = e.target.checked;
+                            const handleChange = async (e) => {
+                                const checked = e.target.checked;
 
-                // UI Update Immediately (Optimistic Update)
-                params.node.setDataValue(
-                  "common_attributes.approval_status",
-                  checked ? 1 : 0,
-                );
+                                // UI Update Immediately (Optimistic Update)
+                                params.node.setDataValue(
+                                    "Approval_Status",
+                                    checked ? 1 : 0,
+                                );
 
-                // Optional: API Call
-                try {
-                  await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                } catch {
-                  // Revert if API fails
-                  params.node.setDataValue(
-                    "common_attributes.approval_status",
-                    status,
-                  );
+                                // Optional: API Call
+                                try {
+                                    await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                                } catch {
+                                    // Revert if API fails
+                                    params.node.setDataValue(
+                                        "Approval_Status",
+                                        status,
+                                    );
+                                }
+                            };
+
+                            return (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={status === 1}
+                                        disabled={status === 1} // Approved hone ke baad disable
+                                        onChange={handleChange}
+                                        style={{
+                                            width: 15,
+                                            height: 15,
+                                            accentColor: "orange",
+                                            cursor: status === 1 ? "not-allowed" : "pointer",
+                                        }}
+                                    />
+                                    <span
+                                        style={{
+                                            color: status === 1 ? "green" : "orange",
+                                            fontSize: "0.8rem",
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        {status === 1 ? "Approved" : "Pending"}
+                                    </span>
+                                </div>
+                            );
+                        },
+                    };
                 }
-              };
-
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={status === 1}
-                    disabled={status === 1} // Approved hone ke baad disable
-                    onChange={handleChange}
-                    style={{
-                      width: 15,
-                      height: 15,
-                      accentColor: "orange",
-                      cursor: status === 1 ? "not-allowed" : "pointer",
-                    }}
-                  />
-                  <span
-                    style={{
-                      color: status === 1 ? "green" : "orange",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {status === 1 ? "Approved" : "Pending"}
-                  </span>
-                </div>
-              );
-            },
-          };
-        }
-
         // ✅ Default column definition
         return {
           field: key,
@@ -1444,7 +1443,7 @@ const AccessControl = () => {
 
     {
       headerName: "Status",
-      field: "IsActive",
+      field: 'common_attributes.is_active',
       editable: false,
       pinned: "right",
       valueGetter: (params) => params.data?.IsActive,
@@ -1454,50 +1453,6 @@ const AccessControl = () => {
           onChange={(e) => handleToggleChange(e, params)}
         />
       ),
-    },
-    // { field: 'IsActive', headerName: 'Is Active', filter: true, editable: false },
-    {
-      field: "Created_By",
-      headerName: "Created By",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Created_At",
-      headerName: "Created At",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Updated_By",
-      headerName: "Updated By",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Updated_At",
-      headerName: "Updated At",
-      filter: true,
-      editable: false,
-    },
-
-    {
-      field: "Approval_Status",
-      headerName: "Approval Status",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Approved_By",
-      headerName: "Approved By",
-      filter: true,
-      editable: false,
-    },
-    {
-      field: "Approved_At",
-      headerName: "Approved At",
-      filter: true,
-      editable: false,
     },
   ];
 
@@ -1549,7 +1504,7 @@ const AccessControl = () => {
         current?.isFilteredData === false &&
         current?.is_access_user_type_dropdown === false
       ) {
-        setData(userAccessDataRes.value);
+        setData(userAccessDataRes[0].value);
       } else {
         // intentionally ignored
       }
