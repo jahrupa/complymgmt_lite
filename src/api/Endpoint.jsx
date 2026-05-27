@@ -255,4 +255,7 @@ export const UPDATE_ENTITY = "/api/v1/entity/update/";
 export const GET_ENTITIES_BY_COMPANY_ID = "/api/v1/entity/view/company_id/";
 export const GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID ="/api/v1/company_location/view/entity/multiple/";
 
+//Document-repo
+export const GET_FILE_NAMES_BY_ACCESS_TYPE = "/api/v1/document_repository/view/file-names";
+
 
