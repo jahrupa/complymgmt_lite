@@ -263,7 +263,7 @@ const AccessControl = () => {
         if (!current.location_to_module)
           tempErrors.location_to_module = "Location to module is required";
         break;
-      case "document-repository":
+      case "document_repository":
         if (!current.file_name)
           tempErrors.file_name = "File Name is required";
         break;
@@ -340,7 +340,7 @@ const AccessControl = () => {
       payload.entity_id = current?.access_user_type_id;
       payload.entity_name = current?.access_user_name;
     }
-    if (current?.access_type === "document-repository") {
+    if (current?.access_type === "document_repository") {
       payload.entity_id = current?.file_id;
       payload.entity_name = current?.file_name;
     }
@@ -567,7 +567,7 @@ const AccessControl = () => {
     const showLocationToModule = current.access_type === "location_to_module";
     const showPage = current.access_type === "page";
     const showDocumentRepository =
-      current.access_type === "document-repository";
+      current.access_type === "document_repository";
 
     // Add service_tracker_wise logic
     const showServiceTrackerWise =
@@ -1727,7 +1727,7 @@ const AccessControl = () => {
       }
     };
 
-    if (current?.access_type === "document-repository") {
+    if (current?.access_type === "document_repository") {
       fetchFileNames();
     }
   }, [current?.access_type]);
