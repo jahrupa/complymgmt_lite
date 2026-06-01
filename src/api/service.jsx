@@ -2401,10 +2401,10 @@ export const getAllCompanyLocationByEntityId = async (id) => {
 };
 
 //Document-repo
-export const getAllFileNamesByAccessType = async (id) => {
+export const getAllFileNamesByAccessType = async () => {
   try {
     const response = await API.get(
-      `${GET_FILE_NAMES_BY_ACCESS_TYPE}${id}`
+      GET_FILE_NAMES_BY_ACCESS_TYPE
     );
 
     return response.data;
@@ -2412,5 +2412,4 @@ export const getAllFileNamesByAccessType = async (id) => {
     throw error;
   }
 };
-
 
