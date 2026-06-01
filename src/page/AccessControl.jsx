@@ -134,6 +134,8 @@ const AccessControl = () => {
       group_name_id: userData.entity_id || null,
       company_name: userData.entity_name || "",
       company_id: userData.entity_id || null,
+      entity_name: userData.entity_name || "",
+      entity_id: userData.entity_id || null,
       location_name: userData.entity_name || "",
       location_id: userData.entity_id || null,
       module_name: userData.entity_name || "",
@@ -793,67 +795,78 @@ const AccessControl = () => {
             />
           )}
 
-          {showEntity && (
-            <SingleSelectTextField
+          {isEditing && showEntity ? (
+            <MuiTextField
               name="entity_name"
               label="Entity"
-              value={current?.entity_name}
-              isdisable={isEditing ? true : false}
-              onChange={async (e) => {
-
-                const selectedEntity = e.target.value;
-
-                const matchedEntity = entityData.find(
-                  (entity) => entity.name === selectedEntity
-                ) || {};
-
-                const selectedEntityId = matchedEntity.id || null;
-
+              value={current.entity_name}
+              isdisabled={true}
+              onChange={(e) => {
                 setCurrent((prev) => ({
                   ...prev,
-
-                  entity_name: selectedEntity,
-                  entity_id: selectedEntityId,
-
-                  // reset location
-                  location_name: "",
-                  location_id: null,
+                  entity_name: e.target.value,
                 }));
-
-
-                // entity remove kiya
-                if (!selectedEntityId) {
-
-                  const allLocations =
-                    await getLocationByCompanyId(current?.company_id);
-
-                  setLocationNameByCompanyId(allLocations || []);
-
-                  return;
-                }
-
-                try {
-
-                  // entity wise locations
-                  const entityLocations =
-                    await getAllCompanyLocationByEntityId(
-                      selectedEntityId
-                    );
-
-                  setLocationNameByCompanyId(entityLocations || []);
-
-                } catch {
-
-                  setLocationNameByCompanyId([]);
-                }
               }}
-              names={entityData?.map((entity) => ({
-                _id: entity?.id,
-                name: entity?.name,
-              }))}
               error={!!errors.entity_name}
               helperText={errors.entity_name}
             />
+          ) : (
+            showEntity && (
+              <SingleSelectTextField
+                name="entity_name"
+                label="Entity"
+                value={current?.entity_name}
+                isdisable={isEditing ? true : false}
+                onChange={async (e) => {
+
+                  const selectedEntity = e.target.value;
+
+                  const matchedEntity = entityData.find(
+                    (entity) => entity.name === selectedEntity
+                  ) || {};
+
+                  const selectedEntityId = matchedEntity.id || null;
+
+                  setCurrent((prev) => ({
+                    ...prev,
+                    entity_name: selectedEntity,
+                    entity_id: selectedEntityId,
+                    location_name: "",
+                    location_id: null,
+                  }));
+
+                  if (!selectedEntityId) {
+
+                    const allLocations =
+                      await getLocationByCompanyId(current?.company_id);
+
+                    setLocationNameByCompanyId(allLocations || []);
+
+                    return;
+                  }
+
+                  try {
+
+                    const entityLocations =
+                      await getAllCompanyLocationByEntityId(
+                        selectedEntityId
+                      );
+
+                    setLocationNameByCompanyId(entityLocations || []);
+
+                  } catch {
+
+                    setLocationNameByCompanyId([]);
+                  }
+                }}
+                names={entityData?.map((entity) => ({
+                  _id: entity?.id,
+                  name: entity?.name,
+                }))}
+                error={!!errors.entity_name}
+                helperText={errors.entity_name}
+              />
+            )
           )}
         </div>
         <div className="d-lg-flex d-md-flex justify-content-between gap-3">
