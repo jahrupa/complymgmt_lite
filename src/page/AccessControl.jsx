@@ -35,7 +35,8 @@ import {
   companyWiseAccess,
   documentWiseAccess,
   fetchEntityById,
-  getAllCompanyLocationByEntityId
+  getAllCompanyLocationByEntityId,
+  getAllFileNamesByAccessType
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -78,6 +79,8 @@ const AccessControl = () => {
     access_user_type: "",
     access_user_type_id: null,
     is_access_user_type_dropdown: false,
+    file_name: "",
+    file_id: null,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,6 +90,7 @@ const AccessControl = () => {
     useState([]);
   const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
   const [entityData, setEntityData] = useState([]);
+  const [fileNameList, setFileNameList] = useState([]);
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [locationToModule, setLocationToModule] = useState([]);
@@ -159,6 +163,8 @@ const AccessControl = () => {
       access_user_type_id: userData.entity_id || null,
       location_to_module: userData.entity_name || "",
       location_to_module_id: userData.entity_id || null,
+      file_name: userData.entity_name || "",
+      file_id: userData.entity_id || null,
     }));
 
     setIsEditing(true);
@@ -259,6 +265,10 @@ const AccessControl = () => {
         if (!current.location_to_module)
           tempErrors.location_to_module = "Location to module is required";
         break;
+      case "document_repository":
+        if (!current.file_name)
+          tempErrors.file_name = "File Name is required";
+        break;
     }
 
     setErrors(tempErrors);
@@ -331,6 +341,10 @@ const AccessControl = () => {
     if (current?.access_type === "user_access") {
       payload.entity_id = current?.access_user_type_id;
       payload.entity_name = current?.access_user_name;
+    }
+    if (current?.access_type === "document_repository") {
+      payload.entity_id = current?.file_id;
+      payload.entity_name = current?.file_name;
     }
     if (accessType) {
       payload.entity_id = current?.service_tracker_inner_id;
@@ -554,6 +568,8 @@ const AccessControl = () => {
     const showServiceTracker = current.access_type === "service_tracker";
     const showLocationToModule = current.access_type === "location_to_module";
     const showPage = current.access_type === "page";
+    const showDocumentRepository =
+      current.access_type === "document_repository";
 
     // Add service_tracker_wise logic
     const showServiceTrackerWise =
@@ -627,6 +643,8 @@ const AccessControl = () => {
                   service_tracker: "",
                   service_tracker_wise: "",
                   page: "",
+                  file_name: "",
+                  file_id: null,
                 }));
               }}
               error={!!errors.access_type}
@@ -656,6 +674,8 @@ const AccessControl = () => {
                   service_tracker: "",
                   service_tracker_wise: "",
                   page: "",
+                  file_name: "",
+                  file_id: null,
                 }));
               }}
               names={accessTypeList.map((item) => ({
@@ -1147,6 +1167,34 @@ const AccessControl = () => {
               helperText={errors.page_name}
             />
           )}
+
+          {showDocumentRepository && (
+            <SingleSelectTextField
+              name="file_name"
+              label="File Name"
+              value={current?.file_name}
+              isdisable={isEditing ? true : false}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+
+                const matchedFile = fileNameList.find(
+                  (item) => item.file_name === selectedName
+                );
+
+                setCurrent((prev) => ({
+                  ...prev,
+                  file_name: selectedName,
+                  file_id: matchedFile?._id || null,
+                }));
+              }}
+              names={fileNameList?.map((data) => ({
+                _id: data?._id,
+                name: data?.file_name,
+              }))}
+              error={!!errors.file_name}
+              helperText={errors.file_name}
+            />
+          )}
         </div>
         {showUser && (
           <SingleSelectTextField
@@ -1191,7 +1239,7 @@ const AccessControl = () => {
                     const filterUpdateData = await fetchAllUserAccessLevels({
                       system_user_id: matchedUser._id,
                     });
-                    console.log(filterUpdateData,'filterUpdateData')
+                    console.log(filterUpdateData, 'filterUpdateData')
                     setData(filterUpdateData);
                   } catch {
                     // handle error silently
@@ -1326,72 +1374,72 @@ const AccessControl = () => {
           return null;
 
         // ✅ Special case for approval_status
-       if (key === "Approval_Status") {
-                    return {
-                        field: key,
-                        headerName: "Approval Status",
-                        filter: true,
-                        editable: false,
-                        valueGetter: (params) =>
-                            params.data?.Approval_Status,
-                        cellRenderer: (params) => {
-                            const status = params.value ?? 0;
+        if (key === "Approval_Status") {
+          return {
+            field: key,
+            headerName: "Approval Status",
+            filter: true,
+            editable: false,
+            valueGetter: (params) =>
+              params.data?.Approval_Status,
+            cellRenderer: (params) => {
+              const status = params.value ?? 0;
 
-                            const handleChange = async (e) => {
-                                const checked = e.target.checked;
+              const handleChange = async (e) => {
+                const checked = e.target.checked;
 
-                                // UI Update Immediately (Optimistic Update)
-                                params.node.setDataValue(
-                                    "Approval_Status",
-                                    checked ? 1 : 0,
-                                );
+                // UI Update Immediately (Optimistic Update)
+                params.node.setDataValue(
+                  "Approval_Status",
+                  checked ? 1 : 0,
+                );
 
-                                // Optional: API Call
-                                try {
-                                    await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                                } catch {
-                                    // Revert if API fails
-                                    params.node.setDataValue(
-                                        "Approval_Status",
-                                        status,
-                                    );
-                                }
-                            };
-
-                            return (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "0.5rem",
-                                    }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={status === 1}
-                                        disabled={status === 1} // Approved hone ke baad disable
-                                        onChange={handleChange}
-                                        style={{
-                                            width: 15,
-                                            height: 15,
-                                            accentColor: "orange",
-                                            cursor: status === 1 ? "not-allowed" : "pointer",
-                                        }}
-                                    />
-                                    <span
-                                        style={{
-                                            color: status === 1 ? "green" : "orange",
-                                            fontSize: "0.8rem",
-                                            fontWeight: 500,
-                                        }}
-                                    >
-                                        {status === 1 ? "Approved" : "Pending"}
-                                    </span>
-                                </div>
-                            );
-                        },
-                    };
+                // Optional: API Call
+                try {
+                  await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                } catch {
+                  // Revert if API fails
+                  params.node.setDataValue(
+                    "Approval_Status",
+                    status,
+                  );
                 }
+              };
+
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={status === 1}
+                    disabled={status === 1} // Approved hone ke baad disable
+                    onChange={handleChange}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      accentColor: "orange",
+                      cursor: status === 1 ? "not-allowed" : "pointer",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: status === 1 ? "green" : "orange",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {status === 1 ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              );
+            },
+          };
+        }
         // ✅ Default column definition
         return {
           field: key,
@@ -1677,6 +1725,25 @@ const AccessControl = () => {
     };
     fetchLocationToModule();
   }, []);
+  useEffect(() => {
+    const fetchFileNames = async () => {
+      try {
+        const data = await getAllFileNamesByAccessType(
+          current?.access_type
+        );
+
+        if (data) {
+          setFileNameList(data);
+        }
+      } catch {
+        setFileNameList([]);
+      }
+    };
+
+    if (current?.access_type === "document_repository") {
+      fetchFileNames();
+    }
+  }, [current?.access_type]);
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
