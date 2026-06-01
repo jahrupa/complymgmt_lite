@@ -198,7 +198,8 @@ import {
   DELETE_ENTITY,
   UPDATE_ENTITY,
   GET_ENTITIES_BY_COMPANY_ID,
-  GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID
+  GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID,
+  GET_FILE_NAMES_BY_ACCESS_TYPE,
 
 } from "./Endpoint";
 
@@ -2398,4 +2399,18 @@ export const getAllCompanyLocationByEntityId = async (id) => {
     throw error;
   }
 };
+
+//Document-repo
+export const getAllFileNamesByAccessType = async (id) => {
+  try {
+    const response = await API.get(
+      `${GET_FILE_NAMES_BY_ACCESS_TYPE}${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
