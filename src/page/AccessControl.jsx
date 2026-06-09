@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -35,15 +41,15 @@ import {
   companyWiseAccess,
   documentWiseAccess,
   fetchEntityById,
-  getAllCompanyLocationByEntityId
+  getAllCompanyLocationByEntityId,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import DeleteModal from "../component/DeleteModal";
 import { decryptData } from "./utils/encrypt";
-import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
-import { flattenObject } from '../../Utils/tableColUtils';
+import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
+import { flattenObject } from "../../Utils/tableColUtils";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -269,13 +275,13 @@ const AccessControl = () => {
     if (!validate()) return; // Don't proceed if validation fails
     const companyWiseAccessPayload = {
       user_id: current?.user_id,
-      company_name: current?.company_name,
-      access_key: current?.access
+      company_id: current?.company_id,
+      access_key: current?.access?.map((item) => item.toLowerCase()) || [],
     };
     const documentWiseAccessPayload = {
       user_id: current?.user_id,
-      access_key: current?.access
-    }
+      access_key: current?.access,
+    };
     const accessType = current?.access_type === "service_tracker_wise";
     const payload = {
       user_id: current?.user_id,
@@ -410,7 +416,7 @@ const AccessControl = () => {
     try {
       const response = await toggleUserAccessLevelStatus(
         params.data._id,
-        newIsActive
+        newIsActive,
       );
       const message = response?.message || "Status update successfully";
       // Show success snackbar
@@ -527,19 +533,28 @@ const AccessControl = () => {
     const showUser_access = current.access_type === "user_access";
 
     const showGroup =
-      ["group", "company", "company_location", "company-wise", "entity"].includes(current.access_type) &&
+      [
+        "group",
+        "company",
+        "company_location",
+        "company-wise",
+        "entity",
+      ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
     const showCompany =
-      ["company", "company_location", "company-wise", "entity"].includes(current.access_type) &&
+      ["company", "company_location", "company-wise", "entity"].includes(
+        current.access_type,
+      ) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
-    const showEntity =
-      ["company_location", "entity"].includes(current.access_type);
+    const showEntity = ["company_location", "entity"].includes(
+      current.access_type,
+    );
     const showLocation =
       ["company_location"].includes(current.access_type) &&
       !showOnlyModule &&
@@ -575,7 +590,7 @@ const AccessControl = () => {
               }}
               error={!!errors.user_name}
               helperText={errors.user_name}
-            // isRequired={true}
+              // isRequired={true}
             />
           ) : (
             <SingleSelectTextField
@@ -585,7 +600,7 @@ const AccessControl = () => {
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedUser = userNameListRes.find(
-                  (item) => item.full_name === selectedName
+                  (item) => item.full_name === selectedName,
                 );
                 setCurrent((prev) => ({
                   ...prev,
@@ -702,7 +717,7 @@ const AccessControl = () => {
                 }
 
                 const matchedGroup = groupHoldingData.find(
-                  (g) => g.name === selectedName
+                  (g) => g.name === selectedName,
                 );
 
                 setCurrent((prev) => ({
@@ -764,7 +779,7 @@ const AccessControl = () => {
                 }
 
                 const matchedCompany = companyNameByGroupHoldingId.find(
-                  (g) => g.company_name === selectedName
+                  (g) => g.company_name === selectedName,
                 );
 
                 setCurrent((prev) => ({
@@ -800,12 +815,11 @@ const AccessControl = () => {
               value={current?.entity_name}
               isdisable={isEditing ? true : false}
               onChange={async (e) => {
-
                 const selectedEntity = e.target.value;
 
-                const matchedEntity = entityData.find(
-                  (entity) => entity.name === selectedEntity
-                ) || {};
+                const matchedEntity =
+                  entityData.find((entity) => entity.name === selectedEntity) ||
+                  {};
 
                 const selectedEntityId = matchedEntity.id || null;
 
@@ -820,12 +834,11 @@ const AccessControl = () => {
                   location_id: null,
                 }));
 
-
                 // entity remove kiya
                 if (!selectedEntityId) {
-
-                  const allLocations =
-                    await getLocationByCompanyId(current?.company_id);
+                  const allLocations = await getLocationByCompanyId(
+                    current?.company_id,
+                  );
 
                   setLocationNameByCompanyId(allLocations || []);
 
@@ -833,17 +846,12 @@ const AccessControl = () => {
                 }
 
                 try {
-
                   // entity wise locations
                   const entityLocations =
-                    await getAllCompanyLocationByEntityId(
-                      selectedEntityId
-                    );
+                    await getAllCompanyLocationByEntityId(selectedEntityId);
 
                   setLocationNameByCompanyId(entityLocations || []);
-
                 } catch {
-
                   setLocationNameByCompanyId([]);
                 }
               }}
@@ -884,7 +892,7 @@ const AccessControl = () => {
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedLocation = locationNameByCompanyId.find(
-                    (g) => g.location_name === selectedName
+                    (g) => g.location_name === selectedName,
                   );
                   setCurrent((prev) => ({
                     ...prev,
@@ -915,7 +923,7 @@ const AccessControl = () => {
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedModule = moduleName.find(
-                  (g) => g.module_name === selectedName
+                  (g) => g.module_name === selectedName,
                 );
                 setCurrent((prev) => ({
                   ...prev,
@@ -962,7 +970,7 @@ const AccessControl = () => {
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedSubModule = subModuleName.find(
-                    (g) => g.sub_module_name === selectedName
+                    (g) => g.sub_module_name === selectedName,
                   );
                   setCurrent((prev) => ({
                     ...prev,
@@ -988,7 +996,7 @@ const AccessControl = () => {
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedServiceTracker = allServiceTrackerList.find(
-                  (g) => g.service_tracker_name === selectedName
+                  (g) => g.service_tracker_name === selectedName,
                 );
                 setCurrent((prev) => ({
                   ...prev,
@@ -1015,7 +1023,7 @@ const AccessControl = () => {
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedServiceTracker = allServiceTrackerList.find(
-                    (g) => g.service_tracker_name === selectedName
+                    (g) => g.service_tracker_name === selectedName,
                   );
                   setCurrent((prev) => ({
                     ...prev,
@@ -1038,7 +1046,7 @@ const AccessControl = () => {
                 onChange={(e) => {
                   const selectedName = e.target.value;
                   const matchedServiceTracker = serviceTrackerSheet.find(
-                    (g) => g.company_name === selectedName
+                    (g) => g.company_name === selectedName,
                   );
                   setCurrent((prev) => ({
                     ...prev,
@@ -1062,7 +1070,7 @@ const AccessControl = () => {
                   const selectedName = e.target.value;
                   const matchedServiceTracker =
                     allInnerPageServiceTrackerList.find(
-                      (g) => g.company_name === selectedName
+                      (g) => g.company_name === selectedName,
                     );
                   setCurrent((prev) => ({
                     ...prev,
@@ -1089,11 +1097,10 @@ const AccessControl = () => {
               label="Location To Module"
               value={current?.location_to_module || ""}
               isdisable={isEditing ? true : false}
-
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedLocation = locationToModule.find(
-                  (g) => g.location_name === selectedName
+                  (g) => g.location_name === selectedName,
                 );
                 setCurrent((prev) => ({
                   ...prev,
@@ -1118,7 +1125,7 @@ const AccessControl = () => {
               onChange={(e) => {
                 const selectedName = e.target.value;
                 const matchedPage = allPageList.find(
-                  (g) => g.page_name === selectedName
+                  (g) => g.page_name === selectedName,
                 );
                 setCurrent((prev) => ({
                   ...prev,
@@ -1144,7 +1151,7 @@ const AccessControl = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedUser = userNameListRes.find(
-                (item) => item.full_name === selectedName
+                (item) => item.full_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1170,7 +1177,7 @@ const AccessControl = () => {
               onChange={async (e) => {
                 const selectedName = e.target.value;
                 const matchedUser = userNameListRes.find(
-                  (item) => item.full_name === selectedName
+                  (item) => item.full_name === selectedName,
                 );
 
                 if (matchedUser?._id) {
@@ -1178,7 +1185,7 @@ const AccessControl = () => {
                     const filterUpdateData = await fetchAllUserAccessLevels({
                       system_user_id: matchedUser._id,
                     });
-                    console.log(filterUpdateData,'filterUpdateData')
+                    console.log(filterUpdateData, "filterUpdateData");
                     setData(filterUpdateData);
                   } catch {
                     // handle error silently
@@ -1206,7 +1213,7 @@ const AccessControl = () => {
               onChange={async (e) => {
                 const selectedName = e.target.value;
                 const matchedUser = data.find(
-                  (item) => item.EntityName === selectedName
+                  (item) => item.EntityName === selectedName,
                 );
 
                 setCurrent((prev) => ({
@@ -1313,72 +1320,65 @@ const AccessControl = () => {
           return null;
 
         // ✅ Special case for approval_status
-       if (key === "Approval_Status") {
-                    return {
-                        field: key,
-                        headerName: "Approval Status",
-                        filter: true,
-                        editable: false,
-                        valueGetter: (params) =>
-                            params.data?.Approval_Status,
-                        cellRenderer: (params) => {
-                            const status = params.value ?? 0;
+        if (key === "Approval_Status") {
+          return {
+            field: key,
+            headerName: "Approval Status",
+            filter: true,
+            editable: false,
+            valueGetter: (params) => params.data?.Approval_Status,
+            cellRenderer: (params) => {
+              const status = params.value ?? 0;
 
-                            const handleChange = async (e) => {
-                                const checked = e.target.checked;
+              const handleChange = async (e) => {
+                const checked = e.target.checked;
 
-                                // UI Update Immediately (Optimistic Update)
-                                params.node.setDataValue(
-                                    "Approval_Status",
-                                    checked ? 1 : 0,
-                                );
+                // UI Update Immediately (Optimistic Update)
+                params.node.setDataValue("Approval_Status", checked ? 1 : 0);
 
-                                // Optional: API Call
-                                try {
-                                    await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                                } catch {
-                                    // Revert if API fails
-                                    params.node.setDataValue(
-                                        "Approval_Status",
-                                        status,
-                                    );
-                                }
-                            };
-
-                            return (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "0.5rem",
-                                    }}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={status === 1}
-                                        disabled={status === 1} // Approved hone ke baad disable
-                                        onChange={handleChange}
-                                        style={{
-                                            width: 15,
-                                            height: 15,
-                                            accentColor: "orange",
-                                            cursor: status === 1 ? "not-allowed" : "pointer",
-                                        }}
-                                    />
-                                    <span
-                                        style={{
-                                            color: status === 1 ? "green" : "orange",
-                                            fontSize: "0.8rem",
-                                            fontWeight: 500,
-                                        }}
-                                    >
-                                        {status === 1 ? "Approved" : "Pending"}
-                                    </span>
-                                </div>
-                            );
-                        },
-                    };
+                // Optional: API Call
+                try {
+                  await handleCheckboxClick(params.data._id, checked ? 1 : 0);
+                } catch {
+                  // Revert if API fails
+                  params.node.setDataValue("Approval_Status", status);
                 }
+              };
+
+              return (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={status === 1}
+                    disabled={status === 1} // Approved hone ke baad disable
+                    onChange={handleChange}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      accentColor: "orange",
+                      cursor: status === 1 ? "not-allowed" : "pointer",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: status === 1 ? "green" : "orange",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {status === 1 ? "Approved" : "Pending"}
+                  </span>
+                </div>
+              );
+            },
+          };
+        }
         // ✅ Default column definition
         return {
           field: key,
@@ -1443,7 +1443,7 @@ const AccessControl = () => {
 
     {
       headerName: "Status",
-      field: 'common_attributes.is_active',
+      field: "common_attributes.is_active",
       editable: false,
       pinned: "right",
       valueGetter: (params) => params.data?.IsActive,
@@ -1472,9 +1472,6 @@ const AccessControl = () => {
       ?.replace(/[^a-z0-9\s-]/g, "")
       ?.replace(/\s+/g, "_");
 
-
-
-
     const fetchData = async () => {
       const [
         userAccessDataRes,
@@ -1494,7 +1491,7 @@ const AccessControl = () => {
         fetchAllServiceTracker(),
         fetchAllInnerPageServiceTracker(
           formattedTrackerName,
-          current?.sheet_name
+          current?.sheet_name,
         ),
         fetchAllServiceTrackerSheetData(formattedTrackerName),
       ]);
@@ -1547,7 +1544,7 @@ const AccessControl = () => {
       }
       if (allInnerPageServiceTrackerListRes.status === "fulfilled") {
         setAllInnerPageServiceTrackerList(
-          allInnerPageServiceTrackerListRes.value
+          allInnerPageServiceTrackerListRes.value,
         );
       } else {
         // intentionally ignored
@@ -1667,7 +1664,7 @@ const AccessControl = () => {
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
-      document.getElementById("filter-text-box").value
+      document.getElementById("filter-text-box").value,
     );
   }, []);
   return (
@@ -1713,17 +1710,14 @@ const AccessControl = () => {
         </div>
       </div>
       <div className="table_div p-3">
-        <div className='d-flex align-items-center gap-2'>
+        <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
           />
-          <MultiSelectFilter
-            rowData={data}
-            onFilterApply={handleFilterApply}
-          />
+          <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
           <div className="w-25 ms-auto">
             <SingleSelectTextField
               name="filter_user_name"
@@ -1732,7 +1726,7 @@ const AccessControl = () => {
               onChange={async (e) => {
                 const selectedName = e.target.value;
                 const matchedUser = userNameListRes.find(
-                  (item) => item.full_name === selectedName
+                  (item) => item.full_name === selectedName,
                 );
 
                 if (matchedUser?._id) {
@@ -1784,7 +1778,7 @@ const AccessControl = () => {
             editType="fullRow"
             rowSelection="single"
             pagination={true}
-          // rowBuffer={rowBuffer}
+            // rowBuffer={rowBuffer}
           />
         </div>
       </div>
