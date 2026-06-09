@@ -1560,7 +1560,7 @@ const AccessControl = () => {
     };
 
     fetchData();
-  }, []);
+  }, [current]);
 
   // fetch company by group id
   useEffect(() => {
