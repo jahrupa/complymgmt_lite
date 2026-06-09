@@ -256,14 +256,15 @@ const Entity = () => {
         setData(updatedData);
     };
 
-    const generateDynamicColDefs = (data) => {
+   const generateDynamicColDefs = (data) => {
+  if (!Array.isArray(data) || data.length === 0 || !data[0]) {
+    return [];
+  }
 
-        if (!data || data.length === 0) return [];
+  const sample = flattenObject(data[0]);
 
-        const sample = flattenObject(data[0]);
-
-        const dynamicCols = Object.keys(sample)
-            .map((key) => {
+        const dynamicCols = Object?.keys(sample)
+            ?.map((key) => {
                 if (key === "_id") return null;
 
                 if (key === "common_attributes.Approval_Status") {
