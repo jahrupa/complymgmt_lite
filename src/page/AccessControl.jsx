@@ -84,6 +84,8 @@ const AccessControl = () => {
     access_user_type: "",
     access_user_type_id: null,
     is_access_user_type_dropdown: false,
+    file_name: "",
+    file_id: null,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,6 +95,7 @@ const AccessControl = () => {
     useState([]);
   const [locationNameByCompanyId, setLocationNameByCompanyId] = useState([]);
   const [entityData, setEntityData] = useState([]);
+  const [fileNameList, setFileNameList] = useState([]);
   const [moduleName, setModuleName] = useState([]);
   const [subModuleName, setSubModuleName] = useState([]);
   const [locationToModule, setLocationToModule] = useState([]);
@@ -140,6 +143,8 @@ const AccessControl = () => {
       group_name_id: userData.entity_id || null,
       company_name: userData.entity_name || "",
       company_id: userData.entity_id || null,
+      entity_name: userData.entity_name || "",
+      entity_id: userData.entity_id || null,
       location_name: userData.entity_name || "",
       location_id: userData.entity_id || null,
       module_name: userData.entity_name || "",
@@ -163,6 +168,8 @@ const AccessControl = () => {
       access_user_type_id: userData.entity_id || null,
       location_to_module: userData.entity_name || "",
       location_to_module_id: userData.entity_id || null,
+      file_name: userData.entity_name || "",
+      file_id: userData.entity_id || null,
     }));
 
     setIsEditing(true);
@@ -263,6 +270,10 @@ const AccessControl = () => {
         if (!current.location_to_module)
           tempErrors.location_to_module = "Location to module is required";
         break;
+      case "document_repository":
+        if (!current.file_name)
+          tempErrors.file_name = "File Name is required";
+        break;
     }
 
     setErrors(tempErrors);
@@ -335,6 +346,10 @@ const AccessControl = () => {
     if (current?.access_type === "user_access") {
       payload.entity_id = current?.access_user_type_id;
       payload.entity_name = current?.access_user_name;
+    }
+    if (current?.access_type === "document_repository") {
+      payload.entity_id = current?.file_id;
+      payload.entity_name = current?.file_name;
     }
     if (accessType) {
       payload.entity_id = current?.service_tracker_inner_id;
@@ -567,6 +582,8 @@ const AccessControl = () => {
     const showServiceTracker = current.access_type === "service_tracker";
     const showLocationToModule = current.access_type === "location_to_module";
     const showPage = current.access_type === "page";
+    const showDocumentRepository =
+      current.access_type === "document_repository";
 
     // Add service_tracker_wise logic
     const showServiceTrackerWise =
@@ -640,6 +657,8 @@ const AccessControl = () => {
                   service_tracker: "",
                   service_tracker_wise: "",
                   page: "",
+                  file_name: "",
+                  file_id: null,
                 }));
               }}
               error={!!errors.access_type}
@@ -669,6 +688,8 @@ const AccessControl = () => {
                   service_tracker: "",
                   service_tracker_wise: "",
                   page: "",
+                  file_name: "",
+                  file_id: null,
                 }));
               }}
               names={accessTypeList.map((item) => ({
@@ -808,8 +829,8 @@ const AccessControl = () => {
             />
           )}
 
-          {showEntity && (
-            <SingleSelectTextField
+          {isEditing && showEntity ? (
+            <MuiTextField
               name="entity_name"
               label="Entity"
               value={current?.entity_name}
@@ -825,14 +846,26 @@ const AccessControl = () => {
 
                 setCurrent((prev) => ({
                   ...prev,
-
-                  entity_name: selectedEntity,
-                  entity_id: selectedEntityId,
-
-                  // reset location
-                  location_name: "",
-                  location_id: null,
+                  entity_name: e.target.value,
                 }));
+              }}
+              error={!!errors.entity_name}
+              helperText={errors.entity_name}
+            />
+          ) : (
+            showEntity && (
+              <SingleSelectTextField
+                name="entity_name"
+                label="Entity"
+                value={current?.entity_name}
+                isdisable={isEditing ? true : false}
+                onChange={async (e) => {
+
+                  const selectedEntity = e.target.value;
+
+                  const matchedEntity = entityData.find(
+                    (entity) => entity.name === selectedEntity
+                  ) || {};
 
                 // entity remove kiya
                 if (!selectedEntityId) {
@@ -840,10 +873,10 @@ const AccessControl = () => {
                     current?.company_id,
                   );
 
-                  setLocationNameByCompanyId(allLocations || []);
+                    const allLocations =
+                      await getLocationByCompanyId(current?.company_id);
 
-                  return;
-                }
+                    setLocationNameByCompanyId(allLocations || []);
 
                 try {
                   // entity wise locations
@@ -1139,6 +1172,34 @@ const AccessControl = () => {
               }))}
               error={!!errors.page_name}
               helperText={errors.page_name}
+            />
+          )}
+
+          {showDocumentRepository && (
+            <SingleSelectTextField
+              name="file_name"
+              label="File Name"
+              value={current?.file_name}
+              isdisable={isEditing ? true : false}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+
+                const matchedFile = fileNameList.find(
+                  (item) => item.file_name === selectedName
+                );
+
+                setCurrent((prev) => ({
+                  ...prev,
+                  file_name: selectedName,
+                  file_id: matchedFile?._id || null,
+                }));
+              }}
+              names={fileNameList?.map((data) => ({
+                _id: data?._id,
+                name: data?.file_name,
+              }))}
+              error={!!errors.file_name}
+              helperText={errors.file_name}
             />
           )}
         </div>
@@ -1661,6 +1722,25 @@ const AccessControl = () => {
     };
     fetchLocationToModule();
   }, []);
+  useEffect(() => {
+    const fetchFileNames = async () => {
+      try {
+        const data = await getAllFileNamesByAccessType(
+          current?.access_type
+        );
+
+        if (data) {
+          setFileNameList(data);
+        }
+      } catch {
+        setFileNameList([]);
+      }
+    };
+
+    if (current?.access_type === "document_repository") {
+      fetchFileNames();
+    }
+  }, [current?.access_type]);
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
