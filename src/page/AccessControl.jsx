@@ -1565,7 +1565,7 @@ const AccessControl = () => {
         current?.isFilteredData === false &&
         current?.is_access_user_type_dropdown === false
       ) {
-        setData(userAccessDataRes[0].value);
+        setData(userAccessDataRes.value);
       } else {
         // intentionally ignored
       }
@@ -1621,7 +1621,7 @@ const AccessControl = () => {
     };
 
     fetchData();
-  }, [current]);
+  }, []);
 
   // fetch company by group id
   useEffect(() => {
