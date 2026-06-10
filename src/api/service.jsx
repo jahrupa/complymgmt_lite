@@ -1212,10 +1212,9 @@ export const approveUserAccess = async (id) => {
 
 export const companyWiseAccess = async (data) => {
   try {
-    const response = await API.post(`${COMPANY_WISE_ACCESS}`, data);
+    const response = await API.post(COMPANY_WISE_ACCESS, data);
     return response.data;
   } catch (error) {
-    // console.error("Error rejecting user access:", error);
     throw error;
   }
 };

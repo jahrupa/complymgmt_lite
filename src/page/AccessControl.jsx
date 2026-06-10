@@ -863,9 +863,17 @@ const AccessControl = () => {
             <MuiTextField
               name="entity_name"
               label="Entity"
-              value={current.entity_name}
-              isdisabled={true}
-              onChange={(e) => {
+              value={current?.entity_name}
+              isdisable={isEditing ? true : false}
+              onChange={async (e) => {
+                const selectedEntity = e.target.value;
+
+                const matchedEntity =
+                  entityData.find((entity) => entity.name === selectedEntity) ||
+                  {};
+
+                const selectedEntityId = matchedEntity.id || null;
+
                 setCurrent((prev) => ({
                   ...prev,
                   entity_name: e.target.value,
