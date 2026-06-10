@@ -117,7 +117,7 @@ export const GET_ALL_ACCESS_TYPES ='/api/v1/user_access/view/access_types';
 export const TOGGLE_USER_ACCESS_LEVEL_STATUS ='/api/v1/user_access/update/status/toggle/';
 export const GET_USER_ACCESS_BY_ID ='/api/v1/user_access/view/';
 export const APPROVE_USER_ACCESS = "/api/v1/user_access/update/approve/";
-export const COMPANY_WISE_ACCESS='/api/v1/user_access/create/company-wise/access';
+export const COMPANY_WISE_ACCESS='/api/v1/user_access/create/companywise/access';
 export const DOCUMENT_WISE_ACCESS='/api/v1/user_access/create/document-wise/access'
 // Common API
 export const APPROVE_ALL_BY_ENTITY_TYPE ='/api/v1/';
@@ -257,5 +257,10 @@ export const GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID ="/api/v1/company_location/vi
 
 //Document-repo
 export const GET_FILE_NAMES_BY_ACCESS_TYPE = "/api/v1/document_repository/view/file-names";
+export const ENTITY_WISE_ACCESS='/api/v1/user_access/create/entity-wise/access';
+
+//component-wise-access
+export const CREATE_GROUPWISE_ACCESS_BY_GROUP_ID = '/api/v1/user_access/create/group-wise/access';
+
 
 
