@@ -43,6 +43,7 @@ import {
   fetchEntityById,
   getAllCompanyLocationByEntityId,
   getAllFileNamesByAccessType,
+  createGroupwiseAccessByGroupId,
   createEntityWiseAccess,
 } from "../api/service";
 import Toggle from "../component/Toggle";
@@ -275,6 +276,10 @@ const AccessControl = () => {
       case "document_repository":
         if (!current.file_name) tempErrors.file_name = "File Name is required";
         break;
+      case "group-wise":
+        if (!current.group_name)
+          tempErrors.group_name = "Group name is required";
+        break;
     }
 
     setErrors(tempErrors);
@@ -290,6 +295,10 @@ const AccessControl = () => {
       company_name: current?.company_name,
       access_key: current?.access,
     };
+    const groupWiseAccessPayload = {
+      user_id: current?.user_id,
+      group_id: current?.group_name_id,
+      access_key: current?.access?.map((a) => a.toLowerCase()),
     const entityWiseAccessPayload = {
       user_id: current?.user_id,
       entity_id: current?.entity_id,
@@ -379,6 +388,8 @@ const AccessControl = () => {
         const response =
           current?.access_type === "company-wise"
             ? await companyWiseAccess(companyWiseAccessPayload)
+            : current?.access_type === "group-wise"
+              ? await createGroupwiseAccessByGroupId(groupWiseAccessPayload)
             : current?.access_type === "entity-wise"
               ? await createEntityWiseAccess(entityWiseAccessPayload)
               : current?.access_type === "document-wise"
@@ -561,6 +572,8 @@ const AccessControl = () => {
         "company",
         "company_location",
         "company-wise",
+        "group-wise",
+        "entity",
         "entity",
         "entity-wise",
       ].includes(current.access_type) &&
@@ -569,6 +582,9 @@ const AccessControl = () => {
       !isCompanyLocationEdit;
 
     const showCompany =
+      ["company", "company_location", "company-wise", "entity"].includes(
+        current.access_type,
+      ) &&
       [
         "company",
         "company_location",
@@ -580,6 +596,7 @@ const AccessControl = () => {
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
+    const showEntity = ["company_location", "entity"].includes(
     const showEntity = ["company_location", "entity", "entity-wise"].includes(
       current.access_type,
     );
