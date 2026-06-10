@@ -201,6 +201,7 @@ import {
   GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID,
   GET_FILE_NAMES_BY_ACCESS_TYPE,
   CREATE_GROUPWISE_ACCESS_BY_GROUP_ID,
+  ENTITY_WISE_ACCESS,
 
 
 } from "./Endpoint";
@@ -2424,6 +2425,14 @@ export const createGroupwiseAccessByGroupId = async (data) => {
   }
 };
 
+export const createEntityWiseAccess = async (data) => {
+  try {
+    const response = await API.post(ENTITY_WISE_ACCESS, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 
