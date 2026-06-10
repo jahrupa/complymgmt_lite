@@ -42,6 +42,9 @@ import {
   documentWiseAccess,
   fetchEntityById,
   getAllCompanyLocationByEntityId,
+  getAllFileNamesByAccessType,
+  createGroupwiseAccessByGroupId,
+  createEntityWiseAccess,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -271,8 +274,11 @@ const AccessControl = () => {
           tempErrors.location_to_module = "Location to module is required";
         break;
       case "document_repository":
-        if (!current.file_name)
-          tempErrors.file_name = "File Name is required";
+        if (!current.file_name) tempErrors.file_name = "File Name is required";
+        break;
+      case "group-wise":
+        if (!current.group_name)
+          tempErrors.group_name = "Group name is required";
         break;
     }
 
@@ -286,8 +292,18 @@ const AccessControl = () => {
     if (!validate()) return; // Don't proceed if validation fails
     const companyWiseAccessPayload = {
       user_id: current?.user_id,
-      company_id: current?.company_id,
-      access_key: current?.access?.map((item) => item.toLowerCase()) || [],
+      company_name: current?.company_name,
+      access_key: current?.access,
+    };
+    const groupWiseAccessPayload = {
+      user_id: current?.user_id,
+      group_id: current?.group_name_id,
+      access_key: current?.access?.map((a) => a.toLowerCase()),
+    };
+    const entityWiseAccessPayload = {
+      user_id: current?.user_id,
+      entity_id: current?.entity_id,
+      access_key: current?.access,
     };
     const documentWiseAccessPayload = {
       user_id: current?.user_id,
@@ -373,9 +389,13 @@ const AccessControl = () => {
         const response =
           current?.access_type === "company-wise"
             ? await companyWiseAccess(companyWiseAccessPayload)
-            : current?.access_type === "document-wise"
-              ? await documentWiseAccess(documentWiseAccessPayload)
-              : await createUserAccessLevel(payload);
+            : current?.access_type === "group-wise"
+              ? await createGroupwiseAccessByGroupId(groupWiseAccessPayload)
+            : current?.access_type === "entity-wise"
+              ? await createEntityWiseAccess(entityWiseAccessPayload)
+              : current?.access_type === "document-wise"
+                ? await documentWiseAccess(documentWiseAccessPayload)
+                : await createUserAccessLevel(payload);
         const message = response?.message || "create successfully";
         // Show success snackbar
         setIsSnackbarsOpen({
@@ -553,7 +573,10 @@ const AccessControl = () => {
         "company",
         "company_location",
         "company-wise",
+        "group-wise",
         "entity",
+        "entity",
+        "entity-wise",
       ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
@@ -563,11 +586,18 @@ const AccessControl = () => {
       ["company", "company_location", "company-wise", "entity"].includes(
         current.access_type,
       ) &&
+      [
+        "company",
+        "company_location",
+        "company-wise",
+        "entity",
+        "entity-wise",
+      ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
-    const showEntity = ["company_location", "entity"].includes(
+   const showEntity = ["company_location", "entity", "entity-wise"].includes(
       current.access_type,
     );
     const showLocation =
@@ -860,41 +890,50 @@ const AccessControl = () => {
                 value={current?.entity_name}
                 isdisable={isEditing ? true : false}
                 onChange={async (e) => {
-
                   const selectedEntity = e.target.value;
 
-                  const matchedEntity = entityData.find(
-                    (entity) => entity.name === selectedEntity
-                  ) || {};
+                  const matchedEntity =
+                    entityData.find(
+                      (entity) => entity.name === selectedEntity,
+                    ) || {};
 
-                // entity remove kiya
-                if (!selectedEntityId) {
-                  const allLocations = await getLocationByCompanyId(
-                    current?.company_id,
-                  );
+                  const selectedEntityId = matchedEntity.id || null;
 
-                    const allLocations =
-                      await getLocationByCompanyId(current?.company_id);
+                  setCurrent((prev) => ({
+                    ...prev,
+                    entity_name: selectedEntity,
+                    entity_id: selectedEntityId,
+                    location_name: "",
+                    location_id: null,
+                  }));
+
+                  if (!selectedEntityId) {
+                    const allLocations = await getLocationByCompanyId(
+                      current?.company_id,
+                    );
 
                     setLocationNameByCompanyId(allLocations || []);
 
-                try {
-                  // entity wise locations
-                  const entityLocations =
-                    await getAllCompanyLocationByEntityId(selectedEntityId);
+                    return;
+                  }
 
-                  setLocationNameByCompanyId(entityLocations || []);
-                } catch {
-                  setLocationNameByCompanyId([]);
-                }
-              }}
-              names={entityData?.map((entity) => ({
-                _id: entity?.id,
-                name: entity?.name,
-              }))}
-              error={!!errors.entity_name}
-              helperText={errors.entity_name}
-            />
+                  try {
+                    const entityLocations =
+                      await getAllCompanyLocationByEntityId(selectedEntityId);
+
+                    setLocationNameByCompanyId(entityLocations || []);
+                  } catch {
+                    setLocationNameByCompanyId([]);
+                  }
+                }}
+                names={entityData?.map((entity) => ({
+                  _id: entity?.id,
+                  name: entity?.name,
+                }))}
+                error={!!errors.entity_name}
+                helperText={errors.entity_name}
+              />
+            )
           )}
         </div>
         <div className="d-lg-flex d-md-flex justify-content-between gap-3">
@@ -1185,7 +1224,7 @@ const AccessControl = () => {
                 const selectedName = e.target.value;
 
                 const matchedFile = fileNameList.find(
-                  (item) => item.file_name === selectedName
+                  (item) => item.file_name === selectedName,
                 );
 
                 setCurrent((prev) => ({
@@ -1725,9 +1764,7 @@ const AccessControl = () => {
   useEffect(() => {
     const fetchFileNames = async () => {
       try {
-        const data = await getAllFileNamesByAccessType(
-          current?.access_type
-        );
+        const data = await getAllFileNamesByAccessType(current?.access_type);
 
         if (data) {
           setFileNameList(data);
