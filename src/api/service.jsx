@@ -200,6 +200,8 @@ import {
   GET_ENTITIES_BY_COMPANY_ID,
   GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID,
   GET_FILE_NAMES_BY_ACCESS_TYPE,
+  CREATE_GROUPWISE_ACCESS_BY_GROUP_ID,
+  ENTITY_WISE_ACCESS
 
 } from "./Endpoint";
 
@@ -2407,6 +2409,25 @@ export const getAllFileNamesByAccessType = async (id) => {
       `${GET_FILE_NAMES_BY_ACCESS_TYPE}${id}`
     );
 
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//component-wise-access
+export const createGroupwiseAccessByGroupId = async (data) => {
+  try {
+    const response = await API.post(CREATE_GROUPWISE_ACCESS_BY_GROUP_ID, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createEntityWiseAccess = async (data) => {
+  try {
+    const response = await API.post(ENTITY_WISE_ACCESS, data);
     return response.data;
   } catch (error) {
     throw error;
