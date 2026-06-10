@@ -299,6 +299,7 @@ const AccessControl = () => {
       user_id: current?.user_id,
       group_id: current?.group_name_id,
       access_key: current?.access?.map((a) => a.toLowerCase()),
+    };
     const entityWiseAccessPayload = {
       user_id: current?.user_id,
       entity_id: current?.entity_id,
@@ -596,8 +597,7 @@ const AccessControl = () => {
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
-    const showEntity = ["company_location", "entity"].includes(
-    const showEntity = ["company_location", "entity", "entity-wise"].includes(
+   const showEntity = ["company_location", "entity", "entity-wise"].includes(
       current.access_type,
     );
     const showLocation =
