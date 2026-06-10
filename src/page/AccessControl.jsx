@@ -292,7 +292,7 @@ const AccessControl = () => {
     if (!validate()) return; // Don't proceed if validation fails
     const companyWiseAccessPayload = {
       user_id: current?.user_id,
-      company_name: current?.company_name,
+      company_id: current?.company_id,
       access_key: current?.access,
     };
     const groupWiseAccessPayload = {
@@ -583,7 +583,7 @@ const AccessControl = () => {
       !isCompanyLocationEdit;
 
     const showCompany =
-      ["company", "company_location", "company-wise", "entity"].includes(
+      ["company", "company_location", "company-wise", "entity", "entity-wise"].includes(
         current.access_type,
       ) &&
       [
