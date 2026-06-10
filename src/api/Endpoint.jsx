@@ -257,5 +257,6 @@ export const GET_ALL_COMPANY_LOCATION_BY_ENTITY_ID ="/api/v1/company_location/vi
 
 //Document-repo
 export const GET_FILE_NAMES_BY_ACCESS_TYPE = "/api/v1/document_repository/view/file-names";
+export const ENTITY_WISE_ACCESS='/api/v1/user_access/create/entity-wise/access';
 
 
