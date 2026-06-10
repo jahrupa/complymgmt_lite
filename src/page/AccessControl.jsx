@@ -44,6 +44,7 @@ import {
   getAllCompanyLocationByEntityId,
   getAllFileNamesByAccessType,
   createGroupwiseAccessByGroupId,
+  createEntityWiseAccess,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -298,6 +299,10 @@ const AccessControl = () => {
       user_id: current?.user_id,
       group_id: current?.group_name_id,
       access_key: current?.access?.map((a) => a.toLowerCase()),
+    const entityWiseAccessPayload = {
+      user_id: current?.user_id,
+      entity_id: current?.entity_id,
+      access_key: current?.access,
     };
     const documentWiseAccessPayload = {
       user_id: current?.user_id,
@@ -385,6 +390,8 @@ const AccessControl = () => {
             ? await companyWiseAccess(companyWiseAccessPayload)
             : current?.access_type === "group-wise"
               ? await createGroupwiseAccessByGroupId(groupWiseAccessPayload)
+            : current?.access_type === "entity-wise"
+              ? await createEntityWiseAccess(entityWiseAccessPayload)
               : current?.access_type === "document-wise"
                 ? await documentWiseAccess(documentWiseAccessPayload)
                 : await createUserAccessLevel(payload);
@@ -567,6 +574,8 @@ const AccessControl = () => {
         "company-wise",
         "group-wise",
         "entity",
+        "entity",
+        "entity-wise",
       ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
@@ -576,11 +585,19 @@ const AccessControl = () => {
       ["company", "company_location", "company-wise", "entity"].includes(
         current.access_type,
       ) &&
+      [
+        "company",
+        "company_location",
+        "company-wise",
+        "entity",
+        "entity-wise",
+      ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
     const showEntity = ["company_location", "entity"].includes(
+    const showEntity = ["company_location", "entity", "entity-wise"].includes(
       current.access_type,
     );
     const showLocation =
