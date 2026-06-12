@@ -348,7 +348,7 @@ const Company = () => {
           value={current.ho_address}
           handleChange={handleChange}
           name="ho_address"
-          label="Address"
+          label="HO Address"
         />
         <div>
           <MuiTextAreaField
