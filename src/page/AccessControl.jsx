@@ -312,7 +312,7 @@ const AccessControl = () => {
     };
     const locationWiseAccessPayload = {
       user_id: current?.user_id,
-      location_id: current?.location_name_id,
+      location_id: current?.location_id,
       access_key: current?.access?.map((a) => a.toLowerCase()),
     };
     const accessType = current?.access_type === "service_tracker_wise";
