@@ -51,7 +51,7 @@ const Company = () => {
     company_common_name: "",
     company_size: "",
     company_industry: "",
-    address: "",
+    ho_address: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -145,7 +145,7 @@ const Company = () => {
       CommonAttributes: CommonAttributes,
       CompanySize: current?.company_size || "",
       CompanyIndustry: current?.company_industry || "",
-      Address: current?.address || "",
+      HOAddress: current?.ho_address ||  "",
     };
 
     try {
@@ -189,7 +189,7 @@ const Company = () => {
       company_common_name: "",
       company_size: "",
       company_industry: "",
-      address: "",
+      ho_address: "",
     });
 
     setIsEditing(false);
