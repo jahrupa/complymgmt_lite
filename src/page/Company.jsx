@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,7 +32,7 @@ import Toggle from "../component/Toggle";
 import MuiTextAreaField from "../component/MuiInputs/MuiTextAreaField";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import { decryptData } from "./utils/encrypt";
-import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
+import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
 import { flattenObject } from "../../Utils/tableColUtils";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -45,6 +51,7 @@ const Company = () => {
     company_common_name: "",
     company_size: "",
     company_industry: "",
+    address: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,7 +73,7 @@ const Company = () => {
 
   const [filters, setFilters] = useState({});
 
-  const handleFilterApply = (newFilters,) => {
+  const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
   };
   const filteredRowData = useMemo(() => {
@@ -111,8 +118,6 @@ const Company = () => {
         message,
         severityType: "success",
       });
-
-
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -121,7 +126,6 @@ const Company = () => {
         message: error?.response?.data?.message,
         severityType: "error",
       });
-
     }
     const updatedData = await fetchAllCompanies();
     setData(updatedData);
@@ -141,6 +145,7 @@ const Company = () => {
       CommonAttributes: CommonAttributes,
       CompanySize: current?.company_size || "",
       CompanyIndustry: current?.company_industry || "",
+      Address: current?.address || "",
     };
 
     try {
@@ -184,6 +189,7 @@ const Company = () => {
       company_common_name: "",
       company_size: "",
       company_industry: "",
+      address: "",
     });
 
     setIsEditing(false);
@@ -230,11 +236,11 @@ const Company = () => {
     setIsEditing(false);
     setCurrent({
       _id: null,
-      group_name: '',
+      group_name: "",
       groups_holdings_id: null,
-      group_holding_account_owner: '',
-      created_at: '',
-      group_description: '',
+      group_holding_account_owner: "",
+      created_at: "",
+      group_description: "",
     });
   };
 
@@ -338,6 +344,12 @@ const Company = () => {
             helperText={errors.company_industry}
           />
         </div>
+        <MuiTextAreaField
+          value={current.ho_address}
+          handleChange={handleChange}
+          name="ho_address"
+          label="Address"
+        />
         <div>
           <MuiTextAreaField
             value={current.company_description}
@@ -582,6 +594,7 @@ const Company = () => {
           <button
             className="btn btn-sm"
             onClick={() => {
+              console.log(params.data);
               setCurrent(params.data);
               setIsEditing(true);
               setIsModalOpen(true);
@@ -684,7 +697,7 @@ const Company = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
-        <div className='d-flex align-items-center gap-2'>
+        <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"

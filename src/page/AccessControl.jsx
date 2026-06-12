@@ -467,7 +467,7 @@ const AccessControl = () => {
         error?.message ||
         "Failed to delete AccessControl";
 
-      // Show error snackbar
+      // Show error snackbars
       setIsSnackbarsOpen({
         ...isSnackbarsOpen,
         open: true,
