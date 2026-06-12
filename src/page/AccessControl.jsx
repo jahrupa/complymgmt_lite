@@ -45,6 +45,7 @@ import {
   getAllFileNamesByAccessType,
   createGroupwiseAccessByGroupId,
   createEntityWiseAccess,
+  createLocationWiseAccess,
 } from "../api/service";
 import Toggle from "../component/Toggle";
 import Snackbars from "../component/Snackbars";
@@ -309,6 +310,11 @@ const AccessControl = () => {
       user_id: current?.user_id,
       access_key: current?.access,
     };
+    const locationWiseAccessPayload = {
+      user_id: current?.user_id,
+      location_id: current?.location_name_id,
+      access_key: current?.access?.map((a) => a.toLowerCase()),
+    };
     const accessType = current?.access_type === "service_tracker_wise";
     const payload = {
       user_id: current?.user_id,
@@ -391,11 +397,13 @@ const AccessControl = () => {
             ? await companyWiseAccess(companyWiseAccessPayload)
             : current?.access_type === "group-wise"
               ? await createGroupwiseAccessByGroupId(groupWiseAccessPayload)
-            : current?.access_type === "entity-wise"
-              ? await createEntityWiseAccess(entityWiseAccessPayload)
-              : current?.access_type === "document-wise"
-                ? await documentWiseAccess(documentWiseAccessPayload)
-                : await createUserAccessLevel(payload);
+              : current?.access_type === "entity-wise"
+                ? await createEntityWiseAccess(entityWiseAccessPayload)
+                : current?.access_type === "location-wise"
+                  ? await createLocationWiseAccess(locationWiseAccessPayload)
+                  : current?.access_type === "document-wise"
+                    ? await documentWiseAccess(documentWiseAccessPayload)
+                    : await createUserAccessLevel(payload);
         const message = response?.message || "create successfully";
         // Show success snackbar
         setIsSnackbarsOpen({
@@ -577,31 +585,41 @@ const AccessControl = () => {
         "entity",
         "entity",
         "entity-wise",
+        "location-wise",
       ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
     const showCompany =
-      ["company", "company_location", "company-wise", "entity", "entity-wise"].includes(
-        current.access_type,
-      ) &&
       [
         "company",
         "company_location",
         "company-wise",
         "entity",
         "entity-wise",
+        "location-wise",
+      ].includes(current.access_type) &&
+      [
+        "company",
+        "company_location",
+        "company-wise",
+        "entity",
+        "entity-wise",
+        "location-wise",
       ].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule &&
       !isCompanyLocationEdit;
 
-   const showEntity = ["company_location", "entity", "entity-wise"].includes(
-      current.access_type,
-    );
+    const showEntity = [
+      "company_location",
+      "entity",
+      "entity-wise",
+      "location-wise",
+    ].includes(current.access_type);
     const showLocation =
-      ["company_location"].includes(current.access_type) &&
+      ["company_location", "location-wise"].includes(current.access_type) &&
       !showOnlyModule &&
       !showOnlyModuleAndSubModule;
 
