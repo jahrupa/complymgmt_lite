@@ -1236,7 +1236,7 @@ const AccessControl = () => {
             <SingleSelectTextField
               name="file_name"
               label="File Name"
-              value={current?.file_name}
+              value={current?.file_name || ""}
               isdisable={isEditing ? true : false}
               onChange={(e) => {
                 const selectedName = e.target.value;
@@ -1253,7 +1253,7 @@ const AccessControl = () => {
               }}
               names={fileNameList?.map((data) => ({
                 _id: data?._id,
-                name: data?.file_name,
+                name: data?.name,
               }))}
               error={!!errors.file_name}
               helperText={errors.file_name}
@@ -1303,7 +1303,7 @@ const AccessControl = () => {
                     const filterUpdateData = await fetchAllUserAccessLevels({
                       system_user_id: matchedUser._id,
                     });
-                    console.log(filterUpdateData, "filterUpdateData");
+
                     setData(filterUpdateData);
                   } catch {
                     // handle error silently
@@ -1796,6 +1796,7 @@ const AccessControl = () => {
       fetchFileNames();
     }
   }, [current?.access_type]);
+
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
