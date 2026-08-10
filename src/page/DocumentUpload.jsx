@@ -922,7 +922,7 @@ const DocumentUpload = () => {
             value={current.group_name}
             onChange={(e) => {
               const selectedName = e.target.value;
-              const matchedGroup = groupHoldingName.find(
+              const matchedGroup = groupHoldingName?.find(
                 (g) => g.group_name === selectedName
               );
               setCurrent((prev) => ({
@@ -951,7 +951,7 @@ const DocumentUpload = () => {
               setServiceTrackerName([]);
               setErrors((prevErrors) => ({ ...prevErrors, group_name: "" }));
             }}
-            names={groupHoldingName.map((item) => ({
+            names={groupHoldingName?.map((item) => ({
               _id: item._id,
               name: item.group_name,
             }))}
