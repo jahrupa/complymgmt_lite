@@ -516,100 +516,84 @@ const DocumentUpload = () => {
         return { color: "#41464b" }; // gray
     }
   };
-  const generateDynamicColDefs = (data) => {
+  // Internal ids / audit fields that should never become their own column,
+  // matched on the leaf of a flattened key (so `ai_data._id` is caught too).
+  const HIDDEN_DYNAMIC_LEAVES = new Set([
+    "_id",
+    "is_active",
+    "is_deleted",
+    "is_archived",
+    "deleted_at",
+    "deleted_by",
+    "created_by",
+    "updated_by",
+    "approved_by",
+  ]);
+
+  // "ai_data.created_at" -> "AI Data Created At" (prefixing the parent keeps
+  // nested fields from colliding with the top level ones)
+  const buildHeaderName = (key) =>
+    key
+      .split(".")
+      .map((part) =>
+        part
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase())
+          .replace(/\bAi\b/g, "AI")
+      )
+      .join(" ");
+
+  const generateDynamicColDefs = (data, existingColDefs = []) => {
     if (!data || data.length === 0) return [];
 
-    const sample = flattenObject(data[0]);
+    // Union the keys of the first rows: an empty `ai_data` on row 0 would
+    // otherwise hide those columns entirely.
+    const sample = data.slice(0, 20).reduce(
+      (acc, row) => Object.assign(acc, flattenObject(row)),
+      {}
+    );
+
+    // Anything already declared as a static column is skipped, matched on both
+    // the field path and the header text.
+    const takenFields = new Set(
+      existingColDefs.map((col) => col.field).filter(Boolean)
+    );
+    const takenHeaders = new Set(
+      existingColDefs
+        .map((col) => col.headerName?.toLowerCase())
+        .filter(Boolean)
+    );
 
     return Object.keys(sample)
       .map((key) => {
-        // Skip unwanted fields
-        if (
-          key === "_id" ||
-          key === "common_attributes.is_active" ||
-          key === "common_attributes.is_deleted" ||
-          key === "common_attributes.deleted_by" ||
-          key === "common_attributes.deleted_at"
-        )
+        const leaf = key.split(".").pop();
+
+        if (HIDDEN_DYNAMIC_LEAVES.has(leaf)) return null;
+
+        // Drop raw ObjectId columns that already have a readable `_name` twin
+        // (company_id, entity_id, module_id, …). `document_id` has no twin, so
+        // it survives.
+        if (leaf.endsWith("_id") && key.replace(/_id$/, "_name") in sample)
           return null;
 
-        // ✅ Special case for approval_status
-        if (key === "common_attributes.approval_status") {
-          return {
-            field: key,
-            headerName: "Approval Status",
-            filter: true,
-            editable: false,
-            valueGetter: (params) =>
-              params.data?.common_attributes?.approval_status,
-            cellRenderer: (params) => {
-              const status = params.value ?? 0;
+        // Nested foreign keys that just repeat a top level id (ai_data.document_id)
+        if (key.includes(".") && leaf.endsWith("_id") && leaf in sample)
+          return null;
 
-              const handleChange = async (e) => {
-                const checked = e.target.checked;
+        // Objects/arrays have no sensible cell rendering (e.g. a null `ai_data`)
+        if (sample[key] !== null && typeof sample[key] === "object") return null;
 
-                // UI Update Immediately (Optimistic Update)
-                params.node.setDataValue(
-                  "common_attributes.approval_status",
-                  checked ? 1 : 0,
-                );
+        const headerName = buildHeaderName(key);
 
-                // Optional: API Call
-                // try {
-                //   await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                // } catch  {
-                //   // Revert if API fails
-                //   params.node.setDataValue(
-                //     "common_attributes.approval_status",
-                //     status,
-                //   );
-                // }
-              };
+        if (takenFields.has(key) || takenHeaders.has(headerName.toLowerCase()))
+          return null;
 
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={status === 1}
-                    disabled={status === 1} // Approved hone ke baad disable
-                    onChange={handleChange}
-                    style={{
-                      width: 15,
-                      height: 15,
-                      accentColor: "orange",
-                      cursor: status === 1 ? "not-allowed" : "pointer",
-                    }}
-                  />
-                  <span
-                    style={{
-                      color: status === 1 ? "green" : "orange",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {status === 1 ? "Approved" : "Pending"}
-                  </span>
-                </div>
-              );
-            },
-          };
-        }
+        takenFields.add(key);
+        takenHeaders.add(headerName.toLowerCase());
 
-        // ✅ Default column definition
         return {
           field: key,
-          headerName: key
-            .split(".")
-            .pop()
-            .replace(/_/g, " ")
-            .replace(/\b\w/g, (l) => l.toUpperCase()),
-
+          headerName,
           filter: true,
           editable: false,
           headerStyle: {
@@ -618,15 +602,20 @@ const DocumentUpload = () => {
           },
 
           valueGetter: (params) => {
-            return key
+            const value = key
               .split(".")
               .reduce((acc, part) => acc?.[part], params.data);
+
+            if (value === null || value === undefined || value === "")
+              return "-";
+            if (typeof value === "boolean") return value ? "Yes" : "No";
+            return value;
           },
         };
       })
       .filter(Boolean);
   };
-  const colDefs = [
+  const staticColDefs = [
     {
       headerName: "Actions",
       field: "actions",
@@ -796,7 +785,10 @@ const DocumentUpload = () => {
         );
       },
     },
-    ...generateDynamicColDefs(data),
+  ];
+  const colDefs = [
+    ...staticColDefs,
+    ...generateDynamicColDefs(data, staticColDefs),
   ];
   const gridRef = useRef();
   const defaultColDef = {
