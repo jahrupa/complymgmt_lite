@@ -8,6 +8,7 @@ import React, {
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import Toggle from "../component/Toggle";
@@ -82,6 +83,10 @@ const DocumentUpload = () => {
     useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [documentId, setDocumentId] = useState(null);
+  const [previewFile, setPreviewFile] = useState({
+    documentId: null,
+    fileName: "",
+  });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -208,6 +213,7 @@ const DocumentUpload = () => {
   };
   const toggleDrawer = (newOpen) => () => {
     setIsModalOpen(newOpen);
+    if (!newOpen) setIsPdfView(false);
   };
 
   //  =============================   auto file upload logic   =================================================
@@ -637,17 +643,20 @@ const DocumentUpload = () => {
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
-            {/* <button
+            <button
               className="btn btn-sm"
+              title="Preview document"
               onClick={() => {
-                // setIsEditing(false);
+                setPreviewFile({
+                  documentId: params.data.document_id,
+                  fileName: params.data.file_name || "",
+                });
                 setIsPdfView(true);
                 setIsModalOpen(true);
-                setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
             >
-              <AttachFileIcon fontSize="small" className="action_icon" />
-            </button> */}
+              <VisibilityIcon fontSize="small" className="action_icon" />
+            </button>
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -901,6 +910,14 @@ const DocumentUpload = () => {
   };
 
   const drawerHeader = () => {
+    if (isPdfView) {
+      return (
+        <div className="p-3 fs-14 fw-600">
+          <FilePresentIcon style={{ color: "deepskyblue" }} />
+          Document Preview
+        </div>
+      );
+    }
     return (
       <div className="p-3 fs-14 fw-600">
         <AttachFileIcon style={{ color: "green" }} />
@@ -1407,13 +1424,17 @@ const DocumentUpload = () => {
   const pdfFile = () => {
     return (
       <div className="p-3 w-100">
-        <ReactPDFViewer />
+        <ReactPDFViewer
+          documentId={previewFile.documentId}
+          fileName={previewFile.fileName}
+        />
       </div>
     );
   };
   return (
     <div>
       <RightDrawer
+        width={isPdfView ? "900px" : "500px"}
         isPdfView={isPdfView}
         toggleDrawer={toggleDrawer}
         drawerHeader={drawerHeader}
