@@ -261,6 +261,7 @@ export const ENTITY_WISE_ACCESS='/api/v1/user_access/create/entity-wise/access';
 
 //component-wise-access
 export const CREATE_GROUPWISE_ACCESS_BY_GROUP_ID = '/api/v1/user_access/create/group-wise/access';
+export const LOCATION_WISE_ACCESS = '/api/v1/user_access/create/location-wise/access';
 
 
 
