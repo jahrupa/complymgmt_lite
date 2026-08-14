@@ -1,7 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import Toggle from "../component/Toggle";
@@ -37,13 +44,15 @@ import { ReactPDFViewer } from "../component/ReactPDFViewer";
 import SmallSizeModal from "../component/SmallSizeModal";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import { Download } from "lucide-react";
-import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
-import { flattenObject } from '../../Utils/tableColUtils';
+import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
+import { flattenObject } from "../../Utils/tableColUtils";
+import MonthYearCalander from "../component/MonthYearCalander";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
+  console.log(data,'data')
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -64,6 +73,8 @@ const DocumentUpload = () => {
     document_type_id: null,
     stage: "",
     stage_id: null,
+    document_month: null,
+    document_year: null,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
@@ -72,6 +83,10 @@ const DocumentUpload = () => {
     useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [documentId, setDocumentId] = useState(null);
+  const [previewFile, setPreviewFile] = useState({
+    documentId: null,
+    fileName: "",
+  });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -198,6 +213,7 @@ const DocumentUpload = () => {
   };
   const toggleDrawer = (newOpen) => () => {
     setIsModalOpen(newOpen);
+    if (!newOpen) setIsPdfView(false);
   };
 
   //  =============================   auto file upload logic   =================================================
@@ -264,7 +280,6 @@ const DocumentUpload = () => {
       const updatedData = await fetchAllFiles();
       setData(updatedData);
       setUploadedFiles([]);
-
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -291,7 +306,7 @@ const DocumentUpload = () => {
     try {
       const response = await updateFileById(
         params.data.document_id,
-        newIsActive
+        newIsActive,
       );
       const message = response?.message || "Status update successfully";
       // Show success snackbar
@@ -368,7 +383,7 @@ const DocumentUpload = () => {
     const fetchCompany = async () => {
       try {
         const data = await fetchCompaniesNameByGroupId(
-          current?.group_holdings_id
+          current?.group_holdings_id,
         );
         if (data) {
           setCompanyName(data);
@@ -424,7 +439,7 @@ const DocumentUpload = () => {
     const fetchModuleByLocationId = async () => {
       try {
         const data = await fetchAllModulesNameByLocationId(
-          current?.location_id
+          current?.location_id,
         );
         if (data) {
           setModuleName(data);
@@ -464,7 +479,7 @@ const DocumentUpload = () => {
         if (data) {
           setServiceTrackerName(data);
         }
-      } catch { }
+      } catch {}
     };
 
     if (current?.module_id) {
@@ -516,100 +531,84 @@ const DocumentUpload = () => {
         return { color: "#41464b" }; // gray
     }
   };
-  const generateDynamicColDefs = (data) => {
+  // Internal ids / audit fields that should never become their own column,
+  // matched on the leaf of a flattened key (so `ai_data._id` is caught too).
+  const HIDDEN_DYNAMIC_LEAVES = new Set([
+    "_id",
+    "is_active",
+    "is_deleted",
+    "is_archived",
+    "deleted_at",
+    "deleted_by",
+    "created_by",
+    "updated_by",
+    "approved_by",
+  ]);
+
+  // "ai_data.created_at" -> "AI Data Created At" (prefixing the parent keeps
+  // nested fields from colliding with the top level ones)
+  const buildHeaderName = (key) =>
+    key
+      .split(".")
+      .map((part) =>
+        part
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase())
+          .replace(/\bAi\b/g, "AI"),
+      )
+      .join(" ");
+
+  const generateDynamicColDefs = (data, existingColDefs = []) => {
     if (!data || data.length === 0) return [];
 
-    const sample = flattenObject(data[0]);
+    // Union the keys of the first rows: an empty `ai_data` on row 0 would
+    // otherwise hide those columns entirely.
+    const sample = data
+      .slice(0, 20)
+      .reduce((acc, row) => Object.assign(acc, flattenObject(row)), {});
+
+    // Anything already declared as a static column is skipped, matched on both
+    // the field path and the header text.
+    const takenFields = new Set(
+      existingColDefs.map((col) => col.field).filter(Boolean),
+    );
+    const takenHeaders = new Set(
+      existingColDefs
+        .map((col) => col.headerName?.toLowerCase())
+        .filter(Boolean),
+    );
 
     return Object.keys(sample)
       .map((key) => {
-        // Skip unwanted fields
-        if (
-          key === "_id" ||
-          key === "common_attributes.is_active" ||
-          key === "common_attributes.is_deleted" ||
-          key === "common_attributes.deleted_by" ||
-          key === "common_attributes.deleted_at"
-        )
+        const leaf = key.split(".").pop();
+
+        if (HIDDEN_DYNAMIC_LEAVES.has(leaf)) return null;
+
+        // Drop raw ObjectId columns that already have a readable `_name` twin
+        // (company_id, entity_id, module_id, …). `document_id` has no twin, so
+        // it survives.
+        if (leaf.endsWith("_id") && key.replace(/_id$/, "_name") in sample)
           return null;
 
-        // ✅ Special case for approval_status
-        if (key === "common_attributes.approval_status") {
-          return {
-            field: key,
-            headerName: "Approval Status",
-            filter: true,
-            editable: false,
-            valueGetter: (params) =>
-              params.data?.common_attributes?.approval_status,
-            cellRenderer: (params) => {
-              const status = params.value ?? 0;
+        // Nested foreign keys that just repeat a top level id (ai_data.document_id)
+        if (key.includes(".") && leaf.endsWith("_id") && leaf in sample)
+          return null;
 
-              const handleChange = async (e) => {
-                const checked = e.target.checked;
+        // Objects/arrays have no sensible cell rendering (e.g. a null `ai_data`)
+        if (sample[key] !== null && typeof sample[key] === "object")
+          return null;
 
-                // UI Update Immediately (Optimistic Update)
-                params.node.setDataValue(
-                  "common_attributes.approval_status",
-                  checked ? 1 : 0,
-                );
+        const headerName = buildHeaderName(key);
 
-                // Optional: API Call
-                // try {
-                //   await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                // } catch  {
-                //   // Revert if API fails
-                //   params.node.setDataValue(
-                //     "common_attributes.approval_status",
-                //     status,
-                //   );
-                // }
-              };
+        if (takenFields.has(key) || takenHeaders.has(headerName.toLowerCase()))
+          return null;
 
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={status === 1}
-                    disabled={status === 1} // Approved hone ke baad disable
-                    onChange={handleChange}
-                    style={{
-                      width: 15,
-                      height: 15,
-                      accentColor: "orange",
-                      cursor: status === 1 ? "not-allowed" : "pointer",
-                    }}
-                  />
-                  <span
-                    style={{
-                      color: status === 1 ? "green" : "orange",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {status === 1 ? "Approved" : "Pending"}
-                  </span>
-                </div>
-              );
-            },
-          };
-        }
+        takenFields.add(key);
+        takenHeaders.add(headerName.toLowerCase());
 
-        // ✅ Default column definition
         return {
           field: key,
-          headerName: key
-            .split(".")
-            .pop()
-            .replace(/_/g, " ")
-            .replace(/\b\w/g, (l) => l.toUpperCase()),
-
+          headerName,
           filter: true,
           editable: false,
           headerStyle: {
@@ -618,15 +617,20 @@ const DocumentUpload = () => {
           },
 
           valueGetter: (params) => {
-            return key
+            const value = key
               .split(".")
               .reduce((acc, part) => acc?.[part], params.data);
+
+            if (value === null || value === undefined || value === "")
+              return "-";
+            if (typeof value === "boolean") return value ? "Yes" : "No";
+            return value;
           },
         };
       })
       .filter(Boolean);
   };
-  const colDefs = [
+  const staticColDefs = [
     {
       headerName: "Actions",
       field: "actions",
@@ -639,17 +643,20 @@ const DocumentUpload = () => {
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
-            {/* <button
+            <button
               className="btn btn-sm"
+              title="Preview document"
               onClick={() => {
-                // setIsEditing(false);
+                setPreviewFile({
+                  documentId: params.data.document_id,
+                  fileName: params.data.file_name || "",
+                });
                 setIsPdfView(true);
                 setIsModalOpen(true);
-                setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
             >
-              <AttachFileIcon fontSize="small" className="action_icon" />
-            </button> */}
+              <VisibilityIcon fontSize="small" className="action_icon" />
+            </button>
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -701,11 +708,15 @@ const DocumentUpload = () => {
         };
 
         return (
-          <button
-            onClick={handleDownload}
-            style={{ display: 'contents' }}
-          >
-            <Download style={{ height: '21px', width: '21px', color: 'cadetblue', cursor: 'pointer' }} />
+          <button onClick={handleDownload} style={{ display: "contents" }}>
+            <Download
+              style={{
+                height: "21px",
+                width: "21px",
+                color: "cadetblue",
+                cursor: "pointer",
+              }}
+            />
           </button>
         );
       },
@@ -781,7 +792,7 @@ const DocumentUpload = () => {
                 height: 15,
                 accentColor: "orange",
               }}
-            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
@@ -796,7 +807,10 @@ const DocumentUpload = () => {
         );
       },
     },
-    ...generateDynamicColDefs(data),
+  ];
+  const colDefs = [
+    ...staticColDefs,
+    ...generateDynamicColDefs(data, staticColDefs),
   ];
   const gridRef = useRef();
   const defaultColDef = {
@@ -805,12 +819,11 @@ const DocumentUpload = () => {
     editable: true,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = () => {
-  };
+  const onRowValueChanged = () => {};
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
-      document.getElementById("filter-text-box").value
+      document.getElementById("filter-text-box").value,
     );
   }, []);
   const fileUploadForm = () => {
@@ -828,7 +841,7 @@ const DocumentUpload = () => {
 
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
-            <div style={{ fontSize: 14, marginBottom: 7, color: 'gray' }}>
+            <div style={{ fontSize: 14, marginBottom: 7, color: "gray" }}>
               <span>Note: </span>
               <span>You can upload a maximum of 5 files at a time.</span>
             </div>
@@ -897,6 +910,14 @@ const DocumentUpload = () => {
   };
 
   const drawerHeader = () => {
+    if (isPdfView) {
+      return (
+        <div className="p-3 fs-14 fw-600">
+          <FilePresentIcon style={{ color: "deepskyblue" }} />
+          Document Preview
+        </div>
+      );
+    }
     return (
       <div className="p-3 fs-14 fw-600">
         <AttachFileIcon style={{ color: "green" }} />
@@ -922,8 +943,8 @@ const DocumentUpload = () => {
             value={current.group_name}
             onChange={(e) => {
               const selectedName = e.target.value;
-              const matchedGroup = groupHoldingName.find(
-                (g) => g.group_name === selectedName
+              const matchedGroup = groupHoldingName?.find(
+                (g) => g.group_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -951,7 +972,7 @@ const DocumentUpload = () => {
               setServiceTrackerName([]);
               setErrors((prevErrors) => ({ ...prevErrors, group_name: "" }));
             }}
-            names={groupHoldingName.map((item) => ({
+            names={groupHoldingName?.map((item) => ({
               _id: item._id,
               name: item.group_name,
             }))}
@@ -965,7 +986,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedCompany = companyName.find(
-                (g) => g.company_name === selectedName
+                (g) => g.company_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1009,9 +1030,8 @@ const DocumentUpload = () => {
               const selectedEntity = e.target.value;
 
               const matchedEntity =
-                entityName.find(
-                  (entity) => entity.name === selectedEntity
-                ) || {};
+                entityName.find((entity) => entity.name === selectedEntity) ||
+                {};
 
               const selectedEntityId = matchedEntity.id || null;
 
@@ -1033,8 +1053,9 @@ const DocumentUpload = () => {
               setSubModuleName([]);
               setServiceTrackerName([]);
               if (!selectedEntityId) {
-                const allLocations =
-                  await getLocationByCompanyId(current?.company_id);
+                const allLocations = await getLocationByCompanyId(
+                  current?.company_id,
+                );
 
                 setLocationName(allLocations || []);
 
@@ -1043,9 +1064,7 @@ const DocumentUpload = () => {
 
               try {
                 const entityLocations =
-                  await getAllCompanyLocationByEntityId(
-                    selectedEntityId
-                  );
+                  await getAllCompanyLocationByEntityId(selectedEntityId);
 
                 setLocationName(entityLocations || []);
               } catch {
@@ -1064,7 +1083,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = locationName.find(
-                (g) => g.location_name === selectedName
+                (g) => g.location_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1088,7 +1107,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = moduleName.find(
-                (g) => g.name === selectedName
+                (g) => g.name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1112,7 +1131,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = subModuleName.find(
-                (g) => g.sub_module_name === selectedName
+                (g) => g.sub_module_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1141,7 +1160,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = serviceTrackerName.find(
-                (g) => g.service_tracker_name === selectedName
+                (g) => g.service_tracker_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1170,7 +1189,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownTypes.find(
-                (g) => g.value === selectedName
+                (g) => g.value === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1197,7 +1216,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownStages.find(
-                (g) => g.value === selectedName
+                (g) => g.value === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1211,10 +1230,48 @@ const DocumentUpload = () => {
               name: item.value,
             }))}
             // isdisable={isEditing ? true : false}
-            error={!!errors.stage}
-            helperText={errors.stage}
+            error={!!errors.stage_name}
+            helperText={errors.stage_name}
           />
         </div>
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <MonthYearCalander
+            label="Document Month"
+            views={["month"]}
+            format="MMMM"
+            outputFormat="M"
+            size="medium"
+            fullWidth
+            value={current?.document_month ?? null}
+            onChange={(val) => {
+              setCurrent((prev) => ({
+                ...prev,
+                document_month: val ? Number(val) : null,
+              }));
+              setErrors((prevErrors) => ({ ...prevErrors, document_month: "" }));
+            }}
+            error={!!errors.document_month}
+            helperText={errors.document_month}
+          />
+          <MonthYearCalander
+            label="Document Year"
+            views={["year"]}
+            format="YYYY"
+            size="medium"
+            fullWidth
+            value={current?.document_year ?? null}
+            onChange={(val) => {
+              setCurrent((prev) => ({
+                ...prev,
+                document_year: val ? Number(val) : null,
+              }));
+              setErrors((prevErrors) => ({ ...prevErrors, document_year: "" }));
+            }}
+            error={!!errors.document_year}
+            helperText={errors.document_year}
+          />
+        </div>
+
         <div className="d-lg-flex d-md-flex d-flex justify-content-between">
           <div>
             <button
@@ -1367,13 +1424,17 @@ const DocumentUpload = () => {
   const pdfFile = () => {
     return (
       <div className="p-3 w-100">
-        <ReactPDFViewer />
+        <ReactPDFViewer
+          documentId={previewFile.documentId}
+          fileName={previewFile.fileName}
+        />
       </div>
     );
   };
   return (
     <div>
       <RightDrawer
+        width={isPdfView ? "900px" : "500px"}
         isPdfView={isPdfView}
         toggleDrawer={toggleDrawer}
         drawerHeader={drawerHeader}
@@ -1442,17 +1503,14 @@ const DocumentUpload = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
-        <div className='d-flex align-items-center gap-2'>
+        <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
           />
-          <MultiSelectFilter
-            rowData={data}
-            onFilterApply={handleFilterApply}
-          />
+          <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
         </div>
 
         <div
