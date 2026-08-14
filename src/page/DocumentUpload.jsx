@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -37,13 +43,15 @@ import { ReactPDFViewer } from "../component/ReactPDFViewer";
 import SmallSizeModal from "../component/SmallSizeModal";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import { Download } from "lucide-react";
-import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
-import { flattenObject } from '../../Utils/tableColUtils';
+import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
+import { flattenObject } from "../../Utils/tableColUtils";
+import MonthYearCalander from "../component/MonthYearCalander";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
+  console.log(data,'data')
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -64,6 +72,8 @@ const DocumentUpload = () => {
     document_type_id: null,
     stage: "",
     stage_id: null,
+    document_month: null,
+    document_year: null,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
@@ -264,7 +274,6 @@ const DocumentUpload = () => {
       const updatedData = await fetchAllFiles();
       setData(updatedData);
       setUploadedFiles([]);
-
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -291,7 +300,7 @@ const DocumentUpload = () => {
     try {
       const response = await updateFileById(
         params.data.document_id,
-        newIsActive
+        newIsActive,
       );
       const message = response?.message || "Status update successfully";
       // Show success snackbar
@@ -368,7 +377,7 @@ const DocumentUpload = () => {
     const fetchCompany = async () => {
       try {
         const data = await fetchCompaniesNameByGroupId(
-          current?.group_holdings_id
+          current?.group_holdings_id,
         );
         if (data) {
           setCompanyName(data);
@@ -424,7 +433,7 @@ const DocumentUpload = () => {
     const fetchModuleByLocationId = async () => {
       try {
         const data = await fetchAllModulesNameByLocationId(
-          current?.location_id
+          current?.location_id,
         );
         if (data) {
           setModuleName(data);
@@ -464,7 +473,7 @@ const DocumentUpload = () => {
         if (data) {
           setServiceTrackerName(data);
         }
-      } catch { }
+      } catch {}
     };
 
     if (current?.module_id) {
@@ -539,7 +548,7 @@ const DocumentUpload = () => {
         part
           .replace(/_/g, " ")
           .replace(/\b\w/g, (l) => l.toUpperCase())
-          .replace(/\bAi\b/g, "AI")
+          .replace(/\bAi\b/g, "AI"),
       )
       .join(" ");
 
@@ -548,20 +557,19 @@ const DocumentUpload = () => {
 
     // Union the keys of the first rows: an empty `ai_data` on row 0 would
     // otherwise hide those columns entirely.
-    const sample = data.slice(0, 20).reduce(
-      (acc, row) => Object.assign(acc, flattenObject(row)),
-      {}
-    );
+    const sample = data
+      .slice(0, 20)
+      .reduce((acc, row) => Object.assign(acc, flattenObject(row)), {});
 
     // Anything already declared as a static column is skipped, matched on both
     // the field path and the header text.
     const takenFields = new Set(
-      existingColDefs.map((col) => col.field).filter(Boolean)
+      existingColDefs.map((col) => col.field).filter(Boolean),
     );
     const takenHeaders = new Set(
       existingColDefs
         .map((col) => col.headerName?.toLowerCase())
-        .filter(Boolean)
+        .filter(Boolean),
     );
 
     return Object.keys(sample)
@@ -581,7 +589,8 @@ const DocumentUpload = () => {
           return null;
 
         // Objects/arrays have no sensible cell rendering (e.g. a null `ai_data`)
-        if (sample[key] !== null && typeof sample[key] === "object") return null;
+        if (sample[key] !== null && typeof sample[key] === "object")
+          return null;
 
         const headerName = buildHeaderName(key);
 
@@ -690,11 +699,15 @@ const DocumentUpload = () => {
         };
 
         return (
-          <button
-            onClick={handleDownload}
-            style={{ display: 'contents' }}
-          >
-            <Download style={{ height: '21px', width: '21px', color: 'cadetblue', cursor: 'pointer' }} />
+          <button onClick={handleDownload} style={{ display: "contents" }}>
+            <Download
+              style={{
+                height: "21px",
+                width: "21px",
+                color: "cadetblue",
+                cursor: "pointer",
+              }}
+            />
           </button>
         );
       },
@@ -770,7 +783,7 @@ const DocumentUpload = () => {
                 height: 15,
                 accentColor: "orange",
               }}
-            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
             />
             <span
               style={{
@@ -797,12 +810,11 @@ const DocumentUpload = () => {
     editable: true,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = () => {
-  };
+  const onRowValueChanged = () => {};
   const onFilterTextBoxChanged = useCallback(() => {
     gridRef.current.api.setGridOption(
       "quickFilterText",
-      document.getElementById("filter-text-box").value
+      document.getElementById("filter-text-box").value,
     );
   }, []);
   const fileUploadForm = () => {
@@ -820,7 +832,7 @@ const DocumentUpload = () => {
 
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
-            <div style={{ fontSize: 14, marginBottom: 7, color: 'gray' }}>
+            <div style={{ fontSize: 14, marginBottom: 7, color: "gray" }}>
               <span>Note: </span>
               <span>You can upload a maximum of 5 files at a time.</span>
             </div>
@@ -915,7 +927,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedGroup = groupHoldingName?.find(
-                (g) => g.group_name === selectedName
+                (g) => g.group_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -957,7 +969,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedCompany = companyName.find(
-                (g) => g.company_name === selectedName
+                (g) => g.company_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1001,9 +1013,8 @@ const DocumentUpload = () => {
               const selectedEntity = e.target.value;
 
               const matchedEntity =
-                entityName.find(
-                  (entity) => entity.name === selectedEntity
-                ) || {};
+                entityName.find((entity) => entity.name === selectedEntity) ||
+                {};
 
               const selectedEntityId = matchedEntity.id || null;
 
@@ -1025,8 +1036,9 @@ const DocumentUpload = () => {
               setSubModuleName([]);
               setServiceTrackerName([]);
               if (!selectedEntityId) {
-                const allLocations =
-                  await getLocationByCompanyId(current?.company_id);
+                const allLocations = await getLocationByCompanyId(
+                  current?.company_id,
+                );
 
                 setLocationName(allLocations || []);
 
@@ -1035,9 +1047,7 @@ const DocumentUpload = () => {
 
               try {
                 const entityLocations =
-                  await getAllCompanyLocationByEntityId(
-                    selectedEntityId
-                  );
+                  await getAllCompanyLocationByEntityId(selectedEntityId);
 
                 setLocationName(entityLocations || []);
               } catch {
@@ -1056,7 +1066,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = locationName.find(
-                (g) => g.location_name === selectedName
+                (g) => g.location_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1080,7 +1090,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = moduleName.find(
-                (g) => g.name === selectedName
+                (g) => g.name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1104,7 +1114,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = subModuleName.find(
-                (g) => g.sub_module_name === selectedName
+                (g) => g.sub_module_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1133,7 +1143,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = serviceTrackerName.find(
-                (g) => g.service_tracker_name === selectedName
+                (g) => g.service_tracker_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1162,7 +1172,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownTypes.find(
-                (g) => g.value === selectedName
+                (g) => g.value === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1189,7 +1199,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownStages.find(
-                (g) => g.value === selectedName
+                (g) => g.value === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1203,10 +1213,48 @@ const DocumentUpload = () => {
               name: item.value,
             }))}
             // isdisable={isEditing ? true : false}
-            error={!!errors.stage}
-            helperText={errors.stage}
+            error={!!errors.stage_name}
+            helperText={errors.stage_name}
           />
         </div>
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <MonthYearCalander
+            label="Document Month"
+            views={["month"]}
+            format="MMMM"
+            outputFormat="M"
+            size="medium"
+            fullWidth
+            value={current?.document_month ?? null}
+            onChange={(val) => {
+              setCurrent((prev) => ({
+                ...prev,
+                document_month: val ? Number(val) : null,
+              }));
+              setErrors((prevErrors) => ({ ...prevErrors, document_month: "" }));
+            }}
+            error={!!errors.document_month}
+            helperText={errors.document_month}
+          />
+          <MonthYearCalander
+            label="Document Year"
+            views={["year"]}
+            format="YYYY"
+            size="medium"
+            fullWidth
+            value={current?.document_year ?? null}
+            onChange={(val) => {
+              setCurrent((prev) => ({
+                ...prev,
+                document_year: val ? Number(val) : null,
+              }));
+              setErrors((prevErrors) => ({ ...prevErrors, document_year: "" }));
+            }}
+            error={!!errors.document_year}
+            helperText={errors.document_year}
+          />
+        </div>
+
         <div className="d-lg-flex d-md-flex d-flex justify-content-between">
           <div>
             <button
@@ -1434,17 +1482,14 @@ const DocumentUpload = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
-        <div className='d-flex align-items-center gap-2'>
+        <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
           />
-          <MultiSelectFilter
-            rowData={data}
-            onFilterApply={handleFilterApply}
-          />
+          <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
         </div>
 
         <div
