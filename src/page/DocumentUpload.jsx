@@ -29,6 +29,7 @@ import {
   downloadFile,
   fetchEntityById,
   getAllCompanyLocationByEntityId,
+  // updateDocumentApprovalStatusById,
 } from "../api/service";
 import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
@@ -329,9 +330,12 @@ const DocumentUpload = () => {
       });
     }
   };
-  const handleApproveAll = async () => {
+  const handleApproveAll = async (id) => {
     try {
       const response = await bulkApproveAllPageData("document_repository");
+      // const response = id
+      //   ? await updateDocumentApprovalStatusById(id, 1)
+      //   : await bulkApproveAllPageData("document_repository");
       const message = response?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
@@ -419,7 +423,9 @@ const DocumentUpload = () => {
     }
   }, [current?.company_id]);
 
-  useEffect(() => {
+  useEffect(() => { // const response = id
+      //   ? await updateDocumentApprovalStatusById(id, 1)
+      //   : await bulkApproveAllPageData("document_repository");
     const fetchLocationByCompanyId = async () => {
       try {
         const data = await getLocationByCompanyId(current?.company_id);
@@ -791,15 +797,15 @@ const DocumentUpload = () => {
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <input
               type="checkbox"
-              checked={status}
-              // readOnly={status === 1}
+              checked={status === 1}
+              disabled={status === 1}
               style={{
-                cursor: "default",
+                cursor: status === 1 ? "default" : "pointer",
                 width: 15,
                 height: 15,
                 accentColor: "orange",
               }}
-              // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+              onChange={() => handleApproveAll(params.data.document_id)}
             />
             <span
               style={{
@@ -1445,7 +1451,7 @@ const DocumentUpload = () => {
     );
   };
   const userType = decryptData(localStorage.getItem("user_type"));
-
+  
   return (
     <div>
       <RightDrawer
