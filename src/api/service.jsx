@@ -203,6 +203,7 @@ import {
   CREATE_GROUPWISE_ACCESS_BY_GROUP_ID,
   ENTITY_WISE_ACCESS,
   LOCATION_WISE_ACCESS,
+  UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID,
 
 
 } from "./Endpoint";
@@ -1133,6 +1134,16 @@ export const downloadFile = async (fileId) => {
     return response.data;
   } catch (error) {
     // console.error("Error downloading file:", error);
+    throw error;
+  }
+}
+
+export const updateDocumentApprovalStatusById = async (id, status) => {
+  try {
+    const response = await API.put(`${UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID}${id}`, { status });
+    return response.data;
+  } catch (error) {
+    // console.error("Error updating document approval status:", error);
     throw error;
   }
 }

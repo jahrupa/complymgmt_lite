@@ -105,6 +105,7 @@ export const UPDATE_FILE='/api/v1/document_repository/update/file/';
 export const GET_DOCUMENT_DROPDOWNS_TYPES='/api/v1/document_repository/view/dropdowns/type/';
 export const GET_DOCUMENT_DROPDOWNS_STAGE='/api/v1/document_repository/view/dropdowns/stage/';
 export const DOWNLOAD_FILE='/api/v1/document_repository/view/download?document_id=';
+export const UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID='/api/v1/document_repository/update/approval_status/file/';
 
 // pages
 export const GET_ALL_PAGE='/api/v1/pages/view/all';
