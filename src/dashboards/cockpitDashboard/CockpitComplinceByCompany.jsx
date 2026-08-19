@@ -1,6 +1,6 @@
 import Chart from 'react-apexcharts';
 import '../../style/cockpitComplinceByCompany.css';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Snackbars from '../../component/Snackbars';
 
 const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts, setSelectedCharts }) => {
@@ -11,6 +11,43 @@ const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts,
     message: "",
     severityType: "",
   });
+  // Overall score: prefer the value from the API, otherwise derive it as a
+  // weighted average of the four categories (weighted by item count).
+  const overallScore = useMemo(() => {
+    if (data?.average_compliance_score != null) {
+      return Number(data.average_compliance_score);
+    }
+
+    const categories = [
+      {
+        total: data?.total_licenses || 0,
+        score: data?.licenses_compliance_score || 0,
+      },
+      {
+        total: data?.total_returns || 0,
+        score: data?.returns_compliance_score || 0,
+      },
+      {
+        total: data?.applicable_registers || 0,
+        score: data?.registers_compliance_score || 0,
+      },
+      {
+        total: data?.total_challans || 0,
+        score: data?.challans_compliance_score || 0,
+      },
+    ];
+
+    const totalItems = categories.reduce((sum, item) => sum + item.total, 0);
+
+    if (!totalItems) return 0;
+
+    const weightedScore = categories.reduce(
+      (sum, item) => sum + item.score * item.total,
+      0
+    );
+
+    return Number((weightedScore / totalItems).toFixed(2));
+  }, [data]);
 
   // Compliance Score Donut Chart
   const complianceChartOptions = {
@@ -29,7 +66,7 @@ const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts,
             total: {
               show: true,
               label: 'Overall Score',
-              formatter: () => `${data?.average_compliance_score}%`
+              formatter: () => `${overallScore ?? 0}%`
             }
           }
         }

@@ -153,7 +153,7 @@ const CockpitComplince = ({
     data?.returnCompliance?.compliance_score || 0,
     data?.challanCompliance?.compliance_score || 0,
     data?.registersCompliance?.compliance_score || 0,
-    data?.overall_compliance_score || 0,
+    Number(overallScore) || 0,
   ];
   useEffect(() => {
     window.__apexTooltipClick = (index) => {
@@ -190,7 +190,15 @@ const CockpitComplince = ({
           const clickedValue = opts.w.globals.series[index];
           if (clickedValue === 0) return;
 
-          navigate("/compliance_cockpit/dashboard/overall_compliance_score", {
+          // navigate("/compliance_cockpit/dashboard/overall_compliance_score", {
+          //   state: {
+          //     score: clickedValue,
+          //     seriesName: clickedLabel,
+          //     index: index,
+          //     widget_name: "Compliance Cockpit - Overall Compliance Score",
+          //   },
+          // },
+          navigate("", {
             state: {
               score: clickedValue,
               seriesName: clickedLabel,
@@ -222,7 +230,7 @@ const CockpitComplince = ({
           total: {
             show: true,
             label: "Overall Score",
-            formatter: () => `${data?.overall_compliance_score ?? 0}%`,
+            formatter: () => `${overallScore ?? 0}%`,
           },
         },
       },
