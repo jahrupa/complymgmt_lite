@@ -60,11 +60,13 @@ const rowData = useMemo(() => {
     };
     // Column definitions
     const columnDefs = [
-        { headerName: "Client Name", field: "name", flex: 2 },
+        { headerName: "Client Name", field: "name", flex: 2, minWidth: 200, resizable: true },
         {
             headerName: "Compliance Score",
             field: "average_compliance_score",
             flex: 1,
+            minWidth: 160,
+            resizable: true,
             cellStyle: (params) => getCellStyle(params.value), // ✅ dynamic styles
             cellRenderer: (params) => `${params.value}%`,
         },

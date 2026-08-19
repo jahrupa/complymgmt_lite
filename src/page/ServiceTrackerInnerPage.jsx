@@ -72,6 +72,8 @@ const ServiceTrackerInnerPage = () => {
     const currentUser = decryptData(localStorage.getItem('user_id'));
     const navigate = useNavigate();
     const defaultColDef = {
+      resizable: true,
+      minWidth: 140,
         sortable: true,
         filter: true,
         editable: true,
@@ -208,6 +210,10 @@ const ServiceTrackerInnerPage = () => {
                 }
                 if (key === 'is_active') {
                     return {
+                      flex: 0,
+                      width: 120,
+                      minWidth: 120,
+                      maxWidth: 120,
                         headerName: 'Status',
                         field: 'is_active',
                         editable: false,
@@ -229,10 +235,13 @@ const ServiceTrackerInnerPage = () => {
                 };
             });
             const actionCol = {
+              flex: 0,
+              width: 130,
+              minWidth: 130,
+              maxWidth: 130,
                 headerName: 'Actions',
                 field: 'actions',
                 pinned: "left",
-                width: 130,
                 cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
                 filter: false,
                 editable: false,

@@ -582,10 +582,13 @@ const Company = () => {
   };
   const colDefs = [
     {
+      flex: 0,
+      width: 130,
+      minWidth: 130,
+      maxWidth: 130,
       headerName: "Actions",
       field: "actions",
       pinned: "left",
-      width: 130,
       filter: false,
       editable: false,
       cellStyle: { backgroundColor: "rgb(252 229 205 / 64%)" },
@@ -620,6 +623,10 @@ const Company = () => {
     ...generateDynamicColDefs(data),
 
     {
+      flex: 0,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
       headerName: "Status",
       field: "common_attributes.is_active",
       pinned: "right",
@@ -634,6 +641,9 @@ const Company = () => {
   ];
 
   const defaultColDef = {
+    resizable: true,
+    flex: 1,
+    minWidth: 140,
     sortable: true,
     filter: true,
     editable: true,

@@ -455,11 +455,14 @@ const SubModule = () => {
 
     const colDefs = [
         {
+          flex: 0,
+          width: 130,
+          minWidth: 130,
+          maxWidth: 130,
             headerName: 'Actions',
             field: 'actions',
             filter: false,
             editable: false,
-            width: 130,
             pinned: "left",
             cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
             cellRenderer: (params) => {
@@ -495,6 +498,10 @@ const SubModule = () => {
         ...generateDynamicColDefs(data),
 
         {
+          flex: 0,
+          width: 120,
+          minWidth: 120,
+          maxWidth: 120,
             headerName: 'Status',
             field: 'common_attributes.is_active',
             editable: false,
@@ -511,6 +518,9 @@ const SubModule = () => {
     ];
     const gridRef = useRef();
     const defaultColDef = {
+      resizable: true,
+      flex: 1,
+      minWidth: 140,
         sortable: true,
         filter: true,
         editable: true,

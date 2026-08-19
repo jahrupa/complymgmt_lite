@@ -287,7 +287,9 @@ const ReturnsAndSubmissions = ({
       field: key,
       sortable: true,
       filter: true,
+      resizable: true,
       flex: 1,
+      minWidth: 150,
       headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
     }));
   }, [escalationRaisedCategoriesByCompany]);

@@ -359,12 +359,13 @@ const Entity = () => {
                 if (key === "common_attributes.IsActive") {
 
                     return {
+                      flex: 0,
+                      width: 140,
+                      minWidth: 140,
+                      maxWidth: 140,
                         headerName: "Status",
                         field: key,
                         pinned: "right",
-                        width: 140,
-                        minWidth: 140,
-
                         cellRenderer: (params) => (
                             <Toggle
                                 checked={params.value}
@@ -412,10 +413,13 @@ const Entity = () => {
 
         return [
             {
+              flex: 0,
+              width: 130,
+              minWidth: 130,
+              maxWidth: 130,
                 headerName: "Actions",
                 field: "actions",
                 pinned: "left",
-                width: 130,
                 filter: false,
                 editable: false,
                 cellStyle: {
