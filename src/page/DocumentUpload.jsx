@@ -47,12 +47,13 @@ import { Download } from "lucide-react";
 import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
 import { flattenObject } from "../../Utils/tableColUtils";
 import MonthYearCalander from "../component/MonthYearCalander";
+import { decryptData } from "./utils/encrypt";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
-  console.log(data,'data')
+  console.log(data, "data");
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -1248,7 +1249,10 @@ const DocumentUpload = () => {
                 ...prev,
                 document_month: val ? Number(val) : null,
               }));
-              setErrors((prevErrors) => ({ ...prevErrors, document_month: "" }));
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                document_month: "",
+              }));
             }}
             error={!!errors.document_month}
             helperText={errors.document_month}
@@ -1431,6 +1435,8 @@ const DocumentUpload = () => {
       </div>
     );
   };
+  const userType = decryptData(localStorage.getItem("user_type"));
+
   return (
     <div>
       <RightDrawer
@@ -1448,24 +1454,27 @@ const DocumentUpload = () => {
       <div className="service-tracker-inner-page-header d-lg-flex d-md-flex">
         <div className="notification-page-title">
           <div>
-            <h1>Upload Document</h1>
+            <h1>Document Repository</h1>
           </div>
         </div>
         <div className="d-lg-flex d-md-flex  justify-content-end mb-3">
           <div className="pe-2 d-lg-flex d-md-flex gap-3">
-            <div>
-              <button
-                className="reject upload-wrapper upload-label"
-                onClick={openModal}
-              >
-                <span className="icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
-                  </svg>
-                </span>
-                <span className="text">Upload File</span>
-              </button>
-            </div>
+            {userType === "0" && (
+              <div>
+                <button
+                  className="reject upload-wrapper upload-label"
+                  onClick={openModal}
+                >
+                  <span className="icon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
+                    </svg>
+                  </span>
+                  <span className="text">Upload File</span>
+                </button>
+              </div>
+            )}
+
             <div className="btn-wrap-div">
               <button
                 className="button approve w-100 justify-content-center"
