@@ -33,6 +33,7 @@ function DashboardDrawerGridDetailPage({ rowData,filters }) {
   }, [rowData]);
 
   const defaultColDef = {
+    resizable: true,
     flex: 1,
     minWidth: 150,
     floatingFilter: false,

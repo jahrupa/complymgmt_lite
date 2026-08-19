@@ -490,12 +490,14 @@ const UntaggedDocument  = () => {
  
     const colDefs = [
         {
+          flex: 0,
+          width: 130,
+          minWidth: 130,
+          maxWidth: 130,
             headerName: 'Actions',
             field: 'actions',
             filter: false,
             editable: false,
-            width: 130,
-            flex: 1,
             pinned: "right",
             cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
             cellRenderer: (params) => {
@@ -599,6 +601,9 @@ const UntaggedDocument  = () => {
     ];
     const gridRef = useRef();
     const defaultColDef = {
+      resizable: true,
+      flex: 1,
+      minWidth: 140,
         sortable: true,
         filter: true,
         editable: true,
