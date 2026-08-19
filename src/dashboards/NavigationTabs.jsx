@@ -306,30 +306,30 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
         fetchGeneralDashboardData();
     }, [selectedCompany, page, limit]);
 
-    // useEffect(() => {
-    //     const fetchCockpitData = async () => {
-    //         const [a, b] = await Promise.allSettled([
-    //             fetchComplainceCockpitByCompany(selectedCompany),
-    //             fetchComplianceCockpit(page, limit)
-    //         ]);
-    //         setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);
-    //         setCockpitData(b.status === "fulfilled" ? b.value : []);
-    //     };
-    //     fetchCockpitData();
-    // }, [selectedCompany]);
+    useEffect(() => {
+        const fetchCockpitData = async () => {
+            const [a, b] = await Promise.allSettled([
+                fetchComplainceCockpitByCompany(selectedCompany),
+                fetchComplianceCockpit(page, limit)
+            ]);
+            setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);
+            setCockpitData(b.status === "fulfilled" ? b.value : []);
+        };
+        fetchCockpitData();
+    }, [selectedCompany]);
 
-    // useEffect(() => {
-    //     const fetchClientOnboardingPortfolioData = async () => {
-    //         const [a, b] = await Promise.allSettled([
-    //             fetchClientOnboardingByCompany(selectedCompany),
-    //             fetchClientOnboardingPortfolio()
-    //         ]);
+    useEffect(() => {
+        const fetchClientOnboardingPortfolioData = async () => {
+            const [a, b] = await Promise.allSettled([
+                fetchClientOnboardingByCompany(selectedCompany),
+                fetchClientOnboardingPortfolio()
+            ]);
 
-    //         setClientOnBoardingByCompanyData(a.status === "fulfilled" ? a.value : []);
-    //         setClientOnboardingData(b.status === "fulfilled" ? b.value : []);
-    //     };
-    //     fetchClientOnboardingPortfolioData();
-    // }, [selectedCompany]);
+            setClientOnBoardingByCompanyData(a.status === "fulfilled" ? a.value : []);
+            setClientOnboardingData(b.status === "fulfilled" ? b.value : []);
+        };
+        fetchClientOnboardingPortfolioData();
+    }, [selectedCompany]);
 
     useEffect(() => {
         const fetchWidgetsListData = async () => {
