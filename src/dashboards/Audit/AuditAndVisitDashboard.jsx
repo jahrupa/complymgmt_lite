@@ -734,7 +734,7 @@ const AuditAndVisitDashboard = ({
                   e.stopPropagation(); // prevent parent click from firing
                   handleOpenDrawer(
                     "right",
-                    "Aaudit count by Service Type across all companies",
+                    "Audit count by Service Type across all companies",
                     AuditCountByServiceType?.rest_counts,
                     AuditCountByServiceType?.rest_counts?.map(
                       (item) => item.service_type
