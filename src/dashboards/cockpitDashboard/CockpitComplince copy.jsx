@@ -385,7 +385,7 @@ const CockpitComplince = ({
                 checked={selectedCharts.includes("cc-1")}
               />
             )}
-            <h1>Multi-Client Compliance Analytics</h1>
+            <h1>Compliance Analytics</h1>
           </div>
 
           <div className="header-stats">
