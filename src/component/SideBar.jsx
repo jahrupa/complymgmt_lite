@@ -225,7 +225,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                             )}
 
                         </div>
-                        <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
+                        {/* <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
                                 onClick={() => handleDropdownToggle('registerProcessing')}
@@ -271,7 +271,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                                 </div>
                             )}
 
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
