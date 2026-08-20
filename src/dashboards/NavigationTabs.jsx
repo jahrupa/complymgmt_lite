@@ -139,7 +139,9 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
             label: "Compliance Cockpit",
             content:
                 selectedCompany !== "" ? (
-                    <CockpitComplinceByCompany data={cockpitByCompanyData ? cockpitByCompanyData : []}
+                    <CockpitComplinceByCompany 
+                    cockpitDataByClient={cockpitData ? cockpitData : []}
+                     data={cockpitByCompanyData ? cockpitByCompanyData : []}
                         current={current}
                         selectedCharts={selectedCharts}
                         companyName={selectedCompany}

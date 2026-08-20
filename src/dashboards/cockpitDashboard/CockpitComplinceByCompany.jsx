@@ -3,7 +3,68 @@ import '../../style/cockpitComplinceByCompany.css';
 import { useMemo, useState } from 'react';
 import Snackbars from '../../component/Snackbars';
 
-const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts, setSelectedCharts }) => {
+// How many chips to show before collapsing the rest behind a "+N more" toggle.
+const CHIP_PREVIEW_COUNT = 6;
+
+// Renders a labelled, collapsible row of chips. Long lists (some clients have
+// 40+ locations) stay readable instead of turning the header into a wall of text.
+const ChipGroup = ({ label, items, tone }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const list = Array.isArray(items) ? items.filter(Boolean) : [];
+
+  if (!list.length) {
+    return (
+      <div className="ccbc-info-row">
+        <span className="ccbc-info-label">{label}</span>
+        <div className="ccbc-chip-list">
+          <span className="ccbc-chip ccbc-chip-empty">Not available</span>
+        </div>
+      </div>
+    );
+  }
+
+  const visible = expanded ? list : list.slice(0, CHIP_PREVIEW_COUNT);
+  const hiddenCount = list.length - visible.length;
+
+  return (
+    <div className="ccbc-info-row">
+      <span className="ccbc-info-label">
+        {label}
+        <span className="ccbc-count-badge">{list.length}</span>
+      </span>
+
+      <div className="ccbc-chip-list">
+        {visible.map((item, index) => (
+          <span
+            key={`${item}-${index}`}
+            className={`ccbc-chip ccbc-chip-${tone}`}
+            title={item}
+          >
+            {item}
+          </span>
+        ))}
+
+        {(hiddenCount > 0 || expanded) && (
+          <button
+            type="button"
+            className="ccbc-chip ccbc-chip-toggle"
+            // The header card itself is clickable (chart selection) — don't
+            // toggle the card when the user only wants to expand the list.
+            onClick={(event) => {
+              event.stopPropagation();
+              setExpanded((prev) => !prev);
+            }}
+          >
+            {expanded ? 'Show less' : `+${hiddenCount} more`}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, current, selectedCharts, setSelectedCharts }) => {
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
     vertical: "top",
@@ -11,6 +72,28 @@ const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts,
     message: "",
     severityType: "",
   });
+  // Location / state / modules come from the onboarding API, which returns
+  // `client_info` keyed by company name — not from the cockpit `data`.
+  const clientInfo = useMemo(() => {
+    const info = cockpitDataByClient?.client_info;
+
+    if (!info || !companyName) return null;
+
+    if (info[companyName]) return info[companyName];
+
+    // Company names can differ in case/spacing between the two APIs.
+    const target = String(companyName).trim().toLowerCase();
+    const matchedKey = Object.keys(info).find(
+      (key) => key.trim().toLowerCase() === target
+    );
+
+    return matchedKey ? info[matchedKey] : null;
+  }, [cockpitDataByClient, companyName]);
+  const locationNames = clientInfo?.location ?? data?.location_names ?? [];
+  const stateNames = clientInfo?.state ?? data?.state ?? [];
+  const modulesSubscribed =
+    clientInfo?.modules_subscribed ?? data?.modules_subscribed ?? [];
+
   // Overall score: prefer the value from the API, otherwise derive it as a
   // weighted average of the four categories (weighted by item count).
   const overallScore = useMemo(() => {
@@ -186,17 +269,10 @@ const CockpitComplinceByCompany = ({ companyName, data, current, selectedCharts,
           checked={selectedCharts.includes("ccbc-1")}
           disabled={!current?.user_name} // if user_name empty → disable
         />
-        <div className="client-info">
-          <div className="info-item">
-            <span className="label">Location:</span>
-            <span className="value">
-              {data?.location_names?.join(', ')}, {data?.state?.join(', ')}
-            </span>
-          </div>
-          <div className="info-item">
-            <span className="label">Modules:</span>
-            <span className="value">{data?.modules_subscribed?.join(', ')}</span>
-          </div>
+        <div className="ccbc-client-info">
+          <ChipGroup label="States" items={stateNames} tone="state" />
+          <ChipGroup label="Locations" items={locationNames} tone="location" />
+          <ChipGroup label="Modules" items={modulesSubscribed} tone="module" />
         </div>
       </div>
 
