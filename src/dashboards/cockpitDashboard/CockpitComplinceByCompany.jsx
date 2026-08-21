@@ -94,6 +94,10 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
   const modulesSubscribed =
     clientInfo?.modules_subscribed ?? data?.modules_subscribed ?? [];
 
+  // The cockpit response has no location count — fall back to the list from
+  // `client_info` so the tile matches the Locations chips in the header.
+  const totalLocations = data?.total_locations || locationNames.length;
+
   // Overall score: prefer the value from the API, otherwise derive it as a
   // weighted average of the four categories (weighted by item count).
   const overallScore = useMemo(() => {
@@ -552,7 +556,7 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
             }}
             style={{ cursor: "pointer" }}
           >
-            <div className="summary-value">{data?.total_locations ?? 0}</div>
+            <div className="summary-value">{totalLocations}</div>
             <div className="summary-label">Total Locations</div>
             <input
               type="checkbox"
