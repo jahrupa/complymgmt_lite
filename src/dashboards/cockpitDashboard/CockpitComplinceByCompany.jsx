@@ -12,7 +12,6 @@ const ChipGroup = ({ label, items, tone }) => {
   const [expanded, setExpanded] = useState(false);
 
   const list = Array.isArray(items) ? items.filter(Boolean) : [];
-
   if (!list.length) {
     return (
       <div className="ccbc-info-row">
@@ -26,7 +25,6 @@ const ChipGroup = ({ label, items, tone }) => {
 
   const visible = expanded ? list : list.slice(0, CHIP_PREVIEW_COUNT);
   const hiddenCount = list.length - visible.length;
-
   return (
     <div className="ccbc-info-row">
       <span className="ccbc-info-label">
@@ -308,7 +306,7 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
                     </div>
                     <div className="stat">
                       <span className="stat-label">Pending</span>
-                      <span className="stat-value">{data?.expired_licenses ?? 0}</span>
+                      <span className="stat-value">{data?.total_data?.totals?.pending_licenses ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Total</span>
@@ -345,11 +343,11 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
                     </div>
                     <div className="stat">
                       <span className="stat-label">Pending</span>
-                      <span className="stat-value">{data?.total_returns_pending ?? 0}</span>
+                      <span className="stat-value">{data?.total_data?.totals?.pending_returns?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Total</span>
-                      <span className="stat-value">{data?.total_locations ?? 0}</span>
+                      <span className="stat-value">{data?.total_returns ?? 0}</span>
                     </div>
                   </div>
                 </div>
@@ -382,11 +380,11 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
                     </div>
                     <div className="stat">
                       <span className="stat-label">Pending</span>
-                      <span className="stat-value">{data?.missing_registers ?? 0}</span>
+                      <span className="stat-value">{data?.total_data?.totals?.pending_registers ?? 0}</span>
                     </div>
                     <div className="stat">
                       <span className="stat-label">Total</span>
-                      <span className="stat-value">{data?.total_locations ?? 0}</span>
+                      <span className="stat-value">{data?.total_data?.totals?.total_registers ?? 0}</span>
                     </div>
                   </div>
                 </div>
@@ -420,14 +418,14 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
                     <div className="stat">
                       <span className="stat-label">Resolved</span>
                       <span className="stat-value">
-                        {data?.resolved_challans ?? 0}
+                        {data?.completed_challans ?? 0}
                       </span>
                     </div>
 
                     <div className="stat">
                       <span className="stat-label">Pending</span>
                       <span className="stat-value">
-                        {data?.pending_challans ?? 0}
+                        {data?.total_data?.totals?.pending_challans ?? 0}
                       </span>
                     </div>
 
@@ -552,7 +550,7 @@ const CockpitComplinceByCompany = ({cockpitDataByClient, companyName, data, curr
             }}
             style={{ cursor: "pointer" }}
           >
-            <div className="summary-value">{data?.total_locations ?? 0}</div>
+            <div className="summary-value">{locationNames?.length ?? 0}</div>
             <div className="summary-label">Total Locations</div>
             <input
               type="checkbox"
