@@ -10,6 +10,7 @@ import NavigationTabs from "../dashboards/NavigationTabs";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import { useEffect, useState } from "react";
 import { fetchAllCompanies, fetchAllUser } from "../api/service";
+import { decryptData } from "./utils/encrypt";
 
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([]);
@@ -37,6 +38,7 @@ const DashboardPage = () => {
 
     fetchCockpitData();
   }, []);
+    const userType = decryptData(localStorage.getItem("user_type"));
 
   return (
     <div>
@@ -83,8 +85,10 @@ const DashboardPage = () => {
               }))}
             />
           </div>
-          <div className="me-1 ms-1" style={{ width: '250px' }}>
-            <SingleSelectTextField
+          {userType === "0" && (
+   <div className="me-1 ms-1" style={{ width: '250px' }}>
+          
+              <SingleSelectTextField
               name="user_id"
               label="Choose a user to create a widget"
               value={current.user_name ?? ''}
@@ -103,8 +107,13 @@ const DashboardPage = () => {
                 name: item.full_name,
               }))}
             />
+        
+            
 
           </div>
+
+          )}
+       
         </div>
       </div>
 
