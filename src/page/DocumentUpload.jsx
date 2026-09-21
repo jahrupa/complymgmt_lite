@@ -52,9 +52,26 @@ import { decryptData } from "./utils/encrypt";
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+// Columns the /view/files endpoint can filter on (comma-separated values)
+const SERVER_FILTER_COLUMNS = [
+  "group_name",
+  "company_name",
+  "entity_name",
+  "location_name",
+  "module_name",
+  "sub_module_name",
+  "service_tracker_name",
+  "document_type_name",
+  "stage_name",
+  "document_month",
+  "document_year",
+];
+
 const DocumentUpload = () => {
   const [data, setData] = useState([]);
-  console.log(data, "data");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -98,19 +115,46 @@ const DocumentUpload = () => {
     severityType: "",
   });
   const [filters, setFilters] = useState({});
+  const [search, setSearch] = useState("");
+  const searchTimerRef = useRef(null);
+
+  const loadFiles = useCallback(async () => {
+    // Search and filters are applied by the backend so they cover every page
+    const query = {};
+    if (search) query.search = search;
+    Object.entries(filters).forEach(([column, values]) => {
+      if (values?.length) query[column] = values.join(",");
+    });
+
+    try {
+      const { rows, total } = await fetchAllFiles(page, pageSize, query);
+      // Deleting the last row of a page leaves it empty, step back one page
+      if (rows.length === 0 && page > 1) {
+        setPage((p) => p - 1);
+        return;
+      }
+      setData(rows);
+      setTotalCount(total);
+    } catch (error) {
+      setIsSnackbarsOpen((prev) => ({
+        ...prev,
+        open: true,
+        message: error?.response?.data?.message || "Failed to fetch files",
+        severityType: "error",
+      }));
+    }
+  }, [page, pageSize, search, filters]);
+
+  useEffect(() => {
+    loadFiles();
+  }, [loadFiles]);
+
+  useEffect(() => () => clearTimeout(searchTimerRef.current), []);
 
   const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
+    setPage(1);
   };
-  const filteredRowData = useMemo(() => {
-    if (Object.keys(filters).length === 0) return data;
-
-    return data.filter((row) => {
-      return Object.entries(filters).every(([column, values]) => {
-        return values.includes(row[column]);
-      });
-    });
-  }, [data, filters]);
   const [isAutoUpload, setIsAutoUpload] = useState(true);
   const [errors, setErrors] = useState({});
   const [groupHoldingName, setGroupHoldingName] = useState([]);
@@ -161,8 +205,7 @@ const DocumentUpload = () => {
       });
 
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -182,8 +225,7 @@ const DocumentUpload = () => {
       const message = response?.message;
 
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
       setIsDeleteModalOpen(false);
 
       // Show success snackbar
@@ -279,8 +321,7 @@ const DocumentUpload = () => {
         severityType: "success",
       });
 
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
       setUploadedFiles([]);
     } catch (error) {
       setIsSnackbarsOpen({
@@ -318,8 +359,7 @@ const DocumentUpload = () => {
         message,
         severityType: "success",
       });
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -345,8 +385,7 @@ const DocumentUpload = () => {
         severityType: "success",
       });
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -362,13 +401,11 @@ const DocumentUpload = () => {
     const fetchData = async () => {
       try {
         const results = await Promise.allSettled([
-          fetchAllFiles(),
           fetchAllGroup(),
           //  fetchAllModulesName(),
         ]);
-        if (results[0].status === "fulfilled") setData(results[0].value);
-        if (results[1].status === "fulfilled")
-          setGroupHoldingName(results[1].value);
+        if (results[0].status === "fulfilled")
+          setGroupHoldingName(results[0].value);
         results.forEach((result, idx) => {
           if (result.status === "rejected") {
             // // console.error(
@@ -821,10 +858,12 @@ const DocumentUpload = () => {
       },
     },
   ];
-  const colDefs = [
-    ...staticColDefs,
-    ...generateDynamicColDefs(data, staticColDefs),
-  ];
+  // staticColDefs is rebuilt every render, so only regenerate columns when data changes
+  const colDefs = useMemo(
+    () => [...staticColDefs, ...generateDynamicColDefs(data, staticColDefs)],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data],
+  );
   const gridRef = useRef();
   const defaultColDef = {
     resizable: true,
@@ -836,11 +875,14 @@ const DocumentUpload = () => {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   const onRowValueChanged = () => {};
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current.api.setGridOption(
-      "quickFilterText",
-      document.getElementById("filter-text-box").value,
-    );
+  // Debounced so typing doesn't fire a request per keystroke
+  const onFilterTextBoxChanged = useCallback((e) => {
+    const value = e.target.value.trim();
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      setSearch(value);
+      setPage(1);
+    }, 400);
   }, []);
   const fileUploadForm = () => {
     return (
@@ -1534,7 +1576,11 @@ const DocumentUpload = () => {
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
           />
-          <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
+          <MultiSelectFilter
+            rowData={data}
+            filterColumns={SERVER_FILTER_COLUMNS}
+            onFilterApply={handleFilterApply}
+          />
         </div>
 
         <div
@@ -1544,14 +1590,65 @@ const DocumentUpload = () => {
           <AgGridReact
             theme="legacy"
             ref={gridRef}
-            rowData={filteredRowData || []}
+            rowData={data}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
             rowSelection="single"
-            pagination={true}
             onRowValueChanged={onRowValueChanged}
           />
+        </div>
+
+        <div className="d-flex justify-content-end align-items-center gap-3 mt-2 fs-14">
+          <div className="d-flex align-items-center gap-2">
+            <span>Rows per page:</span>
+            <select
+              className="form-select form-select-sm w-auto"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              {[10, 20, 50, 100].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+          {totalCount !== null && (
+            <span>
+              {totalCount === 0
+                ? "0 of 0"
+                : `${(page - 1) * pageSize + 1}–${(page - 1) * pageSize + data.length} of ${totalCount}`}
+            </span>
+          )}
+          <div className="d-flex align-items-center gap-2">
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Prev
+            </button>
+            <span>
+              Page {page}
+              {totalCount !== null &&
+                ` of ${Math.max(1, Math.ceil(totalCount / pageSize))}`}
+            </span>
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              disabled={
+                totalCount !== null
+                  ? page * pageSize >= totalCount
+                  : data.length < pageSize
+              }
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

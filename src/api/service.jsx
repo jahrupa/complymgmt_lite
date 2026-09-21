@@ -1088,10 +1088,18 @@ export const deleteFileById = async (id) => {
     throw error;
   }
 };
-export const fetchAllFiles = async () => {
+// filters: { search, stage_name: "Draft,Final", document_year: "2026", ... }
+export const fetchAllFiles = async (page = 1, limit = 10, filters = {}) => {
   try {
-    const response = await API.get(GET_ALL_FILES);
-    return response.data;
+    const response = await API.get(GET_ALL_FILES, {
+      params: { page, limit, ...filters },
+    });
+    // Total comes from the X-Total-Count header (null if CORS doesn't expose it)
+    const total = Number(response.headers?.["x-total-count"]);
+    return {
+      rows: Array.isArray(response.data) ? response.data : [],
+      total: Number.isFinite(total) && response.headers?.["x-total-count"] != null ? total : null,
+    };
   } catch (error) {
     // console.error("Error fetching all files:", error);
     throw error;
