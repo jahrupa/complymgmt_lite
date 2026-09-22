@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useRef,
   useCallback,
-  useMemo,
 } from "react";
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
@@ -35,10 +34,7 @@ import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import PaginatedGrid from "../component/PaginatedGrid";
 import MultiFileUpload from "../component/MultiFileUpload";
 import RightDrawer from "../component/RightDrawer";
 import { ReactPDFViewer } from "../component/ReactPDFViewer";
@@ -49,12 +45,28 @@ import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter
 import { flattenObject } from "../../Utils/tableColUtils";
 import MonthYearCalander from "../component/MonthYearCalander";
 import { decryptData } from "./utils/encrypt";
-// Register module
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DocumentUpload = () => {
+  // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
   const [data, setData] = useState([]);
-  console.log(data, "data");
+  const gridRef = useRef();
+  const filtersRef = useRef({});
+  const searchTextRef = useRef("");
+
+  // MultiSelectFilter + search box only apply to the current page
+  const rowFilter = (row) => {
+    const search = searchTextRef.current.trim().toLowerCase();
+    return (
+      Object.entries(filtersRef.current).every(([column, values]) =>
+        values.includes(row[column]),
+      ) && (!search || JSON.stringify(row).toLowerCase().includes(search))
+    );
+  };
+
+  // Reload the current page from the API (after edit/delete/upload/approve)
+  const loadFiles = useCallback(async () => {
+    gridRef.current?.refresh();
+  }, []);
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -97,20 +109,10 @@ const DocumentUpload = () => {
     message: "",
     severityType: "",
   });
-  const [filters, setFilters] = useState({});
-
   const handleFilterApply = (newFilters) => {
-    setFilters(newFilters);
+    filtersRef.current = newFilters;
+    loadFiles();
   };
-  const filteredRowData = useMemo(() => {
-    if (Object.keys(filters).length === 0) return data;
-
-    return data.filter((row) => {
-      return Object.entries(filters).every(([column, values]) => {
-        return values.includes(row[column]);
-      });
-    });
-  }, [data, filters]);
   const [isAutoUpload, setIsAutoUpload] = useState(true);
   const [errors, setErrors] = useState({});
   const [groupHoldingName, setGroupHoldingName] = useState([]);
@@ -161,8 +163,7 @@ const DocumentUpload = () => {
       });
 
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -182,8 +183,7 @@ const DocumentUpload = () => {
       const message = response?.message;
 
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
       setIsDeleteModalOpen(false);
 
       // Show success snackbar
@@ -279,8 +279,7 @@ const DocumentUpload = () => {
         severityType: "success",
       });
 
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
       setUploadedFiles([]);
     } catch (error) {
       setIsSnackbarsOpen({
@@ -318,8 +317,7 @@ const DocumentUpload = () => {
         message,
         severityType: "success",
       });
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -345,8 +343,7 @@ const DocumentUpload = () => {
         severityType: "success",
       });
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -361,22 +358,8 @@ const DocumentUpload = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const results = await Promise.allSettled([
-          fetchAllFiles(),
-          fetchAllGroup(),
-          //  fetchAllModulesName(),
-        ]);
-        if (results[0].status === "fulfilled") setData(results[0].value);
-        if (results[1].status === "fulfilled")
-          setGroupHoldingName(results[1].value);
-        results.forEach((result, idx) => {
-          if (result.status === "rejected") {
-            // // console.error(
-            //   `Error fetching data at index ${idx}:`,
-            //   result.reason
-            // );
-          }
-        });
+        const groups = await fetchAllGroup();
+        setGroupHoldingName(groups);
       } catch {
         // Handle error silently
       }
@@ -825,7 +808,6 @@ const DocumentUpload = () => {
     ...staticColDefs,
     ...generateDynamicColDefs(data, staticColDefs),
   ];
-  const gridRef = useRef();
   const defaultColDef = {
     resizable: true,
     flex: 1,
@@ -836,12 +818,12 @@ const DocumentUpload = () => {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   const onRowValueChanged = () => {};
+  // quickFilterText doesn't work with the infinite row model, so the search
+  // text is applied inside the datasource instead
   const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current.api.setGridOption(
-      "quickFilterText",
-      document.getElementById("filter-text-box").value,
-    );
-  }, []);
+    searchTextRef.current = document.getElementById("filter-text-box").value;
+    loadFiles();
+  }, [loadFiles]);
   const fileUploadForm = () => {
     return (
       <div>
@@ -1537,19 +1519,17 @@ const DocumentUpload = () => {
           <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
         </div>
 
-        <div
-          className="ag-theme-quartz"
-          style={{ height: "600px", width: "100%", marginTop: "1rem" }}
-        >
-          <AgGridReact
-            theme="legacy"
+        <div style={{ marginTop: "1rem" }}>
+          <PaginatedGrid
             ref={gridRef}
-            rowData={filteredRowData || []}
+            fetchPage={fetchAllFiles}
+            rowFilter={rowFilter}
+            onPageLoaded={setData}
+            pageSize={20}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
             rowSelection="single"
-            pagination={true}
             onRowValueChanged={onRowValueChanged}
           />
         </div>

@@ -1088,9 +1088,11 @@ export const deleteFileById = async (id) => {
     throw error;
   }
 };
-export const fetchAllFiles = async () => {
+export const fetchAllFiles = async (page, limit) => {
   try {
-    const response = await API.get(GET_ALL_FILES);
+    const response = await API.get(GET_ALL_FILES, {
+      params: { page, limit },
+    });
     return response.data;
   } catch (error) {
     // console.error("Error fetching all files:", error);
