@@ -50,23 +50,28 @@ const DocumentUpload = () => {
   // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
   const [data, setData] = useState([]);
   const gridRef = useRef();
-  const filtersRef = useRef({});
-  const searchTextRef = useRef("");
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({});
 
-  // MultiSelectFilter + search box only apply to the current page
-  const rowFilter = (row) => {
-    const search = searchTextRef.current.trim().toLowerCase();
-    return (
-      Object.entries(filtersRef.current).every(([column, values]) =>
-        values.includes(row[column]),
-      ) && (!search || JSON.stringify(row).toLowerCase().includes(search))
-    );
-  };
+  // The search box goes to the API (?search=...), so it covers every record.
+  // MultiSelectFilter still only applies to the rows of the page on screen.
+  const rowFilter = useCallback(
+    (row) =>
+      Object.entries(filters).every(
+        ([column, values]) => !values?.length || values.includes(row[column]),
+      ),
+    [filters],
+  );
 
   // Reload the current page from the API (after edit/delete/upload/approve)
   const loadFiles = useCallback(async () => {
     gridRef.current?.refresh();
   }, []);
+
+  // Re-apply the column filters to the page on screen
+  useEffect(() => {
+    gridRef.current?.refresh();
+  }, [rowFilter]);
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -110,8 +115,7 @@ const DocumentUpload = () => {
     severityType: "",
   });
   const handleFilterApply = (newFilters) => {
-    filtersRef.current = newFilters;
-    loadFiles();
+    setFilters(newFilters);
   };
   const [isAutoUpload, setIsAutoUpload] = useState(true);
   const [errors, setErrors] = useState({});
@@ -124,6 +128,8 @@ const DocumentUpload = () => {
   const [serviceTrackerName, setServiceTrackerName] = useState([]);
   const [documentDropdownTypes, setDocumentDropdownTypes] = useState([]);
   const [documentDropdownStages, setDocumentDropdownStages] = useState([]);
+  const searchTimerRef = useRef(null);
+  
   const validate = () => {
     let tempErrors = {};
     if (!current?.group_name)
@@ -818,12 +824,13 @@ const DocumentUpload = () => {
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
   const onRowValueChanged = () => {};
-  // quickFilterText doesn't work with the infinite row model, so the search
-  // text is applied inside the datasource instead
-  const onFilterTextBoxChanged = useCallback(() => {
-    searchTextRef.current = document.getElementById("filter-text-box").value;
-    loadFiles();
-  }, [loadFiles]);
+  // quickFilterText doesn't work with the infinite row model, so the text is
+  // sent to the API instead; debounced so every keystroke isn't a request
+  const onFilterTextBoxChanged = useCallback((e) => {
+    const value = e.target.value;
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => setSearch(value), 400);
+  }, []);
   const fileUploadForm = () => {
     return (
       <div>
@@ -1523,6 +1530,7 @@ const DocumentUpload = () => {
           <PaginatedGrid
             ref={gridRef}
             fetchPage={fetchAllFiles}
+            search={search}
             rowFilter={rowFilter}
             onPageLoaded={setData}
             pageSize={20}

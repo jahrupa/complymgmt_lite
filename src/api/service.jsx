@@ -1088,12 +1088,18 @@ export const deleteFileById = async (id) => {
     throw error;
   }
 };
-export const fetchAllFiles = async (page, limit) => {
+export const fetchAllFiles = async (page, limit, search) => {
   try {
     const response = await API.get(GET_ALL_FILES, {
-      params: { page, limit },
+      // axios leaves out params that are undefined
+      params: { page, limit, search: search?.trim() || undefined },
     });
-    return response.data;
+    // The record count comes back in the X-Total-Count header, not in the body
+    const total = Number(response.headers?.["x-total-count"]);
+    const rows = Array.isArray(response.data)
+      ? response.data
+      : response.data?.data || [];
+    return { data: rows, total: Number.isNaN(total) ? undefined : total };
   } catch (error) {
     // console.error("Error fetching all files:", error);
     throw error;

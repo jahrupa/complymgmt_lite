@@ -1,5 +1,6 @@
 import React, {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -23,7 +24,8 @@ const defaultGetTotal = (response) =>
  * The grid asks for a block of rows and we fetch that page with page & limit.
  *
  * Props:
- *  - fetchPage(page, limit)   API call, page starts from 1
+ *  - fetchPage(page, limit, search)  API call, page starts from 1
+ *  - search                   search text for the API; a change reloads from page 1
  *  - getRows(response)        pick the rows out of the response
  *  - getTotal(response)       pick the total record count out of the response
  *  - rowFilter(row)           optional client side filter on the current page
@@ -37,6 +39,7 @@ const defaultGetTotal = (response) =>
 const PaginatedGrid = forwardRef(function PaginatedGrid(
   {
     fetchPage,
+    search,
     getRows = defaultGetRows,
     getTotal = defaultGetTotal,
     rowFilter,
@@ -54,11 +57,23 @@ const PaginatedGrid = forwardRef(function PaginatedGrid(
   const callbacksRef = useRef();
   callbacksRef.current = {
     fetchPage,
+    search,
     getRows,
     getTotal,
     rowFilter,
     onPageLoaded,
   };
+
+  // A new search gives a different result set, so start again from page 1
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    gridRef.current?.api?.paginationGoToFirstPage();
+    gridRef.current?.api?.refreshInfiniteCache();
+  }, [search]);
 
   const dataSource = useMemo(
     () => ({
@@ -69,7 +84,7 @@ const PaginatedGrid = forwardRef(function PaginatedGrid(
         const cb = callbacksRef.current;
 
         try {
-          const response = await cb.fetchPage(page, limit);
+          const response = await cb.fetchPage(page, limit, cb.search);
           const rows = cb.getRows(response) || [];
           const total = cb.getTotal(response);
 
