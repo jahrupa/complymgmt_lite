@@ -3,6 +3,7 @@ import "../../style/dashboardWidgets.css";
 import {
     fetchChallanActWise,
     fetchChallanCompanyWise,
+    fetchChallanExceptions,
     fetchChallanFilters,
     fetchChallanLocationWise,
     fetchChallanRecordById,
@@ -20,12 +21,12 @@ import LocationMonthGrid from "../common/LocationMonthGrid";
 import TurnaroundCard from "../common/TurnaroundCard";
 import RecordsTable from "../common/RecordsTable";
 import RecordDetailDrawer from "../common/RecordDetailDrawer";
+import ExceptionsCard from "../common/ExceptionsCard";
 import ChallanFilterBar from "./ChallanFilterBar";
 import SummaryWidget from "./SummaryWidget";
 import CompanyWiseWidget from "./CompanyWiseWidget";
 import TrendWidget from "./TrendWidget";
 import ActWiseWidget from "./ActWiseWidget";
-import ExceptionsWidget from "./ExceptionsWidget";
 import StatusBadges from "./StatusBadges";
 import {
     ACT_KEY,
@@ -51,6 +52,22 @@ const paymentDelayDrill = (index, total) => {
 };
 
 const renderStatus = (computed) => <StatusBadges computed={computed} />;
+
+const exceptionColumns = (isCompanyMode) => [
+    { headerName: "Company", field: "company", minWidth: 170, hide: isCompanyMode },
+    { headerName: "State", field: "state", minWidth: 120 },
+    { headerName: "Location", field: "location", minWidth: 170 },
+    { headerName: "Act", field: "act", width: 90, flex: 0 },
+    { headerName: "Wage Month", field: "wage_month", width: 120, flex: 0 },
+];
+
+const exceptionRow = (row) => ({
+    company: row.record?.company_name,
+    state: row.record?.state,
+    location: row.record?.location,
+    act: row.record?.[ACT_KEY],
+    wage_month: row.computed?.month_label || row.record?.wage_month,
+});
 
 /**
  * Challan Dashboard. Overall mode when no company is selected; company-wise mode calls the
@@ -166,6 +183,7 @@ const ChallanDashboard = ({
     };
 
     const onView = useCallback((id) => setRecordId(id), []);
+    const exceptionLeadColumns = useMemo(() => exceptionColumns(isCompanyMode), [isCompanyMode]);
 
     const fetchRecordsPage = (page, limit, sort) => fetchChallanRecords(page, limit, undefined, { ...params, ...sort });
 
@@ -263,12 +281,16 @@ const ChallanDashboard = ({
                     )}
 
                     {ready && shouldShow("ch-6") && (
-                        <ExceptionsWidget
+                        <ExceptionsCard
                             selection={cardSelection("ch-6")}
                             loading={loading}
-                            params={params}
+                            subtitle={`${data.summary?.exceptions ?? 0} exceptions: non-complied, paid late, overdue, skipped employees or penalty`}
                             total={data.summary?.exceptions}
-                            isCompanyMode={isCompanyMode}
+                            fetchPage={(page, limit) => fetchChallanExceptions(params, page, limit)}
+                            gridKey={JSON.stringify(params)}
+                            leadColumns={exceptionLeadColumns}
+                            mapRow={exceptionRow}
+                            renderStatus={renderStatus}
                             onView={onView}
                         />
                     )}

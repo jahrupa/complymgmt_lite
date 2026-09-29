@@ -128,13 +128,6 @@ import {
   GET_HELPDESK_TICKETS_RAISED_BY_COMPANY,
   GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE,
   GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT,
-  GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME,
-  GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS,
-  GET_FREQUENCY_WISE_RETURNS,
-  GET_COMPANIES_PER_RETURNS_NAMES,
-  GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE,
-  GET_COMPLIANCE_STATUS_BASED_ON_RETURNS,
-  GET_REMARKS_BASED_ON_COMPANY,
   GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED,
   GET_AUDIT_BY_SERVICE_TYPE,
   // GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY,
@@ -179,6 +172,19 @@ import {
   GET_REGISTER_DASH_COVERAGE,
   GET_REGISTER_DASH_RECORDS,
   GET_REGISTER_DASH_RECORD_BY_ID,
+  GET_RETURNS_DASH_FILTERS,
+  GET_RETURNS_DASH_SUMMARY,
+  GET_RETURNS_DASH_COMPANY_WISE,
+  GET_RETURNS_DASH_TREND,
+  GET_RETURNS_DASH_PERIOD_WISE,
+  GET_RETURNS_DASH_RETURN_WISE,
+  GET_RETURNS_DASH_ACT_WISE,
+  GET_RETURNS_DASH_LOCATION_WISE,
+  GET_RETURNS_DASH_TURNAROUND,
+  GET_RETURNS_DASH_EXCEPTIONS,
+  GET_RETURNS_DASH_COVERAGE,
+  GET_RETURNS_DASH_RECORDS,
+  GET_RETURNS_DASH_RECORD_BY_ID,
   GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
   GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
   GET_TOTAL_DELAY_FLAGS_BY_GOVT,
@@ -1808,78 +1814,6 @@ export const fetchHelpDeskPendingForSelectedIssueSubtypes = async (company_name)
     throw error;
   }
 }
-// Returns and Submissions
-export const fetchReturnApplicabilityByCompanyCommonName = async (company_name) => {
-  try {
-    const url = `${GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Return Applicability By Company Common Name", error);
-    throw error;
-  }
-}
-export const fetchStateWiseAnalysisOfApplicableReturns = async (company_name) => {
-  try {
-    const url = `${GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching State Wise Analysis Of Applicable Returns", error);
-    throw error;
-  }
-}
-export const fetchFrequencyWiseReturns = async (company_name) => {
-  try {
-    const url = `${GET_FREQUENCY_WISE_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Frequency Wise Returns", error);
-    throw error;
-  }
-}
-export const fetchCompaniesPerReturnsNames = async (company_name) => {
-  try {
-    const url = `${GET_COMPANIES_PER_RETURNS_NAMES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Companies Per Returns Names", error);
-    throw error;
-  }
-}
-export const fetchComplianceRiskDistributionByState = async (company_name) => {
-  try {
-    const url = `${GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Compliance Risk Distribution By State", error);
-    throw error;
-  }
-}
-
-export const fetchComplianceStatusBasedOnReturns = async (company_name) => {
-  try {
-    const url = `${GET_COMPLIANCE_STATUS_BASED_ON_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Compliance Status Based On Returns", error);
-    throw error;
-  }
-}
-export const fetchRemarksBasedOnCompany = async (company_name) => {
-  try {
-    const url = `${GET_REMARKS_BASED_ON_COMPANY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Remarks Based On Company", error);
-    throw error;
-  }
-}
 // Audit and Visits
 
 export const fetchAuditByServiceType = async (company_name) => {
@@ -2318,6 +2252,127 @@ export const fetchRegisterDashRecords = async (params) => {
 export const fetchRegisterDashRecordById = async (id, company_name) => {
   try {
     const response = await API.get(`${GET_REGISTER_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Returns Dashboard
+// Only company_name narrows the filter options
+export const fetchReturnsDashFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_TREND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashPeriodWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_PERIOD_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashReturnWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_RETURN_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashActWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_ACT_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_LOCATION_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_TURNAROUND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Paginated lists: params carry the filters plus page / limit (and sheet / sort for records)
+export const fetchReturnsDashExceptions = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_EXCEPTIONS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashCoverage = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_COVERAGE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashRecords = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_RECORDS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchReturnsDashRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
     return response.data;
   } catch (error) {
     throw error;

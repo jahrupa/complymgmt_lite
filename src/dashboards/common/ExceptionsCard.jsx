@@ -1,20 +1,35 @@
 import React, { useMemo } from "react";
 import PaginatedGrid from "../../component/PaginatedGrid";
-import DashboardCard from "../common/DashboardCard";
-import ChipList from "../common/ChipList";
-import { fetchRegisterDashExceptions } from "../../api/service";
-import { ExecutionBadges } from "./RegisterBadges";
+import DashboardCard from "./DashboardCard";
+import ChipList from "./ChipList";
 
-// RG-9: server paginated list of rows needing attention, most urgent first
-const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, onView }) => {
+/**
+ * "Needs attention" list: server paginated RecordItems, most urgent first, with status badges,
+ * computed.exceptions as chips and a View action.
+ *
+ * - fetchPage(page, limit)   API call returning { data: RecordItem[], total }
+ * - leadColumns             identifying columns (fields produced by mapRow)
+ * - mapRow(row)             RecordItem -> grid row; _id, computed and exceptions are added here
+ * - renderStatus(computed)  status badges
+ * - gridKey                 a change restarts paging from page 1 (e.g. the filter JSON)
+ */
+const ExceptionsCard = ({
+    selection,
+    loading,
+    subtitle,
+    total,
+    fetchPage,
+    gridKey,
+    leadColumns,
+    mapRow,
+    renderStatus,
+    statusWidth = 220,
+    onView,
+}) => {
     const columnDefs = useMemo(
         () => [
-            { headerName: "Company", field: "company", minWidth: 170, hide: isCompanyMode },
-            { headerName: "Location", field: "location", minWidth: 170 },
-            { headerName: "Register", field: "register", minWidth: 180 },
-            { headerName: "Form", field: "form", width: 110, flex: 0 },
-            { headerName: "Month", field: "month", width: 110, flex: 0 },
-            { headerName: "Status", field: "computed", width: 260, flex: 0, cellRenderer: (p) => <ExecutionBadges computed={p.value} /> },
+            ...leadColumns,
+            { headerName: "Status", field: "computed", width: statusWidth, flex: 0, cellRenderer: (p) => renderStatus(p.value) },
             { headerName: "Exceptions", field: "exceptions", minWidth: 320, flex: 3, cellRenderer: (p) => <ChipList value={p.value} className="exception" /> },
             {
                 headerName: "",
@@ -30,7 +45,7 @@ const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, on
                     ) : null,
             },
         ],
-        [isCompanyMode, onView]
+        [leadColumns, renderStatus, statusWidth, onView]
     );
 
     return (
@@ -38,24 +53,19 @@ const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, on
             selection={selection}
             loading={loading}
             title="Needs Attention"
-            subtitle={`${total ?? 0} exceptions: overdue, SLA missed or variance open`}
+            subtitle={subtitle}
             isEmpty={!total}
             emptyText="No exceptions for the selected filters"
             minHeight={200}
         >
             <div onClick={(e) => e.stopPropagation()}>
                 <PaginatedGrid
-                    // a new key restarts paging from page 1 when the filters change
-                    key={JSON.stringify(params)}
-                    fetchPage={(page, limit) => fetchRegisterDashExceptions({ ...params, page, limit })}
+                    key={gridKey}
+                    fetchPage={fetchPage}
                     getRows={(res) =>
                         (res?.data || []).map((row) => ({
+                            ...mapRow(row),
                             _id: row._id,
-                            company: row.record?.company_name,
-                            location: row.record?.location,
-                            register: row.record?.register_name,
-                            form: row.record?.form_id,
-                            month: row.computed?.month_label,
                             computed: row.computed,
                             exceptions: row.computed?.exceptions || [],
                         }))
@@ -71,4 +81,4 @@ const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, on
     );
 };
 
-export default ExceptionsWidget;
+export default ExceptionsCard;

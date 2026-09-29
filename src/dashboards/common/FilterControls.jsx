@@ -11,7 +11,11 @@ import {
     TextField,
 } from "@mui/material";
 
-// Multi select with checkboxes; options are plain strings
+// Options are plain strings or { value, label }
+const optionValue = (opt) => (typeof opt === "string" ? opt : opt.value);
+const optionLabel = (opt) => (typeof opt === "string" ? opt : opt.label);
+
+// Multi select with checkboxes
 export const MultiFilter = ({ label, value, options = [], onChange, width = 190 }) => (
     <FormControl size="small" sx={{ width }}>
         <InputLabel>{label}</InputLabel>
@@ -23,7 +27,9 @@ export const MultiFilter = ({ label, value, options = [], onChange, width = 190 
                 onChange(typeof v === "string" ? v.split(",") : v);
             }}
             input={<OutlinedInput label={label} />}
-            renderValue={(selected) => selected.join(", ")}
+            renderValue={(selected) =>
+                selected.map((v) => optionLabel(options.find((opt) => optionValue(opt) === v) || v)).join(", ")
+            }
             MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
         >
             {options.length === 0 && (
@@ -32,9 +38,9 @@ export const MultiFilter = ({ label, value, options = [], onChange, width = 190 
                 </MenuItem>
             )}
             {options.map((opt) => (
-                <MenuItem key={opt} value={opt}>
-                    <Checkbox size="small" checked={value.includes(opt)} />
-                    <ListItemText primary={opt} />
+                <MenuItem key={optionValue(opt)} value={optionValue(opt)}>
+                    <Checkbox size="small" checked={value.includes(optionValue(opt))} />
+                    <ListItemText primary={optionLabel(opt)} />
                 </MenuItem>
             ))}
         </Select>

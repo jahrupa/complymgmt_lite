@@ -1,18 +1,18 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import "../../style/dashboardWidgets.css";
 import {
-    fetchRegisterDashActWise,
-    fetchRegisterDashCompanyWise,
-    fetchRegisterDashExceptions,
-    fetchRegisterDashFilters,
-    fetchRegisterDashLocationWise,
-    fetchRegisterDashRecordById,
-    fetchRegisterDashRecords,
-    fetchRegisterDashRegisterWise,
-    fetchRegisterDashSummary,
-    fetchRegisterDashTrend,
-    fetchRegisterDashTurnaround,
-    fetchRegisterDashVariance,
+    fetchReturnsDashActWise,
+    fetchReturnsDashCompanyWise,
+    fetchReturnsDashExceptions,
+    fetchReturnsDashFilters,
+    fetchReturnsDashLocationWise,
+    fetchReturnsDashPeriodWise,
+    fetchReturnsDashRecordById,
+    fetchReturnsDashRecords,
+    fetchReturnsDashReturnWise,
+    fetchReturnsDashSummary,
+    fetchReturnsDashTrend,
+    fetchReturnsDashTurnaround,
 } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
@@ -26,15 +26,21 @@ import RecordDetailDrawer from "../common/RecordDetailDrawer";
 import ExceptionsCard from "../common/ExceptionsCard";
 import GroupTableCard from "../common/GroupTableCard";
 import SheetTabs from "../common/SheetTabs";
-import RegisterFilterBar from "./RegisterFilterBar";
+import ReturnsFilterBar from "./ReturnsFilterBar";
 import SummaryWidget from "./SummaryWidget";
 import TrendWidget from "./TrendWidget";
 import ActWiseWidget from "./ActWiseWidget";
-import VarianceWidget from "./VarianceWidget";
 import CoverageWidget from "./CoverageWidget";
-import { ExecutionBadges } from "./RegisterBadges";
-import { COMPANY_TABLE_COLUMNS, REGISTER_TABLE_COLUMNS, exceptionColumns, exceptionRow } from "./registerColumns";
+import { CoverageStatusBadge, ReturnBadges } from "./ReturnsBadges";
 import {
+    COMPANY_TABLE_COLUMNS,
+    PERIOD_TABLE_COLUMNS,
+    RETURN_TABLE_COLUMNS,
+    exceptionColumns,
+    exceptionRow,
+} from "./returnsColumns";
+import {
+    COLUMN_LABEL_OVERRIDES,
     COMPUTED_RECORD_COLUMNS,
     DEFAULT_RECORD_COLUMNS,
     GRID_STATUSES,
@@ -45,27 +51,24 @@ import {
     SORT_BY_FOR_COLUMN,
     TIMELINE_STEP_KINDS,
     WIDGET_ONLY_KEYS,
-    hasApplicability,
-    hasExecutionFilters,
-} from "./registerUtils";
+    hasApplicableLocations,
+    hasStatusFilters,
+} from "./returnsUtils";
 
-// sla_delays comes in a fixed order: on/before planned, 1-3, 4-7, 8-15, >15 days late, Not completed
-const slaDelayDrill = (index, total) => {
-    if (index === 0) return { sla_met: "Y", completed: "" };
-    if (index === total - 1) return { sla_met: "", completed: "N" };
-    return { sla_met: "N", completed: "" };
+// filing_delays comes in a fixed order: on/before due, 1-3, 4-7, 8-15, >15 days late, Not filed
+const filingDelayDrill = (index, total) => {
+    if (index === 0) return { on_time: "Y", filed: "" };
+    if (index === total - 1) return { on_time: "", filed: "N" };
+    return { on_time: "N", filed: "" };
 };
 
-const coverageText = (coverage) =>
-    hasApplicability(coverage) ? `${formatPercent(coverage.coverage_percent)} coverage` : "No applicability data";
-
-const renderExecutionStatus = (computed) => <ExecutionBadges computed={computed} />;
+const renderStatus = (computed) => <ReturnBadges computed={computed} />;
 
 /**
- * Register Dashboard. Overall mode when no company is selected; company-wise mode calls the
- * same endpoints with company_name. Filters live in the URL query string so views are shareable.
+ * Returns Dashboard (tracker based). Overall mode when no company is selected; company-wise mode
+ * calls the same endpoints with company_name. Filters live in the URL query string.
  */
-const RegisterDashboard = ({
+const ReturnsDashboard = ({
     selectedCompany,
     setSelectedCompany,
     current,
@@ -100,13 +103,13 @@ const RegisterDashboard = ({
     });
 
     const { options: filterOptions, accessError: optionsAccessError } = useFilterOptions(
-        fetchRegisterDashFilters,
+        fetchReturnsDashFilters,
         selectedCompany,
         activated
     );
     // The filters hook needs the default period, but the options load only once that hook reports
     // the tab activated; hand the value back with a render-phase update (React's derived-state pattern)
-    const defaults = useMemo(() => (filterOptions ? defaultPeriod(filterOptions.months) : null), [filterOptions]);
+    const defaults = useMemo(() => (filterOptions ? defaultPeriod(filterOptions.due_months) : null), [filterOptions]);
     if (defaults !== periodOptions) setPeriodOptions(defaults);
 
     // Every widget gets the same filter set; widget-only params (coverage status, records sheet) stay out
@@ -114,18 +117,18 @@ const RegisterDashboard = ({
         () => ({ ...withoutKeys(filters, WIDGET_ONLY_KEYS), company_name: selectedCompany }),
         [filters, selectedCompany]
     );
-    const executionFiltersActive = hasExecutionFilters(filters);
+    const statusFiltersActive = hasStatusFilters(filters);
 
     const { data, loading, accessError: dataAccessError } = useDashboardData({
         fetchers: {
-            summary: { fetch: fetchRegisterDashSummary, fallback: {} },
-            companyWise: { fetch: fetchRegisterDashCompanyWise, fallback: [], skip: isCompanyMode },
-            trend: { fetch: fetchRegisterDashTrend, fallback: [] },
-            registerWise: { fetch: fetchRegisterDashRegisterWise, fallback: [] },
-            actWise: { fetch: fetchRegisterDashActWise, fallback: [] },
-            locationWise: { fetch: fetchRegisterDashLocationWise, fallback: {} },
-            turnaround: { fetch: fetchRegisterDashTurnaround, fallback: {} },
-            variance: { fetch: fetchRegisterDashVariance, fallback: {} },
+            summary: { fetch: fetchReturnsDashSummary, fallback: {} },
+            companyWise: { fetch: fetchReturnsDashCompanyWise, fallback: [], skip: isCompanyMode },
+            trend: { fetch: fetchReturnsDashTrend, fallback: [] },
+            periodWise: { fetch: fetchReturnsDashPeriodWise, fallback: [] },
+            returnWise: { fetch: fetchReturnsDashReturnWise, fallback: [] },
+            actWise: { fetch: fetchReturnsDashActWise, fallback: [] },
+            locationWise: { fetch: fetchReturnsDashLocationWise, fallback: {} },
+            turnaround: { fetch: fetchReturnsDashTurnaround, fallback: {} },
         },
         params,
         enabled: ready,
@@ -158,8 +161,8 @@ const RegisterDashboard = ({
 
     /* ---------- drill downs ---------- */
 
-    const showCoverage = shouldShow("rg-10");
-    const showRecords = shouldShow("rg-11");
+    const showCoverage = shouldShow("rt-10");
+    const showRecords = shouldShow("rt-11");
 
     // Apply filters, then bring the matching list into view (coverage worklist or records)
     const onDrill = useCallback(
@@ -172,14 +175,22 @@ const RegisterDashboard = ({
     );
 
     const drillLocation = (loc, month) =>
-        onDrill(
-            {
-                state: [loc.state],
-                location: [loc.location],
-                ...(month ? { month_from: month, month_to: month } : {}),
-            },
-            "coverage"
-        );
+        onDrill({
+            state: [loc.state],
+            location: [loc.location],
+            ...(month ? { month_from: month, month_to: month } : {}),
+        });
+
+    // Coverage row -> that company's records at the location. In overall mode the company is matched
+    // with free-text search (company_name would switch to company-wise mode). Locations without any
+    // filing open the applicability sheet, since there are no transactions to show.
+    const openCoverageRow = (row) =>
+        onDrill({
+            state: [row.state],
+            location: [row.location],
+            ...(isCompanyMode ? {} : { search: row.company_name }),
+            sheet: row.status === "not_covered" ? "applicability" : "",
+        });
 
     const onOpenCompany = (companyName) => {
         if (!companyName) return;
@@ -192,15 +203,13 @@ const RegisterDashboard = ({
 
     /* ---------- records (sheet tabs) ---------- */
 
-    const sheet = RECORD_SHEETS.some((s) => s.key === filters.sheet) ? filters.sheet : "execution";
+    const sheet = RECORD_SHEETS.some((s) => s.key === filters.sheet) ? filters.sheet : "transaction";
     const isMaster = sheet === "master";
 
     const fetchRecordsPage = (page, limit, sort) => {
-        // The master catalogue ignores company and execution filters
-        const base = isMaster
-            ? Object.fromEntries(MASTER_FILTER_KEYS.map((key) => [key, filters[key]]))
-            : params;
-        return fetchRegisterDashRecords({ ...base, sheet, page, limit, ...sort });
+        // The master catalogue ignores company, location and transaction filters
+        const base = isMaster ? Object.fromEntries(MASTER_FILTER_KEYS.map((key) => [key, filters[key]])) : params;
+        return fetchReturnsDashRecords({ ...base, sheet, page, limit, ...sort });
     };
 
     const locationWise = data.locationWise || {};
@@ -227,19 +236,19 @@ const RegisterDashboard = ({
                 <AccessState
                     status={accessError}
                     companyName={selectedCompany}
-                    dataLabel="register data"
+                    dataLabel="returns data"
                     onShowAll={() => setSelectedCompany("")}
                 />
             ) : (
                 <>
-                    <RegisterFilterBar filterOptions={filterOptions} filters={filters} onChange={updateFilters} onClear={resetFilters} />
+                    <ReturnsFilterBar filterOptions={filterOptions} filters={filters} onChange={updateFilters} onClear={resetFilters} />
 
-                    {shouldShow("rg-1") && (
+                    {shouldShow("rt-1") && (
                         <SummaryWidget
-                            selection={cardSelection("rg-1")}
+                            selection={cardSelection("rt-1")}
                             loading={loading}
                             summary={summary}
-                            executionFiltersActive={executionFiltersActive}
+                            statusFiltersActive={statusFiltersActive}
                             onDrill={onDrill}
                             onCoverageDrill={(status) => onDrill({ coverage_status: [status] }, "coverage")}
                         />
@@ -248,24 +257,24 @@ const RegisterDashboard = ({
                     {ready && showCoverage && (
                         <CoverageWidget
                             ref={coverageRef}
-                            selection={cardSelection("rg-10")}
+                            selection={cardSelection("rt-10")}
                             loading={loading}
                             params={params}
                             coverageStatus={filters.coverage_status}
                             coverage={summary.coverage}
-                            executionFiltersActive={executionFiltersActive}
+                            statusFiltersActive={statusFiltersActive}
                             isCompanyMode={isCompanyMode}
                             onStatusChange={(status) => updateFilters({ coverage_status: status })}
-                            onView={onView}
+                            onOpenRow={openCoverageRow}
                         />
                     )}
 
-                    {!isCompanyMode && shouldShow("rg-2") && (
+                    {!isCompanyMode && shouldShow("rt-2") && (
                         <GroupTableCard
-                            selection={cardSelection("rg-2")}
+                            selection={cardSelection("rt-2")}
                             loading={loading}
-                            title="Company-wise Registers"
-                            subtitle="Lowest completion first. Click a company to open its dashboard"
+                            title="Company-wise Returns"
+                            subtitle="Lowest coverage first. Click a company to open its dashboard"
                             rows={data.companyWise}
                             columnDefs={COMPANY_TABLE_COLUMNS}
                             rowId={(row) => row.company_name}
@@ -274,108 +283,98 @@ const RegisterDashboard = ({
                     )}
 
                     <div className="charts-grid">
-                        {shouldShow("rg-3") && (
-                            <TrendWidget selection={cardSelection("rg-3")} loading={loading} trend={data.trend} onDrill={onDrill} />
+                        {shouldShow("rt-3") && (
+                            <TrendWidget selection={cardSelection("rt-3")} loading={loading} trend={data.trend} onDrill={onDrill} />
                         )}
-                        {shouldShow("rg-5") && (
-                            <ActWiseWidget selection={cardSelection("rg-5")} loading={loading} actWise={data.actWise} onDrill={onDrill} />
+                        {shouldShow("rt-6") && (
+                            <ActWiseWidget selection={cardSelection("rt-6")} loading={loading} actWise={data.actWise} onDrill={onDrill} />
                         )}
                     </div>
 
-                    {shouldShow("rg-4") && (
+                    {shouldShow("rt-4") && (
                         <GroupTableCard
-                            selection={cardSelection("rg-4")}
+                            selection={cardSelection("rt-4")}
                             loading={loading}
-                            title="Register-wise Status"
-                            subtitle="Click a register to filter to it"
-                            rows={data.registerWise}
-                            columnDefs={REGISTER_TABLE_COLUMNS}
-                            rowId={(row) => `${row.register_name}|${row.applicable_act}`}
-                            onRowClick={(row) => onDrill({ register_name: [row.register_name] })}
+                            title="Period-wise Filings"
+                            subtitle="Latest period first. Periods overlap (quarterly vs annual); click one to filter to it"
+                            rows={data.periodWise}
+                            columnDefs={PERIOD_TABLE_COLUMNS}
+                            rowId={(row) => row.period || "unspecified"}
+                            onRowClick={(row) => row.period && onDrill({ period: [row.period] })}
                         />
                     )}
 
-                    {shouldShow("rg-6") && (
-                        <LocationMonthGrid
-                            selection={cardSelection("rg-6")}
+                    {shouldShow("rt-5") && (
+                        <GroupTableCard
+                            selection={cardSelection("rt-5")}
                             loading={loading}
-                            title="Location-wise Coverage by Month"
-                            subtitle="Cells show applicable registers completed; click one to open its coverage worklist"
-                            note={
-                                executionFiltersActive
-                                    ? "Execution filters don't apply to coverage; cells still count every applicable register."
-                                    : ""
-                            }
-                            months={locationWise.months}
+                            title="Return-wise Status"
+                            subtitle="Click a return to filter to it"
+                            note="Return names differ between the applicability and filing sheets, so a name usually has either applicable returns or filings. The two columns are not joined."
+                            rows={data.returnWise}
+                            columnDefs={RETURN_TABLE_COLUMNS}
+                            rowId={(row) => row.return_name}
+                            onRowClick={(row) => onDrill({ return_name: [row.return_name] })}
+                        />
+                    )}
+
+                    {shouldShow("rt-7") && (
+                        <LocationMonthGrid
+                            selection={cardSelection("rt-7")}
+                            loading={loading}
+                            title="Location-wise Filings by Due Month"
+                            subtitle="Cells show returns filed of due; click one to see those records"
+                            note={statusFiltersActive ? "Status filters narrow the filings but not the coverage badges." : ""}
+                            months={locationWise.due_months}
                             locations={locationWise.locations}
                             states={locationWise.states}
                             statuses={GRID_STATUSES}
-                            cellText={(cell) =>
-                                hasApplicability(cell.coverage)
-                                    ? `${cell.coverage.completed}/${cell.coverage.applicable}`
-                                    : `${cell.completed}/${cell.executed} done`
-                            }
+                            blankEmptyCells
+                            locationBadge={(loc) => <CoverageStatusBadge status={loc.coverage_status} />}
+                            cellText={(cell) => `${cell.filed}/${cell.total}`}
                             cellTooltip={(cell) => (
                                 <div>
                                     <div className="fw-600">{GRID_STATUSES[cell.status]?.label || cell.status}</div>
-                                    {hasApplicability(cell.coverage) ? (
-                                        <div>
-                                            Coverage: {cell.coverage.completed}/{cell.coverage.applicable} applicable ·{" "}
-                                            {cell.coverage.not_started} not started
-                                        </div>
-                                    ) : (
-                                        <div>No applicability data for this month</div>
-                                    )}
-                                    <div>Executed: {cell.executed}, completed: {cell.completed}</div>
+                                    <div>Filed: {cell.filed}/{cell.total} ({cell.on_time} on time, {cell.late} late)</div>
+                                    <div>Compliance: {formatPercent(cell.compliance_rate)}</div>
                                     {cell.overdue > 0 && <div>Overdue: {cell.overdue}</div>}
-                                    {cell.variance_open > 0 && <div>Open variances: {cell.variance_open}</div>}
+                                    {cell.exceptions > 0 && <div>Exceptions: {cell.exceptions}</div>}
                                 </div>
                             )}
                             stateText={(s) =>
-                                `${s.locations} locations · ${coverageText(s.coverage)} · ${formatPercent(s.completion_rate)} completion`
+                                `${s.locations} locations · ${
+                                    hasApplicableLocations(s.coverage) ? `${formatPercent(s.coverage.coverage_percent)} coverage` : "no applicable locations"
+                                } · ${s.total} filings`
                             }
-                            overallText={(loc) =>
-                                hasApplicability(loc.coverage) ? formatPercent(loc.coverage.coverage_percent) : "No data"
-                            }
+                            overallText={(loc) => (loc.total ? formatPercent(loc.filing_rate) : "–")}
                             onCellClick={drillLocation}
                             onLocationClick={(loc) => drillLocation(loc)}
                         />
                     )}
 
-                    {shouldShow("rg-7") && (
+                    {shouldShow("rt-8") && (
                         <TurnaroundCard
-                            selection={cardSelection("rg-7")}
+                            selection={cardSelection("rt-8")}
                             loading={loading}
                             stages={turnaround.stages}
                             endToEnd={turnaround.end_to_end}
-                            delays={turnaround.sla_delays}
-                            delaysTitle="Completion vs planned date"
-                            onDelayClick={(index, total) => onDrill(slaDelayDrill(index, total))}
+                            delays={turnaround.filing_delays}
+                            delaysTitle="Filing vs due date"
+                            onDelayClick={(index, total) => onDrill(filingDelayDrill(index, total))}
                         />
                     )}
 
-                    {shouldShow("rg-8") && (
-                        <VarianceWidget
-                            selection={cardSelection("rg-8")}
-                            loading={loading}
-                            variance={data.variance}
-                            isCompanyMode={isCompanyMode}
-                            onDrill={onDrill}
-                            onOpenCompany={onOpenCompany}
-                        />
-                    )}
-
-                    {ready && shouldShow("rg-9") && (
+                    {ready && shouldShow("rt-9") && (
                         <ExceptionsCard
-                            selection={cardSelection("rg-9")}
+                            selection={cardSelection("rt-9")}
                             loading={loading}
-                            subtitle={`${summary.exceptions ?? 0} exceptions: overdue, SLA missed or variance open`}
+                            subtitle={`${summary.exceptions ?? 0} exceptions: non / partially compliant, overdue, filed late, at risk or escalated`}
                             total={summary.exceptions}
-                            fetchPage={(page, limit) => fetchRegisterDashExceptions({ ...params, page, limit })}
+                            fetchPage={(page, limit) => fetchReturnsDashExceptions({ ...params, page, limit })}
                             gridKey={JSON.stringify(params)}
                             leadColumns={exceptionLeadColumns}
                             mapRow={exceptionRow}
-                            renderStatus={renderExecutionStatus}
+                            renderStatus={renderStatus}
                             statusWidth={260}
                             onView={onView}
                         />
@@ -386,29 +385,30 @@ const RegisterDashboard = ({
                             // each sheet has its own columns and saved column choice
                             key={sheet}
                             ref={recordsRef}
-                            selection={cardSelection("rg-11")}
+                            selection={cardSelection("rt-11")}
                             loading={loading}
-                            title="Register Records"
-                            subtitle={sheet === "execution" ? `${summary.executed ?? 0} execution rows match the filters` : ""}
+                            title="Returns Records"
+                            subtitle={sheet === "transaction" ? `${summary.total ?? 0} filings match the filters` : ""}
                             tabs={
                                 <SheetTabs
                                     sheets={RECORD_SHEETS}
                                     value={sheet}
-                                    onChange={(val) => updateFilters({ sheet: val === "execution" ? "" : val })}
+                                    onChange={(val) => updateFilters({ sheet: val === "transaction" ? "" : val })}
                                 />
                             }
                             note={
                                 isMaster
-                                    ? "Master catalogue of register definitions: company and execution filters don't apply."
+                                    ? "Master catalogue of return definitions: only the search box applies here."
                                     : ""
                             }
-                            isEmpty={sheet === "execution" && !summary.executed}
+                            isEmpty={sheet === "transaction" && !summary.total}
                             columns={filterOptions?.columns?.[sheet]}
                             computedColumns={COMPUTED_RECORD_COLUMNS[sheet]}
                             defaultColumns={DEFAULT_RECORD_COLUMNS[sheet]}
-                            storageKey={`registerRecordColumns.${sheet}`}
+                            labelOverrides={COLUMN_LABEL_OVERRIDES}
+                            storageKey={`returnsRecordColumns.${sheet}`}
                             sortByForColumn={SORT_BY_FOR_COLUMN}
-                            renderStatus={isMaster ? null : renderExecutionStatus}
+                            renderStatus={isMaster ? null : renderStatus}
                             fetchPage={fetchRecordsPage}
                             gridKey={JSON.stringify(isMaster ? MASTER_FILTER_KEYS.map((k) => filters[k]) : params)}
                             onView={onView}
@@ -420,14 +420,14 @@ const RegisterDashboard = ({
             <RecordDetailDrawer
                 recordId={recordId}
                 companyName={selectedCompany}
-                fetchRecord={fetchRegisterDashRecordById}
-                title={(d) => [d.record?.register_name, d.record?.form_id].filter(Boolean).join(" · ") || "Register record"}
+                fetchRecord={fetchReturnsDashRecordById}
+                title={(d) => d.record?.return_name || "Return record"}
                 subtitle={(d) =>
-                    [d.record?.company_name, d.record?.location, d.computed?.month_label !== "Unspecified" && d.computed?.month_label]
-                        .filter(Boolean)
+                    [d.record?.company_name, d.record?.location_name, d.computed?.period_label || d.computed?.due_month_label]
+                        .filter((v) => v && v !== "Unspecified")
                         .join(" · ")
                 }
-                badges={renderExecutionStatus}
+                badges={renderStatus}
                 stepKinds={TIMELINE_STEP_KINDS}
                 onClose={() => setRecordId(null)}
             />
@@ -435,4 +435,4 @@ const RegisterDashboard = ({
     );
 };
 
-export default RegisterDashboard;
+export default ReturnsDashboard;
