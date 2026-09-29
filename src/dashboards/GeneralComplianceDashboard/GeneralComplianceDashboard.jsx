@@ -3,7 +3,27 @@ import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import { decryptData } from '../../page/utils/encrypt';
 import DashboardDrawerGrid from '../DashboardDrawer';
-import { fetchGeneralCompaiancePortfolio, fetchPaginatedRecords } from '../../api/service';
+import {
+    fetchChallanRecords,
+    fetchLicenseDashRecords,
+    fetchRegisterDashRecords,
+    fetchReturnsDashRecords,
+} from '../../api/service';
+
+// The drawer shows each module's rows. They come from the module dashboards' own /records
+// endpoints (the old cockpit records endpoint was removed), reshaped to what the drawer reads:
+// { challan|license|register|return: { records: row[], total } }
+const fetchPaginatedRecords = async (page, limit) => {
+    const toModule = (res) => ({ records: (res?.data || []).map((row) => row.record), total: res?.total ?? 0 });
+    const [challan, license, register, returns] = await Promise.allSettled([
+        fetchChallanRecords(page, limit),
+        fetchLicenseDashRecords({ page, limit }),
+        fetchRegisterDashRecords({ page, limit }),
+        fetchReturnsDashRecords({ page, limit }),
+    ]);
+    const pick = (res) => (res.status === 'fulfilled' ? toModule(res.value) : { records: [], total: 0 });
+    return { challan: pick(challan), license: pick(license), register: pick(register), return: pick(returns) };
+};
 
 const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow, page, limit, setActiveDrawer }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({

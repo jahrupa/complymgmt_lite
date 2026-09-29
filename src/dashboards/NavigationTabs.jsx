@@ -8,18 +8,9 @@ import {
     createOrUpdateWidgetMapping,
     fetchClientOnboardingByCompany,
     fetchClientOnboardingPortfolio,
-    fetchComplianceCockpit,
-    fetchComplainceCockpitByCompany,
     fetchGeneralCompaiancePortfolio,
     fetchGeneralComplianceByCompany,
     fetchWidgetMappingById,
-    fetchLicenseComplaince,
-    fetchRegistersCompliance,
-    fetchChallanCompliance,
-    fetchReturnCompliance,
-    fetchPaginatedRecords,
-    fetchClientData,
-    fetchClientCompliance,
 } from "../api/service";
 import CockpitComplinceByCompany from "./cockpitDashboard/CockpitComplinceByCompany";
 import CockpitComplince from "./cockpitDashboard/CockpitComplince";
@@ -60,15 +51,13 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
 
     /* STATES */
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
-    const [cockpitByCompanyData, setCockpitByCompanyData] = useState([]);
-    const [cockpitData, setCockpitData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [selectedCharts, setSelectedCharts] = useState([]);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const [widgetsList, setWidgetsList] = useState([]);
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(20);
+    const [page] = useState(1);
+    const [limit] = useState(20);
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -83,15 +72,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
 
     const [isDragging, setIsDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    const [cockpitComplainceData, setCockpitComplainceData] = useState({
-        licenseComplaince: [],
-        registersCompliance: [],
-        challanCompliance: [],
-        returnCompliance: [],
-        paginatedRecords: [],
-        clientData: [],
-        clientCompliance: [],
-    });
 
     // Start dragging
     const startDrag = (e) => {
@@ -147,6 +127,32 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 item => item?.widget_id?.toUpperCase() === id.toUpperCase()
             );
     };
+    // Switch tabs. The current tab's filters are parked and the target's come back, unless `params`
+    // is given (a drill-down from another dashboard), in which case those filters are opened instead.
+    const switchTab = (toSlug, params) => {
+        const fromSlug = activeSlug || "compliance-cockpit";
+        setSearchParams((prev) => {
+            const own = new URLSearchParams(prev);
+            SHARED_PARAMS.forEach((key) => own.delete(key));
+            tabFiltersRef.current[fromSlug] = own.toString();
+
+            const next = new URLSearchParams();
+            next.set("tab", toSlug);
+            if (prev.get("company_name")) next.set("company_name", prev.get("company_name"));
+            const restored = params
+                ? Object.entries(params).map(([key, value]) => [key, Array.isArray(value) ? value.join(",") : value])
+                : [...new URLSearchParams(tabFiltersRef.current[toSlug] || "").entries()];
+            restored.forEach(([key, value]) => value && next.set(key, value));
+            return next;
+        });
+    };
+    const openTab = (toSlug, params) => {
+        switchTab(toSlug, params);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    // The cockpit is the default tab, so it is active when ?tab= is missing or unknown
+    const isCockpitActive = !activeSlug || activeSlug === "compliance-cockpit";
+
     const tabsList = [
         {
             label: "Compliance Cockpit",
@@ -154,25 +160,24 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             title: "Compliance Cockpit",
             content:
                 selectedCompany !== "" ? (
-                    <CockpitComplinceByCompany 
-                    cockpitDataByClient={cockpitData ? cockpitData : []}
-                     data={cockpitByCompanyData ? cockpitByCompanyData : []}
+                    <CockpitComplinceByCompany
+                        companyName={selectedCompany}
+                        setSelectedCompany={setSelectedCompany}
                         current={current}
                         selectedCharts={selectedCharts}
-                        companyName={selectedCompany}
-                        setSelectedCharts={setSelectedCharts} />
+                        setSelectedCharts={setSelectedCharts}
+                        isActive={isCockpitActive}
+                        openTab={openTab}
+                    />
                 ) : (
                     <CockpitComplince
+                        setSelectedCompany={setSelectedCompany}
                         current={current}
                         selectedCharts={selectedCharts}
                         setSelectedCharts={setSelectedCharts}
                         shouldShow={shouldShow}
-                        setPage={setPage}
-                        setLimit={setLimit}
-                        selectedCompany={selectedCompany}
-                        page={page}
-                        limit={limit}
-                        setActiveDrawer={setActiveDrawer}
+                        isActive={isCockpitActive}
+                        openTab={openTab}
                     />
                 )
         },
@@ -375,22 +380,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
         // eslint-disable-next-line react-hooks/exhaustive-deps -- tabsList is rebuilt every render
     }, [activeIndex, userType]);
 
-    const handleTabChange = (event, newValue) => {
-        const fromSlug = tabsList[activeIndex].slug;
-        const toSlug = tabsList[newValue].slug;
-        setSearchParams((prev) => {
-            // Park the current tab's filters and bring back the ones the target tab had
-            const own = new URLSearchParams(prev);
-            SHARED_PARAMS.forEach((key) => own.delete(key));
-            tabFiltersRef.current[fromSlug] = own.toString();
-
-            const next = new URLSearchParams();
-            next.set("tab", toSlug);
-            if (prev.get("company_name")) next.set("company_name", prev.get("company_name"));
-            new URLSearchParams(tabFiltersRef.current[toSlug] || "").forEach((value, key) => next.set(key, value));
-            return next;
-        });
-    };
+    const handleTabChange = (event, newValue) => switchTab(tabsList[newValue].slug);
 
     useEffect(() => {
         const fetchGeneralDashboardData = async () => {
@@ -406,18 +396,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
         };
         fetchGeneralDashboardData();
     }, [selectedCompany, page, limit]);
-
-    useEffect(() => {
-        const fetchCockpitData = async () => {
-            const [a, b] = await Promise.allSettled([
-                fetchComplainceCockpitByCompany(selectedCompany),
-                fetchComplianceCockpit(page, limit)
-            ]);
-            setCockpitByCompanyData(a.status === "fulfilled" ? a.value : []);
-            setCockpitData(b.status === "fulfilled" ? b.value : []);
-        };
-        fetchCockpitData();
-    }, [selectedCompany]);
 
     useEffect(() => {
         const fetchClientOnboardingPortfolioData = async () => {

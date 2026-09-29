@@ -12,7 +12,8 @@ import {
  *
  * All dashboard tabs stay mounted and share one URL, so a dashboard only follows the URL while
  * it is the active tab and keeps its last filters otherwise. On first activation without any of
- * its filters in the URL it applies `defaultPeriod` (pass null until the period options are known).
+ * its filters in the URL it applies `defaultPeriod` (pass null until the period options are known),
+ * unless the URL has `range=all` (e.g. a cockpit drill-down showing current status, all months).
  */
 export const useDashboardFilters = ({ multiKeys, singleKeys, isActive, defaultPeriod }) => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -45,7 +46,8 @@ export const useDashboardFilters = ({ multiKeys, singleKeys, isActive, defaultPe
 
     useEffect(() => {
         if (!isActive || activated) return;
-        needsDefaultRef.current = ![...multiKeys, ...singleKeys].some((key) => searchParams.has(key));
+        needsDefaultRef.current =
+            searchParams.get("range") !== "all" && ![...multiKeys, ...singleKeys].some((key) => searchParams.has(key));
         setActivated(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- runs on first activation only
     }, [isActive]);

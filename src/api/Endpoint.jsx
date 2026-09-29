@@ -150,20 +150,16 @@ export const CHANGE_TEMPORARY_PASSWORD_STATUS='/api/v1/view/temporary_password_s
 
 // forget password
 export const FORGET_PASSWORD='/api/v1/password/update/email_request';
-// Cockpit Dashboard updated api
-export const LICENSE_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/license'
-export const REGISTERS_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/register'
-export const CHALLAN_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/challan'
-export const RETURN_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/return'
-export const PAGINATED_RECORDS='/api/v1/dashboard/view/compliance/cockpit/records'
-export const CLIENT_DATA='/api/v1/dashboard/view/compliance/cockpit/client-data'
-export const CLIENT_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/client-compliance'
+// Compliance Cockpit (compiles the challan, register, returns and license dashboards)
+export const GET_COCKPIT_FILTERS ='/api/v1/dashboard/view/compliance/cockpit/filters';
+export const GET_COCKPIT_SUMMARY ='/api/v1/dashboard/view/compliance/cockpit/summary';
+export const GET_COCKPIT_COMPANY_WISE ='/api/v1/dashboard/view/compliance/cockpit/company-wise';
+export const GET_COCKPIT_STATE_WISE ='/api/v1/dashboard/view/compliance/cockpit/state-wise';
+export const GET_COCKPIT_CLIENTS ='/api/v1/dashboard/view/compliance/cockpit/clients';
 
-// Cockpit Dashboard
+// General Compliance Dashboard
 export const GET_GENERAL_COMPLIANCE_PORTFOLIO='/api/v1/dashboard/view/general/compliance/portfolio'
 export const GET_GENERAL_COMPLIANCE_BY_COMPANY='/api/v1/dashboard/view/general/compliance/'
-export const GET_COMPLIANCE_COCKPIT_BY_COMPANY ='/api/v1/dashboard/view/compliance/cockpit/'
-export const GET_COCKPIT_COMPLIANCE_PORTFOLIO ='/api/v1/dashboard/view/compliance/cockpit/portfolio'
 export const GET_CLIENT_ONBOARDING_PORTFOLIO ='api/v1/dashboard/view/client/onboarding/portfolio'
 export const GET_CLIENT_ONBOARDING_BY_COMPANY ='/api/v1/dashboard/view/client/onboarding/'
 // Payroll dashboard
