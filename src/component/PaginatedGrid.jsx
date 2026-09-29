@@ -1,6 +1,5 @@
 import React, {
   forwardRef,
-  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -52,29 +51,22 @@ const PaginatedGrid = forwardRef(function PaginatedGrid(
 ) {
   const gridRef = useRef();
 
-  // Keep latest callbacks in a ref so the datasource stays stable; a new
-  // datasource object would make AG Grid reset back to page 1.
+  // Keep latest callbacks in a ref so the datasource identity only depends on
+  // the search text, not on props that change on every render.
   const callbacksRef = useRef();
   callbacksRef.current = {
     fetchPage,
-    search,
     getRows,
     getTotal,
     rowFilter,
     onPageLoaded,
   };
 
-  // A new search gives a different result set, so start again from page 1
-  const isFirstRender = useRef(true);
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    gridRef.current?.api?.paginationGoToFirstPage();
-    gridRef.current?.api?.refreshInfiniteCache();
-  }, [search]);
-
+  // A new search means a different result set, so the grid has to start over.
+  // Handing AG Grid a new datasource is what resets it properly: it throws away
+  // the cached blocks AND the old row count, and pagination falls back to
+  // page 1. refreshInfiniteCache() would instead reload whichever page the user
+  // was on (page 4 stays page 4) and keep the stale total.
   const dataSource = useMemo(
     () => ({
       getRows: async (params) => {
@@ -84,7 +76,7 @@ const PaginatedGrid = forwardRef(function PaginatedGrid(
         const cb = callbacksRef.current;
 
         try {
-          const response = await cb.fetchPage(page, limit, cb.search);
+          const response = await cb.fetchPage(page, limit, search);
           const rows = cb.getRows(response) || [];
           const total = cb.getTotal(response);
 
@@ -102,7 +94,7 @@ const PaginatedGrid = forwardRef(function PaginatedGrid(
         }
       },
     }),
-    [],
+    [search],
   );
 
   useImperativeHandle(ref, () => ({
