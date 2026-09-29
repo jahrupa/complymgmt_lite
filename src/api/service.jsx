@@ -156,6 +156,16 @@ import {
   GET_ASSIGNED_INDIVIDUALS_LIST,
   GET_DOCUMENTS_PENDING_FROM,
   GET_ISSUE_CATEGORY_BY_STATUS,
+  GET_CHALLAN_FILTERS,
+  GET_CHALLAN_SUMMARY,
+  GET_CHALLAN_TREND,
+  GET_CHALLAN_COMPANY_WISE,
+  GET_CHALLAN_ACT_WISE,
+  GET_CHALLAN_LOCATION_WISE,
+  GET_CHALLAN_TURNAROUND,
+  GET_CHALLAN_EXCEPTIONS,
+  GET_CHALLAN_RECORDS,
+  GET_CHALLAN_RECORD_BY_ID,
   GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
   GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
   GET_TOTAL_DELAY_FLAGS_BY_GOVT,
@@ -2075,7 +2085,112 @@ export const fetchIssueCategoryByStatus = async (company_name) => {
   }
 }
 
-// Dashboaed Widgets 
+// Challan Dashboard
+// Builds "?key=value" from a filter object; arrays go as comma separated values, empty values are skipped
+const challanQuery = (params = {}) => {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    const val = Array.isArray(value) ? value.join(",") : value;
+    if (val !== undefined && val !== null && val !== "") query.append(key, val);
+  });
+  const str = query.toString();
+  return str ? `?${str}` : "";
+};
+
+// Only company_name narrows the filter options
+export const fetchChallanFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_FILTERS}${challanQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_SUMMARY}${challanQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_TREND}${challanQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_COMPANY_WISE}${challanQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanActWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_ACT_WISE}${challanQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_LOCATION_WISE}${challanQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_TURNAROUND}${challanQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanExceptions = async (params, page = 1, limit = 50) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_EXCEPTIONS}${challanQuery({ ...params, page, limit })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Signature matches PaginatedGrid's fetchPage(page, limit, search)
+export const fetchChallanRecords = async (page, limit, search, params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_RECORDS}${challanQuery({ ...params, ...(search ? { search } : {}), page, limit })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchChallanRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_RECORD_BY_ID}${encodeURIComponent(id)}${challanQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Dashboaed Widgets
 
 export const fetchAllWidgetMappings = async (userId) => {
   try {

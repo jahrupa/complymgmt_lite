@@ -220,6 +220,18 @@ export const GET_ASSIGNED_INDIVIDUALS_LIST ='/api/v1/dashboard/view/general/help
 export const GET_DOCUMENTS_PENDING_FROM ='/api/v1/dashboard/view/general/helpdesk/documents/pending/from';
 export const GET_ISSUE_CATEGORY_BY_STATUS ='/api/v1/dashboard/view/general/helpdesk/status/based/issue/category';
 
+// Challan Dashboard
+export const GET_CHALLAN_FILTERS ='/api/v1/dashboard/view/challan/filters';
+export const GET_CHALLAN_SUMMARY ='/api/v1/dashboard/view/challan/summary';
+export const GET_CHALLAN_TREND ='/api/v1/dashboard/view/challan/trend';
+export const GET_CHALLAN_COMPANY_WISE ='/api/v1/dashboard/view/challan/company-wise';
+export const GET_CHALLAN_ACT_WISE ='/api/v1/dashboard/view/challan/act-wise';
+export const GET_CHALLAN_LOCATION_WISE ='/api/v1/dashboard/view/challan/location-wise';
+export const GET_CHALLAN_TURNAROUND ='/api/v1/dashboard/view/challan/turnaround';
+export const GET_CHALLAN_EXCEPTIONS ='/api/v1/dashboard/view/challan/exceptions';
+export const GET_CHALLAN_RECORDS ='/api/v1/dashboard/view/challan/records';
+export const GET_CHALLAN_RECORD_BY_ID ='/api/v1/dashboard/view/challan/records/';
+
 // Dashboard Widget Mappings
 export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
 export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';
