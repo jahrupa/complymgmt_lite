@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../style/statsCards.css";
 import "../style/dashboard.css";
@@ -32,8 +32,12 @@ import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";
 import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
 import ChallanDashboard from "./challanDashboard/ChallanDashboard";
+import RegisterDashboard from "./registerDashboard/RegisterDashboard";
 import { decryptData } from "../page/utils/encrypt";
 import Snackbars from "../component/Snackbars";
+
+// Query params shared by every dashboard tab
+const SHARED_PARAMS = ["tab", "company_name"];
 
 function TabPanel({ children, value, index, keepMounted = true }) {
     const isActive = value === index;
@@ -47,6 +51,11 @@ function TabPanel({ children, value, index, keepMounted = true }) {
 
 const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, current }) => {
     const [searchParams, setSearchParams] = useSearchParams();
+    // The active tab lives in the URL (?tab=<slug>) so refresh, shared links and back/forward keep it.
+    // Dashboards keep their filters in the same query string, so each tab's filters are parked when
+    // leaving it and restored when coming back; tab and company are shared by all tabs.
+    const activeSlug = searchParams.get("tab");
+    const tabFiltersRef = useRef({});
 
     /* STATES */
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
@@ -320,15 +329,29 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
-                    isActive={searchParams.get("tab") === "challan"}
+                    isActive={activeSlug === "challan"}
+                />
+            )
+        },
+        {
+            label: "Registers",
+            slug: "register",
+            title: "Register Dashboard",
+            content: (
+                <RegisterDashboard
+                    selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    isActive={activeSlug === "register"}
                 />
             )
         }
     );
 
-    // The active tab lives in the URL (?tab=<slug>) so refresh, shared links and back/forward keep it
-    const tabParam = searchParams.get("tab");
-    const activeIndex = Math.max(0, tabsList.findIndex((t) => t.slug === tabParam));
+    const activeIndex = Math.max(0, tabsList.findIndex((t) => t.slug === activeSlug));
 
     useEffect(() => {
         setActiveTitle(tabsList[activeIndex]?.title || "");
@@ -336,9 +359,18 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
     }, [activeIndex, userType]);
 
     const handleTabChange = (event, newValue) => {
+        const fromSlug = tabsList[activeIndex].slug;
+        const toSlug = tabsList[newValue].slug;
         setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            next.set("tab", tabsList[newValue].slug);
+            // Park the current tab's filters and bring back the ones the target tab had
+            const own = new URLSearchParams(prev);
+            SHARED_PARAMS.forEach((key) => own.delete(key));
+            tabFiltersRef.current[fromSlug] = own.toString();
+
+            const next = new URLSearchParams();
+            next.set("tab", toSlug);
+            if (prev.get("company_name")) next.set("company_name", prev.get("company_name"));
+            new URLSearchParams(tabFiltersRef.current[toSlug] || "").forEach((value, key) => next.set(key, value));
             return next;
         });
     };

@@ -1,6 +1,6 @@
-/* Challan Dashboard */
+/* Tracker dashboard widgets (Challan, Register) */
 
-.challan-filter-bar {
+.dw-filter-bar {
     background: white;
     border-radius: 16px;
     padding: 16px 20px;
@@ -8,48 +8,48 @@
     margin-bottom: 1.5rem;
 }
 
-.challan-kpi-grid {
+.dw-kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px;
 }
 
-.challan-kpi {
+.dw-kpi {
     border: 1px solid #f1f5f9;
     border-radius: 12px;
     padding: 14px 16px;
     background: #fafafa;
 }
 
-.challan-kpi.clickable {
+.dw-kpi.clickable {
     cursor: pointer;
 }
 
-.challan-kpi.clickable:hover {
+.dw-kpi.clickable:hover {
     border-color: #14b8a6;
 }
 
-.challan-kpi-label {
+.dw-kpi-label {
     font-size: 0.8rem;
     color: #6b7280;
     margin-bottom: 4px;
 }
 
-.challan-kpi-value {
+.dw-kpi-value {
     font-size: 1.35rem;
     font-weight: 700;
     color: #111827;
 }
 
-.challan-kpi-value.danger {
+.dw-kpi-value.danger {
     color: #dc2626;
 }
 
-.challan-kpi-value.warning {
+.dw-kpi-value.warning {
     color: #d97706;
 }
 
-.challan-badge {
+.dw-badge {
     display: inline-block;
     padding: 2px 10px;
     border-radius: 999px;
@@ -59,45 +59,55 @@
     line-height: 1.6;
 }
 
-.challan-badge.complied {
+.dw-badge.complied {
     background: #ccfbf1;
     color: #0f766e;
 }
 
-.challan-badge.non-complied {
+.dw-badge.non-complied {
     background: #fee2e2;
     color: #b91c1c;
 }
 
-.challan-badge.overdue,
-.challan-badge.data-issue {
+.dw-badge.overdue,
+.dw-badge.data-issue {
     background: #fef3c7;
     color: #92400e;
 }
 
-.challan-badge.exception {
+.dw-badge.pending {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.dw-badge.neutral {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.dw-badge.exception {
     background: #fee2e2;
     color: #b91c1c;
 }
 
-.challan-badge.clickable {
+.dw-badge.clickable {
     cursor: pointer;
 }
 
 /* Location x month grid */
-.challan-loc-grid-wrap {
+.dw-loc-grid-wrap {
     overflow: auto;
     max-height: 520px;
 }
 
-.challan-loc-grid {
+.dw-loc-grid {
     border-collapse: separate;
     border-spacing: 4px;
     width: 100%;
     font-size: 13px;
 }
 
-.challan-loc-grid th {
+.dw-loc-grid th {
     position: sticky;
     top: 0;
     background: white;
@@ -108,48 +118,34 @@
     z-index: 1;
 }
 
-.challan-loc-grid th:first-child,
-.challan-loc-grid td:first-child {
+.dw-loc-grid th:first-child,
+.dw-loc-grid td:first-child {
     text-align: left;
     white-space: nowrap;
 }
 
-.challan-loc-grid .state-row td {
+.dw-loc-grid .state-row td {
     font-weight: 600;
     color: #0f766e;
     padding-top: 10px;
 }
 
-.challan-loc-cell {
+.dw-loc-cell {
     text-align: center;
     border-radius: 6px;
     padding: 6px 4px;
     min-width: 80px;
 }
 
-.challan-loc-cell.complied {
-    background: #14b8a6;
-    color: white;
+.dw-loc-cell.clickable {
     cursor: pointer;
 }
 
-.challan-loc-cell.partial {
-    background: #fbbf24;
-    color: #422006;
-    cursor: pointer;
-}
-
-.challan-loc-cell.non_complied {
-    background: #f87171;
-    color: white;
-    cursor: pointer;
-}
-
-.challan-loc-cell.empty {
+.dw-loc-cell.empty {
     background: #f3f4f6;
 }
 
-.challan-legend {
+.dw-legend {
     display: flex;
     gap: 12px;
     font-size: 12px;
@@ -157,7 +153,7 @@
     flex-wrap: wrap;
 }
 
-.challan-legend span::before {
+.dw-legend span::before {
     content: "";
     display: inline-block;
     width: 10px;
@@ -168,18 +164,18 @@
 }
 
 /* Record detail timeline */
-.challan-timeline {
+.dw-timeline {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.challan-timeline li {
+.dw-timeline li {
     position: relative;
     padding: 0 0 16px 28px;
 }
 
-.challan-timeline li::before {
+.dw-timeline li::before {
     content: "";
     position: absolute;
     left: 7px;
@@ -189,11 +185,11 @@
     background: #e5e7eb;
 }
 
-.challan-timeline li:last-child::before {
+.dw-timeline li:last-child::before {
     display: none;
 }
 
-.challan-timeline .dot {
+.dw-timeline .dot {
     position: absolute;
     left: 0;
     top: 3px;
@@ -204,42 +200,51 @@
     border: 3px solid #ccfbf1;
 }
 
-.challan-timeline li.pending .dot {
+.dw-timeline li.pending .dot {
     background: #d1d5db;
     border-color: #f3f4f6;
 }
 
-.challan-timeline li.deadline .dot {
+.dw-timeline li.deadline .dot {
     background: white;
     border: 2px dashed #d97706;
     border-radius: 3px;
 }
 
-.challan-timeline li.deadline .step-label {
+.dw-timeline li.deadline .step-label {
     color: #d97706;
 }
 
-.challan-timeline li.out-of-order .dot {
+.dw-timeline li.marker .dot {
+    background: white;
+    border: 2px solid #6366f1;
+}
+
+.dw-timeline li.marker .step-label {
+    color: #4f46e5;
+}
+
+.dw-timeline li.out-of-order .dot {
     background: #dc2626;
     border-color: #fee2e2;
 }
 
-.challan-timeline .step-label {
+.dw-timeline .step-label {
     font-weight: 600;
     font-size: 14px;
 }
 
-.challan-timeline .step-meta {
+.dw-timeline .step-meta {
     font-size: 12px;
     color: #6b7280;
 }
 
-.challan-timeline li.out-of-order .step-meta {
+.dw-timeline li.out-of-order .step-meta {
     color: #dc2626;
     font-weight: 600;
 }
 
-.challan-state-message {
+.dw-state-message {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -250,7 +255,51 @@
     gap: 8px;
 }
 
-.challan-state-message h5 {
+.dw-state-message h5 {
     color: #374151;
     margin: 0;
+}
+
+/* Horizontal share bar, e.g. coverage completed / in progress / not started */
+.dw-share-bar {
+    display: flex;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.dw-share-bar > span {
+    height: 100%;
+}
+
+.dw-share-bar.clickable > span {
+    cursor: pointer;
+}
+
+.dw-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+}
+
+.dw-progress-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+
+.dw-progress-track > span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+}
+
+.dw-progress-label {
+    min-width: 58px;
+    text-align: right;
+    font-size: 12px;
 }

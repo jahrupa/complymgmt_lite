@@ -1,8 +1,8 @@
 import React from "react";
 
 // Same select checkbox behaviour as the helpdesk chart cards, plus loading / empty states.
-// `selection` comes from ChallanDashboard's cardSelection(id).
-const ChallanCard = ({
+// `selection` comes from the dashboard's cardSelection(id).
+const DashboardCard = ({
     selection,
     title,
     subtitle,
@@ -53,4 +53,4 @@ const ChallanCard = ({
     );
 };
 
-export default ChallanCard;
+export default DashboardCard;

@@ -1,21 +1,20 @@
 import React, { useMemo } from "react";
 import PaginatedGrid from "../../component/PaginatedGrid";
 import DashboardCard from "../common/DashboardCard";
-import StatusBadges from "./StatusBadges";
 import ChipList from "../common/ChipList";
-import { fetchChallanExceptions } from "../../api/service";
-import { ACT_KEY } from "./challanUtils";
+import { fetchRegisterDashExceptions } from "../../api/service";
+import { ExecutionBadges } from "./RegisterBadges";
 
-// CH-6: server paginated list of rows needing attention, most severe first
+// RG-9: server paginated list of rows needing attention, most urgent first
 const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, onView }) => {
     const columnDefs = useMemo(
         () => [
             { headerName: "Company", field: "company", minWidth: 170, hide: isCompanyMode },
-            { headerName: "State", field: "state", minWidth: 120 },
             { headerName: "Location", field: "location", minWidth: 170 },
-            { headerName: "Act", field: "act", width: 90, flex: 0 },
-            { headerName: "Wage Month", field: "wage_month", width: 120, flex: 0 },
-            { headerName: "Status", field: "computed", width: 200, flex: 0, cellRenderer: (p) => <StatusBadges computed={p.value} /> },
+            { headerName: "Register", field: "register", minWidth: 180 },
+            { headerName: "Form", field: "form", width: 110, flex: 0 },
+            { headerName: "Month", field: "month", width: 110, flex: 0 },
+            { headerName: "Status", field: "computed", width: 260, flex: 0, cellRenderer: (p) => <ExecutionBadges computed={p.value} /> },
             { headerName: "Exceptions", field: "exceptions", minWidth: 320, flex: 3, cellRenderer: (p) => <ChipList value={p.value} className="exception" /> },
             {
                 headerName: "",
@@ -39,7 +38,7 @@ const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, on
             selection={selection}
             loading={loading}
             title="Needs Attention"
-            subtitle={`${total ?? 0} exceptions: non-complied, paid late, overdue, skipped employees or penalty`}
+            subtitle={`${total ?? 0} exceptions: overdue, SLA missed or variance open`}
             isEmpty={!total}
             emptyText="No exceptions for the selected filters"
             minHeight={200}
@@ -48,15 +47,15 @@ const ExceptionsWidget = ({ selection, loading, params, total, isCompanyMode, on
                 <PaginatedGrid
                     // a new key restarts paging from page 1 when the filters change
                     key={JSON.stringify(params)}
-                    fetchPage={(page, limit) => fetchChallanExceptions(params, page, limit)}
+                    fetchPage={(page, limit) => fetchRegisterDashExceptions({ ...params, page, limit })}
                     getRows={(res) =>
                         (res?.data || []).map((row) => ({
                             _id: row._id,
                             company: row.record?.company_name,
-                            state: row.record?.state,
                             location: row.record?.location,
-                            act: row.record?.[ACT_KEY],
-                            wage_month: row.computed?.month_label || row.record?.wage_month,
+                            register: row.record?.register_name,
+                            form: row.record?.form_id,
+                            month: row.computed?.month_label,
                             computed: row.computed,
                             exceptions: row.computed?.exceptions || [],
                         }))

@@ -8,13 +8,37 @@ import LaptopMinimalCheck from "../assets/compliance-cockpit.png";
 import ComplianceCpckpitTabs from "../component/ComplianceCpckpitTabs";
 import NavigationTabs from "../dashboards/NavigationTabs";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { fetchAllCompanies, fetchAllUser } from "../api/service";
 import { decryptData } from "./utils/encrypt";
 
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState(""); // single selected value
+  const [searchParams, setSearchParams] = useSearchParams();
+  // The selected company is kept in the URL (?company_name=) so dashboard views are shareable
+  const urlCompany = searchParams.get("company_name") || "";
+  const [selectedCompany, setSelectedCompany] = useState(urlCompany); // single selected value
+  const syncedCompanyRef = useRef(urlCompany);
+
+  // URL changed from outside (back/forward, a pasted link): follow it
+  useEffect(() => {
+    if (urlCompany === syncedCompanyRef.current) return;
+    syncedCompanyRef.current = urlCompany;
+    setSelectedCompany(urlCompany);
+  }, [urlCompany]);
+
+  // Company picked in the page: write it to the URL
+  useEffect(() => {
+    if (selectedCompany === syncedCompanyRef.current) return;
+    syncedCompanyRef.current = selectedCompany;
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (selectedCompany) next.set("company_name", selectedCompany);
+      else next.delete("company_name");
+      return next;
+    });
+  }, [selectedCompany, setSearchParams]);
   const [activeTitle, setActiveTitle] = useState(""); // header title of the active dashboard tab
   const [current, setCurrent] = useState({});
   const [allUser, setAllUser] = useState([]);
