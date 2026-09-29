@@ -28,8 +28,9 @@ const toDisplayDate = (d, m, y) => {
     return `${String(d).padStart(2, "0")} ${MONTHS[month - 1]} ${y}`;
 };
 
-// Uploaded values are raw strings. Dates come as m/d/yyyy (challan) or mm-dd-yy (register) and are
-// shown as dd MMM yyyy; "-" means empty. Anything else is returned unchanged.
+// Uploaded values are raw strings. Dates come as m/d/yyyy (challan), mm-dd-yy (register),
+// yyyy-mm-dd or d-Mon-yy (returns) and are shown as dd MMM yyyy; "-" means empty. Anything else,
+// including notes typed into date columns, is returned unchanged.
 export const formatRawValue = (val) => {
     const str = String(val ?? "").trim();
     if (str === "" || str === "-") return "—";
@@ -37,6 +38,14 @@ export const formatRawValue = (val) => {
     if (match) return toDisplayDate(match[2], match[1], match[3]) || str;
     match = /^(\d{1,2})-(\d{1,2})-(\d{2})$/.exec(str);
     if (match) return toDisplayDate(match[2], match[1], `20${match[3]}`) || str;
+    match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+    if (match) return toDisplayDate(match[3], match[2], match[1]) || str;
+    match = /^(\d{1,2})-([A-Za-z]{3})-(\d{2}|\d{4})$/.exec(str);
+    if (match) {
+        const month = MONTHS.findIndex((m) => m.toLowerCase() === match[2].toLowerCase()) + 1;
+        const year = match[3].length === 2 ? `20${match[3]}` : match[3];
+        return (month && toDisplayDate(match[1], month, year)) || str;
+    }
     return str;
 };
 

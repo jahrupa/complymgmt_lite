@@ -11,6 +11,8 @@ import DashboardCard from "./DashboardCard";
  * - cellTooltip(cell)     tooltip content
  * - stateText(state)      summary next to a state heading (state summary row from the API)
  * - overallText(loc)      last column
+ * - locationBadge(loc)     optional badge after the location name
+ * - blankEmptyCells        leave months without a row blank instead of grey (sparse data)
  * - onCellClick(loc, month) / onLocationClick(loc)
  */
 const LocationMonthGrid = ({
@@ -27,6 +29,8 @@ const LocationMonthGrid = ({
     cellTooltip,
     stateText,
     overallText,
+    locationBadge,
+    blankEmptyCells = false,
     onCellClick,
     onLocationClick,
 }) => {
@@ -51,7 +55,7 @@ const LocationMonthGrid = ({
                     {Object.entries(statuses).map(([key, s]) => (
                         <span key={key} style={{ "--swatch": s.bg }}>{s.label}</span>
                     ))}
-                    <span style={{ "--swatch": "#f3f4f6" }}>No row</span>
+                    {!blankEmptyCells && <span style={{ "--swatch": "#f3f4f6" }}>No row</span>}
                 </div>
             }
         >
@@ -84,10 +88,11 @@ const LocationMonthGrid = ({
                                             <span role="button" className="text-decoration-underline" onClick={() => onLocationClick(loc)}>
                                                 {loc.location}
                                             </span>
+                                            {locationBadge && <span className="ms-2">{locationBadge(loc)}</span>}
                                         </td>
                                         {months.map((m) => {
                                             const cell = loc.months?.[m.month];
-                                            if (!cell) return <td key={m.month} className="dw-loc-cell empty" />;
+                                            if (!cell) return <td key={m.month} className={`dw-loc-cell ${blankEmptyCells ? "" : "empty"}`} />;
                                             const style = statuses[cell.status] || { bg: "#e5e7eb", color: "#374151" };
                                             return (
                                                 <Tooltip key={m.month} title={cellTooltip(cell)}>

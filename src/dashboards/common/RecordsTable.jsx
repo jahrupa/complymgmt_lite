@@ -21,6 +21,7 @@ const loadVisibleColumns = (storageKey, defaults) => {
  * - fetchPage(page, limit, sort)  sort is { sort_by, sort_order } or {} for the default order
  * - columns                      [{ key, label, section }] from the API; hidden fields are simply missing
  * - computedColumns              extra columns read from row.computed, e.g. { key: "days_late", label, section, after }
+ * - labelOverrides               column key -> label to use instead of the API label
  * - sortByForColumn              column key -> backend sort_by value; other columns are not sortable
  * - renderStatus(computed)       status badges
  * - gridKey                      a change restarts paging from page 1 (e.g. the filter JSON)
@@ -38,6 +39,7 @@ const RecordsTable = forwardRef(function RecordsTable(
         columns,
         computedColumns = [],
         defaultColumns,
+        labelOverrides,
         storageKey,
         sortByForColumn,
         renderStatus,
@@ -52,14 +54,16 @@ const RecordsTable = forwardRef(function RecordsTable(
 
     // Computed columns go after the column named in `after`, or at the end
     const allColumns = useMemo(() => {
-        const result = [...(columns || [])];
+        const result = (columns || []).map((col) =>
+            labelOverrides?.[col.key] ? { ...col, label: labelOverrides[col.key] } : col
+        );
         computedColumns.forEach((col) => {
             const index = col.after ? result.findIndex((c) => c.key === col.after) : -1;
             if (index === -1) result.push(col);
             else result.splice(index + 1, 0, col);
         });
         return result;
-    }, [columns, computedColumns]);
+    }, [columns, computedColumns, labelOverrides]);
     const computedKeys = useMemo(() => new Set(computedColumns.map((c) => c.key)), [computedColumns]);
 
     const toggleColumn = (key) => {

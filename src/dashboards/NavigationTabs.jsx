@@ -26,7 +26,7 @@ import CockpitComplince from "./cockpitDashboard/CockpitComplince";
 import ClientOnbordingDashboard from "./clientOnbordingDashboard/ClientOnbordingDashboard";
 import ClientOnBoardingByCompany from "./clientOnbordingDashboard/ClientOnBoardingByCompany/ClientOnBoardingByCompany";
 import PayrollServices from "./payrollDashboard/PayrollServices";
-import ReturnsAndSubmissions from "./payrollDashboard/ReturnsAndSubmissions";
+import ReturnsDashboard from "./returnsDashboard/ReturnsDashboard";
 import HelpdeskAndEscalations from "./payrollDashboard/HelpdeskAndEscalations";
 import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";
 import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
@@ -240,14 +240,14 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             slug: "returns-submissions",
             title: "Payroll - Returns & Submissions",
             content: (
-                <ReturnsAndSubmissions
+                <ReturnsDashboard
                     selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
-                    activeDrawer={activeDrawer}
-                    setActiveDrawer={setActiveDrawer}
+                    isActive={activeSlug === "returns-submissions"}
                 />
             )
         },

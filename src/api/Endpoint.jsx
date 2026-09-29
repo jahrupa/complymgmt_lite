@@ -184,14 +184,20 @@ export const GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES ='/api/v1/dashboard/v
 export const GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT ='/api/v1/dashboard/view/helpdesk/client/delay/flag'
 export const GET_TOTAL_DELAY_FLAGS_BY_GOVT ='/api/v1/dashboard/view/helpdesk/govt/delay/flag'
 
-// Returns and Submissions
-export const GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME ='/api/v1/dashboard/view/returns/applicability/company'
-export const GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS ='/api/v1/dashboard/view/returns/state/applicable'
-export const GET_FREQUENCY_WISE_RETURNS ='/api/v1/dashboard/view/returns/frequency/distribution/returns'
-export const GET_COMPANIES_PER_RETURNS_NAMES ='/api/v1/dashboard/view/returns/company/per/returns'
-export const GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE ='/api/v1/dashboard/view/returns/compliance/risk/ditribution/state'
-export const GET_COMPLIANCE_STATUS_BASED_ON_RETURNS ='/api/v1/dashboard/view/returns/compliance/status/based/returns'
-export const GET_REMARKS_BASED_ON_COMPANY ='/api/v1/dashboard/view/returns/remarks/based/company'
+// Returns Dashboard (tracker based)
+export const GET_RETURNS_DASH_FILTERS ='/api/v1/dashboard/view/returns/filters';
+export const GET_RETURNS_DASH_SUMMARY ='/api/v1/dashboard/view/returns/summary';
+export const GET_RETURNS_DASH_COMPANY_WISE ='/api/v1/dashboard/view/returns/company-wise';
+export const GET_RETURNS_DASH_TREND ='/api/v1/dashboard/view/returns/trend';
+export const GET_RETURNS_DASH_PERIOD_WISE ='/api/v1/dashboard/view/returns/period-wise';
+export const GET_RETURNS_DASH_RETURN_WISE ='/api/v1/dashboard/view/returns/return-wise';
+export const GET_RETURNS_DASH_ACT_WISE ='/api/v1/dashboard/view/returns/act-wise';
+export const GET_RETURNS_DASH_LOCATION_WISE ='/api/v1/dashboard/view/returns/location-wise';
+export const GET_RETURNS_DASH_TURNAROUND ='/api/v1/dashboard/view/returns/turnaround';
+export const GET_RETURNS_DASH_EXCEPTIONS ='/api/v1/dashboard/view/returns/exceptions';
+export const GET_RETURNS_DASH_COVERAGE ='/api/v1/dashboard/view/returns/coverage';
+export const GET_RETURNS_DASH_RECORDS ='/api/v1/dashboard/view/returns/records';
+export const GET_RETURNS_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/returns/records/';
 
 // Audit & Visits
 export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/type'
