@@ -23,7 +23,9 @@ const loadVisibleColumns = (storageKey, defaults) => {
  * - computedColumns              extra columns read from row.computed, e.g. { key: "days_late", label, section, after }
  * - labelOverrides               column key -> label to use instead of the API label
  * - sortByForColumn              column key -> backend sort_by value; other columns are not sortable
+ *                                ("__status" makes the status column sortable)
  * - renderStatus(computed)       status badges
+ * - statusHeader                 header of the badge column (default "Status")
  * - gridKey                      a change restarts paging from page 1 (e.g. the filter JSON)
  */
 const RecordsTable = forwardRef(function RecordsTable(
@@ -43,6 +45,7 @@ const RecordsTable = forwardRef(function RecordsTable(
         storageKey,
         sortByForColumn,
         renderStatus,
+        statusHeader = "Status",
         fetchPage,
         gridKey,
         onView,
@@ -84,11 +87,13 @@ const RecordsTable = forwardRef(function RecordsTable(
             ...(renderStatus
                 ? [
                       {
-                          headerName: "Status",
-                          colId: "status",
+                          headerName: statusHeader,
+                          // "__status" so it can't clash with a record column named "status"
+                          colId: "__status",
                           width: 230,
                           flex: 0,
                           pinned: "left",
+                          sortable: Boolean(sortByForColumn.__status),
                           cellRenderer: (p) => (p.data ? renderStatus(p.data._computed) : null),
                       },
                   ]
@@ -117,7 +122,7 @@ const RecordsTable = forwardRef(function RecordsTable(
                     ) : null,
             },
         ],
-        [allColumns, computedKeys, visible, sortByForColumn, renderStatus, onView]
+        [allColumns, computedKeys, visible, sortByForColumn, renderStatus, statusHeader, onView]
     );
 
     // Group picker entries by their section, keeping the Excel order

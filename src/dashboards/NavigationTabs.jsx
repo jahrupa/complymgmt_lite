@@ -33,6 +33,7 @@ import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
 import ChallanDashboard from "./challanDashboard/ChallanDashboard";
 import RegisterDashboard from "./registerDashboard/RegisterDashboard";
+import LicenseDashboard from "./licenseDashboard/LicenseDashboard";
 import { decryptData } from "../page/utils/encrypt";
 import Snackbars from "../component/Snackbars";
 
@@ -346,6 +347,22 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     isActive={activeSlug === "register"}
+                />
+            )
+        },
+        {
+            label: "Licenses",
+            slug: "license",
+            title: "License Dashboard",
+            content: (
+                <LicenseDashboard
+                    selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    isActive={activeSlug === "license"}
                 />
             )
         }

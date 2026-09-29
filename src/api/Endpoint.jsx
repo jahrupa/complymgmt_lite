@@ -199,6 +199,19 @@ export const GET_RETURNS_DASH_COVERAGE ='/api/v1/dashboard/view/returns/coverage
 export const GET_RETURNS_DASH_RECORDS ='/api/v1/dashboard/view/returns/records';
 export const GET_RETURNS_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/returns/records/';
 
+// License Dashboard
+export const GET_LICENSE_DASH_FILTERS ='/api/v1/dashboard/view/license/filters';
+export const GET_LICENSE_DASH_SUMMARY ='/api/v1/dashboard/view/license/summary';
+export const GET_LICENSE_DASH_COMPANY_WISE ='/api/v1/dashboard/view/license/company-wise';
+export const GET_LICENSE_DASH_BREAKDOWN ='/api/v1/dashboard/view/license/breakdown';
+export const GET_LICENSE_DASH_LOCATION_WISE ='/api/v1/dashboard/view/license/location-wise';
+export const GET_LICENSE_DASH_EXPIRY_TIMELINE ='/api/v1/dashboard/view/license/expiry-timeline';
+export const GET_LICENSE_DASH_TREND ='/api/v1/dashboard/view/license/trend';
+export const GET_LICENSE_DASH_TURNAROUND ='/api/v1/dashboard/view/license/turnaround';
+export const GET_LICENSE_DASH_EXCEPTIONS ='/api/v1/dashboard/view/license/exceptions';
+export const GET_LICENSE_DASH_RECORDS ='/api/v1/dashboard/view/license/records';
+export const GET_LICENSE_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/license/records/';
+
 // Audit & Visits
 export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/type'
 export const GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED ='/api/v1/dashboard/view/audit/platforms/count'

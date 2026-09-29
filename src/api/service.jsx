@@ -185,6 +185,17 @@ import {
   GET_RETURNS_DASH_COVERAGE,
   GET_RETURNS_DASH_RECORDS,
   GET_RETURNS_DASH_RECORD_BY_ID,
+  GET_LICENSE_DASH_FILTERS,
+  GET_LICENSE_DASH_SUMMARY,
+  GET_LICENSE_DASH_COMPANY_WISE,
+  GET_LICENSE_DASH_BREAKDOWN,
+  GET_LICENSE_DASH_LOCATION_WISE,
+  GET_LICENSE_DASH_EXPIRY_TIMELINE,
+  GET_LICENSE_DASH_TREND,
+  GET_LICENSE_DASH_TURNAROUND,
+  GET_LICENSE_DASH_EXCEPTIONS,
+  GET_LICENSE_DASH_RECORDS,
+  GET_LICENSE_DASH_RECORD_BY_ID,
   GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
   GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
   GET_TOTAL_DELAY_FLAGS_BY_GOVT,
@@ -2373,6 +2384,111 @@ export const fetchReturnsDashRecords = async (params) => {
 export const fetchReturnsDashRecordById = async (id, company_name) => {
   try {
     const response = await API.get(`${GET_RETURNS_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// License Dashboard
+// Only company_name narrows the filter options
+export const fetchLicenseDashFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_LOCATION_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_TREND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_TURNAROUND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// params carry the filters plus `by` (one of filters.breakdowns)
+export const fetchLicenseDashBreakdown = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_BREAKDOWN}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// params carry the filters plus `months` (timeline length from the current month)
+export const fetchLicenseDashExpiryTimeline = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_EXPIRY_TIMELINE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Paginated lists: params carry the filters plus page / limit (and sort for records)
+export const fetchLicenseDashExceptions = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_EXCEPTIONS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashRecords = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_RECORDS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchLicenseDashRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
     return response.data;
   } catch (error) {
     throw error;
