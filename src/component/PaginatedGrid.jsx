@@ -23,7 +23,8 @@ const defaultGetTotal = (response) =>
  * The grid asks for a block of rows and we fetch that page with page & limit.
  *
  * Props:
- *  - fetchPage(page, limit, search)  API call, page starts from 1
+ *  - fetchPage(page, limit, search, sortModel)  API call, page starts from 1;
+ *                             sortModel is AG Grid's [{ colId, sort }] for server side sorting
  *  - search                   search text for the API; a change reloads from page 1
  *  - getRows(response)        pick the rows out of the response
  *  - getTotal(response)       pick the total record count out of the response
@@ -70,13 +71,13 @@ const PaginatedGrid = forwardRef(function PaginatedGrid(
   const dataSource = useMemo(
     () => ({
       getRows: async (params) => {
-        const { startRow, endRow } = params;
+        const { startRow, endRow, sortModel } = params;
         const limit = endRow - startRow;
         const page = startRow / limit + 1; // AG Grid rows are 0 based
         const cb = callbacksRef.current;
 
         try {
-          const response = await cb.fetchPage(page, limit, search);
+          const response = await cb.fetchPage(page, limit, search, sortModel);
           const rows = cb.getRows(response) || [];
           const total = cb.getTotal(response);
 

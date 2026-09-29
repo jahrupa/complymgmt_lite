@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import "../style/statsCards.css";
 import "../style/dashboard.css";
 import { Tabs, Tab, Box } from "@mui/material";
@@ -30,6 +31,7 @@ import HelpdeskAndEscalations from "./payrollDashboard/HelpdeskAndEscalations";
 import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";
 import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
+import ChallanDashboard from "./challanDashboard/ChallanDashboard";
 import { decryptData } from "../page/utils/encrypt";
 import Snackbars from "../component/Snackbars";
 
@@ -43,7 +45,8 @@ function TabPanel({ children, value, index, keepMounted = true }) {
     );
 }
 
-const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) => {
+const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setActiveTab, current }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
 
     /* STATES */
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
@@ -286,11 +289,43 @@ const NavigationTabs = ({ selectedCompany, activeTab, setActiveTab, current }) =
                     setActiveDrawer={setActiveDrawer}
                 />
             )
+        },
+        {
+            label: "Challan",
+            content: (
+                <ChallanDashboard
+                    selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                />
+            )
         }
     );
 
+    // Challan dashboard views are shareable: ?tab=challan opens that tab
+    const challanTabIndex = tabsList.findIndex((t) => t.label === "Challan");
+
+    useEffect(() => {
+        if (searchParams.get("tab") === "challan" && challanTabIndex !== -1) {
+            setActiveTab(challanTabIndex);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- only on first load
+    }, []);
+
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                if (newValue === challanTabIndex) next.set("tab", "challan");
+                else next.delete("tab");
+                return next;
+            },
+            { replace: true }
+        );
     };
 
     useEffect(() => {

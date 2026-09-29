@@ -66,7 +66,9 @@ const DashboardPage = () => {
                             ? "Audit & Visits"
                             : activeTab === 8
                               ? "Notices & Inspections"
-                              : ""}
+                              : activeTab === 9
+                                ? "Challan Dashboard"
+                                : ""}
           </div>
         </div>
         <div className="d-lg-flex d-md-flex justify-content-between"
@@ -132,6 +134,7 @@ const DashboardPage = () => {
 
         <NavigationTabs
           selectedCompany={selectedCompany}
+          setSelectedCompany={setSelectedCompany}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           current={current}

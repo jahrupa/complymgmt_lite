@@ -45,7 +45,9 @@ import Entity from '../page/Entity.jsx';
 
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  // Start from the stored token so a full page load of a protected URL keeps its path and query
+  // string instead of bouncing through "/" to active_url
+  const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(localStorage.getItem('authToken')))
   const [isChangePassword, setIsChangePassword] = useState(false)
   const [unreadCountNotification, setUnreadCountNotification] = useState(0);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
