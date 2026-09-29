@@ -62,6 +62,7 @@ const ChallanDashboard = ({
     selectedCharts,
     setSelectedCharts,
     shouldShow,
+    isActive,
 }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     // Keyed on the filter values only, so writing unrelated params (tab, company_name) doesn't refetch
@@ -81,6 +82,9 @@ const ChallanDashboard = ({
     // Without filters in the URL we default to the last 6 months once the options are known
     const [periodReady, setPeriodReady] = useState(() => hasAnyFilter(searchParams));
     const [period, setPeriod] = useState({ month_from: "", month_to: "" });
+    const [optionsLoaded, setOptionsLoaded] = useState(false);
+    // All tabs stay mounted; don't touch the URL or load widget data until this tab is first opened
+    const [activated, setActivated] = useState(Boolean(isActive));
 
     const recordsRef = useRef(null);
     const requestIdRef = useRef(0);
@@ -143,30 +147,36 @@ const ChallanDashboard = ({
                 if (cancelled) return;
                 const options = res?.data || {};
                 setFilterOptions(options);
-                const def = defaultPeriod(options.wage_months);
-                setPeriod(def);
-                if (!periodReady) {
-                    updateFilters(def, { replace: true });
-                    setPeriodReady(true);
-                }
+                setPeriod(defaultPeriod(options.wage_months));
+                setOptionsLoaded(true);
             })
             .catch((error) => {
                 if (cancelled) return;
                 setFilterOptions({});
                 const status = errorStatus(error);
                 if (selectedCompany && (status === 403 || status === 404)) setAccessError(status);
-                setPeriodReady(true);
+                setOptionsLoaded(true);
             });
         return () => {
             cancelled = true;
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- periodReady is a one-time switch
     }, [selectedCompany, companySynced]);
+
+    useEffect(() => {
+        if (isActive) setActivated(true);
+    }, [isActive]);
+
+    // Default period, applied once when the tab is first opened without filters in the URL
+    useEffect(() => {
+        if (!activated || periodReady || !optionsLoaded) return;
+        if (period.month_from) updateFilters(period, { replace: true });
+        setPeriodReady(true);
+    }, [activated, periodReady, optionsLoaded, period, updateFilters]);
 
     /* ---------- widget data: every widget gets the same filter set ---------- */
 
     const params = useMemo(() => ({ ...filters, company_name: selectedCompany }), [filters, selectedCompany]);
-    const ready = companySynced && periodReady;
+    const ready = activated && companySynced && periodReady;
 
     useEffect(() => {
         if (!ready) return;

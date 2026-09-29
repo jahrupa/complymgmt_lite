@@ -45,7 +45,7 @@ function TabPanel({ children, value, index, keepMounted = true }) {
     );
 }
 
-const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setActiveTab, current }) => {
+const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, current }) => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     /* STATES */
@@ -140,6 +140,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
     const tabsList = [
         {
             label: "Compliance Cockpit",
+            slug: "compliance-cockpit",
+            title: "Compliance Cockpit",
             content:
                 selectedCompany !== "" ? (
                     <CockpitComplinceByCompany 
@@ -166,6 +168,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "General Compliance",
+            slug: "general-compliance",
+            title: "General Compliance",
             content: (
                 <GeneralComplianceDashboard data={generalDashboardData} current={current}
                     selectedCharts={selectedCharts}
@@ -183,6 +187,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
     if (userType === "0") {
         tabsList.push({
             label: "Client Onboarding",
+            slug: "client-onboarding",
+            title: "Client Onboarding",
             content:
                 selectedCompany === "" ? (
                     <ClientOnbordingDashboard
@@ -206,6 +212,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
     tabsList.push(
         {
             label: "Payroll Services",
+            slug: "payroll-services",
+            title: "Payroll",
             content: (
                 <PayrollServices
                     selectedCompany={selectedCompany}
@@ -220,6 +228,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Returns & Submissions",
+            slug: "returns-submissions",
+            title: "Payroll - Returns & Submissions",
             content: (
                 <ReturnsAndSubmissions
                     selectedCompany={selectedCompany}
@@ -234,6 +244,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Helpdesk & Escalations",
+            slug: "helpdesk-escalations",
+            title: "Payroll - Helpdesk & Escalations",
             content: (
                 <HelpdeskAndEscalations
                     selectedCompany={selectedCompany}
@@ -249,6 +261,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "General Helpdesk",
+            slug: "general-helpdesk",
+            title: "Payroll - General Helpdesk",
             content: (
                 <GeneralHelpdesk
                     selectedCompany={selectedCompany}
@@ -263,6 +277,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Audit & Visits",
+            slug: "audit-visits",
+            title: "Audit & Visits",
             content: (
                 <AuditAndVisitDashboard
                     selectedCompany={selectedCompany}
@@ -277,6 +293,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Notices & Inspections",
+            slug: "notices-inspections",
+            title: "Notices & Inspections",
             content: (
                 <NoticeDashboard
                     selectedCompany={selectedCompany}
@@ -292,6 +310,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Challan",
+            slug: "challan",
+            title: "Challan Dashboard",
             content: (
                 <ChallanDashboard
                     selectedCompany={selectedCompany}
@@ -300,32 +320,27 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    isActive={searchParams.get("tab") === "challan"}
                 />
             )
         }
     );
 
-    // Challan dashboard views are shareable: ?tab=challan opens that tab
-    const challanTabIndex = tabsList.findIndex((t) => t.label === "Challan");
+    // The active tab lives in the URL (?tab=<slug>) so refresh, shared links and back/forward keep it
+    const tabParam = searchParams.get("tab");
+    const activeIndex = Math.max(0, tabsList.findIndex((t) => t.slug === tabParam));
 
     useEffect(() => {
-        if (searchParams.get("tab") === "challan" && challanTabIndex !== -1) {
-            setActiveTab(challanTabIndex);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- only on first load
-    }, []);
+        setActiveTitle(tabsList[activeIndex]?.title || "");
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- tabsList is rebuilt every render
+    }, [activeIndex, userType]);
 
     const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
-        setSearchParams(
-            (prev) => {
-                const next = new URLSearchParams(prev);
-                if (newValue === challanTabIndex) next.set("tab", "challan");
-                else next.delete("tab");
-                return next;
-            },
-            { replace: true }
-        );
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set("tab", tabsList[newValue].slug);
+            return next;
+        });
     };
 
     useEffect(() => {
@@ -415,7 +430,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <Tabs
-                value={activeTab}
+                value={activeIndex}
                 onChange={handleTabChange}
                 variant="scrollable"
                 scrollButtons="auto"
@@ -427,7 +442,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
 
             <Box sx={{ marginTop: 2 }}>
                 {tabsList.map((tab, index) => (
-                    <TabPanel key={index} value={activeTab} index={index} keepMounted>
+                    <TabPanel key={index} value={activeIndex} index={index} keepMounted>
                         {tab.content}
                     </TabPanel>
                 ))}
