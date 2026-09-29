@@ -1,8 +1,8 @@
 import React from "react";
 import Chart from "react-apexcharts";
 import { Tooltip } from "@mui/material";
-import ChallanCard from "./ChallanCard";
-import { formatINR, formatINRShort, formatPercent } from "./challanUtils";
+import DashboardCard from "../common/DashboardCard";
+import { formatINR, formatINRShort, formatPercent } from "../common/dashboardUtils";
 
 const STATUS_COLORS = ["#14b8a6", "#f87171", "#fbbf24", "#99f6e4"];
 
@@ -91,7 +91,7 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
         .join(" · ");
 
     return (
-        <ChallanCard
+        <DashboardCard
             selection={selection}
             title="Challan Summary"
             subtitle={isEmpty ? "" : scope}
@@ -101,7 +101,7 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
             actions={
                 s.data_issues > 0 && (
                     <Tooltip title="Process dates entered out of order, e.g. checklist prepared before data received. This is a data quality problem, not non-compliance. Click to view these rows.">
-                        <span className="challan-badge data-issue clickable" onClick={() => onDrill({ data_issues_only: "true" })}>
+                        <span className="dw-badge data-issue clickable" onClick={() => onDrill({ data_issues_only: "true" })}>
                             Data quality: {s.data_issues} rows with data issues
                         </span>
                     </Tooltip>
@@ -110,11 +110,11 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
         >
             <div className="row g-3 align-items-center">
                 <div className="col-lg-9">
-                    <div className="challan-kpi-grid">
+                    <div className="dw-kpi-grid">
                         {tiles.map((t) => (
                             <Tooltip key={t.label} title={t.hint || ""}>
                                 <div
-                                    className={`challan-kpi ${t.drill ? "clickable" : ""}`}
+                                    className={`dw-kpi ${t.drill ? "clickable" : ""}`}
                                     onClick={
                                         t.drill
                                             ? (e) => {
@@ -124,8 +124,8 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
                                             : undefined
                                     }
                                 >
-                                    <div className="challan-kpi-label">{t.label}</div>
-                                    <div className={`challan-kpi-value ${t.tone || ""}`}>{t.value}</div>
+                                    <div className="dw-kpi-label">{t.label}</div>
+                                    <div className={`dw-kpi-value ${t.tone || ""}`}>{t.value}</div>
                                 </div>
                             </Tooltip>
                         ))}
@@ -135,7 +135,7 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
                     {byStatus.length > 0 && <Chart options={donut.options} series={donut.series} type="donut" height={220} />}
                 </div>
             </div>
-        </ChallanCard>
+        </DashboardCard>
     );
 };
 

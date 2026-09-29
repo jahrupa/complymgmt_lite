@@ -232,6 +232,21 @@ export const GET_CHALLAN_EXCEPTIONS ='/api/v1/dashboard/view/challan/exceptions'
 export const GET_CHALLAN_RECORDS ='/api/v1/dashboard/view/challan/records';
 export const GET_CHALLAN_RECORD_BY_ID ='/api/v1/dashboard/view/challan/records/';
 
+// Register Dashboard
+export const GET_REGISTER_DASH_FILTERS ='/api/v1/dashboard/view/register/filters';
+export const GET_REGISTER_DASH_SUMMARY ='/api/v1/dashboard/view/register/summary';
+export const GET_REGISTER_DASH_COMPANY_WISE ='/api/v1/dashboard/view/register/company-wise';
+export const GET_REGISTER_DASH_TREND ='/api/v1/dashboard/view/register/trend';
+export const GET_REGISTER_DASH_REGISTER_WISE ='/api/v1/dashboard/view/register/register-wise';
+export const GET_REGISTER_DASH_ACT_WISE ='/api/v1/dashboard/view/register/act-wise';
+export const GET_REGISTER_DASH_LOCATION_WISE ='/api/v1/dashboard/view/register/location-wise';
+export const GET_REGISTER_DASH_TURNAROUND ='/api/v1/dashboard/view/register/turnaround';
+export const GET_REGISTER_DASH_VARIANCE ='/api/v1/dashboard/view/register/variance';
+export const GET_REGISTER_DASH_EXCEPTIONS ='/api/v1/dashboard/view/register/exceptions';
+export const GET_REGISTER_DASH_COVERAGE ='/api/v1/dashboard/view/register/coverage';
+export const GET_REGISTER_DASH_RECORDS ='/api/v1/dashboard/view/register/records';
+export const GET_REGISTER_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/register/records/';
+
 // Dashboard Widget Mappings
 export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
 export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';

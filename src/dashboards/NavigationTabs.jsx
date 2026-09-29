@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../style/statsCards.css";
 import "../style/dashboard.css";
@@ -32,8 +32,12 @@ import GeneralHelpdesk from "./payrollDashboard/GeneralHelpdesk";
 import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
 import ChallanDashboard from "./challanDashboard/ChallanDashboard";
+import RegisterDashboard from "./registerDashboard/RegisterDashboard";
 import { decryptData } from "../page/utils/encrypt";
 import Snackbars from "../component/Snackbars";
+
+// Query params shared by every dashboard tab
+const SHARED_PARAMS = ["tab", "company_name"];
 
 function TabPanel({ children, value, index, keepMounted = true }) {
     const isActive = value === index;
@@ -45,8 +49,13 @@ function TabPanel({ children, value, index, keepMounted = true }) {
     );
 }
 
-const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setActiveTab, current }) => {
+const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, current }) => {
     const [searchParams, setSearchParams] = useSearchParams();
+    // The active tab lives in the URL (?tab=<slug>) so refresh, shared links and back/forward keep it.
+    // Dashboards keep their filters in the same query string, so each tab's filters are parked when
+    // leaving it and restored when coming back; tab and company are shared by all tabs.
+    const activeSlug = searchParams.get("tab");
+    const tabFiltersRef = useRef({});
 
     /* STATES */
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
@@ -140,6 +149,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
     const tabsList = [
         {
             label: "Compliance Cockpit",
+            slug: "compliance-cockpit",
+            title: "Compliance Cockpit",
             content:
                 selectedCompany !== "" ? (
                     <CockpitComplinceByCompany 
@@ -166,6 +177,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "General Compliance",
+            slug: "general-compliance",
+            title: "General Compliance",
             content: (
                 <GeneralComplianceDashboard data={generalDashboardData} current={current}
                     selectedCharts={selectedCharts}
@@ -183,6 +196,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
     if (userType === "0") {
         tabsList.push({
             label: "Client Onboarding",
+            slug: "client-onboarding",
+            title: "Client Onboarding",
             content:
                 selectedCompany === "" ? (
                     <ClientOnbordingDashboard
@@ -206,6 +221,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
     tabsList.push(
         {
             label: "Payroll Services",
+            slug: "payroll-services",
+            title: "Payroll",
             content: (
                 <PayrollServices
                     selectedCompany={selectedCompany}
@@ -220,6 +237,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Returns & Submissions",
+            slug: "returns-submissions",
+            title: "Payroll - Returns & Submissions",
             content: (
                 <ReturnsAndSubmissions
                     selectedCompany={selectedCompany}
@@ -234,6 +253,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Helpdesk & Escalations",
+            slug: "helpdesk-escalations",
+            title: "Payroll - Helpdesk & Escalations",
             content: (
                 <HelpdeskAndEscalations
                     selectedCompany={selectedCompany}
@@ -249,6 +270,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "General Helpdesk",
+            slug: "general-helpdesk",
+            title: "Payroll - General Helpdesk",
             content: (
                 <GeneralHelpdesk
                     selectedCompany={selectedCompany}
@@ -263,6 +286,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Audit & Visits",
+            slug: "audit-visits",
+            title: "Audit & Visits",
             content: (
                 <AuditAndVisitDashboard
                     selectedCompany={selectedCompany}
@@ -277,6 +302,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Notices & Inspections",
+            slug: "notices-inspections",
+            title: "Notices & Inspections",
             content: (
                 <NoticeDashboard
                     selectedCompany={selectedCompany}
@@ -292,6 +319,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
         },
         {
             label: "Challan",
+            slug: "challan",
+            title: "Challan Dashboard",
             content: (
                 <ChallanDashboard
                     selectedCompany={selectedCompany}
@@ -300,32 +329,50 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
+                    isActive={activeSlug === "challan"}
+                />
+            )
+        },
+        {
+            label: "Registers",
+            slug: "register",
+            title: "Register Dashboard",
+            content: (
+                <RegisterDashboard
+                    selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    isActive={activeSlug === "register"}
                 />
             )
         }
     );
 
-    // Challan dashboard views are shareable: ?tab=challan opens that tab
-    const challanTabIndex = tabsList.findIndex((t) => t.label === "Challan");
+    const activeIndex = Math.max(0, tabsList.findIndex((t) => t.slug === activeSlug));
 
     useEffect(() => {
-        if (searchParams.get("tab") === "challan" && challanTabIndex !== -1) {
-            setActiveTab(challanTabIndex);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- only on first load
-    }, []);
+        setActiveTitle(tabsList[activeIndex]?.title || "");
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- tabsList is rebuilt every render
+    }, [activeIndex, userType]);
 
     const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
-        setSearchParams(
-            (prev) => {
-                const next = new URLSearchParams(prev);
-                if (newValue === challanTabIndex) next.set("tab", "challan");
-                else next.delete("tab");
-                return next;
-            },
-            { replace: true }
-        );
+        const fromSlug = tabsList[activeIndex].slug;
+        const toSlug = tabsList[newValue].slug;
+        setSearchParams((prev) => {
+            // Park the current tab's filters and bring back the ones the target tab had
+            const own = new URLSearchParams(prev);
+            SHARED_PARAMS.forEach((key) => own.delete(key));
+            tabFiltersRef.current[fromSlug] = own.toString();
+
+            const next = new URLSearchParams();
+            next.set("tab", toSlug);
+            if (prev.get("company_name")) next.set("company_name", prev.get("company_name"));
+            new URLSearchParams(tabFiltersRef.current[toSlug] || "").forEach((value, key) => next.set(key, value));
+            return next;
+        });
     };
 
     useEffect(() => {
@@ -415,7 +462,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
                 setIsSnackbarsOpen={setIsSnackbarsOpen}
             />
             <Tabs
-                value={activeTab}
+                value={activeIndex}
                 onChange={handleTabChange}
                 variant="scrollable"
                 scrollButtons="auto"
@@ -427,7 +474,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, activeTab, setAct
 
             <Box sx={{ marginTop: 2 }}>
                 {tabsList.map((tab, index) => (
-                    <TabPanel key={index} value={activeTab} index={index} keepMounted>
+                    <TabPanel key={index} value={activeIndex} index={index} keepMounted>
                         {tab.content}
                     </TabPanel>
                 ))}

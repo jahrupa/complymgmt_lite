@@ -1,28 +1,26 @@
 import React from "react";
 import Chart from "react-apexcharts";
 import DashboardCard from "../common/DashboardCard";
-import { formatINR, formatINRShort } from "../common/dashboardUtils";
+import { hasApplicability } from "./registerUtils";
 
-// Distinct hues so acts are told apart in the stacked bars
-const ACT_COLORS = ["#14b8a6", "#6366f1", "#f59e0b", "#ec4899", "#64748b"];
-
-// CH-2: compliance % / on-time % lines and amount by act stacked bars
+// RG-3: completion / SLA / coverage % lines and executed vs completed bars per month
 const TrendWidget = ({ selection, loading, trend, onDrill }) => {
     // "Unspecified" (month "") has no place on a time axis
     const rows = (trend || []).filter((r) => r.month);
     const labels = rows.map((r) => r.label);
-    const acts = [...new Set(rows.flatMap((r) => Object.keys(r.amount_by_act || {})))];
 
     const drillMonth = (event, dataPointIndex) => {
         event?.stopPropagation?.();
         const month = rows[dataPointIndex]?.month;
-        if (month) onDrill({ month_from: month, month_to: month, wage_month: [] });
+        if (month) onDrill({ month_from: month, month_to: month });
     };
 
     const percentChart = {
         series: [
-            { name: "Compliance %", data: rows.map((r) => r.compliance_score) },
-            { name: "On-time %", data: rows.map((r) => r.on_time_percent) },
+            { name: "Completion %", data: rows.map((r) => r.completion_rate) },
+            { name: "SLA met %", data: rows.map((r) => r.sla_met_percent) },
+            // Only months with applicability data have a coverage value
+            { name: "Coverage %", data: rows.map((r) => (hasApplicability(r.coverage) ? r.coverage.coverage_percent : null)) },
         ],
         options: {
             chart: {
@@ -31,7 +29,7 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
                 zoom: { enabled: false },
                 events: { markerClick: (event, ctx, { dataPointIndex }) => drillMonth(event, dataPointIndex) },
             },
-            colors: ["#14b8a6", "#f59e0b"],
+            colors: ["#6366f1", "#f59e0b", "#14b8a6"],
             stroke: { width: 3, curve: "smooth" },
             markers: { size: 5 },
             dataLabels: { enabled: false },
@@ -41,9 +39,10 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
                 shared: true,
                 intersect: false,
                 y: {
-                    formatter: (val, { dataPointIndex }) => {
+                    formatter: (val, { seriesIndex, dataPointIndex }) => {
                         const r = rows[dataPointIndex];
-                        return `${val}% (${r?.complied ?? 0}/${r?.total ?? 0} complied)`;
+                        if (seriesIndex === 2 && !hasApplicability(r?.coverage)) return "No applicability data";
+                        return val === null || val === undefined ? "–" : `${val}%`;
                     },
                 },
             },
@@ -51,22 +50,22 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
         },
     };
 
-    const amountChart = {
-        series: acts.map((act) => ({ name: act, data: rows.map((r) => r.amount_by_act?.[act] || 0) })),
+    const countChart = {
+        series: [
+            { name: "Executed", data: rows.map((r) => r.executed) },
+            { name: "Completed", data: rows.map((r) => r.completed) },
+        ],
         options: {
             chart: {
                 type: "bar",
-                stacked: true,
                 toolbar: { show: false },
                 events: { dataPointSelection: (event, ctx, { dataPointIndex }) => drillMonth(event, dataPointIndex) },
             },
-            colors: ACT_COLORS,
+            colors: ["#c7d2fe", "#6366f1"],
             states: { active: { filter: { type: "none" } } },
-            plotOptions: { bar: { columnWidth: "45%" } },
+            plotOptions: { bar: { columnWidth: "55%" } },
             dataLabels: { enabled: false },
             xaxis: { categories: labels },
-            yaxis: { labels: { formatter: (v) => formatINRShort(v) } },
-            tooltip: { y: { formatter: (v) => formatINR(v) } },
             legend: { position: "top", horizontalAlign: "left" },
         },
     };
@@ -75,13 +74,13 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
         <DashboardCard
             selection={selection}
             title="Monthly Trend"
-            subtitle="Click a month to see its records"
+            subtitle="Click a month to filter to it"
             loading={loading}
             isEmpty={rows.length === 0}
         >
             <Chart options={percentChart.options} series={percentChart.series} type="line" height={240} />
-            <div className="fw-600 small text-muted mt-2">Challan amount by act</div>
-            <Chart options={amountChart.options} series={amountChart.series} type="bar" height={240} />
+            <div className="fw-600 small text-muted mt-2">Registers executed vs completed</div>
+            <Chart options={countChart.options} series={countChart.series} type="bar" height={220} />
         </DashboardCard>
     );
 };

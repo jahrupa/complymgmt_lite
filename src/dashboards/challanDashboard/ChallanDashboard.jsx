@@ -1,55 +1,56 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import "../../style/challanDashboard.css";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import "../../style/dashboardWidgets.css";
 import {
     fetchChallanActWise,
     fetchChallanCompanyWise,
     fetchChallanFilters,
     fetchChallanLocationWise,
+    fetchChallanRecordById,
+    fetchChallanRecords,
     fetchChallanSummary,
     fetchChallanTrend,
     fetchChallanTurnaround,
 } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
 import { decryptData } from "../../page/utils/encrypt";
+import { useDashboardData, useDashboardFilters, useFilterOptions } from "../common/useDashboard";
+import { defaultPeriod, formatINR, formatPercent } from "../common/dashboardUtils";
+import AccessState from "../common/AccessState";
+import LocationMonthGrid from "../common/LocationMonthGrid";
+import TurnaroundCard from "../common/TurnaroundCard";
+import RecordsTable from "../common/RecordsTable";
+import RecordDetailDrawer from "../common/RecordDetailDrawer";
 import ChallanFilterBar from "./ChallanFilterBar";
 import SummaryWidget from "./SummaryWidget";
 import CompanyWiseWidget from "./CompanyWiseWidget";
 import TrendWidget from "./TrendWidget";
 import ActWiseWidget from "./ActWiseWidget";
-import LocationGridWidget from "./LocationGridWidget";
-import TurnaroundWidget from "./TurnaroundWidget";
 import ExceptionsWidget from "./ExceptionsWidget";
-import RecordsWidget from "./RecordsWidget";
-import RecordDetailDrawer from "./RecordDetailDrawer";
+import StatusBadges from "./StatusBadges";
 import {
-    EMPTY_FILTERS,
-    applyFiltersToSearchParams,
-    errorStatus,
-    filtersFromSearchParams,
-    hasAnyFilter,
+    ACT_KEY,
+    COMPUTED_RECORD_COLUMNS,
+    DEFAULT_RECORD_COLUMNS,
+    MULTI_FILTER_KEYS,
+    SINGLE_FILTER_KEYS,
+    SORT_BY_FOR_COLUMN,
+    TIMELINE_STEP_KINDS,
 } from "./challanUtils";
 
-const DEFAULT_PERIOD_MONTHS = 6;
-
-const EMPTY_DATA = {
-    summary: {},
-    trend: [],
-    actWise: [],
-    locationWise: {},
-    turnaround: {},
-    companyWise: [],
+const GRID_STATUSES = {
+    complied: { label: "Complied", bg: "#14b8a6", color: "white" },
+    partial: { label: "Partial", bg: "#fbbf24", color: "#422006" },
+    non_complied: { label: "Non-complied", bg: "#f87171", color: "white" },
 };
 
-// Last N months from the filter options (wage_months is newest first)
-const defaultPeriod = (wageMonths = []) => {
-    const months = wageMonths.filter((m) => m.month);
-    if (!months.length) return { month_from: "", month_to: "" };
-    return {
-        month_from: months[Math.min(DEFAULT_PERIOD_MONTHS, months.length) - 1].month,
-        month_to: months[0].month,
-    };
+// payment_delays comes in a fixed order: on/before due, 1-3, 4-7, 8-15, >15 days late, Not paid
+const paymentDelayDrill = (index, total) => {
+    if (index === 0) return { paid_on_time: "Y", overdue: "" };
+    if (index === total - 1) return { paid_on_time: "", overdue: "true" };
+    return { paid_on_time: "N", overdue: "" };
 };
+
+const renderStatus = (computed) => <StatusBadges computed={computed} />;
 
 /**
  * Challan Dashboard. Overall mode when no company is selected; company-wise mode calls the
@@ -62,28 +63,11 @@ const ChallanDashboard = ({
     selectedCharts,
     setSelectedCharts,
     shouldShow,
+    isActive,
 }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
-    // Keyed on the filter values only, so writing unrelated params (tab, company_name) doesn't refetch
-    const filtersJson = JSON.stringify(filtersFromSearchParams(searchParams));
-    const filters = useMemo(() => JSON.parse(filtersJson), [filtersJson]);
-
     const isCompanyMode = Boolean(selectedCompany);
-
-    const [filterOptions, setFilterOptions] = useState({});
-    const [data, setData] = useState(EMPTY_DATA);
-    const [loading, setLoading] = useState(true);
-    const [accessError, setAccessError] = useState(null); // 403 / 404 in company-wise mode
     const [recordId, setRecordId] = useState(null);
-
-    // Wait for the URL company to reach the page's company picker before fetching anything
-    const [companySynced, setCompanySynced] = useState(false);
-    // Without filters in the URL we default to the last 6 months once the options are known
-    const [periodReady, setPeriodReady] = useState(() => hasAnyFilter(searchParams));
-    const [period, setPeriod] = useState({ month_from: "", month_to: "" });
-
     const recordsRef = useRef(null);
-    const requestIdRef = useRef(0);
 
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -93,135 +77,50 @@ const ChallanDashboard = ({
         severityType: "",
     });
     const showSnackbar = useCallback(
-        (message, severityType) =>
-            setIsSnackbarsOpen((prev) => ({ ...prev, open: true, message, severityType })),
+        (message, severityType) => setIsSnackbarsOpen((prev) => ({ ...prev, open: true, message, severityType })),
         []
     );
 
-    const userRole = decryptData(localStorage.getItem("user_role"));
+    const [periodOptions, setPeriodOptions] = useState(null);
+    const { filters, updateFilters, resetFilters, activated, ready } = useDashboardFilters({
+        multiKeys: MULTI_FILTER_KEYS,
+        singleKeys: SINGLE_FILTER_KEYS,
+        isActive,
+        defaultPeriod: periodOptions,
+    });
 
-    const updateFilters = useCallback(
-        (patch, options) => {
-            setSearchParams(
-                (prev) => applyFiltersToSearchParams(prev, { ...filtersFromSearchParams(prev), ...patch }),
-                options
-            );
-        },
-        [setSearchParams]
+    const { options: filterOptions, accessError: optionsAccessError } = useFilterOptions(
+        fetchChallanFilters,
+        selectedCompany,
+        activated
     );
+    // The filters hook needs the default period, but the options load only once that hook reports
+    // the tab activated; hand the value back with a render-phase update (React's derived-state pattern)
+    const defaults = useMemo(() => (filterOptions ? defaultPeriod(filterOptions.wage_months) : null), [filterOptions]);
+    if (defaults !== periodOptions) setPeriodOptions(defaults);
 
-    /* ---------- company <-> URL ---------- */
-
-    useEffect(() => {
-        if (!companySynced) {
-            const urlCompany = searchParams.get("company_name") || "";
-            setCompanySynced(true);
-            if (urlCompany && urlCompany !== selectedCompany) setSelectedCompany?.(urlCompany);
-            return;
-        }
-        if ((searchParams.get("company_name") || "") === selectedCompany) return;
-        setSearchParams(
-            (prev) => {
-                const next = new URLSearchParams(prev);
-                if (selectedCompany) next.set("company_name", selectedCompany);
-                else next.delete("company_name");
-                return next;
-            },
-            { replace: true }
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to company changes
-    }, [selectedCompany, companySynced]);
-
-    /* ---------- filter options (only company_name narrows them) ---------- */
-
-    useEffect(() => {
-        if (!companySynced) return;
-        let cancelled = false;
-        setAccessError(null);
-        fetchChallanFilters(selectedCompany)
-            .then((res) => {
-                if (cancelled) return;
-                const options = res?.data || {};
-                setFilterOptions(options);
-                const def = defaultPeriod(options.wage_months);
-                setPeriod(def);
-                if (!periodReady) {
-                    updateFilters(def, { replace: true });
-                    setPeriodReady(true);
-                }
-            })
-            .catch((error) => {
-                if (cancelled) return;
-                setFilterOptions({});
-                const status = errorStatus(error);
-                if (selectedCompany && (status === 403 || status === 404)) setAccessError(status);
-                setPeriodReady(true);
-            });
-        return () => {
-            cancelled = true;
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- periodReady is a one-time switch
-    }, [selectedCompany, companySynced]);
-
-    /* ---------- widget data: every widget gets the same filter set ---------- */
-
+    // Every widget gets the same filter set
     const params = useMemo(() => ({ ...filters, company_name: selectedCompany }), [filters, selectedCompany]);
-    const ready = companySynced && periodReady;
 
-    useEffect(() => {
-        if (!ready) return;
-        const requestId = ++requestIdRef.current;
-        setLoading(true);
-
-        const fetchData = async () => {
-            const [summaryRes, trendRes, actRes, locationRes, turnaroundRes, companyRes] = await Promise.allSettled([
-                fetchChallanSummary(params),
-                fetchChallanTrend(params),
-                fetchChallanActWise(params),
-                fetchChallanLocationWise(params),
-                fetchChallanTurnaround(params),
-                isCompanyMode ? Promise.resolve({ data: [] }) : fetchChallanCompanyWise(params),
-            ]);
-            // A newer filter change already started another request
-            if (requestId !== requestIdRef.current) return;
-
-            const results = [summaryRes, trendRes, actRes, locationRes, turnaroundRes, companyRes];
-            const failed = results.filter((r) => r.status === "rejected");
-            const accessStatus = failed.map((r) => errorStatus(r.reason)).find((s) => s === 403 || s === 404);
-
-            if (isCompanyMode && accessStatus) {
-                setAccessError(accessStatus);
-                setData(EMPTY_DATA);
-            } else {
-                const pick = (res, fallback) => (res.status === "fulfilled" ? res.value?.data ?? fallback : fallback);
-                setAccessError(null);
-                setData({
-                    summary: pick(summaryRes, {}),
-                    trend: pick(trendRes, []),
-                    actWise: pick(actRes, []),
-                    locationWise: pick(locationRes, {}),
-                    turnaround: pick(turnaroundRes, {}),
-                    companyWise: pick(companyRes, []),
-                });
-                if (failed.length) {
-                    showSnackbar(
-                        failed[0].reason?.response?.data?.message || "Some challan widgets could not be loaded",
-                        "error"
-                    );
-                }
-            }
-            setLoading(false);
-        };
-        fetchData();
-    }, [params, ready, isCompanyMode, showSnackbar]);
+    const { data, loading, accessError: dataAccessError } = useDashboardData({
+        fetchers: {
+            summary: { fetch: fetchChallanSummary, fallback: {} },
+            trend: { fetch: fetchChallanTrend, fallback: [] },
+            actWise: { fetch: fetchChallanActWise, fallback: [] },
+            locationWise: { fetch: fetchChallanLocationWise, fallback: {} },
+            turnaround: { fetch: fetchChallanTurnaround, fallback: {} },
+            companyWise: { fetch: fetchChallanCompanyWise, fallback: [], skip: isCompanyMode },
+        },
+        params,
+        enabled: ready,
+        isCompanyMode,
+        onError: (message) => showSnackbar(message, "error"),
+    });
+    const accessError = optionsAccessError || dataAccessError;
 
     /* ---------- widget selection (same rules as the other dashboards) ---------- */
 
-    useEffect(() => {
-        setSelectedCharts([]);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [current?.user_name]);
-
+    const userRole = decryptData(localStorage.getItem("user_role"));
     const canSelect = userRole === "Admin" || userRole === "Super-Admin";
 
     const toggleChartSelection = (chartId) => {
@@ -229,9 +128,7 @@ const ChallanDashboard = ({
             showSnackbar("First you need to select a user", "warning");
             return;
         }
-        setSelectedCharts((prev) =>
-            prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]
-        );
+        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
     };
 
     const cardSelection = (id) => ({
@@ -255,33 +152,27 @@ const ChallanDashboard = ({
         [updateFilters, showRecords]
     );
 
+    const drillLocation = (loc, month) =>
+        onDrill({
+            state: [loc.state],
+            location: [loc.location],
+            ...(month ? { month_from: month, month_to: month, wage_month: [] } : {}),
+        });
+
     const onOpenCompany = (companyName) => {
         if (!companyName) return;
-        setSelectedCompany?.(companyName);
+        setSelectedCompany(companyName);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const onView = useCallback((id) => setRecordId(id), []);
 
-    const resetFilters = () => updateFilters({ ...EMPTY_FILTERS, ...period });
+    const fetchRecordsPage = (page, limit, sort) => fetchChallanRecords(page, limit, undefined, { ...params, ...sort });
+
+    const locationWise = data.locationWise || {};
+    const turnaround = data.turnaround || {};
 
     /* ---------- render ---------- */
-
-    const accessMessage = accessError && (
-        <div className="chart-card">
-            <div className="challan-state-message">
-                <h5>{accessError === 403 ? "No access to this company" : "Company not found"}</h5>
-                <div>
-                    {accessError === 403
-                        ? `You don't have access to challan data for "${selectedCompany}".`
-                        : `No company named "${selectedCompany}" was found.`}
-                </div>
-                <button className="btn btn-primary btn-sm mt-2" onClick={() => setSelectedCompany?.("")}>
-                    View all companies
-                </button>
-            </div>
-        </div>
-    );
 
     return (
         <div>
@@ -291,22 +182,22 @@ const ChallanDashboard = ({
                 <div className="d-flex align-items-center gap-2 mb-2 small">
                     <span className="text-muted">Company-wise view:</span>
                     <span className="fw-600">{selectedCompany}</span>
-                    <button className="btn btn-link btn-sm p-0" onClick={() => setSelectedCompany?.("")}>
+                    <button className="btn btn-link btn-sm p-0" onClick={() => setSelectedCompany("")}>
                         View all companies
                     </button>
                 </div>
             )}
 
             {accessError ? (
-                accessMessage
+                <AccessState
+                    status={accessError}
+                    companyName={selectedCompany}
+                    dataLabel="challan data"
+                    onShowAll={() => setSelectedCompany("")}
+                />
             ) : (
                 <>
-                    <ChallanFilterBar
-                        filterOptions={filterOptions}
-                        filters={filters}
-                        onChange={updateFilters}
-                        onClear={resetFilters}
-                    />
+                    <ChallanFilterBar filterOptions={filterOptions} filters={filters} onChange={updateFilters} onClear={resetFilters} />
 
                     {shouldShow("ch-1") && (
                         <SummaryWidget selection={cardSelection("ch-1")} loading={loading} summary={data.summary} onDrill={onDrill} />
@@ -331,20 +222,43 @@ const ChallanDashboard = ({
                     </div>
 
                     {shouldShow("ch-4") && (
-                        <LocationGridWidget
+                        <LocationMonthGrid
                             selection={cardSelection("ch-4")}
                             loading={loading}
-                            locationWise={data.locationWise}
-                            onDrill={onDrill}
+                            title="Location-wise Compliance by Month"
+                            subtitle="Click a cell to see that location's records for the month"
+                            months={locationWise.months}
+                            locations={locationWise.locations}
+                            states={locationWise.states}
+                            statuses={GRID_STATUSES}
+                            cellText={(cell) => `${cell.complied}/${cell.total}`}
+                            cellTooltip={(cell) => (
+                                <div>
+                                    <div className="fw-600">{GRID_STATUSES[cell.status]?.label || cell.status}</div>
+                                    <div>Acts: {(cell.acts || []).join(", ") || "–"}</div>
+                                    <div>Complied: {cell.complied}/{cell.total}</div>
+                                    <div>Amount: {formatINR(cell.amount)}</div>
+                                    {cell.exceptions > 0 && <div>Exceptions: {cell.exceptions}</div>}
+                                </div>
+                            )}
+                            stateText={(s) =>
+                                `${s.locations} locations · ${formatPercent(s.compliance_score)} complied · ${formatINR(s.amount)}`
+                            }
+                            overallText={(loc) => formatPercent(loc.compliance_score)}
+                            onCellClick={drillLocation}
+                            onLocationClick={(loc) => drillLocation(loc)}
                         />
                     )}
 
                     {shouldShow("ch-5") && (
-                        <TurnaroundWidget
+                        <TurnaroundCard
                             selection={cardSelection("ch-5")}
                             loading={loading}
-                            turnaround={data.turnaround}
-                            onDrill={onDrill}
+                            stages={turnaround.stages}
+                            endToEnd={turnaround.end_to_end}
+                            delays={turnaround.payment_delays}
+                            delaysTitle="Payment timing vs due date"
+                            onDelayClick={(index, total) => onDrill(paymentDelayDrill(index, total))}
                         />
                     )}
 
@@ -360,13 +274,21 @@ const ChallanDashboard = ({
                     )}
 
                     {ready && showRecords && (
-                        <RecordsWidget
+                        <RecordsTable
                             ref={recordsRef}
                             selection={cardSelection("ch-7")}
                             loading={loading}
-                            params={params}
+                            title="Challan Records"
+                            subtitle={`${data.summary?.total ?? 0} records match the filters`}
+                            isEmpty={!data.summary?.total}
                             columns={filterOptions?.columns}
-                            total={data.summary?.total}
+                            computedColumns={COMPUTED_RECORD_COLUMNS}
+                            defaultColumns={DEFAULT_RECORD_COLUMNS}
+                            storageKey="challanRecordColumns"
+                            sortByForColumn={SORT_BY_FOR_COLUMN}
+                            renderStatus={renderStatus}
+                            fetchPage={fetchRecordsPage}
+                            gridKey={JSON.stringify(params)}
                             onView={onView}
                         />
                     )}
@@ -376,6 +298,11 @@ const ChallanDashboard = ({
             <RecordDetailDrawer
                 recordId={recordId}
                 companyName={selectedCompany}
+                fetchRecord={fetchChallanRecordById}
+                title={(d) => [d.record?.[ACT_KEY], d.record?.location].filter(Boolean).join(" · ") || "Challan record"}
+                subtitle={(d) => [d.record?.company_name, d.record?.state, d.computed?.month_label].filter(Boolean).join(" · ")}
+                badges={renderStatus}
+                stepKinds={TIMELINE_STEP_KINDS}
                 onClose={() => setRecordId(null)}
             />
         </div>

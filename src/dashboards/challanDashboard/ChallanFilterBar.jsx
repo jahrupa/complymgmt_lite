@@ -1,61 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { Chip } from "@mui/material";
 import {
-    Checkbox,
-    Chip,
-    FormControl,
-    InputLabel,
-    ListItemText,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    TextField,
-} from "@mui/material";
-
-// Multi select with checkboxes; options are plain strings
-const MultiFilter = ({ label, value, options, onChange }) => (
-    <FormControl size="small" sx={{ width: 190 }}>
-        <InputLabel>{label}</InputLabel>
-        <Select
-            multiple
-            value={value}
-            onChange={(e) => {
-                const v = e.target.value;
-                onChange(typeof v === "string" ? v.split(",") : v);
-            }}
-            input={<OutlinedInput label={label} />}
-            renderValue={(selected) => selected.join(", ")}
-            MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
-        >
-            {options.length === 0 && (
-                <MenuItem disabled>
-                    <em>No options</em>
-                </MenuItem>
-            )}
-            {options.map((opt) => (
-                <MenuItem key={opt} value={opt}>
-                    <Checkbox size="small" checked={value.includes(opt)} />
-                    <ListItemText primary={opt} />
-                </MenuItem>
-            ))}
-        </Select>
-    </FormControl>
-);
-
-const SingleFilter = ({ label, value, options, onChange, emptyLabel = "All", width = 150 }) => (
-    <FormControl size="small" sx={{ width }}>
-        <InputLabel>{label}</InputLabel>
-        <Select value={value} label={label} onChange={(e) => onChange(e.target.value)}>
-            <MenuItem value="">
-                <em>{emptyLabel}</em>
-            </MenuItem>
-            {options.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                </MenuItem>
-            ))}
-        </Select>
-    </FormControl>
-);
+    DebouncedSearch,
+    MultiFilter,
+    PeriodFilter,
+    SingleFilter,
+    ToggleChip,
+} from "../common/FilterControls";
+import { YES_NO_OPTIONS, locationOptionsFor } from "../common/dashboardUtils";
 
 const TOGGLES = [
     { key: "overdue", label: "Overdue" },
@@ -64,105 +16,53 @@ const TOGGLES = [
 ];
 
 const ChallanFilterBar = ({ filterOptions, filters, onChange, onClear }) => {
-    const [searchText, setSearchText] = useState(filters.search);
-    const searchTimerRef = useRef();
-
-    // Keep the box in sync when search changes from outside (clear, back/forward navigation)
-    useEffect(() => {
-        setSearchText(filters.search);
-    }, [filters.search]);
-
-    useEffect(() => () => clearTimeout(searchTimerRef.current), []);
-
-    const onSearchChange = (e) => {
-        const value = e.target.value;
-        setSearchText(value);
-        clearTimeout(searchTimerRef.current);
-        searchTimerRef.current = setTimeout(() => onChange({ search: value.trim() }), 300);
-    };
-
+    const opts = filterOptions || {};
     const set = (key) => (value) => onChange({ [key]: value });
 
-    // Location options narrow down to the selected states
-    const locationOptions = [
-        ...new Set(
-            (filterOptions?.locations || [])
-                .filter((l) => !filters.state.length || filters.state.includes(l.state))
-                .map((l) => l.location)
-        ),
-    ];
-
-    const monthOptions = (filterOptions?.wage_months || [])
-        .filter((m) => m.month)
-        .map((m) => ({ value: m.month, label: m.label }));
-
     return (
-        <div className="challan-filter-bar">
+        <div className="dw-filter-bar">
             <div className="d-flex flex-wrap gap-2 align-items-center">
-                <SingleFilter
-                    label="From"
-                    value={filters.month_from}
-                    options={monthOptions}
-                    emptyLabel="Any"
-                    onChange={set("month_from")}
+                <PeriodFilter months={opts.wage_months} monthFrom={filters.month_from} monthTo={filters.month_to} onChange={onChange} />
+                <MultiFilter label="State" value={filters.state} options={opts.states} onChange={set("state")} />
+                <MultiFilter
+                    label="Location"
+                    value={filters.location}
+                    options={locationOptionsFor(opts.locations, filters.state)}
+                    onChange={set("location")}
                 />
-                <SingleFilter
-                    label="To"
-                    value={filters.month_to}
-                    options={monthOptions}
-                    emptyLabel="Any"
-                    onChange={set("month_to")}
-                />
-                <MultiFilter label="State" value={filters.state} options={filterOptions?.states || []} onChange={set("state")} />
-                <MultiFilter label="Location" value={filters.location} options={locationOptions} onChange={set("location")} />
-                <MultiFilter label="Act" value={filters.act} options={filterOptions?.acts || []} onChange={set("act")} />
+                <MultiFilter label="Act" value={filters.act} options={opts.acts} onChange={set("act")} />
                 <MultiFilter
                     label="Compliance Status"
                     value={filters.compliance_status}
-                    options={filterOptions?.compliance_statuses || []}
+                    options={opts.compliance_statuses}
                     onChange={set("compliance_status")}
                 />
                 <MultiFilter
                     label="Payment Responsibility"
                     value={filters.payment_responsibility}
-                    options={filterOptions?.payment_responsibilities || []}
+                    options={opts.payment_responsibilities}
                     onChange={set("payment_responsibility")}
                 />
-                <MultiFilter label="Frequency" value={filters.frequency} options={filterOptions?.frequencies || []} onChange={set("frequency")} />
-                <MultiFilter label="Maker" value={filters.maker} options={filterOptions?.makers || []} onChange={set("maker")} />
-                <MultiFilter label="Checker" value={filters.checker} options={filterOptions?.checkers || []} onChange={set("checker")} />
+                <MultiFilter label="Frequency" value={filters.frequency} options={opts.frequencies} onChange={set("frequency")} />
+                <MultiFilter label="Maker" value={filters.maker} options={opts.makers} onChange={set("maker")} />
+                <MultiFilter label="Checker" value={filters.checker} options={opts.checkers} onChange={set("checker")} />
             </div>
             <div className="d-flex flex-wrap gap-2 align-items-center mt-3">
-                <TextField
-                    size="small"
-                    label="Search"
+                <DebouncedSearch
+                    value={filters.search}
+                    onChange={set("search")}
                     placeholder="Company, location, act, registration no, remarks…"
-                    value={searchText}
-                    onChange={onSearchChange}
-                    sx={{ width: 340 }}
                 />
                 <SingleFilter
                     label="Paid On Time"
                     value={filters.paid_on_time}
-                    options={[
-                        { value: "Y", label: "Yes" },
-                        { value: "N", label: "No" },
-                    ]}
+                    options={YES_NO_OPTIONS}
                     emptyLabel="Any"
                     onChange={set("paid_on_time")}
                 />
-                {TOGGLES.map((t) => {
-                    const active = filters[t.key] === "true";
-                    return (
-                        <Chip
-                            key={t.key}
-                            label={t.label}
-                            color={active ? "primary" : "default"}
-                            variant={active ? "filled" : "outlined"}
-                            onClick={() => onChange({ [t.key]: active ? "" : "true" })}
-                        />
-                    );
-                })}
+                {TOGGLES.map((t) => (
+                    <ToggleChip key={t.key} label={t.label} value={filters[t.key]} onChange={set(t.key)} />
+                ))}
                 {filters.wage_month.length > 0 && (
                     <Chip label={`Wage month: ${filters.wage_month.join(", ")}`} onDelete={() => onChange({ wage_month: [] })} />
                 )}

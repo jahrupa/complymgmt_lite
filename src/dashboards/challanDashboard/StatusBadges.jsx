@@ -6,11 +6,11 @@ const StatusBadges = ({ computed }) => {
     return (
         <span className="d-inline-flex gap-1 align-items-center">
             {computed.is_complied ? (
-                <span className="challan-badge complied">Complied</span>
+                <span className="dw-badge complied">Complied</span>
             ) : (
-                <span className="challan-badge non-complied">Non-complied</span>
+                <span className="dw-badge non-complied">Non-complied</span>
             )}
-            {computed.overdue && <span className="challan-badge overdue">Overdue</span>}
+            {computed.overdue && <span className="dw-badge overdue">Overdue</span>}
         </span>
     );
 };

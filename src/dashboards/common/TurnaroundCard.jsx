@@ -1,22 +1,15 @@
 import React from "react";
 import Chart from "react-apexcharts";
-import ChallanCard from "./ChallanCard";
+import DashboardCard from "./DashboardCard";
 
 const DELAY_COLORS = ["#14b8a6", "#fbbf24", "#fb923c", "#f87171", "#dc2626", "#6b7280"];
 
-// payment_delays comes in a fixed order: on/before due, 1-3, 4-7, 8-15, >15 days late, Not paid
-const delayDrill = (index, total) => {
-    if (index === 0) return { paid_on_time: "Y", overdue: "" };
-    if (index === total - 1) return { paid_on_time: "", overdue: "true" };
-    return { paid_on_time: "N", overdue: "" };
-};
-
-// CH-5: average days per process stage and payment delay buckets
-const TurnaroundWidget = ({ selection, loading, turnaround, onDrill }) => {
-    const stages = turnaround?.stages || [];
-    const endToEnd = turnaround?.end_to_end;
-    const delays = turnaround?.payment_delays || [];
-    const anomalyStages = stages.filter((s) => s.anomalies > 0);
+/**
+ * Process turnaround: average days per stage plus a delay bucket chart.
+ * `delays` are { name, count } in the backend's fixed order; `onDelayClick(index, count)` drills down.
+ */
+const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = [], delaysTitle, onDelayClick }) => {
+    const anomalyStages = [...stages, ...(endToEnd?.anomalies ? [endToEnd] : [])].filter((s) => s.anomalies > 0);
 
     const stageChart = {
         series: [{ name: "Avg days", data: stages.map((s) => s.avg_days) }],
@@ -32,7 +25,7 @@ const TurnaroundWidget = ({ selection, loading, turnaround, onDrill }) => {
                 y: {
                     formatter: (val, { dataPointIndex }) => {
                         const s = stages[dataPointIndex];
-                        return `${val} days avg · min ${s?.min_days ?? 0} · max ${s?.max_days ?? 0} · ${s?.count ?? 0} challans`;
+                        return `${val} days avg · min ${s?.min_days ?? 0} · max ${s?.max_days ?? 0} · ${s?.count ?? 0} rows`;
                     },
                 },
             },
@@ -40,7 +33,7 @@ const TurnaroundWidget = ({ selection, loading, turnaround, onDrill }) => {
     };
 
     const delayChart = {
-        series: [{ name: "Challans", data: delays.map((d) => d.count) }],
+        series: [{ name: "Rows", data: delays.map((d) => d.count) }],
         options: {
             chart: {
                 type: "bar",
@@ -48,7 +41,7 @@ const TurnaroundWidget = ({ selection, loading, turnaround, onDrill }) => {
                 events: {
                     dataPointSelection: (event, ctx, { dataPointIndex }) => {
                         event?.stopPropagation?.();
-                        onDrill(delayDrill(dataPointIndex, delays.length));
+                        onDelayClick(dataPointIndex, delays.length);
                     },
                 },
             },
@@ -61,7 +54,7 @@ const TurnaroundWidget = ({ selection, loading, turnaround, onDrill }) => {
     };
 
     return (
-        <ChallanCard
+        <DashboardCard
             selection={selection}
             title="Turnaround Time"
             subtitle={
@@ -76,22 +69,20 @@ const TurnaroundWidget = ({ selection, loading, turnaround, onDrill }) => {
                 <div className="col-lg-7">
                     <div className="fw-600 small text-muted">Average days per stage</div>
                     <Chart options={stageChart.options} series={stageChart.series} type="bar" height={300} />
-                    {(anomalyStages.length > 0 || endToEnd?.anomalies > 0) && (
+                    {anomalyStages.length > 0 && (
                         <div className="text-muted small">
                             Excluded because dates are out of order:{" "}
-                            {[...anomalyStages, ...(endToEnd?.anomalies ? [endToEnd] : [])]
-                                .map((s) => `${s.label} (${s.anomalies})`)
-                                .join(", ")}
+                            {anomalyStages.map((s) => `${s.label} (${s.anomalies})`).join(", ")}
                         </div>
                     )}
                 </div>
                 <div className="col-lg-5">
-                    <div className="fw-600 small text-muted">Payment timing vs due date</div>
+                    <div className="fw-600 small text-muted">{delaysTitle}</div>
                     <Chart options={delayChart.options} series={delayChart.series} type="bar" height={300} />
                 </div>
             </div>
-        </ChallanCard>
+        </DashboardCard>
     );
 };
 
-export default TurnaroundWidget;
+export default TurnaroundCard;

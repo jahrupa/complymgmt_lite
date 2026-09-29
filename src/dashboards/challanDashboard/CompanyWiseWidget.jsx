@@ -3,8 +3,8 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
-import ChallanCard from "./ChallanCard";
-import { formatINR, formatPercent } from "./challanUtils";
+import DashboardCard from "../common/DashboardCard";
+import { formatINR, formatPercent } from "../common/dashboardUtils";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -41,7 +41,7 @@ const CompanyWiseWidget = ({ selection, loading, companyWise, onOpenCompany }) =
     );
 
     return (
-        <ChallanCard
+        <DashboardCard
             selection={selection}
             title="Company-wise Compliance"
             subtitle="Lowest compliance first. Click a company to open its dashboard"
@@ -64,7 +64,7 @@ const CompanyWiseWidget = ({ selection, loading, companyWise, onOpenCompany }) =
                     onRowClicked={(e) => onOpenCompany(e.data?.company_name)}
                 />
             </div>
-        </ChallanCard>
+        </DashboardCard>
     );
 };
 

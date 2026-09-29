@@ -1,7 +1,7 @@
 import React from "react";
 import Chart from "react-apexcharts";
-import ChallanCard from "./ChallanCard";
-import { formatINR, formatINRShort, formatPercent } from "./challanUtils";
+import DashboardCard from "../common/DashboardCard";
+import { formatINR, formatINRShort, formatPercent } from "../common/dashboardUtils";
 
 // CH-3: complied vs non-complied per act, with an act detail table
 const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
@@ -48,7 +48,7 @@ const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
     };
 
     return (
-        <ChallanCard
+        <DashboardCard
             selection={selection}
             title="Act-wise Compliance"
             subtitle="Click an act to see its records"
@@ -96,7 +96,7 @@ const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
                     </tbody>
                 </table>
             </div>
-        </ChallanCard>
+        </DashboardCard>
     );
 };
 
