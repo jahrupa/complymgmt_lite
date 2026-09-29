@@ -5,7 +5,7 @@ import { formatPercent } from "../common/dashboardUtils";
 import { hasApplicability } from "./registerUtils";
 
 // RG-5: coverage and completion % per act
-const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
+const ActWiseWidget = ({ loading, actWise, onDrill }) => {
     const rows = actWise || [];
 
     const chart = {
@@ -52,7 +52,6 @@ const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Act-wise Coverage & Completion"
             subtitle="Click an act to filter to it"
             loading={loading}

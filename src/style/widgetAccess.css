@@ -1,0 +1,125 @@
+/* Widget Access page */
+
+.widget-access-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(360px, 1fr) minmax(420px, 1.3fr);
+    gap: 16px;
+    align-items: start;
+    margin-top: 12px;
+}
+
+@media (max-width: 1200px) {
+    .widget-access-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.widget-access-panel {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    min-width: 0;
+}
+
+/* Users */
+.widget-access-user-list {
+    margin-top: 12px;
+    max-height: calc(100vh - 260px);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.widget-access-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    border: 1px solid #f1f5f9;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 8px 10px;
+}
+
+.widget-access-user:hover {
+    border-color: #14b8a6;
+}
+
+.widget-access-user.active {
+    border-color: #14b8a6;
+    background: #f0fdfa;
+}
+
+/* Catalog */
+.widget-access-groups {
+    max-height: calc(100vh - 330px);
+    overflow: auto;
+}
+
+.widget-access-group {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 4px 0 8px;
+}
+
+.widget-access-group-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: #0f766e;
+    margin: 0;
+}
+
+.widget-access-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 6px 0 24px;
+    border-radius: 8px;
+}
+
+.widget-access-row.focused {
+    background: #f0fdfa;
+}
+
+.widget-access-name {
+    flex: 1;
+    font-size: 14px;
+}
+
+/* Preview */
+.widget-access-preview {
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 40px);
+    overflow: auto;
+}
+
+.widget-preview-canvas {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 12px;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* A single widget in a preview should use the full width, not one column of a 2-up grid */
+.widget-preview-canvas .charts-grid {
+    grid-template-columns: 1fr !important;
+}
+
+/* Filters and page chrome don't belong in a snapshot */
+.widget-preview-canvas .dw-filter-bar {
+    display: none;
+}
+
+.widget-preview-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    color: gray;
+    text-align: center;
+}

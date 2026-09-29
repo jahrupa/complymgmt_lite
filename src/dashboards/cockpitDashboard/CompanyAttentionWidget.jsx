@@ -72,7 +72,7 @@ const SOURCES = [
  * CCBC-8: "Needs attention" for one company: the first few exceptions of each module (with the
  * same filters), each opening its record. Replaces the old recent documents list.
  */
-const CompanyAttentionWidget = ({ selection, enabled, params, companyName, onOpenModule }) => {
+const CompanyAttentionWidget = ({ enabled, params, companyName, onOpenModule }) => {
     const [results, setResults] = useState({});
     const [loading, setLoading] = useState(true);
     const [openRow, setOpenRow] = useState(null); // { source, id }
@@ -104,7 +104,6 @@ const CompanyAttentionWidget = ({ selection, enabled, params, companyName, onOpe
     return (
         <>
             <DashboardCard
-                selection={selection}
                 title="Needs Attention"
                 subtitle={`${total} items across modules; the first ${LIMIT} of each are shown`}
                 loading={loading}

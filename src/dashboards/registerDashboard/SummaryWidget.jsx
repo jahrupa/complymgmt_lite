@@ -6,7 +6,7 @@ import CoverageBar from "./CoverageBar";
 import { hasApplicability } from "./registerUtils";
 
 // RG-1: KPI tiles, coverage bar and a separate data quality badge
-const SummaryWidget = ({ selection, loading, summary, executionFiltersActive, onDrill, onCoverageDrill }) => {
+const SummaryWidget = ({ loading, summary, executionFiltersActive, onDrill, onCoverageDrill }) => {
     const s = summary || {};
     const coverage = s.coverage;
     const isEmpty = !s.executed && !s.applicable_registers;
@@ -70,7 +70,6 @@ const SummaryWidget = ({ selection, loading, summary, executionFiltersActive, on
 
     return (
         <DashboardCard
-            selection={selection}
             title="Register Summary"
             subtitle={isEmpty ? "" : scope}
             loading={loading}

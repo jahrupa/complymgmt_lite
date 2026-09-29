@@ -12,7 +12,7 @@ const BREAKDOWNS = [
 ];
 
 // RG-8: flagged / open / corrected variances with a breakdown chart
-const VarianceWidget = ({ selection, loading, variance, isCompanyMode, onDrill, onOpenCompany }) => {
+const VarianceWidget = ({ loading, variance, isCompanyMode, onDrill, onOpenCompany }) => {
     const [breakdownKey, setBreakdownKey] = useState("by_type");
     const v = variance || {};
     const breakdowns = BREAKDOWNS.filter((b) => !(b.company && isCompanyMode));
@@ -60,7 +60,6 @@ const VarianceWidget = ({ selection, loading, variance, isCompanyMode, onDrill, 
 
     return (
         <DashboardCard
-            selection={selection}
             title="Variance Analysis"
             subtitle="Open = corrected file not received and register not completed"
             loading={loading}

@@ -62,7 +62,7 @@ export const ScoreCell = ({ score }) => {
 };
 
 // CC-6 / CCBC-1: overall score gauge, labelled with how many modules it averages
-export const OverallScoreCard = ({ selection, loading, summary, title }) => {
+export const OverallScoreCard = ({ loading, summary, title }) => {
     const available = summary?.modules_available ?? 0;
     const score = available ? summary.overall_score : null;
     const band = scoreBand(score);
@@ -96,7 +96,6 @@ export const OverallScoreCard = ({ selection, loading, summary, title }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title={title}
             subtitle={period ? `Period: ${period}` : "Current status (no month range)"}
             loading={loading}
@@ -115,14 +114,13 @@ export const OverallScoreCard = ({ selection, loading, summary, title }) => {
  * CC-2…5 / CCBC-2…5: one module's score. Copy is "completed of total unit completed_as"; the
  * license wording comes from the API because it changes with the month range.
  */
-export const ModuleTile = ({ selection, loading, module, onOpen }) => {
+export const ModuleTile = ({ loading, module, onOpen }) => {
     const meta = MODULES[module?.module] || {};
     const available = Boolean(module?.available);
     const band = scoreBand(available ? module.score : null);
 
     return (
         <DashboardCard
-            selection={selection}
             title={module?.label || meta.label}
             loading={loading}
             isEmpty={!module}
@@ -175,7 +173,7 @@ export const ModuleTile = ({ selection, loading, module, onOpen }) => {
 };
 
 // CC-7 / CCBC-7: completed vs pending per module; unavailable modules are labelled, not zeroed
-export const CompletionStatusCard = ({ selection, loading, modules, onOpen }) => {
+export const CompletionStatusCard = ({ loading, modules, onOpen }) => {
     const rows = MODULE_ORDER.map((key) => (modules || []).find((m) => m.module === key)).filter(Boolean);
     const categories = rows.map((m) => (m.available ? m.label : `${m.label} (no data)`));
 
@@ -218,7 +216,6 @@ export const CompletionStatusCard = ({ selection, loading, modules, onOpen }) =>
 
     return (
         <DashboardCard
-            selection={selection}
             title="Completion Status Across All Modules"
             subtitle="Completed vs pending in each module; click a bar to open that dashboard"
             loading={loading}

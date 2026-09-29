@@ -15,7 +15,6 @@ import {
     fetchRegisterDashVariance,
 } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useDashboardData, useDashboardFilters, useFilterOptions } from "../common/useDashboard";
 import { defaultPeriod, formatPercent, withoutKeys } from "../common/dashboardUtils";
 import AccessState from "../common/AccessState";
@@ -68,9 +67,6 @@ const renderExecutionStatus = (computed) => <ExecutionBadges computed={computed}
 const RegisterDashboard = ({
     selectedCompany,
     setSelectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
     shouldShow,
     isActive,
 }) => {
@@ -133,28 +129,6 @@ const RegisterDashboard = ({
         onError: (message) => showSnackbar(message, "error"),
     });
     const accessError = optionsAccessError || dataAccessError;
-
-    /* ---------- widget selection (same rules as the other dashboards) ---------- */
-
-    const userRole = decryptData(localStorage.getItem("user_role"));
-    const canSelect = userRole === "Admin" || userRole === "Super-Admin";
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            showSnackbar("First you need to select a user", "warning");
-            return;
-        }
-        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
-    };
-
-    const cardSelection = (id) => ({
-        id,
-        canSelect,
-        selected: selectedCharts.includes(id),
-        disabled: !current?.user_name,
-        onSelect: (chartId) => canSelect && toggleChartSelection(chartId),
-        onToggle: toggleChartSelection,
-    });
 
     /* ---------- drill downs ---------- */
 
@@ -236,7 +210,6 @@ const RegisterDashboard = ({
 
                     {shouldShow("rg-1") && (
                         <SummaryWidget
-                            selection={cardSelection("rg-1")}
                             loading={loading}
                             summary={summary}
                             executionFiltersActive={executionFiltersActive}
@@ -248,7 +221,6 @@ const RegisterDashboard = ({
                     {ready && showCoverage && (
                         <CoverageWidget
                             ref={coverageRef}
-                            selection={cardSelection("rg-10")}
                             loading={loading}
                             params={params}
                             coverageStatus={filters.coverage_status}
@@ -262,7 +234,6 @@ const RegisterDashboard = ({
 
                     {!isCompanyMode && shouldShow("rg-2") && (
                         <GroupTableCard
-                            selection={cardSelection("rg-2")}
                             loading={loading}
                             title="Company-wise Registers"
                             subtitle="Lowest completion first. Click a company to open its dashboard"
@@ -275,16 +246,15 @@ const RegisterDashboard = ({
 
                     <div className="charts-grid">
                         {shouldShow("rg-3") && (
-                            <TrendWidget selection={cardSelection("rg-3")} loading={loading} trend={data.trend} onDrill={onDrill} />
+                            <TrendWidget loading={loading} trend={data.trend} onDrill={onDrill} />
                         )}
                         {shouldShow("rg-5") && (
-                            <ActWiseWidget selection={cardSelection("rg-5")} loading={loading} actWise={data.actWise} onDrill={onDrill} />
+                            <ActWiseWidget loading={loading} actWise={data.actWise} onDrill={onDrill} />
                         )}
                     </div>
 
                     {shouldShow("rg-4") && (
                         <GroupTableCard
-                            selection={cardSelection("rg-4")}
                             loading={loading}
                             title="Register-wise Status"
                             subtitle="Click a register to filter to it"
@@ -297,7 +267,6 @@ const RegisterDashboard = ({
 
                     {shouldShow("rg-6") && (
                         <LocationMonthGrid
-                            selection={cardSelection("rg-6")}
                             loading={loading}
                             title="Location-wise Coverage by Month"
                             subtitle="Cells show applicable registers completed; click one to open its coverage worklist"
@@ -344,7 +313,6 @@ const RegisterDashboard = ({
 
                     {shouldShow("rg-7") && (
                         <TurnaroundCard
-                            selection={cardSelection("rg-7")}
                             loading={loading}
                             stages={turnaround.stages}
                             endToEnd={turnaround.end_to_end}
@@ -356,7 +324,6 @@ const RegisterDashboard = ({
 
                     {shouldShow("rg-8") && (
                         <VarianceWidget
-                            selection={cardSelection("rg-8")}
                             loading={loading}
                             variance={data.variance}
                             isCompanyMode={isCompanyMode}
@@ -367,7 +334,6 @@ const RegisterDashboard = ({
 
                     {ready && shouldShow("rg-9") && (
                         <ExceptionsCard
-                            selection={cardSelection("rg-9")}
                             loading={loading}
                             subtitle={`${summary.exceptions ?? 0} exceptions: overdue, SLA missed or variance open`}
                             total={summary.exceptions}
@@ -386,7 +352,6 @@ const RegisterDashboard = ({
                             // each sheet has its own columns and saved column choice
                             key={sheet}
                             ref={recordsRef}
-                            selection={cardSelection("rg-11")}
                             loading={loading}
                             title="Register Records"
                             subtitle={sheet === "execution" ? `${summary.executed ?? 0} execution rows match the filters` : ""}

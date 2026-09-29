@@ -4,7 +4,7 @@ import DashboardCard from "../common/DashboardCard";
 import { VALIDITY, VALIDITY_ORDER } from "./licenseUtils";
 
 // LC-6: license requests per month split by current validity, with average days to grant
-const TrendWidget = ({ selection, loading, trend, onDrill }) => {
+const TrendWidget = ({ loading, trend, onDrill }) => {
     // "Unspecified" (request_month "") has no place on a time axis
     const rows = (trend || []).filter((r) => r.request_month);
 
@@ -59,7 +59,6 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Requests Over Time"
             subtitle="By client request month; line: average days from request to validity start"
             loading={loading}

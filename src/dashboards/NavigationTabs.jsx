@@ -5,7 +5,6 @@ import "../style/dashboard.css";
 import { Tabs, Tab, Box } from "@mui/material";
 import GeneralComplianceDashboard from "../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard";
 import {
-    createOrUpdateWidgetMapping,
     fetchClientOnboardingByCompany,
     fetchClientOnboardingPortfolio,
     fetchGeneralCompaiancePortfolio,
@@ -26,7 +25,6 @@ import ChallanDashboard from "./challanDashboard/ChallanDashboard";
 import RegisterDashboard from "./registerDashboard/RegisterDashboard";
 import LicenseDashboard from "./licenseDashboard/LicenseDashboard";
 import { decryptData } from "../page/utils/encrypt";
-import Snackbars from "../component/Snackbars";
 
 // Query params shared by every dashboard tab
 const SHARED_PARAMS = ["tab", "company_name"];
@@ -41,7 +39,7 @@ function TabPanel({ children, value, index, keepMounted = true }) {
     );
 }
 
-const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, current }) => {
+const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     // The active tab lives in the URL (?tab=<slug>) so refresh, shared links and back/forward keep it.
     // Dashboards keep their filters in the same query string, so each tab's filters are parked when
@@ -53,71 +51,10 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
     const [generalDashboardData, setGeneralDashboardData] = useState([]);
     const [clientOnboardingData, setClientOnboardingData] = useState([]);
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
-    const [selectedCharts, setSelectedCharts] = useState([]);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const [widgetsList, setWidgetsList] = useState([]);
     const [page] = useState(1);
     const [limit] = useState(20);
-    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-        open: false,
-        vertical: "top",
-        horizontal: "center",
-        message: "",
-        severityType: "",
-    });
-    const [position, setPosition] = useState({
-        x: window.innerWidth / 2 - 75,   // center horizontally
-        y: window.innerHeight - 80       // bottom with 80px padding
-    });
-
-    const [isDragging, setIsDragging] = useState(false);
-    const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-    // Start dragging
-    const startDrag = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-
-        const clientX = e.clientX || e.touches?.[0]?.clientX;
-        const clientY = e.clientY || e.touches?.[0]?.clientY;
-
-        setOffset({
-            x: clientX - position.x,
-            y: clientY - position.y,
-        });
-    };
-
-    // Dragging
-    const onDrag = (e) => {
-        if (!isDragging) return;
-        const clientX = e.clientX || e.touches?.[0]?.clientX;
-        const clientY = e.clientY || e.touches?.[0]?.clientY;
-        let newX = clientX - offset.x;
-        let newY = clientY - offset.y;
-        // Restrict inside screen
-        newX = Math.max(0, Math.min(newX, window.innerWidth - 150));
-        newY = Math.max(0, Math.min(newY, window.innerHeight - 60));
-        setPosition({ x: newX, y: newY });
-    };
-
-    // Stop dragging
-    const stopDrag = () => setIsDragging(false);
-    useEffect(() => {
-        if (isDragging) {
-            window.addEventListener("mousemove", onDrag);
-            window.addEventListener("mouseup", stopDrag);
-            window.addEventListener("touchmove", onDrag);
-            window.addEventListener("touchend", stopDrag);
-        }
-
-        return () => {
-            window.removeEventListener("mousemove", onDrag);
-            window.removeEventListener("mouseup", stopDrag);
-
-            window.removeEventListener("touchmove", onDrag);
-            window.removeEventListener("touchend", stopDrag);
-        };
-    }, [isDragging, offset]);
 
     const userType = decryptData(localStorage.getItem("user_type"));
     const userId = decryptData(localStorage.getItem("user_id"));
@@ -163,18 +100,13 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                     <CockpitComplinceByCompany
                         companyName={selectedCompany}
                         setSelectedCompany={setSelectedCompany}
-                        current={current}
-                        selectedCharts={selectedCharts}
-                        setSelectedCharts={setSelectedCharts}
+                        shouldShow={shouldShow}
                         isActive={isCockpitActive}
                         openTab={openTab}
                     />
                 ) : (
                     <CockpitComplince
                         setSelectedCompany={setSelectedCompany}
-                        current={current}
-                        selectedCharts={selectedCharts}
-                        setSelectedCharts={setSelectedCharts}
                         shouldShow={shouldShow}
                         isActive={isCockpitActive}
                         openTab={openTab}
@@ -186,9 +118,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             slug: "general-compliance",
             title: "General Compliance",
             content: (
-                <GeneralComplianceDashboard data={generalDashboardData} current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
+                <GeneralComplianceDashboard data={generalDashboardData}
                     shouldShow={shouldShow}
                     page={page}
                     limit={limit}
@@ -208,14 +138,12 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 selectedCompany === "" ? (
                     <ClientOnbordingDashboard
                         data={clientOnboardingData}
-                        current={current}
                         selectedCompany={selectedCompany}
                         activeDrawer={activeDrawer}
                         setActiveDrawer={setActiveDrawer}
                     />) : (
                     <ClientOnBoardingByCompany
                         locationData={ClientOnBoardingByCompanyData}
-                        current={current}
                         selectedCompany={selectedCompany}
                         activeDrawer={activeDrawer}
                         setActiveDrawer={setActiveDrawer}
@@ -233,9 +161,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 <RegisterDashboard
                     selectedCompany={selectedCompany}
                     setSelectedCompany={setSelectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     isActive={activeSlug === "register"}
                 />
@@ -249,9 +174,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 <ReturnsDashboard
                     selectedCompany={selectedCompany}
                     setSelectedCompany={setSelectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     isActive={activeSlug === "returns-submissions"}
                 />
@@ -265,9 +187,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 <ChallanDashboard
                     selectedCompany={selectedCompany}
                     setSelectedCompany={setSelectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     isActive={activeSlug === "challan"}
                 />
@@ -281,9 +200,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 <LicenseDashboard
                     selectedCompany={selectedCompany}
                     setSelectedCompany={setSelectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     isActive={activeSlug === "license"}
                 />
@@ -296,9 +212,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             content: (
                 <PayrollServices
                     selectedCompany={selectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     activeDrawer={activeDrawer}
                     setActiveDrawer={setActiveDrawer}
@@ -312,9 +225,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             content: (
                 <HelpdeskAndEscalations
                     selectedCompany={selectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     activeDrawer={activeDrawer}
                     setActiveDrawer={setActiveDrawer}
@@ -329,9 +239,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             content: (
                 <GeneralHelpdesk
                     selectedCompany={selectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     widgetsList={widgetsList}
                     activeDrawer={activeDrawer}
                     setActiveDrawer={setActiveDrawer}
@@ -345,9 +252,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             content: (
                 <AuditAndVisitDashboard
                     selectedCompany={selectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     activeDrawer={activeDrawer}
                     setActiveDrawer={setActiveDrawer}
@@ -361,9 +265,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
             content: (
                 <NoticeDashboard
                     selectedCompany={selectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     widgetsList={widgetsList}
                     activeDrawer={activeDrawer}
@@ -423,39 +324,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
         };
         fetchWidgetsListData();
     }, [selectedCompany]);
-
-    const handleSubmit = async (updatedFormData) => {
-        if (!updatedFormData) return;
-
-        const payload = {
-            user_id: current?.user_id,
-            widget_ids: selectedCharts.map(id => id.toUpperCase())
-        };
-        try {
-            const response = await createOrUpdateWidgetMapping(payload, userId);
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: response?.message || "Mapping updated successfully",
-                severityType: 'success'
-            });
-            setSelectedCharts([]);
-
-        } catch (error) {
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: error?.response?.data?.message || "Error updating mapping",
-                severityType: 'error'
-            });
-        }
-    };
     return (
         <Box sx={{ width: "100%" }}>
-            <Snackbars
-                issnackbarsOpen={issnackbarsOpen}
-                setIsSnackbarsOpen={setIsSnackbarsOpen}
-            />
             <Tabs
                 value={activeIndex}
                 onChange={handleTabChange}
@@ -475,27 +345,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                 ))}
             </Box>
 
-            {userType === "0" && activeDrawer === null && (
-                <div className="navigation-wrapper">
-                    <div
-                        className="dashbord-user-access-btn"
-                        style={{
-                            position: "fixed",
-                            left: position.x,
-                            top: position.y,
-                            cursor: isDragging ? "grabbing" : "grab",
-                            zIndex: 9999,
-                            ...(selectedCharts?.length === 0
-                                ? { cursor: "not-allowed", opacity: 0.9 }
-                                : { pointerEvents: "auto", opacity: 1 })
-                        }}
-                        onMouseDown={startDrag}
-                        onTouchStart={startDrag}
-                    >
-                        <button className="btn btn-primary" disabled={selectedCharts?.length === 0} onClick={handleSubmit}>Create User Widget</button>
-                    </div>
-                </div>
-            )}
         </Box>
     );
 };

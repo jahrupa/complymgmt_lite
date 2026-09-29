@@ -11,7 +11,7 @@ import { BREAKDOWN_LABELS, VALIDITY, VALIDITY_ORDER } from "./licenseUtils";
  * switching it doesn't refetch the rest of the dashboard. Clicking a bar applies that filter
  * (every breakdown dimension has a filter param of the same name).
  */
-const BreakdownWidget = ({ selection, enabled, params, by, dimensions, onByChange, onDrill }) => {
+const BreakdownWidget = ({ enabled, params, by, dimensions, onByChange, onDrill }) => {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const requestIdRef = useRef(0);
@@ -70,7 +70,6 @@ const BreakdownWidget = ({ selection, enabled, params, by, dimensions, onByChang
 
     return (
         <DashboardCard
-            selection={selection}
             title="Breakdown"
             subtitle="Largest first. Click a bar to filter to it"
             loading={loading}

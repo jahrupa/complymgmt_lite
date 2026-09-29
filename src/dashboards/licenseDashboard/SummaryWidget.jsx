@@ -31,7 +31,7 @@ const Tile = ({ label, value, hint, tone, drill, onDrill }) => (
 );
 
 // LC-1: KPI tiles, validity donut, application type bars and attention flags
-const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
+const SummaryWidget = ({ loading, summary, onDrill }) => {
     const s = summary || {};
     const windowDays = s.expiring_window ?? 60;
     const byValidity = (s.by_validity || []).filter((v) => v.count > 0);
@@ -143,7 +143,6 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="License Summary"
             subtitle={s.total ? scope : ""}
             loading={loading}

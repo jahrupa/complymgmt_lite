@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
     applyFiltersToSearchParams,
@@ -8,15 +8,35 @@ import {
 } from "./dashboardUtils";
 
 /**
+ * Set when a dashboard is rendered as a widget preview (e.g. on the Widget Access page). The
+ * dashboard then keeps its filters in memory instead of reading and writing the page URL.
+ */
+export const WidgetPreviewContext = createContext(null);
+
+// URLSearchParams-like state that lives in memory, with the same setter signature as useSearchParams
+const useMemorySearchParams = () => {
+    const [params, setParams] = useState(() => new URLSearchParams());
+    const setSearchParams = useCallback(
+        (next) => setParams((prev) => new URLSearchParams(typeof next === "function" ? next(prev) : next)),
+        []
+    );
+    return [params, setSearchParams];
+};
+
+/**
  * Filter state kept in the URL query string.
  *
  * All dashboard tabs stay mounted and share one URL, so a dashboard only follows the URL while
  * it is the active tab and keeps its last filters otherwise. On first activation without any of
  * its filters in the URL it applies `defaultPeriod` (pass null until the period options are known),
  * unless the URL has `range=all` (e.g. a cockpit drill-down showing current status, all months).
+ * In a widget preview the same logic runs on in-memory params, so the host page's URL is untouched.
  */
 export const useDashboardFilters = ({ multiKeys, singleKeys, isActive, defaultPeriod }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const preview = useContext(WidgetPreviewContext);
+    const urlParams = useSearchParams();
+    const memoryParams = useMemorySearchParams();
+    const [searchParams, setSearchParams] = preview ? memoryParams : urlParams;
 
     const liveJson = JSON.stringify(filtersFromSearchParams(searchParams, multiKeys, singleKeys));
     const frozenJsonRef = useRef(liveJson);

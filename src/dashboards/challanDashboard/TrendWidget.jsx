@@ -7,7 +7,7 @@ import { formatINR, formatINRShort } from "../common/dashboardUtils";
 const ACT_COLORS = ["#14b8a6", "#6366f1", "#f59e0b", "#ec4899", "#64748b"];
 
 // CH-2: compliance % / on-time % lines and amount by act stacked bars
-const TrendWidget = ({ selection, loading, trend, onDrill }) => {
+const TrendWidget = ({ loading, trend, onDrill }) => {
     // "Unspecified" (month "") has no place on a time axis
     const rows = (trend || []).filter((r) => r.month);
     const labels = rows.map((r) => r.label);
@@ -73,7 +73,6 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Monthly Trend"
             subtitle="Click a month to see its records"
             loading={loading}

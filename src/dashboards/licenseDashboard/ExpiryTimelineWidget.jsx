@@ -12,7 +12,7 @@ const startsWithinWindow = (month, windowDays) => {
 };
 
 // LC-5: active + expiring licenses by end month from this month, for renewal planning
-const ExpiryTimelineWidget = ({ selection, loading, timeline, expiringWindow = 60, onDrill }) => {
+const ExpiryTimelineWidget = ({ loading, timeline, expiringWindow = 60, onDrill }) => {
     const t = timeline || {};
     const months = t.timeline || [];
     const total = months.reduce((sum, m) => sum + m.count, 0);
@@ -64,7 +64,6 @@ const ExpiryTimelineWidget = ({ selection, loading, timeline, expiringWindow = 6
 
     return (
         <DashboardCard
-            selection={selection}
             title="Expiry Timeline"
             subtitle={`Active and expiring licenses by end month (amber: within ${expiringWindow} days); click a month to see them`}
             loading={loading}

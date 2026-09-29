@@ -11,7 +11,7 @@ import { COVERAGE_STATUSES } from "./returnsUtils";
  * locations (filings but nothing applicable) are a data gap. A row opens its records.
  */
 const CoverageWidget = forwardRef(function CoverageWidget(
-    { selection, loading, params, coverageStatus, coverage, statusFiltersActive, isCompanyMode, onStatusChange, onOpenRow },
+    { loading, params, coverageStatus, coverage, statusFiltersActive, isCompanyMode, onStatusChange, onOpenRow },
     ref
 ) {
     const [total, setTotal] = useState(null);
@@ -37,7 +37,6 @@ const CoverageWidget = forwardRef(function CoverageWidget(
     return (
         <div ref={ref}>
             <DashboardCard
-                selection={selection}
                 loading={loading}
                 title="Location Coverage Worklist"
                 subtitle={

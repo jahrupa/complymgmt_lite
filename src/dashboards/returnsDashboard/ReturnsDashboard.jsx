@@ -15,7 +15,6 @@ import {
     fetchReturnsDashTurnaround,
 } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useDashboardData, useDashboardFilters, useFilterOptions } from "../common/useDashboard";
 import { defaultPeriod, formatPercent, withoutKeys } from "../common/dashboardUtils";
 import AccessState from "../common/AccessState";
@@ -71,9 +70,6 @@ const renderStatus = (computed) => <ReturnBadges computed={computed} />;
 const ReturnsDashboard = ({
     selectedCompany,
     setSelectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
     shouldShow,
     isActive,
 }) => {
@@ -136,28 +132,6 @@ const ReturnsDashboard = ({
         onError: (message) => showSnackbar(message, "error"),
     });
     const accessError = optionsAccessError || dataAccessError;
-
-    /* ---------- widget selection (same rules as the other dashboards) ---------- */
-
-    const userRole = decryptData(localStorage.getItem("user_role"));
-    const canSelect = userRole === "Admin" || userRole === "Super-Admin";
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            showSnackbar("First you need to select a user", "warning");
-            return;
-        }
-        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
-    };
-
-    const cardSelection = (id) => ({
-        id,
-        canSelect,
-        selected: selectedCharts.includes(id),
-        disabled: !current?.user_name,
-        onSelect: (chartId) => canSelect && toggleChartSelection(chartId),
-        onToggle: toggleChartSelection,
-    });
 
     /* ---------- drill downs ---------- */
 
@@ -245,7 +219,6 @@ const ReturnsDashboard = ({
 
                     {shouldShow("rt-1") && (
                         <SummaryWidget
-                            selection={cardSelection("rt-1")}
                             loading={loading}
                             summary={summary}
                             statusFiltersActive={statusFiltersActive}
@@ -257,7 +230,6 @@ const ReturnsDashboard = ({
                     {ready && showCoverage && (
                         <CoverageWidget
                             ref={coverageRef}
-                            selection={cardSelection("rt-10")}
                             loading={loading}
                             params={params}
                             coverageStatus={filters.coverage_status}
@@ -271,7 +243,6 @@ const ReturnsDashboard = ({
 
                     {!isCompanyMode && shouldShow("rt-2") && (
                         <GroupTableCard
-                            selection={cardSelection("rt-2")}
                             loading={loading}
                             title="Company-wise Returns"
                             subtitle="Lowest coverage first. Click a company to open its dashboard"
@@ -284,16 +255,15 @@ const ReturnsDashboard = ({
 
                     <div className="charts-grid">
                         {shouldShow("rt-3") && (
-                            <TrendWidget selection={cardSelection("rt-3")} loading={loading} trend={data.trend} onDrill={onDrill} />
+                            <TrendWidget loading={loading} trend={data.trend} onDrill={onDrill} />
                         )}
                         {shouldShow("rt-6") && (
-                            <ActWiseWidget selection={cardSelection("rt-6")} loading={loading} actWise={data.actWise} onDrill={onDrill} />
+                            <ActWiseWidget loading={loading} actWise={data.actWise} onDrill={onDrill} />
                         )}
                     </div>
 
                     {shouldShow("rt-4") && (
                         <GroupTableCard
-                            selection={cardSelection("rt-4")}
                             loading={loading}
                             title="Period-wise Filings"
                             subtitle="Latest period first. Periods overlap (quarterly vs annual); click one to filter to it"
@@ -306,7 +276,6 @@ const ReturnsDashboard = ({
 
                     {shouldShow("rt-5") && (
                         <GroupTableCard
-                            selection={cardSelection("rt-5")}
                             loading={loading}
                             title="Return-wise Status"
                             subtitle="Click a return to filter to it"
@@ -320,7 +289,6 @@ const ReturnsDashboard = ({
 
                     {shouldShow("rt-7") && (
                         <LocationMonthGrid
-                            selection={cardSelection("rt-7")}
                             loading={loading}
                             title="Location-wise Filings by Due Month"
                             subtitle="Cells show returns filed of due; click one to see those records"
@@ -354,7 +322,6 @@ const ReturnsDashboard = ({
 
                     {shouldShow("rt-8") && (
                         <TurnaroundCard
-                            selection={cardSelection("rt-8")}
                             loading={loading}
                             stages={turnaround.stages}
                             endToEnd={turnaround.end_to_end}
@@ -366,7 +333,6 @@ const ReturnsDashboard = ({
 
                     {ready && shouldShow("rt-9") && (
                         <ExceptionsCard
-                            selection={cardSelection("rt-9")}
                             loading={loading}
                             subtitle={`${summary.exceptions ?? 0} exceptions: non / partially compliant, overdue, filed late, at risk or escalated`}
                             total={summary.exceptions}
@@ -385,7 +351,6 @@ const ReturnsDashboard = ({
                             // each sheet has its own columns and saved column choice
                             key={sheet}
                             ref={recordsRef}
-                            selection={cardSelection("rt-11")}
                             loading={loading}
                             title="Returns Records"
                             subtitle={sheet === "transaction" ? `${summary.total ?? 0} filings match the filters` : ""}

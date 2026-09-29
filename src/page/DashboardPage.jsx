@@ -10,8 +10,7 @@ import NavigationTabs from "../dashboards/NavigationTabs";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchAllCompanies, fetchAllUser } from "../api/service";
-import { decryptData } from "./utils/encrypt";
+import { fetchAllCompanies } from "../api/service";
 
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([]);
@@ -40,29 +39,18 @@ const DashboardPage = () => {
     });
   }, [selectedCompany, setSearchParams]);
   const [activeTitle, setActiveTitle] = useState(""); // header title of the active dashboard tab
-  const [current, setCurrent] = useState({});
-  const [allUser, setAllUser] = useState([]);
   useEffect(() => {
-    const fetchCockpitData = async () => {
-      const [cockpitByCompanyRes, allUserRes] = await Promise.allSettled([
-        fetchAllCompanies(),
-        fetchAllUser(),
-      ]);
-      if (cockpitByCompanyRes.status === "fulfilled" && Array.isArray(cockpitByCompanyRes.value)) {
-        setCompanyName(cockpitByCompanyRes.value);
-      } else {
+    const fetchCompanies = async () => {
+      try {
+        const companies = await fetchAllCompanies();
+        setCompanyName(Array.isArray(companies) ? companies : []);
+      } catch {
         setCompanyName([]);
-      }
-      if (allUserRes.status === "fulfilled" && Array.isArray(allUserRes.value)) {
-        setAllUser(allUserRes.value);
-      } else {
-        setAllUser([]);
       }
     };
 
-    fetchCockpitData();
+    fetchCompanies();
   }, []);
-    const userType = decryptData(localStorage.getItem("user_type"));
 
   return (
     <div>
@@ -91,34 +79,6 @@ const DashboardPage = () => {
               }))}
             />
           </div>
-          {userType === "0" && (
-   <div className="me-1 ms-1" style={{ width: '250px' }}>
-          
-              <SingleSelectTextField
-              name="user_id"
-              label="Choose a user to create a widget"
-              value={current.user_name ?? ''}
-              onChange={(e) => {
-                const userName = e.target.value;
-                const matchedUser = allUser.find((u) => u.full_name === userName);
-
-                setCurrent((prev) => ({
-                  ...prev,
-                  user_id: matchedUser?._id,
-                  user_name: matchedUser?.full_name || '',
-                }));
-              }}
-              names={allUser?.map((item) => ({
-                _id: item._id,
-                name: item.full_name,
-              }))}
-            />
-        
-            
-
-          </div>
-
-          )}
        
         </div>
       </div>
@@ -140,7 +100,6 @@ const DashboardPage = () => {
           selectedCompany={selectedCompany}
           setSelectedCompany={setSelectedCompany}
           setActiveTitle={setActiveTitle}
-          current={current}
         />
         {/* <ComplianceMasterDashboard /> */}
       </div>

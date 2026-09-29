@@ -1,12 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 // cockpitComplinceByCompany.css also holds the global .chart-card / .selected-card styles
 import "../../style/cockpitComplinceByCompany.css";
 import "../../style/dashboardWidgets.css";
 import { fetchCockpitClients, fetchCockpitCompanyWise, fetchCockpitStateWise, fetchCockpitSummary } from "../../api/service";
-import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useDashboardData } from "../common/useDashboard";
 import DashboardCard from "../common/DashboardCard";
 import GroupTableCard from "../common/GroupTableCard";
@@ -84,26 +82,11 @@ const CLIENT_COLUMNS = [
  */
 const CockpitComplince = ({
     setSelectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
     shouldShow,
     isActive,
     openTab,
 }) => {
     const [groupBy, setGroupBy] = useState("company");
-    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-        open: false,
-        vertical: "top",
-        horizontal: "center",
-        message: "",
-        severityType: "",
-    });
-    const showSnackbar = useCallback(
-        (message, severityType) => setIsSnackbarsOpen((prev) => ({ ...prev, open: true, message, severityType })),
-        []
-    );
-
     const { filters, updateFilters, resetFilters, ready, filterOptions, params, openModule, loadError, setLoadError } = useCockpit({
         selectedCompany: "",
         isActive,
@@ -121,28 +104,6 @@ const CockpitComplince = ({
         enabled: ready,
         isCompanyMode: false,
         onError: setLoadError,
-    });
-
-    /* ---------- widget selection (same rules as the other dashboards) ---------- */
-
-    const userRole = decryptData(localStorage.getItem("user_role"));
-    const canSelect = userRole === "Admin" || userRole === "Super-Admin";
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            showSnackbar("First you need to select a user", "warning");
-            return;
-        }
-        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
-    };
-
-    const cardSelection = (id) => ({
-        id,
-        canSelect,
-        selected: selectedCharts.includes(id),
-        disabled: !current?.user_name,
-        onSelect: (chartId) => canSelect && toggleChartSelection(chartId),
-        onToggle: toggleChartSelection,
     });
 
     /* ---------- data ---------- */
@@ -196,8 +157,6 @@ const CockpitComplince = ({
 
     return (
         <div>
-            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-
             <div className="d-flex align-items-center gap-2 mb-2 small">
                 <span className="text-muted">Showing:</span>
                 <span className="fw-600">{period || "Current status"}</span>
@@ -210,11 +169,10 @@ const CockpitComplince = ({
 
             <div className="charts-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
                 {shouldShow("cc-6") && (
-                    <OverallScoreCard selection={cardSelection("cc-6")} loading={loading} summary={data.summary} title="Overall Compliance Score" />
+                    <OverallScoreCard loading={loading} summary={data.summary} title="Overall Compliance Score" />
                 )}
                 {shouldShow("cc-9") && (
                         <DashboardCard
-                            selection={cardSelection("cc-9")}
                             title="Analytics Summary"
                             subtitle="Companies by overall score"
                             loading={loading}
@@ -238,7 +196,6 @@ const CockpitComplince = ({
                 {TILE_ORDER.filter((key) => shouldShow(MODULES[key].widgetId)).map((key) => (
                     <ModuleTile
                         key={key}
-                        selection={cardSelection(MODULES[key].widgetId)}
                         loading={loading}
                         module={moduleByKey[key]}
                         onOpen={openModule}
@@ -247,12 +204,11 @@ const CockpitComplince = ({
             </div>
 
             {shouldShow("cc-7") && (
-                <CompletionStatusCard selection={cardSelection("cc-7")} loading={loading} modules={modules} onOpen={openModule} />
+                <CompletionStatusCard loading={loading} modules={modules} onOpen={openModule} />
             )}
 
             {shouldShow("cc-1") && (
                 <GroupTableCard
-                    selection={cardSelection("cc-1")}
                     loading={loading}
                     title="Multi-Client Compliance Analytics"
                     subtitle={
@@ -279,7 +235,6 @@ const CockpitComplince = ({
 
             {shouldShow("cc-8") && (
                 <GroupTableCard
-                    selection={cardSelection("cc-8")}
                     loading={loading}
                     title="Client Performance Overview"
                     subtitle="Overall score with onboarding details from the client master. Click a company to open its cockpit"

@@ -5,7 +5,7 @@ import DashboardCard from "../common/DashboardCard";
 const FILING_COLORS = ["#14b8a6", "#fbbf24", "#f87171"];
 
 // RT-3: filed on time vs late vs not filed per due month, with compliance %
-const TrendWidget = ({ selection, loading, trend, onDrill }) => {
+const TrendWidget = ({ loading, trend, onDrill }) => {
     // "Unspecified" (due_month "") has no place on a time axis
     const rows = (trend || []).filter((r) => r.due_month);
 
@@ -49,7 +49,6 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Filings by Due Month"
             subtitle="Click a month to filter to it"
             loading={loading}

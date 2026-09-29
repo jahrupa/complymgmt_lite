@@ -1,11 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import Chart from "react-apexcharts";
 // cockpitComplinceByCompany.css also holds the global .chart-card / .selected-card styles
 import "../../style/cockpitComplinceByCompany.css";
 import "../../style/dashboardWidgets.css";
 import { fetchCockpitClients, fetchCockpitSummary } from "../../api/service";
-import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useDashboardData } from "../common/useDashboard";
 import DashboardCard from "../common/DashboardCard";
 import AccessState from "../common/AccessState";
@@ -20,29 +18,15 @@ const TILE_ORDER = ["license", "registers", "returns", "challan"];
 
 /**
  * Compliance Cockpit for one company (company_name on every call). Module tiles link to the module
- * dashboards with the company and month range.
+ * dashboards with the company and month range. Each widget is gated by its CCBC-* id.
  */
 const CockpitComplinceByCompany = ({
     companyName,
     setSelectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
+    shouldShow,
     isActive,
     openTab,
 }) => {
-    const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-        open: false,
-        vertical: "top",
-        horizontal: "center",
-        message: "",
-        severityType: "",
-    });
-    const showSnackbar = useCallback(
-        (message, severityType) => setIsSnackbarsOpen((prev) => ({ ...prev, open: true, message, severityType })),
-        []
-    );
-
     const { filters, updateFilters, resetFilters, ready, filterOptions, optionsAccessError, params, openModule, loadError, setLoadError } =
         useCockpit({ selectedCompany: companyName, isActive, openTab });
 
@@ -57,28 +41,6 @@ const CockpitComplinceByCompany = ({
         onError: setLoadError,
     });
     const accessError = optionsAccessError || dataAccessError;
-
-    /* ---------- widget selection (same rules as the other dashboards) ---------- */
-
-    const userRole = decryptData(localStorage.getItem("user_role"));
-    const canSelect = userRole === "Admin" || userRole === "Super-Admin";
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            showSnackbar("First you need to select a user", "warning");
-            return;
-        }
-        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
-    };
-
-    const cardSelection = (id) => ({
-        id,
-        canSelect,
-        selected: selectedCharts.includes(id),
-        disabled: !current?.user_name,
-        onSelect: (chartId) => canSelect && toggleChartSelection(chartId),
-        onToggle: toggleChartSelection,
-    });
 
     /* ---------- data ---------- */
 
@@ -136,8 +98,6 @@ const CockpitComplinceByCompany = ({
 
     return (
         <div>
-            <Snackbars issnackbarsOpen={issnackbarsOpen} setIsSnackbarsOpen={setIsSnackbarsOpen} />
-
             <div className="d-flex flex-wrap align-items-center gap-2 mb-2 small">
                 <span className="text-muted">Company-wise view:</span>
                 <span className="fw-600">{companyName}</span>
@@ -156,24 +116,26 @@ const CockpitComplinceByCompany = ({
                     {loadError && <div className="alert alert-danger">{loadError}</div>}
 
                     <div className="charts-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
-                        <OverallScoreCard selection={cardSelection("ccbc-1")} loading={loading} summary={data.summary} title="Compliance Dashboard" />
-                        <DashboardCard
-                            selection={cardSelection("ccbc-6")}
-                            title="Compliance Score Distribution"
-                            subtitle="Score of each module; click a bar to open that dashboard"
-                            loading={loading}
-                            isEmpty={!ordered.length}
-                            minHeight={220}
-                        >
-                            <Chart options={scoreChart.options} series={scoreChart.series} type="bar" height={270} />
-                        </DashboardCard>
+                        {shouldShow("ccbc-1") && (
+                            <OverallScoreCard loading={loading} summary={data.summary} title="Compliance Dashboard" />
+                        )}
+                        {shouldShow("ccbc-6") && (
+                            <DashboardCard
+                                title="Compliance Score Distribution"
+                                subtitle="Score of each module; click a bar to open that dashboard"
+                                loading={loading}
+                                isEmpty={!ordered.length}
+                                minHeight={220}
+                            >
+                                <Chart options={scoreChart.options} series={scoreChart.series} type="bar" height={270} />
+                            </DashboardCard>
+                        )}
                     </div>
 
                     <div className="charts-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
-                        {TILE_ORDER.map((key) => (
+                        {TILE_ORDER.filter((key) => shouldShow(MODULES[key].companyWidgetId)).map((key) => (
                             <ModuleTile
                                 key={key}
-                                selection={cardSelection(MODULES[key].companyWidgetId)}
                                 loading={loading}
                                 module={moduleByKey[key]}
                                 onOpen={openModule}
@@ -181,11 +143,10 @@ const CockpitComplinceByCompany = ({
                         ))}
                     </div>
 
-                    <CompletionStatusCard selection={cardSelection("ccbc-7")} loading={loading} modules={modules} onOpen={openModule} />
+                    {shouldShow("ccbc-7") && <CompletionStatusCard loading={loading} modules={modules} onOpen={openModule} />}
 
-                    {ready && (
+                    {ready && shouldShow("ccbc-8") && (
                         <CompanyAttentionWidget
-                            selection={cardSelection("ccbc-8")}
                             enabled={ready}
                             params={params}
                             companyName={companyName}
@@ -193,8 +154,8 @@ const CockpitComplinceByCompany = ({
                         />
                     )}
 
+                    {shouldShow("ccbc-9") && (
                     <DashboardCard
-                        selection={cardSelection("ccbc-9")}
                         title="Summary Statistics"
                         subtitle={`Totals across modules with data (${modulesAvailableText(summary.modules_available)})`}
                         loading={loading}
@@ -240,6 +201,7 @@ const CockpitComplinceByCompany = ({
                             )}
                         </div>
                     </DashboardCard>
+                    )}
                 </>
             )}
         </div>

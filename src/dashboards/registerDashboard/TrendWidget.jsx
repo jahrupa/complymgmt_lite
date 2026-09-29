@@ -4,7 +4,7 @@ import DashboardCard from "../common/DashboardCard";
 import { hasApplicability } from "./registerUtils";
 
 // RG-3: completion / SLA / coverage % lines and executed vs completed bars per month
-const TrendWidget = ({ selection, loading, trend, onDrill }) => {
+const TrendWidget = ({ loading, trend, onDrill }) => {
     // "Unspecified" (month "") has no place on a time axis
     const rows = (trend || []).filter((r) => r.month);
     const labels = rows.map((r) => r.label);
@@ -72,7 +72,6 @@ const TrendWidget = ({ selection, loading, trend, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Monthly Trend"
             subtitle="Click a month to filter to it"
             loading={loading}

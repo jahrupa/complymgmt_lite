@@ -18,16 +18,12 @@ import {
 import { ArrowUpRight, X } from "lucide-react";
 import DashboardDrawerGrid from "../DashboardDrawer";
 import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useNavigate } from "react-router-dom";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const PayrollServices = ({
     selectedCompany,
-    current,
-    setSelectedCharts,
-    selectedCharts,
     shouldShow,
     activeDrawer,
     setActiveDrawer,
@@ -196,7 +192,6 @@ const PayrollServices = ({
     const [isDetailPage, setIsDetailPage] = useState(false);
     const [isDetailPageData, setIsDetailPageData] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
-    const userRole = decryptData(localStorage.getItem("user_role"));
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
@@ -481,34 +476,7 @@ const PayrollServices = ({
         fetchData();
     }, [selectedCompany]);
 
-    useEffect(() => {
-        setSelectedCharts([]);
-    }, [current?.user_name]);
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            // alert("First you need to select a user");
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "First you need to select a user",
-                severityType: "warning",
-            });
-            return;
-        }
 
-        setSelectedCharts((prev) =>
-            prev.includes(chartId)
-                ? prev.filter((id) => id !== chartId)
-                : [...prev, chartId]
-        );
-    };
-    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
-    const cardClass = (id, defaultClass = "") =>
-        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
-
-    const handleSelect = (id) => {
-        if (canSelect) toggleChartSelection(id);
-    };
     const payrollDashboardConfig = [
         /* =======================
            STATS CARDS (Top Row)
@@ -627,20 +595,8 @@ const PayrollServices = ({
                             shouldShow(stat.id) ? (
                                 <div
                                     key={stat.id}
-                                    className={`payroll-stat-card performer-card high-performer ${cardClass(
-                                        stat.id,
-                                        "returns"
-                                    )}`}
-                                    onClick={canSelect ? () => handleSelect(stat.id) : undefined}
-                                    style={{ cursor: canSelect ? "pointer" : "default" }}
+                                    className={`payroll-stat-card performer-card high-performer`}
                                 >
-                                    <input
-                                        type="checkbox"
-                                        className="chart-select-checkbox"
-                                        onChange={() => toggleChartSelection(stat.id)}
-                                        checked={selectedCharts.includes(stat.id)}
-                                        disabled={!current?.user_name}
-                                    />
 
                                     <div className="stat-label">{stat.title}</div>
 
@@ -686,18 +642,9 @@ const PayrollServices = ({
                     {/* ps-4 */}
                     {shouldShow("ps-4") && (
                         <div
-                            className={`chart-card ${cardClass("ps-4") ? "selected-card" : ""}`}
-                            onClick={canSelect ? () => handleSelect("ps-4") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`chart-card`}
                         >
                             <div className="d-flex justify-content-end align-items-center">
-                                <input
-                                    type="checkbox"
-                                    className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-4")}
-                                    checked={selectedCharts.includes("ps-4")}
-                                    disabled={!current?.user_name}
-                                />
 
                                 <div
                                     className="dashboard-icon ms-2"
@@ -735,18 +682,9 @@ const PayrollServices = ({
                     {/* ps-5 */}
                     {shouldShow("ps-5") && (
                         <div
-                            className={`chart-card ${cardClass("ps-5") ? "selected-card" : ""}`}
-                            onClick={canSelect ? () => handleSelect("ps-5") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`chart-card`}
                         >
                             <div className="d-flex justify-content-end align-items-center">
-                                <input
-                                    type="checkbox"
-                                    className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-5")}
-                                    checked={selectedCharts.includes("ps-5")}
-                                    disabled={!current?.user_name}
-                                />
 
                                 <div
                                     className="dashboard-icon ms-2"
@@ -787,18 +725,9 @@ const PayrollServices = ({
                     {/* ps-6 */}
                     {shouldShow("ps-6") && (
                         <div
-                            className={`chart-card ${cardClass("ps-6") ? "selected-card" : ""}`}
-                            onClick={canSelect ? () => handleSelect("ps-6") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`chart-card`}
                         >
                             <div className="d-flex justify-content-end align-items-center">
-                                <input
-                                    type="checkbox"
-                                    className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-6")}
-                                    checked={selectedCharts.includes("ps-6")}
-                                    disabled={!current?.user_name}
-                                />
 
                                 <div
                                     className="dashboard-icon ms-2"
@@ -836,18 +765,9 @@ const PayrollServices = ({
                     {/* ps-7 */}
                     {shouldShow("ps-7") && (
                         <div
-                            className={`chart-card ${cardClass("ps-7") ? "selected-card" : ""}`}
-                            onClick={canSelect ? () => handleSelect("ps-7") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`chart-card`}
                         >
                             <div className="d-flex justify-content-end align-items-center">
-                                <input
-                                    type="checkbox"
-                                    className="chart-select-checkbox"
-                                    onChange={() => toggleChartSelection("ps-7")}
-                                    checked={selectedCharts.includes("ps-7")}
-                                    disabled={!current?.user_name}
-                                />
 
                                 <div
                                     className="dashboard-icon ms-2"
@@ -885,8 +805,7 @@ const PayrollServices = ({
 
                 {shouldShow("ps-8") && (
                     <div
-                        className={`chart-card ${cardClass("ps-8") ? "selected-card" : ""}`}
-                        onClick={canSelect ? () => handleSelect("ps-8") : undefined}
+                        className={`chart-card`}
                         style={{ height: '515px' }}
                     >
                         <div className="ag-theme-quartz" style={{ height: "400px", width: "100%", marginTop: "1rem" }}>

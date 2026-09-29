@@ -4,7 +4,7 @@ import DashboardCard from "../common/DashboardCard";
 import { formatPercent } from "../common/dashboardUtils";
 
 // RT-6: filing outcome per act (transactions)
-const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
+const ActWiseWidget = ({ loading, actWise, onDrill }) => {
     const rows = (actWise || []).filter((r) => r.total > 0);
 
     const chart = {
@@ -54,7 +54,6 @@ const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Act-wise Filings"
             subtitle="Click an act to filter to it"
             loading={loading}
