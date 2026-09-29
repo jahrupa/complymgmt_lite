@@ -5,10 +5,11 @@ import DashboardCard from "./DashboardCard";
 const DELAY_COLORS = ["#14b8a6", "#fbbf24", "#fb923c", "#f87171", "#dc2626", "#6b7280"];
 
 /**
- * Process turnaround: average days per stage plus a delay bucket chart.
+ * Process turnaround: average days per stage plus an optional delay bucket chart.
  * `delays` are { name, count } in the backend's fixed order; `onDelayClick(index, count)` drills down.
+ * `footer` renders below the charts (e.g. an SLA figure when there are no delay buckets).
  */
-const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = [], delaysTitle, onDelayClick }) => {
+const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = [], delaysTitle, onDelayClick, footer }) => {
     const anomalyStages = [...stages, ...(endToEnd?.anomalies ? [endToEnd] : [])].filter((s) => s.anomalies > 0);
 
     const stageChart = {
@@ -66,9 +67,9 @@ const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = []
             isEmpty={stages.length === 0 && delays.length === 0}
         >
             <div className="row">
-                <div className="col-lg-7">
+                <div className={delays.length ? "col-lg-7" : "col-12"}>
                     <div className="fw-600 small text-muted">Average days per stage</div>
-                    <Chart options={stageChart.options} series={stageChart.series} type="bar" height={300} />
+                    <Chart options={stageChart.options} series={stageChart.series} type="bar" height={Math.max(300, stages.length * 40 + 60)} />
                     {anomalyStages.length > 0 && (
                         <div className="text-muted small">
                             Excluded because dates are out of order:{" "}
@@ -76,11 +77,14 @@ const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = []
                         </div>
                     )}
                 </div>
-                <div className="col-lg-5">
-                    <div className="fw-600 small text-muted">{delaysTitle}</div>
-                    <Chart options={delayChart.options} series={delayChart.series} type="bar" height={300} />
-                </div>
+                {delays.length > 0 && (
+                    <div className="col-lg-5">
+                        <div className="fw-600 small text-muted">{delaysTitle}</div>
+                        <Chart options={delayChart.options} series={delayChart.series} type="bar" height={300} />
+                    </div>
+                )}
             </div>
+            {footer}
         </DashboardCard>
     );
 };

@@ -33,6 +33,7 @@ import AuditAndVisitDashboard from "./Audit/AuditAndVisitDashboard";
 import NoticeDashboard from "./noticeDashboard/NoticeDashboard";
 import ChallanDashboard from "./challanDashboard/ChallanDashboard";
 import RegisterDashboard from "./registerDashboard/RegisterDashboard";
+import LicenseDashboard from "./licenseDashboard/LicenseDashboard";
 import { decryptData } from "../page/utils/encrypt";
 import Snackbars from "../component/Snackbars";
 
@@ -220,18 +221,18 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
 
     tabsList.push(
         {
-            label: "Payroll Services",
-            slug: "payroll-services",
-            title: "Payroll",
+            label: "Registers",
+            slug: "register",
+            title: "Register Dashboard",
             content: (
-                <PayrollServices
+                <RegisterDashboard
                     selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
                     current={current}
                     selectedCharts={selectedCharts}
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
-                    activeDrawer={activeDrawer}
-                    setActiveDrawer={setActiveDrawer}
+                    isActive={activeSlug === "register"}
                 />
             )
         },
@@ -248,6 +249,54 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                     setSelectedCharts={setSelectedCharts}
                     shouldShow={shouldShow}
                     isActive={activeSlug === "returns-submissions"}
+                />
+            )
+        },
+        {
+            label: "Challan",
+            slug: "challan",
+            title: "Challan Dashboard",
+            content: (
+                <ChallanDashboard
+                    selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    isActive={activeSlug === "challan"}
+                />
+            )
+        },
+        {
+            label: "Licenses",
+            slug: "license",
+            title: "License Dashboard",
+            content: (
+                <LicenseDashboard
+                    selectedCompany={selectedCompany}
+                    setSelectedCompany={setSelectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    isActive={activeSlug === "license"}
+                />
+            )
+        },
+        {
+            label: "Payroll Services",
+            slug: "payroll-services",
+            title: "Payroll",
+            content: (
+                <PayrollServices
+                    selectedCompany={selectedCompany}
+                    current={current}
+                    selectedCharts={selectedCharts}
+                    setSelectedCharts={setSelectedCharts}
+                    shouldShow={shouldShow}
+                    activeDrawer={activeDrawer}
+                    setActiveDrawer={setActiveDrawer}
                 />
             )
         },
@@ -314,38 +363,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle, c
                     widgetsList={widgetsList}
                     activeDrawer={activeDrawer}
                     setActiveDrawer={setActiveDrawer}
-                />
-            )
-        },
-        {
-            label: "Challan",
-            slug: "challan",
-            title: "Challan Dashboard",
-            content: (
-                <ChallanDashboard
-                    selectedCompany={selectedCompany}
-                    setSelectedCompany={setSelectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
-                    shouldShow={shouldShow}
-                    isActive={activeSlug === "challan"}
-                />
-            )
-        },
-        {
-            label: "Registers",
-            slug: "register",
-            title: "Register Dashboard",
-            content: (
-                <RegisterDashboard
-                    selectedCompany={selectedCompany}
-                    setSelectedCompany={setSelectedCompany}
-                    current={current}
-                    selectedCharts={selectedCharts}
-                    setSelectedCharts={setSelectedCharts}
-                    shouldShow={shouldShow}
-                    isActive={activeSlug === "register"}
                 />
             )
         }
