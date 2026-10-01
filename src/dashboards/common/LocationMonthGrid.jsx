@@ -16,7 +16,6 @@ import DashboardCard from "./DashboardCard";
  * - onCellClick(loc, month) / onLocationClick(loc)
  */
 const LocationMonthGrid = ({
-    selection,
     loading,
     title,
     subtitle,
@@ -45,7 +44,6 @@ const LocationMonthGrid = ({
 
     return (
         <DashboardCard
-            selection={selection}
             title={title}
             subtitle={subtitle}
             loading={loading}

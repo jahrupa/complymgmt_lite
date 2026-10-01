@@ -7,7 +7,7 @@ import { formatINR, formatINRShort, formatPercent } from "../common/dashboardUti
 const STATUS_COLORS = ["#14b8a6", "#f87171", "#fbbf24", "#99f6e4"];
 
 // CH-1: KPI tiles, compliance status donut and a separate data quality badge
-const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
+const SummaryWidget = ({ loading, summary, onDrill }) => {
     const s = summary || {};
     const byStatus = s.by_status || [];
     const isEmpty = !s.total;
@@ -92,7 +92,6 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Challan Summary"
             subtitle={isEmpty ? "" : scope}
             loading={loading}

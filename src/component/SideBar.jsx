@@ -89,14 +89,6 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents' },
 
-        ...(userRole === 'Admin' || userRole === 'Super-Admin'
-            ? [{
-                icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
-                label: 'Widget Mappings',
-                link: 'widget_mappings'
-            }]
-            : []
-        ),
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 
     ];
@@ -107,6 +99,11 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                 icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
                 label: 'Tracker Access',
                 link: 'service_tracker_access',
+                parent: 'serviceTracker'
+            }, {
+                icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+                label: 'Widget Access',
+                link: 'widget_access',
                 parent: 'serviceTracker'
             }]
             : []

@@ -2,7 +2,7 @@ import React from "react";
 import Chart from "react-apexcharts";
 import { Tooltip } from "@mui/material";
 import DashboardCard from "../common/DashboardCard";
-import { formatPercent } from "../common/dashboardUtils";
+import { formatPercent, periodLabel } from "../common/dashboardUtils";
 import { VALIDITY, validityLabel } from "./licenseUtils";
 
 const Tile = ({ label, value, hint, tone, drill, onDrill }) => (
@@ -31,7 +31,7 @@ const Tile = ({ label, value, hint, tone, drill, onDrill }) => (
 );
 
 // LC-1: KPI tiles, validity donut, application type bars and attention flags
-const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
+const SummaryWidget = ({ loading, summary, onDrill }) => {
     const s = summary || {};
     const windowDays = s.expiring_window ?? 60;
     const byValidity = (s.by_validity || []).filter((v) => v.count > 0);
@@ -44,6 +44,16 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
             value: notSurrendered > 0 ? formatPercent(s.valid_percent) : "–",
             hint: `${s.valid ?? 0} of ${notSurrendered} licenses not surrendered are active, expiring or lifetime`,
         },
+        // With a month range: licenses whose validity started in the range or is still valid at its end
+        ...(s.period_coverage
+            ? [
+                  {
+                      label: `Coverage for ${periodLabel(s.period_coverage)}`,
+                      value: formatPercent(s.period_coverage.coverage_percent),
+                      hint: `${s.period_coverage.covered} of ${s.period_coverage.applicable} licenses (excl. surrendered) covered in the period; ${s.period_coverage.not_covered} not covered. The period doesn't narrow the license list.`,
+                  },
+              ]
+            : []),
         { label: "Active", value: s.active ?? 0, tone: VALIDITY.active.color, drill: s.active ? { validity: ["active"] } : null, hint: `Valid for more than ${windowDays} days` },
         {
             label: `Expiring in ${windowDays} days`,
@@ -133,7 +143,6 @@ const SummaryWidget = ({ selection, loading, summary, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="License Summary"
             subtitle={s.total ? scope : ""}
             loading={loading}

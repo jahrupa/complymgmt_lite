@@ -4,7 +4,7 @@ import DashboardCard from "../common/DashboardCard";
 import { formatINR, formatINRShort, formatPercent } from "../common/dashboardUtils";
 
 // CH-3: complied vs non-complied per act, with an act detail table
-const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
+const ActWiseWidget = ({ loading, actWise, onDrill }) => {
     const rows = actWise || [];
 
     const drillAct = (act) => act && onDrill({ act: [act] });
@@ -49,7 +49,6 @@ const ActWiseWidget = ({ selection, loading, actWise, onDrill }) => {
 
     return (
         <DashboardCard
-            selection={selection}
             title="Act-wise Compliance"
             subtitle="Click an act to see its records"
             loading={loading}

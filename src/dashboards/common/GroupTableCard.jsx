@@ -11,8 +11,8 @@ ModuleRegistry.registerModules([AllCommunityModule]);
  * Sortable table of grouped stats (company-wise, register-wise, period-wise…). `columnDefs` should be
  * a stable reference; `onRowClick(row)` drills down.
  */
-const GroupTableCard = ({ selection, loading, title, subtitle, note, rows = [], columnDefs, rowId, onRowClick, maxHeight = 460 }) => (
-    <DashboardCard selection={selection} title={title} subtitle={subtitle} loading={loading} isEmpty={rows.length === 0} minHeight={200}>
+const GroupTableCard = ({ loading, title, subtitle, note, rows = [], columnDefs, rowId, onRowClick, maxHeight = 460 }) => (
+    <DashboardCard title={title} subtitle={subtitle} loading={loading} isEmpty={rows.length === 0} minHeight={200}>
         {note && <div className="text-muted small mb-2">{note}</div>}
         <div
             className="ag-theme-quartz"

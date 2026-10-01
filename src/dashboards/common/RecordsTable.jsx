@@ -30,7 +30,6 @@ const loadVisibleColumns = (storageKey, defaults) => {
  */
 const RecordsTable = forwardRef(function RecordsTable(
     {
-        selection,
         loading,
         title,
         subtitle,
@@ -140,7 +139,6 @@ const RecordsTable = forwardRef(function RecordsTable(
     return (
         <div ref={ref}>
             <DashboardCard
-                selection={selection}
                 loading={loading}
                 title={title}
                 subtitle={subtitle}

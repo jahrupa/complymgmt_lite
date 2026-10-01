@@ -12,7 +12,7 @@ const validitySegments = (stats) =>
  * LC-4: state totals as validity bars, then each location with its licenses as chips coloured by
  * validity. A chip opens that license; a state bar segment filters by state + validity.
  */
-const LocationWidget = ({ selection, loading, locationWise, isCompanyMode, onDrill, onView }) => {
+const LocationWidget = ({ loading, locationWise, isCompanyMode, onDrill, onView }) => {
     const locations = locationWise?.locations || [];
     const states = locationWise?.states || [];
 
@@ -26,7 +26,6 @@ const LocationWidget = ({ selection, loading, locationWise, isCompanyMode, onDri
 
     return (
         <DashboardCard
-            selection={selection}
             title="Location-wise Licenses"
             subtitle="Each chip is a license coloured by validity; click one to open it"
             loading={loading}

@@ -14,7 +14,6 @@ import ChipList from "./ChipList";
  * - gridKey                 a change restarts paging from page 1 (e.g. the filter JSON)
  */
 const ExceptionsCard = ({
-    selection,
     loading,
     subtitle,
     total,
@@ -50,7 +49,6 @@ const ExceptionsCard = ({
 
     return (
         <DashboardCard
-            selection={selection}
             loading={loading}
             title="Needs Attention"
             subtitle={subtitle}

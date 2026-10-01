@@ -109,8 +109,6 @@ import {
   DELETE_INAPP_NOTIFICATION,
   DELETE_ALL_INAPP_NOTIFICATION,
   READ_ALL_INAPP_NOTIFICATION,
-  GET_COMPLIANCE_COCKPIT_BY_COMPANY,
-  GET_COCKPIT_COMPLIANCE_PORTFOLIO,
   GET_GENERAL_COMPLIANCE_PORTFOLIO,
   GET_CLIENT_ONBOARDING_PORTFOLIO,
   CHANGE_TEMPORARY_PASSWORD_STATUS,
@@ -196,6 +194,11 @@ import {
   GET_LICENSE_DASH_EXCEPTIONS,
   GET_LICENSE_DASH_RECORDS,
   GET_LICENSE_DASH_RECORD_BY_ID,
+  GET_COCKPIT_FILTERS,
+  GET_COCKPIT_SUMMARY,
+  GET_COCKPIT_COMPANY_WISE,
+  GET_COCKPIT_STATE_WISE,
+  GET_COCKPIT_CLIENTS,
   GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
   GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
   GET_TOTAL_DELAY_FLAGS_BY_GOVT,
@@ -210,13 +213,6 @@ import {
   PROCESS_REGISTERS,
   GET_FILE_BY_TYPE,
   DOWNLOAD_FILE,
-  LICENSE_COMPLIANCE,
-  REGISTERS_COMPLIANCE,
-  CHALLAN_COMPLIANCE,
-  RETURN_COMPLIANCE,
-  PAGINATED_RECORDS,
-  CLIENT_DATA,
-  CLIENT_COMPLIANCE,
   DOCUMENT_WISE_ACCESS,
   CREATE_REGISTER,
   CREATE_APPLICABILITY,
@@ -1546,98 +1542,6 @@ export const fetchGeneralComplianceByCompany = async (company_name) => {
   }
 };
 
-// cockpit updated api 
-export const fetchLicenseComplaince = async () => {
-  try {
-    const response = await API.get(LICENSE_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchRegistersCompliance = async () => {
-  try {
-    const response = await API.get(REGISTERS_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchChallanCompliance = async () => {
-  try {
-    const response = await API.get(CHALLAN_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchReturnCompliance = async () => {
-  try {
-    const response = await API.get(RETURN_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchPaginatedRecords = async (page, limit) => {
-  try {
-    const response = await API.get(`${PAGINATED_RECORDS}?page=${page}&limit=${limit}`);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchClientData = async () => {
-  try {
-    const response = await API.get(CLIENT_DATA);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-}
-export const fetchClientCompliance = async () => {
-  try {
-    const response = await API.get(CLIENT_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-// end cockpit updated api
-export const fetchComplainceCockpitByCompany = async (company_name) => {
-  try {
-    const response = await API.get(`${GET_COMPLIANCE_COCKPIT_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Complaince Cockpit By Company:", error);
-    throw error;
-  }
-};
-
-
-// export const fetchCockPitCompliancePortfolio = async () => {
-//   try {
-//     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
-//     return response.data;
-//   } catch (error) {
-//     // console.error("Error fetching all Client", error);
-//     throw error;
-//   }
-// };
-
-
 export const fetchClientOnboardingPortfolio = async () => {
   try {
     const response = await API.get(GET_CLIENT_ONBOARDING_PORTFOLIO);
@@ -1657,16 +1561,6 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
     throw error;
   }
 };
-export const fetchComplianceCockpit = async (page, limit) => {
-  try {
-    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}?page=${1}&limit=${10}`);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Complaince Cockpit", error);
-    throw error;
-  }
-};
-
 // Dashboard For Payroll
 export const fetchInvestmentDeclarationStatusByCompany = async (company_name) => {
   try {
@@ -2489,6 +2383,55 @@ export const fetchLicenseDashRecords = async (params) => {
 export const fetchLicenseDashRecordById = async (id, company_name) => {
   try {
     const response = await API.get(`${GET_LICENSE_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Compliance Cockpit
+// Only company_name narrows the filter options
+export const fetchCockpitFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// params: company_name, state, location, search, month_from, month_to
+export const fetchCockpitSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchCockpitCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchCockpitStateWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_STATE_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Client master data; only company_name applies
+export const fetchCockpitClients = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_CLIENTS}${dashboardQuery({ company_name })}`);
     return response.data;
   } catch (error) {
     throw error;

@@ -6,7 +6,7 @@ import { formatINR, formatPercent } from "../common/dashboardUtils";
 import { COVERAGE_STATUSES, hasApplicableLocations } from "./returnsUtils";
 
 // RT-1: KPI tiles, location coverage bar, transaction-only data gap and data quality badges
-const SummaryWidget = ({ selection, loading, summary, statusFiltersActive, onDrill, onCoverageDrill }) => {
+const SummaryWidget = ({ loading, summary, statusFiltersActive, onDrill, onCoverageDrill }) => {
     const s = summary || {};
     const coverage = s.coverage;
     const isEmpty = !s.total && !s.applicable_returns;
@@ -65,7 +65,6 @@ const SummaryWidget = ({ selection, loading, summary, statusFiltersActive, onDri
 
     return (
         <DashboardCard
-            selection={selection}
             title="Returns Summary"
             subtitle={isEmpty ? "" : scope}
             loading={loading}

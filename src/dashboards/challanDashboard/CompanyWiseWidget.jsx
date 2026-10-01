@@ -16,7 +16,7 @@ const scoreStyle = (p) => {
 };
 
 // CH-8 (overall dashboard only): one row per company, lowest compliance first; a click opens that company
-const CompanyWiseWidget = ({ selection, loading, companyWise, onOpenCompany }) => {
+const CompanyWiseWidget = ({ loading, companyWise, onOpenCompany }) => {
     const rows = companyWise || [];
 
     const columnDefs = useMemo(
@@ -42,7 +42,6 @@ const CompanyWiseWidget = ({ selection, loading, companyWise, onOpenCompany }) =
 
     return (
         <DashboardCard
-            selection={selection}
             title="Company-wise Compliance"
             subtitle="Lowest compliance first. Click a company to open its dashboard"
             loading={loading}

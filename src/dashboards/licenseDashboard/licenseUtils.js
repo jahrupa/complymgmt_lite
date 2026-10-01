@@ -45,6 +45,9 @@ export const SINGLE_FILTER_KEYS = [
     "exceptions_only",
     "data_issues_only",
     "search",
+    // Coverage period for the summary; it does not narrow the license rows
+    "month_from",
+    "month_to",
     // widget-only: breakdown dimension
     "breakdown_by",
 ];

@@ -13,7 +13,6 @@ import {
     fetchChallanTurnaround,
 } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useDashboardData, useDashboardFilters, useFilterOptions } from "../common/useDashboard";
 import { defaultPeriod, formatINR, formatPercent } from "../common/dashboardUtils";
 import AccessState from "../common/AccessState";
@@ -76,9 +75,6 @@ const exceptionRow = (row) => ({
 const ChallanDashboard = ({
     selectedCompany,
     setSelectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
     shouldShow,
     isActive,
 }) => {
@@ -134,28 +130,6 @@ const ChallanDashboard = ({
         onError: (message) => showSnackbar(message, "error"),
     });
     const accessError = optionsAccessError || dataAccessError;
-
-    /* ---------- widget selection (same rules as the other dashboards) ---------- */
-
-    const userRole = decryptData(localStorage.getItem("user_role"));
-    const canSelect = userRole === "Admin" || userRole === "Super-Admin";
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            showSnackbar("First you need to select a user", "warning");
-            return;
-        }
-        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
-    };
-
-    const cardSelection = (id) => ({
-        id,
-        canSelect,
-        selected: selectedCharts.includes(id),
-        disabled: !current?.user_name,
-        onSelect: (chartId) => canSelect && toggleChartSelection(chartId),
-        onToggle: toggleChartSelection,
-    });
 
     /* ---------- drill downs ---------- */
 
@@ -218,12 +192,11 @@ const ChallanDashboard = ({
                     <ChallanFilterBar filterOptions={filterOptions} filters={filters} onChange={updateFilters} onClear={resetFilters} />
 
                     {shouldShow("ch-1") && (
-                        <SummaryWidget selection={cardSelection("ch-1")} loading={loading} summary={data.summary} onDrill={onDrill} />
+                        <SummaryWidget loading={loading} summary={data.summary} onDrill={onDrill} />
                     )}
 
                     {!isCompanyMode && shouldShow("ch-8") && (
                         <CompanyWiseWidget
-                            selection={cardSelection("ch-8")}
                             loading={loading}
                             companyWise={data.companyWise}
                             onOpenCompany={onOpenCompany}
@@ -232,16 +205,15 @@ const ChallanDashboard = ({
 
                     <div className="charts-grid">
                         {shouldShow("ch-2") && (
-                            <TrendWidget selection={cardSelection("ch-2")} loading={loading} trend={data.trend} onDrill={onDrill} />
+                            <TrendWidget loading={loading} trend={data.trend} onDrill={onDrill} />
                         )}
                         {shouldShow("ch-3") && (
-                            <ActWiseWidget selection={cardSelection("ch-3")} loading={loading} actWise={data.actWise} onDrill={onDrill} />
+                            <ActWiseWidget loading={loading} actWise={data.actWise} onDrill={onDrill} />
                         )}
                     </div>
 
                     {shouldShow("ch-4") && (
                         <LocationMonthGrid
-                            selection={cardSelection("ch-4")}
                             loading={loading}
                             title="Location-wise Compliance by Month"
                             subtitle="Click a cell to see that location's records for the month"
@@ -270,7 +242,6 @@ const ChallanDashboard = ({
 
                     {shouldShow("ch-5") && (
                         <TurnaroundCard
-                            selection={cardSelection("ch-5")}
                             loading={loading}
                             stages={turnaround.stages}
                             endToEnd={turnaround.end_to_end}
@@ -282,7 +253,6 @@ const ChallanDashboard = ({
 
                     {ready && shouldShow("ch-6") && (
                         <ExceptionsCard
-                            selection={cardSelection("ch-6")}
                             loading={loading}
                             subtitle={`${data.summary?.exceptions ?? 0} exceptions: non-complied, paid late, overdue, skipped employees or penalty`}
                             total={data.summary?.exceptions}
@@ -298,7 +268,6 @@ const ChallanDashboard = ({
                     {ready && showRecords && (
                         <RecordsTable
                             ref={recordsRef}
-                            selection={cardSelection("ch-7")}
                             loading={loading}
                             title="Challan Records"
                             subtitle={`${data.summary?.total ?? 0} records match the filters`}

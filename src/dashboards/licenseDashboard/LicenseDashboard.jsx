@@ -13,7 +13,6 @@ import {
     fetchLicenseDashTurnaround,
 } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 import { useDashboardData, useDashboardFilters, useFilterOptions } from "../common/useDashboard";
 import { formatPercent, withoutKeys } from "../common/dashboardUtils";
 import AccessState from "../common/AccessState";
@@ -53,9 +52,6 @@ const renderStatus = (computed) => <LicenseBadges computed={computed} />;
 const LicenseDashboard = ({
     selectedCompany,
     setSelectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
     shouldShow,
     isActive,
 }) => {
@@ -112,28 +108,6 @@ const LicenseDashboard = ({
         onError: (message) => showSnackbar(message, "error"),
     });
     const accessError = optionsAccessError || dataAccessError;
-
-    /* ---------- widget selection (same rules as the other dashboards) ---------- */
-
-    const userRole = decryptData(localStorage.getItem("user_role"));
-    const canSelect = userRole === "Admin" || userRole === "Super-Admin";
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            showSnackbar("First you need to select a user", "warning");
-            return;
-        }
-        setSelectedCharts((prev) => (prev.includes(chartId) ? prev.filter((id) => id !== chartId) : [...prev, chartId]));
-    };
-
-    const cardSelection = (id) => ({
-        id,
-        canSelect,
-        selected: selectedCharts.includes(id),
-        disabled: !current?.user_name,
-        onSelect: (chartId) => canSelect && toggleChartSelection(chartId),
-        onToggle: toggleChartSelection,
-    });
 
     /* ---------- drill downs ---------- */
 
@@ -196,12 +170,11 @@ const LicenseDashboard = ({
                     <LicenseFilterBar filterOptions={filterOptions} filters={filters} onChange={updateFilters} onClear={resetFilters} />
 
                     {shouldShow("lc-1") && (
-                        <SummaryWidget selection={cardSelection("lc-1")} loading={loading} summary={summary} onDrill={onDrill} />
+                        <SummaryWidget loading={loading} summary={summary} onDrill={onDrill} />
                     )}
 
                     {!isCompanyMode && shouldShow("lc-2") && (
                         <GroupTableCard
-                            selection={cardSelection("lc-2")}
                             loading={loading}
                             title="Company-wise Licenses"
                             subtitle="Lowest valid % first. Click a company to open its dashboard"
@@ -215,7 +188,6 @@ const LicenseDashboard = ({
                     <div className="charts-grid">
                         {shouldShow("lc-5") && (
                             <ExpiryTimelineWidget
-                                selection={cardSelection("lc-5")}
                                 loading={loading}
                                 timeline={data.expiryTimeline}
                                 expiringWindow={summary.expiring_window ?? filterOptions?.expiring_window ?? 60}
@@ -224,7 +196,6 @@ const LicenseDashboard = ({
                         )}
                         {shouldShow("lc-3") && (
                             <BreakdownWidget
-                                selection={cardSelection("lc-3")}
                                 enabled={ready}
                                 params={params}
                                 by={breakdownBy}
@@ -237,7 +208,6 @@ const LicenseDashboard = ({
 
                     {shouldShow("lc-4") && (
                         <LocationWidget
-                            selection={cardSelection("lc-4")}
                             loading={loading}
                             locationWise={data.locationWise}
                             isCompanyMode={isCompanyMode}
@@ -247,12 +217,11 @@ const LicenseDashboard = ({
                     )}
 
                     {shouldShow("lc-6") && (
-                        <TrendWidget selection={cardSelection("lc-6")} loading={loading} trend={data.trend} onDrill={onDrill} />
+                        <TrendWidget loading={loading} trend={data.trend} onDrill={onDrill} />
                     )}
 
                     {shouldShow("lc-7") && (
                         <TurnaroundCard
-                            selection={cardSelection("lc-7")}
                             loading={loading}
                             stages={turnaround.stages}
                             endToEnd={turnaround.end_to_end}
@@ -280,7 +249,6 @@ const LicenseDashboard = ({
 
                     {ready && shouldShow("lc-8") && (
                         <ExceptionsCard
-                            selection={cardSelection("lc-8")}
                             loading={loading}
                             subtitle={`${summary.exceptions ?? 0} exceptions: expired, expiring, SLA breached, follow-up overdue, document not uploaded, or billing not triggered`}
                             total={summary.exceptions}
@@ -297,7 +265,6 @@ const LicenseDashboard = ({
                     {ready && showRecords && (
                         <RecordsTable
                             ref={recordsRef}
-                            selection={cardSelection("lc-9")}
                             loading={loading}
                             title="License Records"
                             subtitle={`${summary.total ?? 0} licenses match the filters · soonest expiry first`}

@@ -69,6 +69,27 @@ export const defaultPeriod = (months = [], count = 6) => {
     };
 };
 
+// The last `count` calendar months as { month: "YYYY-MM", label: "Aug 2026" }, newest first
+export const recentMonths = (count = 24, today = new Date()) =>
+    Array.from({ length: count }, (_, i) => {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        return {
+            month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+            label: `${MONTHS[d.getMonth()]} ${d.getFullYear()}`,
+        };
+    });
+
+// { month_from, month_to } -> "Jun 2026 – Aug 2026" / "Aug 2026", or null when there is no range
+export const periodLabel = (period) => {
+    const label = (month) => {
+        const [y, m] = String(month || "").split("-");
+        return m ? `${MONTHS[Number(m) - 1]} ${y}` : month;
+    };
+    if (!period?.month_from && !period?.month_to) return null;
+    if (period.month_from === period.month_to) return label(period.month_from);
+    return `${label(period.month_from)} – ${label(period.month_to)}`;
+};
+
 /* ---------- filter options ---------- */
 
 export const YES_NO_OPTIONS = [

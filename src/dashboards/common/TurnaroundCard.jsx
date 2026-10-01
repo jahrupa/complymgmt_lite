@@ -9,7 +9,7 @@ const DELAY_COLORS = ["#14b8a6", "#fbbf24", "#fb923c", "#f87171", "#dc2626", "#6
  * `delays` are { name, count } in the backend's fixed order; `onDelayClick(index, count)` drills down.
  * `footer` renders below the charts (e.g. an SLA figure when there are no delay buckets).
  */
-const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = [], delaysTitle, onDelayClick, footer }) => {
+const TurnaroundCard = ({ loading, stages = [], endToEnd, delays = [], delaysTitle, onDelayClick, footer }) => {
     const anomalyStages = [...stages, ...(endToEnd?.anomalies ? [endToEnd] : [])].filter((s) => s.anomalies > 0);
 
     const stageChart = {
@@ -56,7 +56,6 @@ const TurnaroundCard = ({ selection, loading, stages = [], endToEnd, delays = []
 
     return (
         <DashboardCard
-            selection={selection}
             title="Turnaround Time"
             subtitle={
                 endToEnd?.count
