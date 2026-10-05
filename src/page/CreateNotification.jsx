@@ -395,9 +395,12 @@ const CreateNotification = () => {
   // ✅ Column definitions
   const colDefs = [
     {
+      flex: 0,
+      width: 130,
+      minWidth: 130,
+      maxWidth: 130,
       headerName: "Actions",
       field: "actions",
-      width: 130,
       pinned: "left",
       editable: false,
       filter: true,
@@ -524,9 +527,12 @@ const CreateNotification = () => {
       },
     },
     {
+      flex: 0,
+      width: 100,
+      minWidth: 100,
+      maxWidth: 100,
       headerName: "Active",
       field: "is_active",
-      width: 100,
       pinned: "right",
       editable: false,
       filter: true,

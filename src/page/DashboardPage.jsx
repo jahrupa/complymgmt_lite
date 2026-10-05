@@ -8,34 +8,48 @@ import LaptopMinimalCheck from "../assets/compliance-cockpit.png";
 import ComplianceCpckpitTabs from "../component/ComplianceCpckpitTabs";
 import NavigationTabs from "../dashboards/NavigationTabs";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
-import { useEffect, useState } from "react";
-import { fetchAllCompanies, fetchAllUser } from "../api/service";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { fetchAllCompanies } from "../api/service";
 
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState(""); // single selected value
-  const [activeTab, setActiveTab] = useState(0); // To toggle between stats and statsComp
-  const [current, setCurrent] = useState({});
-  const [allUser, setAllUser] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // The selected company is kept in the URL (?company_name=) so dashboard views are shareable
+  const urlCompany = searchParams.get("company_name") || "";
+  const [selectedCompany, setSelectedCompany] = useState(urlCompany); // single selected value
+  const syncedCompanyRef = useRef(urlCompany);
+
+  // URL changed from outside (back/forward, a pasted link): follow it
   useEffect(() => {
-    const fetchCockpitData = async () => {
-      const [cockpitByCompanyRes, allUserRes] = await Promise.allSettled([
-        fetchAllCompanies(),
-        fetchAllUser(),
-      ]);
-      if (cockpitByCompanyRes.status === "fulfilled" && Array.isArray(cockpitByCompanyRes.value)) {
-        setCompanyName(cockpitByCompanyRes.value);
-      } else {
+    if (urlCompany === syncedCompanyRef.current) return;
+    syncedCompanyRef.current = urlCompany;
+    setSelectedCompany(urlCompany);
+  }, [urlCompany]);
+
+  // Company picked in the page: write it to the URL
+  useEffect(() => {
+    if (selectedCompany === syncedCompanyRef.current) return;
+    syncedCompanyRef.current = selectedCompany;
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (selectedCompany) next.set("company_name", selectedCompany);
+      else next.delete("company_name");
+      return next;
+    });
+  }, [selectedCompany, setSearchParams]);
+  const [activeTitle, setActiveTitle] = useState(""); // header title of the active dashboard tab
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const companies = await fetchAllCompanies();
+        setCompanyName(Array.isArray(companies) ? companies : []);
+      } catch {
         setCompanyName([]);
-      }
-      if (allUserRes.status === "fulfilled" && Array.isArray(allUserRes.value)) {
-        setAllUser(allUserRes.value);
-      } else {
-        setAllUser([]);
       }
     };
 
-    fetchCockpitData();
+    fetchCompanies();
   }, []);
 
   return (
@@ -46,25 +60,7 @@ const DashboardPage = () => {
             <img src={LaptopMinimalCheck} width={55} />
           </span>
           <div className="mt-1 ps-lg-4 ps-md-4 fw-600 fs-5">
-            {activeTab === 0
-              ? "Compliance Cockpit"
-              : activeTab === 1
-                ? "General Compliance"
-                : activeTab === 2
-                  ? "Client Onboarding"
-                  : activeTab === 3
-                    ? "Payroll"
-                    : activeTab === 4
-                      ? "Payroll - Returns & Submissions"
-                      : activeTab === 5
-                        ? "Payroll - Helpdesk & Escalations"
-                        : activeTab === 6
-                          ? "Payroll - General Helpdesk"
-                          : activeTab === 7
-                            ? "Audit & Visits"
-                            : activeTab === 8
-                              ? "Notices & Inspections"
-                              : ""}
+            {activeTitle}
           </div>
         </div>
         <div className="d-lg-flex d-md-flex justify-content-between"
@@ -83,28 +79,7 @@ const DashboardPage = () => {
               }))}
             />
           </div>
-          <div className="me-1 ms-1" style={{ width: '250px' }}>
-            <SingleSelectTextField
-              name="user_id"
-              label="Choose a user to create a widget"
-              value={current.user_name ?? ''}
-              onChange={(e) => {
-                const userName = e.target.value;
-                const matchedUser = allUser.find((u) => u.full_name === userName);
-
-                setCurrent((prev) => ({
-                  ...prev,
-                  user_id: matchedUser?._id,
-                  user_name: matchedUser?.full_name || '',
-                }));
-              }}
-              names={allUser?.map((item) => ({
-                _id: item._id,
-                name: item.full_name,
-              }))}
-            />
-
-          </div>
+       
         </div>
       </div>
 
@@ -123,9 +98,8 @@ const DashboardPage = () => {
 
         <NavigationTabs
           selectedCompany={selectedCompany}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          current={current}
+          setSelectedCompany={setSelectedCompany}
+          setActiveTitle={setActiveTitle}
         />
         {/* <ComplianceMasterDashboard /> */}
       </div>

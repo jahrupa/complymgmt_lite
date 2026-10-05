@@ -87,16 +87,8 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Subscribe Module & Sub-Module ', link: 'location_to_module' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Tag Document', link: 'upload_documents' },
+        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents' },
 
-        ...(userRole === 'Admin' || userRole === 'Super-Admin'
-            ? [{
-                icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
-                label: 'Widget Mappings',
-                link: 'widget_mappings'
-            }]
-            : []
-        ),
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 
     ];
@@ -107,6 +99,11 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                 icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
                 label: 'Tracker Access',
                 link: 'service_tracker_access',
+                parent: 'serviceTracker'
+            }, {
+                icon: (active) => <Layers className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
+                label: 'Widget Access',
+                link: 'widget_access',
                 parent: 'serviceTracker'
             }]
             : []
@@ -225,7 +222,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                             )}
 
                         </div>
-                        <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
+                        {/* <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
                                 onClick={() => handleDropdownToggle('registerProcessing')}
@@ -271,7 +268,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                                 </div>
                             )}
 
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

@@ -37,9 +37,9 @@ function ClientOnBoardingByCompany({selectedCompany}) {
       <div className="content-wrapper">
         <aside className="">
           <StatsPanel
-            totalLocations={Object.keys(locationData.location_module_map).length}
+            totalLocations={Object.keys(locationData.location_module_map || {}).length}
             filteredLocations={filteredLocations.length}
-            totalModules={locationData.modules_subscribed.length}
+            totalModules={locationData.modules_subscribed?.length ?? 0}
           />
 
 
@@ -51,13 +51,13 @@ function ClientOnBoardingByCompany({selectedCompany}) {
               <ModuleFilter
                 selectedModule={selectedModule}
                 onModuleChange={setSelectedModule}
-                modules={locationData.modules_subscribed}
+                modules={locationData.modules_subscribed || []}
               />
             </div>
             <div className='col'>
               <LocationList
                 locations={filteredLocations}
-                locationModuleMap={locationData.location_module_map}
+                locationModuleMap={locationData.location_module_map || {}}
                 selectedModule={selectedModule}
               />
             </div>

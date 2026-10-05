@@ -327,6 +327,8 @@ const GroupCompaniesPage = () => {
             headerName: "Approval Status",
             filter: true,
             editable: false,
+            flex: 1,
+            minWidth: 160,
             valueGetter: (params) =>
               params.data?.common_attributes?.approval_status,
             cellRenderer: (params) => {
@@ -399,6 +401,8 @@ const GroupCompaniesPage = () => {
 
           filter: true,
           editable: false,
+          flex: 1,
+          minWidth: 140,
           headerStyle: {
             color: "#515151",
             backgroundColor: "#ffffe24d",
@@ -420,7 +424,12 @@ const GroupCompaniesPage = () => {
       field: 'actions',
       filter: false,
       editable: false,
-      width: 130,
+      sortable: false,
+      resizable: false,
+      flex: 0,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
       pinned: "left",
       cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
       cellRenderer: (params) => {
@@ -451,6 +460,11 @@ const GroupCompaniesPage = () => {
       headerName: 'Is Active',
       field: 'common_attributes.is_active',
       editable: false,
+      filter: false,
+      flex: 0,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
       pinned: "right",
       valueGetter: (params) => params.data?.common_attributes?.is_active,
       cellRenderer: (params) => (
@@ -469,7 +483,10 @@ const GroupCompaniesPage = () => {
   const defaultColDef = {
     sortable: true,
     filter: true,
-    editable: true,
+    editable: false,
+    resizable: true,
+    flex: 1,
+    minWidth: 140,
     headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
   };
 

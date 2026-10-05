@@ -9,13 +9,9 @@ import {
 import { ArrowUpRight, X } from "lucide-react";
 import DashboardDrawerGrid from "../DashboardDrawer";
 import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
 
 const GeneralHelpdesk = ({
     selectedCompany,
-    current,
-    selectedCharts,
-    setSelectedCharts,
     widgetsList,
     activeDrawer,
     setActiveDrawer,
@@ -336,7 +332,6 @@ const GeneralHelpdesk = ({
     const [isDetailPage, setIsDetailPage] = useState(false);
     const [isDetailPageData, setIsDetailPageData] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
-    const userRole = decryptData(localStorage.getItem("user_role"));
     const handleOpenDrawer = (anchor, title, data = [], chartXaxisCategory, isDetailData, filterColumn) => {
         setDrawerAnchor(anchor);
         setDrawerTitle(title);
@@ -389,35 +384,6 @@ const GeneralHelpdesk = ({
         fetchData();
     }, [selectedCompany]);
 
-    useEffect(() => {
-        setSelectedCharts([]);
-    }, [current?.user_name]);
-
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            // alert("First you need to select a user");
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "First you need to select a user",
-                severityType: "warning",
-            });
-            return;
-        }
-
-        setSelectedCharts((prev) =>
-            prev.includes(chartId)
-                ? prev.filter((id) => id !== chartId)
-                : [...prev, chartId]
-        );
-    };
-
-    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
-    const cardClass = (id, defaultClass = "") =>
-        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
-    const handleSelect = (id) => {
-        if (canSelect) toggleChartSelection(id);
-    };
     const shouldShow = (id) => {
         return widgetsList.flat().some(
             item => item.widget_id?.toLowerCase() === id.toLowerCase()
@@ -433,21 +399,11 @@ const GeneralHelpdesk = ({
             <div className="charts-grid mb-4">
                 {shouldShow("gh-1") && (
                     <div
-                        className={`chart-card ${cardClass("gh-1") ? "selected-card" : ""
-                            }`}
-                        onClick={canSelect ? () => handleSelect("gh-1") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}>
+                        className={`chart-card`}>
                         <div
                             className="d-flex justify-content-end align-items-center"
 
                         >
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gh-1")}
-                                checked={selectedCharts.includes("gh-1")}
-                                disabled={!current?.user_name} // if user_name empty → disable
-                            />
 
                             <div
                                 className="dashboard-icon ms-2"
@@ -484,22 +440,12 @@ const GeneralHelpdesk = ({
                 )}
                 {shouldShow("gh-2") && (
                     <div
-                        className={`chart-card ${cardClass("gh-2") ? "selected-card" : ""
-                            }`}
-                        onClick={canSelect ? () => handleSelect("gh-2") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                        className={`chart-card`}
                     >
                         <div
                             className="d-flex justify-content-end align-items-center"
 
                         >
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gh-2")}
-                                checked={selectedCharts.includes("gh-2")}
-                                disabled={!current?.user_name}
-                            />
                             <div
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {
@@ -539,23 +485,12 @@ const GeneralHelpdesk = ({
             <div className="charts-grid mb-4">
                 {shouldShow("gh-3") && (
                     <div
-                        className={`chart-card ${cardClass("gh-3") ? "selected-card" : ""
-                            }`}
-                        onClick={canSelect ? () => handleSelect("gh-3") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                        className={`chart-card`}
                     >
                         <div
                             className="d-flex justify-content-end align-items-center"
 
                         >
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gh-3")}
-                                checked={selectedCharts.includes("gh-3")}
-                                disabled={!current?.user_name}
-
-                            />
                             <div
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {
@@ -589,23 +524,12 @@ const GeneralHelpdesk = ({
                 )}
                 {shouldShow("gh-4") && (
                     <div
-                        className={`chart-card ${cardClass("gh-4") ? "selected-card" : ""
-                            }`}
-                        onClick={canSelect ? () => handleSelect("gh-4") : undefined}
-                        style={{ cursor: canSelect ? "pointer" : "default" }}
+                        className={`chart-card`}
                     >
                         <div
                             className="d-flex justify-content-end align-items-center"
 
                         >
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gh-4")}
-                                checked={selectedCharts.includes("gh-4")}
-                                disabled={!current?.user_name}
-
-                            />
                             <div
                                 className="dashboard-icon ms-2"
                                 onClick={(e) => {

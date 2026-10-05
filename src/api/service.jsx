@@ -109,8 +109,6 @@ import {
   DELETE_INAPP_NOTIFICATION,
   DELETE_ALL_INAPP_NOTIFICATION,
   READ_ALL_INAPP_NOTIFICATION,
-  GET_COMPLIANCE_COCKPIT_BY_COMPANY,
-  GET_COCKPIT_COMPLIANCE_PORTFOLIO,
   GET_GENERAL_COMPLIANCE_PORTFOLIO,
   GET_CLIENT_ONBOARDING_PORTFOLIO,
   CHANGE_TEMPORARY_PASSWORD_STATUS,
@@ -128,13 +126,6 @@ import {
   GET_HELPDESK_TICKETS_RAISED_BY_COMPANY,
   GET_HELPDESK_STATUS_BASED_ON_ISSUE_SUB_TYPE,
   GET_TICKETS_DISTRIBUTION_ASSIGNED_TO_COUNT,
-  GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME,
-  GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS,
-  GET_FREQUENCY_WISE_RETURNS,
-  GET_COMPANIES_PER_RETURNS_NAMES,
-  GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE,
-  GET_COMPLIANCE_STATUS_BASED_ON_RETURNS,
-  GET_REMARKS_BASED_ON_COMPANY,
   GET_AUDIT_PLATFORMS_COUNT_BY_STATE_SEGMENTED,
   GET_AUDIT_BY_SERVICE_TYPE,
   // GET_AUDIT_VISIT_FINDINGS_BY_SEVERITY,
@@ -156,6 +147,58 @@ import {
   GET_ASSIGNED_INDIVIDUALS_LIST,
   GET_DOCUMENTS_PENDING_FROM,
   GET_ISSUE_CATEGORY_BY_STATUS,
+  GET_CHALLAN_FILTERS,
+  GET_CHALLAN_SUMMARY,
+  GET_CHALLAN_TREND,
+  GET_CHALLAN_COMPANY_WISE,
+  GET_CHALLAN_ACT_WISE,
+  GET_CHALLAN_LOCATION_WISE,
+  GET_CHALLAN_TURNAROUND,
+  GET_CHALLAN_EXCEPTIONS,
+  GET_CHALLAN_RECORDS,
+  GET_CHALLAN_RECORD_BY_ID,
+  GET_REGISTER_DASH_FILTERS,
+  GET_REGISTER_DASH_SUMMARY,
+  GET_REGISTER_DASH_COMPANY_WISE,
+  GET_REGISTER_DASH_TREND,
+  GET_REGISTER_DASH_REGISTER_WISE,
+  GET_REGISTER_DASH_ACT_WISE,
+  GET_REGISTER_DASH_LOCATION_WISE,
+  GET_REGISTER_DASH_TURNAROUND,
+  GET_REGISTER_DASH_VARIANCE,
+  GET_REGISTER_DASH_EXCEPTIONS,
+  GET_REGISTER_DASH_COVERAGE,
+  GET_REGISTER_DASH_RECORDS,
+  GET_REGISTER_DASH_RECORD_BY_ID,
+  GET_RETURNS_DASH_FILTERS,
+  GET_RETURNS_DASH_SUMMARY,
+  GET_RETURNS_DASH_COMPANY_WISE,
+  GET_RETURNS_DASH_TREND,
+  GET_RETURNS_DASH_PERIOD_WISE,
+  GET_RETURNS_DASH_RETURN_WISE,
+  GET_RETURNS_DASH_ACT_WISE,
+  GET_RETURNS_DASH_LOCATION_WISE,
+  GET_RETURNS_DASH_TURNAROUND,
+  GET_RETURNS_DASH_EXCEPTIONS,
+  GET_RETURNS_DASH_COVERAGE,
+  GET_RETURNS_DASH_RECORDS,
+  GET_RETURNS_DASH_RECORD_BY_ID,
+  GET_LICENSE_DASH_FILTERS,
+  GET_LICENSE_DASH_SUMMARY,
+  GET_LICENSE_DASH_COMPANY_WISE,
+  GET_LICENSE_DASH_BREAKDOWN,
+  GET_LICENSE_DASH_LOCATION_WISE,
+  GET_LICENSE_DASH_EXPIRY_TIMELINE,
+  GET_LICENSE_DASH_TREND,
+  GET_LICENSE_DASH_TURNAROUND,
+  GET_LICENSE_DASH_EXCEPTIONS,
+  GET_LICENSE_DASH_RECORDS,
+  GET_LICENSE_DASH_RECORD_BY_ID,
+  GET_COCKPIT_FILTERS,
+  GET_COCKPIT_SUMMARY,
+  GET_COCKPIT_COMPANY_WISE,
+  GET_COCKPIT_STATE_WISE,
+  GET_COCKPIT_CLIENTS,
   GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES,
   GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT,
   GET_TOTAL_DELAY_FLAGS_BY_GOVT,
@@ -170,13 +213,6 @@ import {
   PROCESS_REGISTERS,
   GET_FILE_BY_TYPE,
   DOWNLOAD_FILE,
-  LICENSE_COMPLIANCE,
-  REGISTERS_COMPLIANCE,
-  CHALLAN_COMPLIANCE,
-  RETURN_COMPLIANCE,
-  PAGINATED_RECORDS,
-  CLIENT_DATA,
-  CLIENT_COMPLIANCE,
   DOCUMENT_WISE_ACCESS,
   CREATE_REGISTER,
   CREATE_APPLICABILITY,
@@ -202,6 +238,8 @@ import {
   GET_FILE_NAMES_BY_ACCESS_TYPE,
   CREATE_GROUPWISE_ACCESS_BY_GROUP_ID,
   ENTITY_WISE_ACCESS,
+  LOCATION_WISE_ACCESS,
+  UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID,
 
 
 } from "./Endpoint";
@@ -1086,10 +1124,18 @@ export const deleteFileById = async (id) => {
     throw error;
   }
 };
-export const fetchAllFiles = async () => {
+export const fetchAllFiles = async (page, limit, search) => {
   try {
-    const response = await API.get(GET_ALL_FILES);
-    return response.data;
+    const response = await API.get(GET_ALL_FILES, {
+      // axios leaves out params that are undefined
+      params: { page, limit, search: search?.trim() || undefined },
+    });
+    // The record count comes back in the X-Total-Count header, not in the body
+    const total = Number(response.headers?.["x-total-count"]);
+    const rows = Array.isArray(response.data)
+      ? response.data
+      : response.data?.data || [];
+    return { data: rows, total: Number.isNaN(total) ? undefined : total };
   } catch (error) {
     // console.error("Error fetching all files:", error);
     throw error;
@@ -1132,6 +1178,16 @@ export const downloadFile = async (fileId) => {
     return response.data;
   } catch (error) {
     // console.error("Error downloading file:", error);
+    throw error;
+  }
+}
+
+export const updateDocumentApprovalStatusById = async (id, status) => {
+  try {
+    const response = await API.put(`${UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID}${id}`, { status });
+    return response.data;
+  } catch (error) {
+    // console.error("Error updating document approval status:", error);
     throw error;
   }
 }
@@ -1486,98 +1542,6 @@ export const fetchGeneralComplianceByCompany = async (company_name) => {
   }
 };
 
-// cockpit updated api 
-export const fetchLicenseComplaince = async () => {
-  try {
-    const response = await API.get(LICENSE_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchRegistersCompliance = async () => {
-  try {
-    const response = await API.get(REGISTERS_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchChallanCompliance = async () => {
-  try {
-    const response = await API.get(CHALLAN_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchReturnCompliance = async () => {
-  try {
-    const response = await API.get(RETURN_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchPaginatedRecords = async (page, limit) => {
-  try {
-    const response = await API.get(`${PAGINATED_RECORDS}?page=${page}&limit=${limit}`);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-
-export const fetchClientData = async () => {
-  try {
-    const response = await API.get(CLIENT_DATA);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-}
-export const fetchClientCompliance = async () => {
-  try {
-    const response = await API.get(CLIENT_COMPLIANCE);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Client", error);
-    throw error;
-  }
-};
-// end cockpit updated api
-export const fetchComplainceCockpitByCompany = async (company_name) => {
-  try {
-    const response = await API.get(`${GET_COMPLIANCE_COCKPIT_BY_COMPANY}company?company_name=${encodeURIComponent(company_name)}`);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Complaince Cockpit By Company:", error);
-    throw error;
-  }
-};
-
-
-// export const fetchCockPitCompliancePortfolio = async () => {
-//   try {
-//     const response = await API.get(GET_COCKPIT_COMPLIANCE_PORTFOLIO);
-//     return response.data;
-//   } catch (error) {
-//     // console.error("Error fetching all Client", error);
-//     throw error;
-//   }
-// };
-
-
 export const fetchClientOnboardingPortfolio = async () => {
   try {
     const response = await API.get(GET_CLIENT_ONBOARDING_PORTFOLIO);
@@ -1597,16 +1561,6 @@ export const fetchClientOnboardingByCompany = async (company_name) => {
     throw error;
   }
 };
-export const fetchComplianceCockpit = async (page, limit) => {
-  try {
-    const response = await API.get(`${GET_COCKPIT_COMPLIANCE_PORTFOLIO}?page=${1}&limit=${10}`);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching all Complaince Cockpit", error);
-    throw error;
-  }
-};
-
 // Dashboard For Payroll
 export const fetchInvestmentDeclarationStatusByCompany = async (company_name) => {
   try {
@@ -1762,78 +1716,6 @@ export const fetchHelpDeskPendingForSelectedIssueSubtypes = async (company_name)
     return response.data;
   } catch (error) {
     // console.error("Error fetching Tickets Distribution Assigned To Count", error);
-    throw error;
-  }
-}
-// Returns and Submissions
-export const fetchReturnApplicabilityByCompanyCommonName = async (company_name) => {
-  try {
-    const url = `${GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Return Applicability By Company Common Name", error);
-    throw error;
-  }
-}
-export const fetchStateWiseAnalysisOfApplicableReturns = async (company_name) => {
-  try {
-    const url = `${GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching State Wise Analysis Of Applicable Returns", error);
-    throw error;
-  }
-}
-export const fetchFrequencyWiseReturns = async (company_name) => {
-  try {
-    const url = `${GET_FREQUENCY_WISE_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Frequency Wise Returns", error);
-    throw error;
-  }
-}
-export const fetchCompaniesPerReturnsNames = async (company_name) => {
-  try {
-    const url = `${GET_COMPANIES_PER_RETURNS_NAMES}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Companies Per Returns Names", error);
-    throw error;
-  }
-}
-export const fetchComplianceRiskDistributionByState = async (company_name) => {
-  try {
-    const url = `${GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Compliance Risk Distribution By State", error);
-    throw error;
-  }
-}
-
-export const fetchComplianceStatusBasedOnReturns = async (company_name) => {
-  try {
-    const url = `${GET_COMPLIANCE_STATUS_BASED_ON_RETURNS}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Compliance Status Based On Returns", error);
-    throw error;
-  }
-}
-export const fetchRemarksBasedOnCompany = async (company_name) => {
-  try {
-    const url = `${GET_REMARKS_BASED_ON_COMPANY}${company_name ? `?company_name=${encodeURIComponent(company_name)}` : ''}`;
-    const response = await API.get(url);
-    return response.data;
-  } catch (error) {
-    // console.error("Error fetching Remarks Based On Company", error);
     throw error;
   }
 }
@@ -2055,7 +1937,508 @@ export const fetchIssueCategoryByStatus = async (company_name) => {
   }
 }
 
-// Dashboaed Widgets 
+// Challan Dashboard
+// Dashboard filters -> "?key=value"; arrays go as comma separated values, empty values are skipped
+const dashboardQuery = (params = {}) => {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    const val = Array.isArray(value) ? value.join(",") : value;
+    if (val !== undefined && val !== null && val !== "") query.append(key, val);
+  });
+  const str = query.toString();
+  return str ? `?${str}` : "";
+};
+
+// Only company_name narrows the filter options
+export const fetchChallanFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_TREND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanActWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_ACT_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_LOCATION_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_TURNAROUND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchChallanExceptions = async (params, page = 1, limit = 50) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_EXCEPTIONS}${dashboardQuery({ ...params, page, limit })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Signature matches PaginatedGrid's fetchPage(page, limit, search)
+export const fetchChallanRecords = async (page, limit, search, params) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_RECORDS}${dashboardQuery({ ...params, ...(search ? { search } : {}), page, limit })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchChallanRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_CHALLAN_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Register Dashboard
+// Only company_name narrows the filter options
+export const fetchRegisterDashFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_TREND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashRegisterWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_REGISTER_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashActWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_ACT_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_LOCATION_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_TURNAROUND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashVariance = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_VARIANCE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Paginated lists: params carry the filters plus page / limit (and sheet / sort for records)
+export const fetchRegisterDashExceptions = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_EXCEPTIONS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashCoverage = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_COVERAGE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchRegisterDashRecords = async (params) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_RECORDS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchRegisterDashRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_REGISTER_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Returns Dashboard
+// Only company_name narrows the filter options
+export const fetchReturnsDashFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_TREND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashPeriodWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_PERIOD_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashReturnWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_RETURN_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashActWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_ACT_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_LOCATION_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_TURNAROUND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Paginated lists: params carry the filters plus page / limit (and sheet / sort for records)
+export const fetchReturnsDashExceptions = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_EXCEPTIONS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashCoverage = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_COVERAGE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchReturnsDashRecords = async (params) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_RECORDS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchReturnsDashRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_RETURNS_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// License Dashboard
+// Only company_name narrows the filter options
+export const fetchLicenseDashFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashLocationWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_LOCATION_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashTrend = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_TREND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashTurnaround = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_TURNAROUND}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// params carry the filters plus `by` (one of filters.breakdowns)
+export const fetchLicenseDashBreakdown = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_BREAKDOWN}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// params carry the filters plus `months` (timeline length from the current month)
+export const fetchLicenseDashExpiryTimeline = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_EXPIRY_TIMELINE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Paginated lists: params carry the filters plus page / limit (and sort for records)
+export const fetchLicenseDashExceptions = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_EXCEPTIONS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchLicenseDashRecords = async (params) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_RECORDS}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Pass company_name in company-wise mode so the backend checks access to that company
+export const fetchLicenseDashRecordById = async (id, company_name) => {
+  try {
+    const response = await API.get(`${GET_LICENSE_DASH_RECORD_BY_ID}${encodeURIComponent(id)}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Compliance Cockpit
+// Only company_name narrows the filter options
+export const fetchCockpitFilters = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_FILTERS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// params: company_name, state, location, search, month_from, month_to
+export const fetchCockpitSummary = async (params) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_SUMMARY}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchCockpitCompanyWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_COMPANY_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const fetchCockpitStateWise = async (params) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_STATE_WISE}${dashboardQuery(params)}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Client master data; only company_name applies
+export const fetchCockpitClients = async (company_name) => {
+  try {
+    const response = await API.get(`${GET_COCKPIT_CLIENTS}${dashboardQuery({ company_name })}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Dashboaed Widgets
 
 export const fetchAllWidgetMappings = async (userId) => {
   try {
@@ -2403,10 +2786,10 @@ export const getAllCompanyLocationByEntityId = async (id) => {
 };
 
 //Document-repo
-export const getAllFileNamesByAccessType = async (id) => {
+export const getAllFileNamesByAccessType = async () => {
   try {
     const response = await API.get(
-      `${GET_FILE_NAMES_BY_ACCESS_TYPE}${id}`
+      GET_FILE_NAMES_BY_ACCESS_TYPE
     );
 
     return response.data;
@@ -2428,6 +2811,15 @@ export const createGroupwiseAccessByGroupId = async (data) => {
 export const createEntityWiseAccess = async (data) => {
   try {
     const response = await API.post(ENTITY_WISE_ACCESS, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createLocationWiseAccess = async (data) => {
+  try {
+    const response = await API.post(LOCATION_WISE_ACCESS, data);
     return response.data;
   } catch (error) {
     throw error;

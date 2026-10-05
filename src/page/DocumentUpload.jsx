@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import "../style/useRole.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import Toggle from "../component/Toggle";
@@ -22,28 +28,50 @@ import {
   downloadFile,
   fetchEntityById,
   getAllCompanyLocationByEntityId,
+  // updateDocumentApprovalStatusById,
 } from "../api/service";
 import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import PaginatedGrid from "../component/PaginatedGrid";
 import MultiFileUpload from "../component/MultiFileUpload";
 import RightDrawer from "../component/RightDrawer";
 import { ReactPDFViewer } from "../component/ReactPDFViewer";
 import SmallSizeModal from "../component/SmallSizeModal";
 import { AnimatedSearchBar } from "../component/AnimatedSearchBar";
 import { Download } from "lucide-react";
-import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
-import { flattenObject } from '../../Utils/tableColUtils';
-// Register module
-ModuleRegistry.registerModules([AllCommunityModule]);
+import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter";
+import { flattenObject } from "../../Utils/tableColUtils";
+import MonthYearCalander from "../component/MonthYearCalander";
+import { decryptData } from "./utils/encrypt";
 
 const DocumentUpload = () => {
+  // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
   const [data, setData] = useState([]);
+  const gridRef = useRef();
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState({});
+
+  // The search box goes to the API (?search=...), so it covers every record.
+  // MultiSelectFilter still only applies to the rows of the page on screen.
+  const rowFilter = useCallback(
+    (row) =>
+      Object.entries(filters).every(
+        ([column, values]) => !values?.length || values.includes(row[column]),
+      ),
+    [filters],
+  );
+
+  // Reload the current page from the API (after edit/delete/upload/approve)
+  const loadFiles = useCallback(async () => {
+    gridRef.current?.refresh();
+  }, []);
+
+  // Re-apply the column filters to the page on screen
+  useEffect(() => {
+    gridRef.current?.refresh();
+  }, [rowFilter]);
   const [uploading, setUploading] = useState(false);
   const [current, setCurrent] = useState({
     group_name: "",
@@ -64,6 +92,8 @@ const DocumentUpload = () => {
     document_type_id: null,
     stage: "",
     stage_id: null,
+    document_month: null,
+    document_year: null,
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isPdfView, setIsPdfView] = useState(false);
@@ -72,6 +102,10 @@ const DocumentUpload = () => {
     useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [documentId, setDocumentId] = useState(null);
+  const [previewFile, setPreviewFile] = useState({
+    documentId: null,
+    fileName: "",
+  });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
     open: false,
@@ -80,20 +114,9 @@ const DocumentUpload = () => {
     message: "",
     severityType: "",
   });
-  const [filters, setFilters] = useState({});
-
   const handleFilterApply = (newFilters) => {
     setFilters(newFilters);
   };
-  const filteredRowData = useMemo(() => {
-    if (Object.keys(filters).length === 0) return data;
-
-    return data.filter((row) => {
-      return Object.entries(filters).every(([column, values]) => {
-        return values.includes(row[column]);
-      });
-    });
-  }, [data, filters]);
   const [isAutoUpload, setIsAutoUpload] = useState(true);
   const [errors, setErrors] = useState({});
   const [groupHoldingName, setGroupHoldingName] = useState([]);
@@ -105,6 +128,8 @@ const DocumentUpload = () => {
   const [serviceTrackerName, setServiceTrackerName] = useState([]);
   const [documentDropdownTypes, setDocumentDropdownTypes] = useState([]);
   const [documentDropdownStages, setDocumentDropdownStages] = useState([]);
+  const searchTimerRef = useRef(null);
+  
   const validate = () => {
     let tempErrors = {};
     if (!current?.group_name)
@@ -144,8 +169,7 @@ const DocumentUpload = () => {
       });
 
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -165,8 +189,7 @@ const DocumentUpload = () => {
       const message = response?.message;
 
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
       setIsDeleteModalOpen(false);
 
       // Show success snackbar
@@ -198,6 +221,7 @@ const DocumentUpload = () => {
   };
   const toggleDrawer = (newOpen) => () => {
     setIsModalOpen(newOpen);
+    if (!newOpen) setIsPdfView(false);
   };
 
   //  =============================   auto file upload logic   =================================================
@@ -261,10 +285,8 @@ const DocumentUpload = () => {
         severityType: "success",
       });
 
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
       setUploadedFiles([]);
-
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
@@ -291,7 +313,7 @@ const DocumentUpload = () => {
     try {
       const response = await updateFileById(
         params.data.document_id,
-        newIsActive
+        newIsActive,
       );
       const message = response?.message || "Status update successfully";
       // Show success snackbar
@@ -301,8 +323,7 @@ const DocumentUpload = () => {
         message,
         severityType: "success",
       });
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -313,9 +334,12 @@ const DocumentUpload = () => {
       });
     }
   };
-  const handleApproveAll = async () => {
+  const handleApproveAll = async (id) => {
     try {
       const response = await bulkApproveAllPageData("document_repository");
+      // const response = id
+      //   ? await updateDocumentApprovalStatusById(id, 1)
+      //   : await bulkApproveAllPageData("document_repository");
       const message = response?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
@@ -325,8 +349,7 @@ const DocumentUpload = () => {
         severityType: "success",
       });
       // Refresh data
-      const updatedData = await fetchAllFiles();
-      setData(updatedData);
+      await loadFiles();
     } catch (error) {
       // Show error snackbar
       setIsSnackbarsOpen({
@@ -341,22 +364,8 @@ const DocumentUpload = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const results = await Promise.allSettled([
-          fetchAllFiles(),
-          fetchAllGroup(),
-          //  fetchAllModulesName(),
-        ]);
-        if (results[0].status === "fulfilled") setData(results[0].value);
-        if (results[1].status === "fulfilled")
-          setGroupHoldingName(results[1].value);
-        results.forEach((result, idx) => {
-          if (result.status === "rejected") {
-            // // console.error(
-            //   `Error fetching data at index ${idx}:`,
-            //   result.reason
-            // );
-          }
-        });
+        const groups = await fetchAllGroup();
+        setGroupHoldingName(groups);
       } catch {
         // Handle error silently
       }
@@ -368,7 +377,7 @@ const DocumentUpload = () => {
     const fetchCompany = async () => {
       try {
         const data = await fetchCompaniesNameByGroupId(
-          current?.group_holdings_id
+          current?.group_holdings_id,
         );
         if (data) {
           setCompanyName(data);
@@ -403,7 +412,9 @@ const DocumentUpload = () => {
     }
   }, [current?.company_id]);
 
-  useEffect(() => {
+  useEffect(() => { // const response = id
+      //   ? await updateDocumentApprovalStatusById(id, 1)
+      //   : await bulkApproveAllPageData("document_repository");
     const fetchLocationByCompanyId = async () => {
       try {
         const data = await getLocationByCompanyId(current?.company_id);
@@ -424,7 +435,7 @@ const DocumentUpload = () => {
     const fetchModuleByLocationId = async () => {
       try {
         const data = await fetchAllModulesNameByLocationId(
-          current?.location_id
+          current?.location_id,
         );
         if (data) {
           setModuleName(data);
@@ -464,7 +475,7 @@ const DocumentUpload = () => {
         if (data) {
           setServiceTrackerName(data);
         }
-      } catch { }
+      } catch {}
     };
 
     if (current?.module_id) {
@@ -516,100 +527,84 @@ const DocumentUpload = () => {
         return { color: "#41464b" }; // gray
     }
   };
-  const generateDynamicColDefs = (data) => {
+  // Internal ids / audit fields that should never become their own column,
+  // matched on the leaf of a flattened key (so `ai_data._id` is caught too).
+  const HIDDEN_DYNAMIC_LEAVES = new Set([
+    "_id",
+    "is_active",
+    "is_deleted",
+    "is_archived",
+    "deleted_at",
+    "deleted_by",
+    "created_by",
+    "updated_by",
+    "approved_by",
+  ]);
+
+  // "ai_data.created_at" -> "AI Data Created At" (prefixing the parent keeps
+  // nested fields from colliding with the top level ones)
+  const buildHeaderName = (key) =>
+    key
+      .split(".")
+      .map((part) =>
+        part
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase())
+          .replace(/\bAi\b/g, "AI"),
+      )
+      .join(" ");
+
+  const generateDynamicColDefs = (data, existingColDefs = []) => {
     if (!data || data.length === 0) return [];
 
-    const sample = flattenObject(data[0]);
+    // Union the keys of the first rows: an empty `ai_data` on row 0 would
+    // otherwise hide those columns entirely.
+    const sample = data
+      .slice(0, 20)
+      .reduce((acc, row) => Object.assign(acc, flattenObject(row)), {});
+
+    // Anything already declared as a static column is skipped, matched on both
+    // the field path and the header text.
+    const takenFields = new Set(
+      existingColDefs.map((col) => col.field).filter(Boolean),
+    );
+    const takenHeaders = new Set(
+      existingColDefs
+        .map((col) => col.headerName?.toLowerCase())
+        .filter(Boolean),
+    );
 
     return Object.keys(sample)
       .map((key) => {
-        // Skip unwanted fields
-        if (
-          key === "_id" ||
-          key === "common_attributes.is_active" ||
-          key === "common_attributes.is_deleted" ||
-          key === "common_attributes.deleted_by" ||
-          key === "common_attributes.deleted_at"
-        )
+        const leaf = key.split(".").pop();
+
+        if (HIDDEN_DYNAMIC_LEAVES.has(leaf)) return null;
+
+        // Drop raw ObjectId columns that already have a readable `_name` twin
+        // (company_id, entity_id, module_id, …). `document_id` has no twin, so
+        // it survives.
+        if (leaf.endsWith("_id") && key.replace(/_id$/, "_name") in sample)
           return null;
 
-        // ✅ Special case for approval_status
-        if (key === "common_attributes.approval_status") {
-          return {
-            field: key,
-            headerName: "Approval Status",
-            filter: true,
-            editable: false,
-            valueGetter: (params) =>
-              params.data?.common_attributes?.approval_status,
-            cellRenderer: (params) => {
-              const status = params.value ?? 0;
+        // Nested foreign keys that just repeat a top level id (ai_data.document_id)
+        if (key.includes(".") && leaf.endsWith("_id") && leaf in sample)
+          return null;
 
-              const handleChange = async (e) => {
-                const checked = e.target.checked;
+        // Objects/arrays have no sensible cell rendering (e.g. a null `ai_data`)
+        if (sample[key] !== null && typeof sample[key] === "object")
+          return null;
 
-                // UI Update Immediately (Optimistic Update)
-                params.node.setDataValue(
-                  "common_attributes.approval_status",
-                  checked ? 1 : 0,
-                );
+        const headerName = buildHeaderName(key);
 
-                // Optional: API Call
-                // try {
-                //   await handleCheckboxClick(params.data._id, checked ? 1 : 0);
-                // } catch  {
-                //   // Revert if API fails
-                //   params.node.setDataValue(
-                //     "common_attributes.approval_status",
-                //     status,
-                //   );
-                // }
-              };
+        if (takenFields.has(key) || takenHeaders.has(headerName.toLowerCase()))
+          return null;
 
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={status === 1}
-                    disabled={status === 1} // Approved hone ke baad disable
-                    onChange={handleChange}
-                    style={{
-                      width: 15,
-                      height: 15,
-                      accentColor: "orange",
-                      cursor: status === 1 ? "not-allowed" : "pointer",
-                    }}
-                  />
-                  <span
-                    style={{
-                      color: status === 1 ? "green" : "orange",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {status === 1 ? "Approved" : "Pending"}
-                  </span>
-                </div>
-              );
-            },
-          };
-        }
+        takenFields.add(key);
+        takenHeaders.add(headerName.toLowerCase());
 
-        // ✅ Default column definition
         return {
           field: key,
-          headerName: key
-            .split(".")
-            .pop()
-            .replace(/_/g, " ")
-            .replace(/\b\w/g, (l) => l.toUpperCase()),
-
+          headerName,
           filter: true,
           editable: false,
           headerStyle: {
@@ -618,38 +613,48 @@ const DocumentUpload = () => {
           },
 
           valueGetter: (params) => {
-            return key
+            const value = key
               .split(".")
               .reduce((acc, part) => acc?.[part], params.data);
+
+            if (value === null || value === undefined || value === "")
+              return "-";
+            if (typeof value === "boolean") return value ? "Yes" : "No";
+            return value;
           },
         };
       })
       .filter(Boolean);
   };
-  const colDefs = [
+  const staticColDefs = [
     {
+      flex: 0,
+      width: 130,
+      minWidth: 130,
+      maxWidth: 130,
       headerName: "Actions",
       field: "actions",
       filter: false,
       editable: false,
-      width: 130,
-      flex: 1,
       pinned: "right",
       cellStyle: { "background-color": "rgb(252 229 205 / 64%)" },
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
-            {/* <button
+            <button
               className="btn btn-sm"
+              title="Preview document"
               onClick={() => {
-                // setIsEditing(false);
+                setPreviewFile({
+                  documentId: params.data.document_id,
+                  fileName: params.data.file_name || "",
+                });
                 setIsPdfView(true);
                 setIsModalOpen(true);
-                setDocumentId(params.data.document_id); // OR .user_id based on your data
               }}
             >
-              <AttachFileIcon fontSize="small" className="action_icon" />
-            </button> */}
+              <VisibilityIcon fontSize="small" className="action_icon" />
+            </button>
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -701,11 +706,15 @@ const DocumentUpload = () => {
         };
 
         return (
-          <button
-            onClick={handleDownload}
-            style={{ display: 'contents' }}
-          >
-            <Download style={{ height: '21px', width: '21px', color: 'cadetblue', cursor: 'pointer' }} />
+          <button onClick={handleDownload} style={{ display: "contents" }}>
+            <Download
+              style={{
+                height: "21px",
+                width: "21px",
+                color: "cadetblue",
+                cursor: "pointer",
+              }}
+            />
           </button>
         );
       },
@@ -736,6 +745,10 @@ const DocumentUpload = () => {
       ),
     },
     {
+      flex: 0,
+      width: 120,
+      minWidth: 120,
+      maxWidth: 120,
       editable: "false",
       field: "is_active",
       headerName: "Status",
@@ -773,15 +786,15 @@ const DocumentUpload = () => {
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <input
               type="checkbox"
-              checked={status}
-              // readOnly={status === 1}
+              checked={status === 1}
+              disabled={status === 1}
               style={{
-                cursor: "default",
+                cursor: status === 1 ? "default" : "pointer",
                 width: 15,
                 height: 15,
                 accentColor: "orange",
               }}
-            // onChange={status !== 1 ? () => handleCheckboxClick(params.data._id) : null}
+              onChange={() => handleApproveAll(params.data.document_id)}
             />
             <span
               style={{
@@ -796,22 +809,27 @@ const DocumentUpload = () => {
         );
       },
     },
-    ...generateDynamicColDefs(data),
   ];
-  const gridRef = useRef();
+  const colDefs = [
+    ...staticColDefs,
+    ...generateDynamicColDefs(data, staticColDefs),
+  ];
   const defaultColDef = {
+    resizable: true,
+    flex: 1,
+    minWidth: 140,
     sortable: true,
     filter: true,
     editable: true,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = () => {
-  };
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current.api.setGridOption(
-      "quickFilterText",
-      document.getElementById("filter-text-box").value
-    );
+  const onRowValueChanged = () => {};
+  // quickFilterText doesn't work with the infinite row model, so the text is
+  // sent to the API instead; debounced so every keystroke isn't a request
+  const onFilterTextBoxChanged = useCallback((e) => {
+    const value = e.target.value;
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => setSearch(value), 400);
   }, []);
   const fileUploadForm = () => {
     return (
@@ -828,7 +846,7 @@ const DocumentUpload = () => {
 
         <div className="mb-3 ps-3 pe-3 pb-3 mt-4">
           <div className="button-wrap">
-            <div style={{ fontSize: 14, marginBottom: 7, color: 'gray' }}>
+            <div style={{ fontSize: 14, marginBottom: 7, color: "gray" }}>
               <span>Note: </span>
               <span>You can upload a maximum of 5 files at a time.</span>
             </div>
@@ -897,6 +915,14 @@ const DocumentUpload = () => {
   };
 
   const drawerHeader = () => {
+    if (isPdfView) {
+      return (
+        <div className="p-3 fs-14 fw-600">
+          <FilePresentIcon style={{ color: "deepskyblue" }} />
+          Document Preview
+        </div>
+      );
+    }
     return (
       <div className="p-3 fs-14 fw-600">
         <AttachFileIcon style={{ color: "green" }} />
@@ -922,8 +948,8 @@ const DocumentUpload = () => {
             value={current.group_name}
             onChange={(e) => {
               const selectedName = e.target.value;
-              const matchedGroup = groupHoldingName.find(
-                (g) => g.group_name === selectedName
+              const matchedGroup = groupHoldingName?.find(
+                (g) => g.group_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -951,7 +977,7 @@ const DocumentUpload = () => {
               setServiceTrackerName([]);
               setErrors((prevErrors) => ({ ...prevErrors, group_name: "" }));
             }}
-            names={groupHoldingName.map((item) => ({
+            names={groupHoldingName?.map((item) => ({
               _id: item._id,
               name: item.group_name,
             }))}
@@ -965,7 +991,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedCompany = companyName.find(
-                (g) => g.company_name === selectedName
+                (g) => g.company_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1009,9 +1035,8 @@ const DocumentUpload = () => {
               const selectedEntity = e.target.value;
 
               const matchedEntity =
-                entityName.find(
-                  (entity) => entity.name === selectedEntity
-                ) || {};
+                entityName.find((entity) => entity.name === selectedEntity) ||
+                {};
 
               const selectedEntityId = matchedEntity.id || null;
 
@@ -1033,8 +1058,9 @@ const DocumentUpload = () => {
               setSubModuleName([]);
               setServiceTrackerName([]);
               if (!selectedEntityId) {
-                const allLocations =
-                  await getLocationByCompanyId(current?.company_id);
+                const allLocations = await getLocationByCompanyId(
+                  current?.company_id,
+                );
 
                 setLocationName(allLocations || []);
 
@@ -1043,9 +1069,7 @@ const DocumentUpload = () => {
 
               try {
                 const entityLocations =
-                  await getAllCompanyLocationByEntityId(
-                    selectedEntityId
-                  );
+                  await getAllCompanyLocationByEntityId(selectedEntityId);
 
                 setLocationName(entityLocations || []);
               } catch {
@@ -1064,7 +1088,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = locationName.find(
-                (g) => g.location_name === selectedName
+                (g) => g.location_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1088,7 +1112,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = moduleName.find(
-                (g) => g.name === selectedName
+                (g) => g.name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1112,7 +1136,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = subModuleName.find(
-                (g) => g.sub_module_name === selectedName
+                (g) => g.sub_module_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1141,7 +1165,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = serviceTrackerName.find(
-                (g) => g.service_tracker_name === selectedName
+                (g) => g.service_tracker_name === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1170,7 +1194,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownTypes.find(
-                (g) => g.value === selectedName
+                (g) => g.value === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1197,7 +1221,7 @@ const DocumentUpload = () => {
             onChange={(e) => {
               const selectedName = e.target.value;
               const matchedLocation = documentDropdownStages.find(
-                (g) => g.value === selectedName
+                (g) => g.value === selectedName,
               );
               setCurrent((prev) => ({
                 ...prev,
@@ -1211,10 +1235,51 @@ const DocumentUpload = () => {
               name: item.value,
             }))}
             // isdisable={isEditing ? true : false}
-            error={!!errors.stage}
-            helperText={errors.stage}
+            error={!!errors.stage_name}
+            helperText={errors.stage_name}
           />
         </div>
+        <div className="d-lg-flex d-md-flex gap-3 mb-3">
+          <MonthYearCalander
+            label="Document Month"
+            views={["month"]}
+            format="MMMM"
+            outputFormat="M"
+            size="medium"
+            fullWidth
+            value={current?.document_month ?? null}
+            onChange={(val) => {
+              setCurrent((prev) => ({
+                ...prev,
+                document_month: val ? Number(val) : null,
+              }));
+              setErrors((prevErrors) => ({
+                ...prevErrors,
+                document_month: "",
+              }));
+            }}
+            error={!!errors.document_month}
+            helperText={errors.document_month}
+          />
+          <MonthYearCalander
+            label="Document Year"
+            views={["year"]}
+            format="YYYY"
+            size="medium"
+            fullWidth
+            value={current?.document_year ?? null}
+            onChange={(val) => {
+              setCurrent((prev) => ({
+                ...prev,
+                document_year: val ? Number(val) : null,
+              }));
+              setErrors((prevErrors) => ({ ...prevErrors, document_year: "" }));
+            }}
+            error={!!errors.document_year}
+            helperText={errors.document_year}
+          />
+        </div>
+
         <div className="d-lg-flex d-md-flex d-flex justify-content-between">
           <div>
             <button
@@ -1367,13 +1432,19 @@ const DocumentUpload = () => {
   const pdfFile = () => {
     return (
       <div className="p-3 w-100">
-        <ReactPDFViewer />
+        <ReactPDFViewer
+          documentId={previewFile.documentId}
+          fileName={previewFile.fileName}
+        />
       </div>
     );
   };
+  const userType = decryptData(localStorage.getItem("user_type"));
+  
   return (
     <div>
       <RightDrawer
+        width={isPdfView ? "900px" : "500px"}
         isPdfView={isPdfView}
         toggleDrawer={toggleDrawer}
         drawerHeader={drawerHeader}
@@ -1387,24 +1458,27 @@ const DocumentUpload = () => {
       <div className="service-tracker-inner-page-header d-lg-flex d-md-flex">
         <div className="notification-page-title">
           <div>
-            <h1>Upload Document</h1>
+            <h1>Document Repository</h1>
           </div>
         </div>
         <div className="d-lg-flex d-md-flex  justify-content-end mb-3">
           <div className="pe-2 d-lg-flex d-md-flex gap-3">
-            <div>
-              <button
-                className="reject upload-wrapper upload-label"
-                onClick={openModal}
-              >
-                <span className="icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
-                  </svg>
-                </span>
-                <span className="text">Upload File</span>
-              </button>
-            </div>
+            {userType === "0" && (
+              <div>
+                <button
+                  className="reject upload-wrapper upload-label"
+                  onClick={openModal}
+                >
+                  <span className="icon">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5h4v6h3v-6h4L12 2z" />
+                    </svg>
+                  </span>
+                  <span className="text">Upload File</span>
+                </button>
+              </div>
+            )}
+
             <div className="btn-wrap-div">
               <button
                 className="button approve w-100 justify-content-center"
@@ -1442,32 +1516,28 @@ const DocumentUpload = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
-        <div className='d-flex align-items-center gap-2'>
+        <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
             type="text"
             id="filter-text-box"
             onInput={onFilterTextBoxChanged}
           />
-          <MultiSelectFilter
-            rowData={data}
-            onFilterApply={handleFilterApply}
-          />
+          <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
         </div>
 
-        <div
-          className="ag-theme-quartz"
-          style={{ height: "600px", width: "100%", marginTop: "1rem" }}
-        >
-          <AgGridReact
-            theme="legacy"
+        <div style={{ marginTop: "1rem" }}>
+          <PaginatedGrid
             ref={gridRef}
-            rowData={filteredRowData || []}
+            fetchPage={fetchAllFiles}
+            search={search}
+            rowFilter={rowFilter}
+            onPageLoaded={setData}
+            pageSize={20}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
             rowSelection="single"
-            pagination={true}
             onRowValueChanged={onRowValueChanged}
           />
         </div>

@@ -1,11 +1,30 @@
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
-import { decryptData } from '../../page/utils/encrypt';
 import DashboardDrawerGrid from '../DashboardDrawer';
-import { fetchGeneralCompaiancePortfolio, fetchPaginatedRecords } from '../../api/service';
+import {
+    fetchChallanRecords,
+    fetchLicenseDashRecords,
+    fetchRegisterDashRecords,
+    fetchReturnsDashRecords,
+} from '../../api/service';
 
-const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelectedCharts, shouldShow, page, limit, setActiveDrawer }) => {
+// The drawer shows each module's rows. They come from the module dashboards' own /records
+// endpoints (the old cockpit records endpoint was removed), reshaped to what the drawer reads:
+// { challan|license|register|return: { records: row[], total } }
+const fetchPaginatedRecords = async (page, limit) => {
+    const toModule = (res) => ({ records: (res?.data || []).map((row) => row.record), total: res?.total ?? 0 });
+    const [challan, license, register, returns] = await Promise.allSettled([
+        fetchChallanRecords(page, limit),
+        fetchLicenseDashRecords({ page, limit }),
+        fetchRegisterDashRecords({ page, limit }),
+        fetchReturnsDashRecords({ page, limit }),
+    ]);
+    const pick = (res) => (res.status === 'fulfilled' ? toModule(res.value) : { records: [], total: 0 });
+    return { challan: pick(challan), license: pick(license), register: pick(register), return: pick(returns) };
+};
+
+const GeneralComplianceDashboard = ({ data, shouldShow, page, limit, setActiveDrawer }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -167,33 +186,7 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
         }
     };
 
-    const userRole = decryptData(localStorage.getItem("user_role"));
 
-    const toggleChartSelection = (chartId) => {
-        if (!current?.user_name) {
-            setIsSnackbarsOpen({
-                ...issnackbarsOpen,
-                open: true,
-                message: "First you need to select a user",
-                severityType: "warning",
-            });
-            return;
-        }
-
-        setSelectedCharts((prev) =>
-            prev.includes(chartId)
-                ? prev.filter((id) => id !== chartId)
-                : [...prev, chartId]
-        );
-    };
-
-    const canSelect = userRole === 'Admin' || userRole === 'Super-Admin';
-    const cardClass = (id, defaultClass = "") =>
-        canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
-
-    const handleSelect = (id) => {
-        if (canSelect) toggleChartSelection(id);
-    };
 
 
     const handleOpenDrawer = (anchor, filterColumn) => {
@@ -222,18 +215,9 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 {shouldShow("gc-1") && (
                     <div className='col-12 col-md-6 mb-4'>
                         <div
-                            className={`general-compliance ${cardClass("gc-1")}`}
-                            onClick={canSelect ? () => handleSelect("gc-1") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`general-compliance`}
                         >
                             <h2>Licenses (Total: {licenseData.total})</h2>
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gc-1")}
-                                checked={selectedCharts.includes("gc-1")}
-                                disabled={!current?.user_name}
-                            />
                             <Chart
                                 options={licensesChart.options}
                                 series={licensesChart.series}
@@ -246,18 +230,9 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 {shouldShow("gc-2") && (
                     <div className='col-12 col-md-6 mb-4'>
                         <div
-                            className={`general-compliance ${cardClass("gc-2")}`}
-                            onClick={canSelect ? () => handleSelect("gc-2") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`general-compliance`}
                         >
                             <h2>Challan Compliance</h2>
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gc-2")}
-                                checked={selectedCharts.includes("gc-2")}
-                                disabled={!current?.user_name}
-                            />
                             <div className="compliance-items">
                                 {payrollData.map((item, index) => (
                                     <div key={index} className={`compliance-item ${item.status}`}>
@@ -273,17 +248,8 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 {shouldShow("gc-3") && (
                     <div className='col-12 col-md-6 mb-4'>
                         <div
-                            className={`general-compliance ${cardClass("gc-3")}`}
-                            onClick={canSelect ? () => handleSelect("gc-3") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`general-compliance`}
                         >
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gc-3")}
-                                checked={selectedCharts.includes("gc-3")}
-                                disabled={!current?.user_name}
-                            />
                             <Chart
                                 options={registersChart.options}
                                 series={registersChart.series}
@@ -296,17 +262,8 @@ const GeneralComplianceDashboard = ({ data, current, selectedCharts, setSelected
                 {shouldShow("gc-4") && (
                     <div className='col-12 col-md-6 mb-4'>
                         <div
-                            className={`general-compliance ${cardClass("gc-4")}`}
-                            onClick={canSelect ? () => handleSelect("gc-4") : undefined}
-                            style={{ cursor: canSelect ? "pointer" : "default" }}
+                            className={`general-compliance`}
                         >
-                            <input
-                                type="checkbox"
-                                className="chart-select-checkbox"
-                                onChange={() => toggleChartSelection("gc-4")}
-                                checked={selectedCharts.includes("gc-4")}
-                                disabled={!current?.user_name}
-                            />
                             <Chart
                                 options={returnsChart.options}
                                 series={returnsChart.series}

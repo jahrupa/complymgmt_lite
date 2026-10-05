@@ -1,0 +1,305 @@
+/* Tracker dashboard widgets (Challan, Register) */
+
+.dw-filter-bar {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.dw-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.dw-kpi {
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #fafafa;
+}
+
+.dw-kpi.clickable {
+    cursor: pointer;
+}
+
+.dw-kpi.clickable:hover {
+    border-color: #14b8a6;
+}
+
+.dw-kpi-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.dw-kpi-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.dw-kpi-value.danger {
+    color: #dc2626;
+}
+
+.dw-kpi-value.warning {
+    color: #d97706;
+}
+
+.dw-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: normal;
+    line-height: 1.6;
+}
+
+.dw-badge.complied {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+.dw-badge.non-complied {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.dw-badge.overdue,
+.dw-badge.data-issue {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.dw-badge.pending {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.dw-badge.neutral {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.dw-badge.exception {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.dw-badge.clickable {
+    cursor: pointer;
+}
+
+/* Location x month grid */
+.dw-loc-grid-wrap {
+    overflow: auto;
+    max-height: 520px;
+}
+
+.dw-loc-grid {
+    border-collapse: separate;
+    border-spacing: 4px;
+    width: 100%;
+    font-size: 13px;
+}
+
+.dw-loc-grid th {
+    position: sticky;
+    top: 0;
+    background: white;
+    font-weight: 600;
+    color: #515151;
+    text-align: center;
+    padding: 4px 8px;
+    z-index: 1;
+}
+
+.dw-loc-grid th:first-child,
+.dw-loc-grid td:first-child {
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dw-loc-grid .state-row td {
+    font-weight: 600;
+    color: #0f766e;
+    padding-top: 10px;
+}
+
+.dw-loc-cell {
+    text-align: center;
+    border-radius: 6px;
+    padding: 6px 4px;
+    min-width: 80px;
+}
+
+.dw-loc-cell.clickable {
+    cursor: pointer;
+}
+
+.dw-loc-cell.empty {
+    background: #f3f4f6;
+}
+
+.dw-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: #6b7280;
+    flex-wrap: wrap;
+}
+
+.dw-legend span::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 4px;
+    background: var(--swatch);
+}
+
+/* Record detail timeline */
+.dw-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dw-timeline li {
+    position: relative;
+    padding: 0 0 16px 28px;
+}
+
+.dw-timeline li::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 16px;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.dw-timeline li:last-child::before {
+    display: none;
+}
+
+.dw-timeline .dot {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #14b8a6;
+    border: 3px solid #ccfbf1;
+}
+
+.dw-timeline li.pending .dot {
+    background: #d1d5db;
+    border-color: #f3f4f6;
+}
+
+.dw-timeline li.deadline .dot {
+    background: white;
+    border: 2px dashed #d97706;
+    border-radius: 3px;
+}
+
+.dw-timeline li.deadline .step-label {
+    color: #d97706;
+}
+
+.dw-timeline li.marker .dot {
+    background: white;
+    border: 2px solid #6366f1;
+}
+
+.dw-timeline li.marker .step-label {
+    color: #4f46e5;
+}
+
+.dw-timeline li.out-of-order .dot {
+    background: #dc2626;
+    border-color: #fee2e2;
+}
+
+.dw-timeline .step-label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.dw-timeline .step-meta {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.dw-timeline li.out-of-order .step-meta {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.dw-state-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    color: gray;
+    gap: 8px;
+}
+
+.dw-state-message h5 {
+    color: #374151;
+    margin: 0;
+}
+
+/* Horizontal share bar, e.g. coverage completed / in progress / not started */
+.dw-share-bar {
+    display: flex;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.dw-share-bar > span {
+    height: 100%;
+}
+
+.dw-share-bar.clickable > span {
+    cursor: pointer;
+}
+
+.dw-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+}
+
+.dw-progress-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+
+.dw-progress-track > span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+}
+
+.dw-progress-label {
+    min-width: 58px;
+    text-align: right;
+    font-size: 12px;
+}

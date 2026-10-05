@@ -51,6 +51,119 @@
     font-weight: 500;
 }
 
+/* ── Client info (states / locations / modules) ────────────────────────── */
+/* Prefixed with `ccbc-` because `.client-info` is also defined in
+   clientOnboarding.css and these stylesheets are global. */
+
+.ccbc-client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #f1f2f4;
+}
+
+.ccbc-info-row {
+    display: grid;
+    grid-template-columns: 116px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+}
+
+.ccbc-info-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.ccbc-count-badge {
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #eef0f3;
+    color: #4b5563;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-align: center;
+}
+
+.ccbc-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ccbc-chip {
+    display: inline-block;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 4px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.ccbc-chip-state {
+    background: #eef2ff;
+    border-color: #dfe4ff;
+    color: #3730a3;
+}
+
+.ccbc-chip-location {
+    background: #f4f5f7;
+    border-color: #e6e8ec;
+    color: #374151;
+}
+
+.ccbc-chip-module {
+    background: #f0fdfa;
+    border-color: #cdeeea;
+    color: #0f766e;
+}
+
+.ccbc-chip-empty {
+    background: transparent;
+    border-color: #e6e8ec;
+    border-style: dashed;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.ccbc-chip-toggle {
+    background: transparent;
+    border-color: #d5d8de;
+    border-style: dashed;
+    color: #6b7280;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ccbc-chip-toggle:hover {
+    background: #fff7ed;
+    border-color: #fdba74;
+    border-style: solid;
+    color: #c2410c;
+}
+
+.ccbc-chip-toggle:focus-visible {
+    outline: 2px solid #fdba74;
+    outline-offset: 2px;
+}
+
 .dashboard1-grid {
     /* display: grid; */
     grid-template-columns: 1fr;
@@ -319,6 +432,19 @@
     .client-info {
         flex-direction: column;
         gap: 16px;
+    }
+
+    .ccbc-info-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 6px;
+    }
+
+    .ccbc-info-label {
+        padding-top: 0;
+    }
+
+    .ccbc-chip {
+        max-width: 100%;
     }
 
     .cards-grid {

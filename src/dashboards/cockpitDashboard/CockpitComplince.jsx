@@ -1,1159 +1,257 @@
-// import React, { useState } from 'react';
+import React, { useMemo, useState } from "react";
 import Chart from "react-apexcharts";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+// cockpitComplinceByCompany.css also holds the global .chart-card / .selected-card styles
 import "../../style/cockpitComplinceByCompany.css";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ClientComplianceTable from "./ClientComplianceTable";
-import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
-import { Settings2 } from "lucide-react";
-import { AnimatedSearchBar } from "../../component/AnimatedSearchBar";
-import Snackbars from "../../component/Snackbars";
-import { decryptData } from "../../page/utils/encrypt";
-import { useNavigate } from "react-router-dom";
-import DashboardDrawerGrid from "../DashboardDrawer";
-import { fetchChallanCompliance, fetchClientCompliance, fetchClientData, fetchLicenseComplaince, fetchPaginatedRecords, fetchRegistersCompliance, fetchReturnCompliance } from "../../api/service";
+import "../../style/dashboardWidgets.css";
+import { fetchCockpitClients, fetchCockpitCompanyWise, fetchCockpitStateWise, fetchCockpitSummary } from "../../api/service";
+import { useDashboardData } from "../common/useDashboard";
+import DashboardCard from "../common/DashboardCard";
+import GroupTableCard from "../common/GroupTableCard";
+import { CockpitFilterBar, CompletionStatusCard, ModuleTile, OverallScoreCard, ScoreCell } from "./CockpitWidgets";
+import { useCockpit } from "./useCockpit";
+import { MODULES, MODULE_ORDER, distributionColor, periodLabel } from "./cockpitUtils";
 
+// Tiles in the order of their widget ids: CC-2 Licenses, CC-3 Registers, CC-4 Returns, CC-5 Challans
+const TILE_ORDER = ["license", "registers", "returns", "challan"];
+
+const moduleScoreColumn = (key) => ({
+    headerName: MODULES[key].label,
+    colId: key,
+    minWidth: 120,
+    // unavailable modules sort below every score
+    valueGetter: (p) => p.data?.modules?.[key]?.score ?? -1,
+    cellRenderer: (p) => <ScoreCell score={p.data?.modules?.[key] ? p.data.modules[key].score : null} />,
+    tooltipValueGetter: (p) => {
+        const m = p.data?.modules?.[key];
+        return m ? `${m.completed} of ${m.total} · ${m.exceptions} need attention` : "No data for this module";
+    },
+});
+
+const overallColumn = {
+    headerName: "Overall",
+    field: "overall_score",
+    minWidth: 150,
+    sort: "asc",
+    cellRenderer: (p) => (
+        <span className="d-inline-flex align-items-center gap-1">
+            <ScoreCell score={p.data?.modules_available ? p.value : null} />
+            <span className="text-muted small">of {p.data?.modules_available ?? 0}</span>
+        </span>
+    ),
+};
+
+const groupColumns = (nameHeader) => [
+    { headerName: nameHeader, field: "name", minWidth: 230, flex: 2, cellStyle: { fontWeight: 600 } },
+    overallColumn,
+    ...MODULE_ORDER.map(moduleScoreColumn),
+    { headerName: "Exceptions", field: "exceptions", maxWidth: 120 },
+];
+const COMPANY_COLUMNS = groupColumns("Company");
+const STATE_COLUMNS = groupColumns("State");
+
+const CLIENT_COLUMNS = [
+    { headerName: "Company", field: "name", minWidth: 230, flex: 2, cellStyle: { fontWeight: 600 } },
+    overallColumn,
+    { headerName: "Modules with Data", field: "modules_available", maxWidth: 160, valueFormatter: (p) => `${p.value ?? 0} of 4` },
+    { headerName: "Locations", field: "location_count", maxWidth: 110 },
+    { headerName: "States", field: "states_text", minWidth: 160 },
+    {
+        headerName: "Modules Subscribed",
+        field: "modules_subscribed",
+        minWidth: 220,
+        flex: 2,
+        sortable: false,
+        cellRenderer: (p) =>
+            p.value?.length ? (
+                <div className="d-flex gap-1 flex-wrap">
+                    {p.value.map((m) => (
+                        <span key={m} className="dw-badge neutral">{m}</span>
+                    ))}
+                </div>
+            ) : (
+                <span className="text-muted small">–</span>
+            ),
+    },
+    { headerName: "Exceptions", field: "exceptions", maxWidth: 120 },
+];
+
+/**
+ * Compliance Cockpit, overall (no company). Compiles the four module dashboards; every figure comes
+ * from the cockpit API and equals the module dashboard's number for the same filters.
+ */
 const CockpitComplince = ({
-  // data,
-  selectedCharts,
-  setSelectedCharts,
-  current,
-  shouldShow,
-  setPage,
-  setLimit,
-  selectedCompany,
-  page,
-  limit,
-  setActiveDrawer
+    setSelectedCompany,
+    shouldShow,
+    isActive,
+    openTab,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [menuOption, setMenuOption] = useState("card");
-  const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
-    open: false,
-    vertical: "top",
-    horizontal: "center",
-    message: "",
-    severityType: "",
-  });
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerAnchor, setDrawerAnchor] = useState("right");
-  const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
-  const [isDetailPage, setIsDetailPage] = useState(false);
-  const [filterColumns, setFilterColumns] = useState([]);
-  const [data, setData] = useState({
-    licenseComplaince: [],
-    registersCompliance: [],
-    challanCompliance: [],
-    returnCompliance: [],
-    paginatedRecords: [],
-    clientData: [],
-    clientCompliance: [],
-  });
-  const gridRef = useRef();
-  const navigate = useNavigate();
-  const userRole = decryptData(localStorage.getItem("user_role"));
-  const itemsPerPage = 10; // number of cards per page
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) {
-        setMenuOption("table"); // force table on mobile
-      }
-    };
-    // run on mount
-    handleResize();
-    // run on resize
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [window.innerWidth]);
-
-  const onFilterTextBoxChanged = useCallback(() => {
-    gridRef.current.api.setGridOption(
-      "quickFilterText",
-      document.getElementById("filter-text-box").value,
-    );
-  }, []);
-  useEffect(() => {
-    const fetchCockpitData = async () => {
-      const results = await Promise.allSettled([
-        fetchLicenseComplaince(),
-        fetchRegistersCompliance(),
-        fetchChallanCompliance(),
-        fetchReturnCompliance(),
-        fetchPaginatedRecords(page, limit),
-        fetchClientData(),
-        fetchClientCompliance(),
-      ]);
-
-      const keys = [
-        "licenseComplaince",
-        "registersCompliance",
-        "challanCompliance",
-        "returnCompliance",
-        "paginatedRecords",
-        "clientData",
-        "clientCompliance",
-      ];
-
-      const updatedData = {};
-
-      results.forEach((res, index) => {
-        updatedData[keys[index]] =
-          res.status === "fulfilled" ? res.value : [];
-      });
-
-      setData(updatedData);
-    };
-    fetchCockpitData();
-  },
-    [selectedCompany]);
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data?.clientCompliance]);
-
-  const overallScore = useMemo(() => {
-    const license = data.licenseComplaince || {};
-    const registers = data.registersCompliance || {};
-    const challans = data.challanCompliance || {};
-    const returns = data.returnCompliance || {};
-
-    const categories = [
-      {
-        total: license.total_license || 0,
-        score: license.overall_license_compliance_score || 0,
-      },
-      {
-        total: registers.applicable_registers || 0,
-        score: registers.compliance_score || 0,
-      },
-      {
-        total: challans.total_challans || 0,
-        score: challans.compliance_score || 0,
-      },
-      {
-        total: returns.applicable_returns || 0,
-        score: returns.compliance_score || 0,
-      },
-    ];
-
-    const totalItems = categories.reduce((sum, item) => sum + item.total, 0);
-
-    if (!totalItems) return 0;
-
-    const weightedScore = categories.reduce(
-      (sum, item) => sum + item.score * item.total,
-      0
-    );
-
-    return (weightedScore / totalItems).toFixed(2);
-  }, [data]);
-
-  const overallChartSeries = [
-    data?.licenseComplaince?.overall_license_compliance_score || 0,
-    data?.returnCompliance?.compliance_score || 0,
-    data?.challanCompliance?.compliance_score || 0,
-    data?.registersCompliance?.compliance_score || 0,
-    data?.overall_compliance_score || 0,
-  ];
-  useEffect(() => {
-    window.__apexTooltipClick = (index) => {
-      const labels = ["Licenses", "Returns", "Challans", "Registers", "Overall"];
-      const values = overallChartSeries;
-
-      const clickedValue = values[index];
-      if (!clickedValue) return;
-
-      navigate("/compliance_cockpit/dashboard/overall_compliance_score", {
-        state: {
-          score: clickedValue,
-          seriesName: labels[index],
-          index: index,
-          widget_name: "Compliance Cockpit - Overall Compliance Score",
-        },
-      });
-    };
-
-    return () => delete window.__apexTooltipClick;
-  }, [overallChartSeries]);
-
-
-  const overallChartOptions = {
-    chart: {
-      type: "radialBar",
-      height: 350,
-      events: {
-        dataPointSelection(event, chartContext, opts) {
-          const index = opts.dataPointIndex;
-          if (index === undefined || index === -1) return;
-
-          const clickedLabel = opts.w.globals.labels[index];
-          const clickedValue = opts.w.globals.series[index];
-          if (clickedValue === 0) return;
-
-          navigate("/compliance_cockpit/dashboard/overall_compliance_score", {
-            state: {
-              score: clickedValue,
-              seriesName: clickedLabel,
-              index: index,
-              widget_name: "Compliance Cockpit - Overall Compliance Score",
-            },
-          },
-          );
-        },
-      },
-    },
-
-    colors: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"],
-
-    title: {
-      text: "Overall Compliance Score",
-      align: "center",
-    },
-
-    plotOptions: {
-      radialBar: {
-        dataLabels: {
-          name: {
-            fontSize: "16px",
-          },
-          value: {
-            fontSize: "14px",
-          },
-          total: {
-            show: true,
-            label: "Overall Score",
-            formatter: () => `${data?.overall_compliance_score ?? 0}%`,
-          },
-        },
-      },
-    },
-    tooltip: {
-      enabled: true,
-      custom: function ({ w }) {
-        const labels = w.globals.labels;
-        const series = w.globals.series;
-
-        let html = `<div style="padding:10px">`;
-
-        labels.forEach((label, index) => {
-          const value = series[index];
-
-          html += `
-        <div
-          style="
-            display:flex;
-            justify-content:space-between;
-            cursor:pointer;
-            padding:4px 0;
-          "
-          onclick="window.__apexTooltipClick(${index})"
-        >
-          <span>${label}</span>
-          <b>${value}%</b>
-        </div>
-      `;
-        });
-
-        html += `</div>`;
-        return html;
-      },
-    },
-
-    labels: ["Licenses", "Returns", "Challans", "Registers", "Overall"],
-  };
-
-
-
-  // Completion Status Chart
-  const completionChartOptions = {
-    chart: {
-      type: "bar",
-      height: 400,
-      stacked: true,
-    },
-
-    colors: ["#43A047", "#FB8C00"],
-
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "70%",
-      },
-    },
-
-    dataLabels: {
-      enabled: true,
-    },
-
-    xaxis: {
-      categories: ["Licenses", "Returns", "Registers", "Challans"],
-    },
-
-    yaxis: {
-      title: {
-        text: "Count",
-      },
-    },
-
-    legend: {
-      position: "top",
-    },
-
-    title: {
-      text: "Completion Status Across All Modules",
-      align: "center",
-    },
-
-    tooltip: {
-      enabled: true,
-      custom: function ({ series, dataPointIndex, w }) {
-        const category = w.globals.labels[dataPointIndex];
-
-        const completed = series[0][dataPointIndex];
-        const pending = series[1][dataPointIndex];
-
-        return `
-        <div style="padding:10px; font-size:14px">
-          <strong>${category}</strong>
-          <div style="margin-top:6px">
-            <div>✅ Completed: <b>${completed}</b></div>
-            <div>⏳ Pending: <b>${pending}</b></div>
-          </div>
-        </div>
-      `;
-      },
-    },
-  };
-
-  const safe = (val) => Number(val) || 0;
-
-  const completionChartSeries = [
-    {
-      name: "Completed",
-      data: [
-        safe(data?.licenseComplaince?.active_license),
-        safe(data?.returnCompliance?.completed_returns),
-        safe(data?.registersCompliance?.completed_registers),
-        safe(data?.challanCompliance?.completed_challans),
-      ],
-    },
-    {
-      name: "Pending",
-      data: [
-        safe(data?.licenseComplaince?.total_license) - safe(data?.licenseComplaince?.active_license),
-        safe(data?.returnCompliance?.applicable_returns) - safe(data?.returnCompliance?.completed_returns),
-        safe(data?.registersCompliance?.applicable_registers) - safe(data?.registersCompliance?.completed_registers),
-        safe(data?.challanCompliance?.total_challans) - safe(data?.challanCompliance?.completed_challans),
-      ],
-    },
-  ];
-
-  if (!data || Object.keys(data).length === 0) {
-    return (
-      <div className="no-data">
-        {!data || Object.keys(data).length === 0 ? "No Data Found" : "Loading..."}
-      </div>
-    );
-  }
-
-  const clientDataObj = data?.clientData || {};
-
-  const clients = Array.isArray(clientDataObj)
-    ? clientDataObj.map((item) => ({
-      ...item,
-    }))
-    : Object.keys(clientDataObj).map((key) => {
-      const clientInfo = clientDataObj[key];
-
-      const complianceEntry = Object.entries(
-        data?.clientCompliance?.compliance_info || {}
-      ).find(([compKey]) => compKey.trim() === key.trim());
-
-      const compliance = complianceEntry ? complianceEntry[1] : {};
-
-      return {
-        name: key,
-        ...clientInfo,
-        ...compliance,
-      };
+    const [groupBy, setGroupBy] = useState("company");
+    const { filters, updateFilters, resetFilters, ready, filterOptions, params, openModule, loadError, setLoadError } = useCockpit({
+        selectedCompany: "",
+        isActive,
+        openTab,
     });
 
-  const totalPages = Math.ceil(clients.length / itemsPerPage);
+    const { data, loading } = useDashboardData({
+        fetchers: {
+            summary: { fetch: fetchCockpitSummary, fallback: {} },
+            companyWise: { fetch: fetchCockpitCompanyWise, fallback: [] },
+            stateWise: { fetch: fetchCockpitStateWise, fallback: [] },
+            clients: { fetch: () => fetchCockpitClients(), fallback: [] },
+        },
+        params,
+        enabled: ready,
+        isCompanyMode: false,
+        onError: setLoadError,
+    });
 
-  const currentClients = clients.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+    /* ---------- data ---------- */
 
+    const summary = data.summary || {};
+    const modules = summary.modules || [];
+    const moduleByKey = Object.fromEntries(modules.map((m) => [m.module, m]));
+    const period = periodLabel(summary.period);
 
+    // Company rows joined with the client master (names compared ignoring case)
+    const clientRows = useMemo(() => {
+        const clients = new Map((data.clients || []).map((c) => [String(c.company_name).toLowerCase(), c]));
+        return (data.companyWise || []).map((row) => {
+            const client = clients.get(String(row.name).toLowerCase());
+            return {
+                ...row,
+                location_count: client ? client.locations?.length ?? 0 : null,
+                states_text: client?.states?.join(", ") || "–",
+                modules_subscribed: client?.modules_subscribed || [],
+            };
+        });
+    }, [data.companyWise, data.clients]);
 
-  const toggleChartSelection = (chartId) => {
-    if (!current?.user_name) {
-      // alert("First you need to select a user");
-      setIsSnackbarsOpen({
-        ...issnackbarsOpen,
-        open: true,
-        message: "First you need to select a user",
-        severityType: "warning",
-      });
-      return;
-    }
+    // Opening a company keeps the current filters (they stay in the URL on this tab)
+    const openCompany = (name) => {
+        if (!name) return;
+        setSelectedCompany(name);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
-    setSelectedCharts((prev) =>
-      prev.includes(chartId)
-        ? prev.filter((id) => id !== chartId)
-        : [...prev, chartId],
-    );
-  };
-  const canSelect = userRole === "Admin" || userRole === "Super-Admin";
+    const distribution = summary.score_distribution || [];
+    const distributionChart = {
+        series: [{ name: "Companies", data: distribution.map((d) => d.count) }],
+        options: {
+            chart: { type: "bar", toolbar: { show: false } },
+            colors: distribution.map((d) => distributionColor(d.name)),
+            plotOptions: { bar: { distributed: true, columnWidth: "55%" } },
+            legend: { show: false },
+            dataLabels: { enabled: true },
+            xaxis: { categories: distribution.map((d) => `${d.name}%`), title: { text: "Overall score" } },
+            // whole-number ticks; small counts would otherwise repeat after rounding
+            yaxis: { min: 0, tickAmount: Math.min(Math.max(...distribution.map((d) => d.count), 1), 5), labels: { formatter: (v) => Math.round(v) } },
+        },
+    };
 
-  const cardClass = (id, defaultClass = "") =>
-    canSelect && selectedCharts.includes(id) ? "selected-card" : defaultClass;
-  const handleSelect = (id) => {
-    if (canSelect) toggleChartSelection(id);
-  };
-  const handleOpenDrawer = (anchor, filterColumn) => {
-    setDrawerAnchor(anchor);
-    setDrawerOpen(true);
-    setFilterColumns(filterColumn);
-    setActiveDrawer("cockpit");
-  };
-  return (
-    <div className="">
-      <Snackbars
-        issnackbarsOpen={issnackbarsOpen}
-        setIsSnackbarsOpen={setIsSnackbarsOpen}
-      />
-      {shouldShow("cc-1") && (
-        <div
-          className={`dashboard2-header ${cardClass("cc-1")}`}
-          onClick={canSelect ? () => handleSelect("cc-1") : undefined}
-          style={{ cursor: canSelect ? "pointer" : "default" }}
-        >
-          <div className="d-lg-flex d-md-flex gap-2 align-items-center">
-            {canSelect && (
-              <input
-                type="checkbox"
-                className="chart-select-checkbox"
-                onChange={() => handleSelect("cc-1")}
-                checked={selectedCharts.includes("cc-1")}
-              />
-            )}
-            <h1>Multi-Client Compliance Analytics</h1>
-          </div>
+    const kpis = [
+        { label: "Companies in Scope", value: summary.companies ?? 0 },
+        { label: "Needs Attention", value: summary.exceptions ?? 0, tone: summary.exceptions ? "warning" : "" },
+        { label: "Modules with Data", value: `${summary.modules_available ?? 0} of 4` },
+    ];
 
-          <div className="header-stats">
-            <div className="header-stat">
-              <span className="stat-value">
-                {data?.clientData?.total_clients}
-                {/* {data?.total_clients?.toLocaleString()} */}
-              </span>
-              <span className="stat-label-cock-pit-complince">
-                Total Clients
-              </span>
+    return (
+        <div>
+            <div className="d-flex align-items-center gap-2 mb-2 small">
+                <span className="text-muted">Showing:</span>
+                <span className="fw-600">{period || "Current status"}</span>
+                <span className="text-muted">· all companies you can access</span>
             </div>
-            <div className="header-stat">
-              <span className="stat-value">
-                {/* {data?.overall_compliance_score}% */}
-                {overallScore}%
-              </span>
-              <span className="stat-label-cock-pit-complince">
-                Overall Score
-              </span>
-            </div>
-            <div className="align-content-center">
-              <button
-                className="btn btn-primary "
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenDrawer("left");
-                }}
-              >
-                View Details
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      <div className="dashboard2-grid">
-        {/* Key Metrics */}
-        <div className="metrics-section">
-          <div className="metrics-grid">
-            {/* CC-2 - Licenses */}
-            {shouldShow("cc-2") && (
-              <div
-                className={`metric-card ${cardClass("cc-2", "license")}`}
-                onClick={canSelect ? () => handleSelect("cc-2") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="d-lg-flex d-md-flex justify-content-between">
-                  <div className="metric-icon">📋</div>
+            <CockpitFilterBar filterOptions={filterOptions} filters={filters} onChange={updateFilters} onClear={resetFilters} />
 
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("cc-2")}
-                      checked={selectedCharts.includes("cc-2")}
-                    />
-                  )}
-                </div>
+            {loadError && <div className="alert alert-danger">{loadError}</div>}
 
-                <div className="metric-content">
-                  <h3>Licenses</h3>
-                  <div className="metric-value">{data?.licenseComplaince?.total_license}</div>
-                  <div className="metric-progress">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${(data?.licenseComplaince?.active_license /
-                            data?.licenseComplaince?.total_license) *
-                            100
-                            }%`,
-                        }}
-                      ></div>
-                    </div>
-                    <span className="progress-text">
-                      {data?.licenseComplaince?.active_license} / {data?.licenseComplaince?.total_license}{" "}
-                      completed
-                    </span>
-                  </div>
-                  <div className="compliance-score">
-                    {data?.licenseComplaince?.overall_license_compliance_score}% compliance
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* CC-3 - Returns */}
-            {shouldShow("cc-3") && (
-              <div
-                className={`metric-card ${cardClass("cc-3", "returns")}`}
-                onClick={canSelect ? () => handleSelect("cc-3") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="d-lg-flex d-md-flex justify-content-between">
-                  <div className="metric-icon">📊</div>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("cc-3")}
-                      checked={selectedCharts.includes("cc-3")}
-                    />
-                  )}
-                </div>
-
-                <div className="metric-content">
-                  <h3>Returns</h3>
-                  <div className="metric-value">
-                    {data?.returnCompliance?.applicable_returns} total
-                  </div>
-                  <div className="metric-progress">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${(data?.returnCompliance?.completed_returns /
-                            data?.returnCompliance?.applicable_returns) *
-                            100
-                            }%`,
-                        }}
-                      ></div>
-                    </div>
-                    <span className="progress-text">
-                      {data?.returnCompliance?.completed_returns} / {data?.returnCompliance?.applicable_returns}{" "}
-                      completed
-                    </span>
-                  </div>
-                  <div className="compliance-score">
-                    {data?.returnCompliance?.compliance_score}% compliance
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* CC-4 - Registers */}
-            {shouldShow("cc-4") && (
-              <div
-                className={`metric-card ${cardClass("cc-4", "registers")}`}
-                onClick={canSelect ? () => handleSelect("cc-4") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="d-lg-flex d-md-flex justify-content-between">
-                  <div className="metric-icon">📚</div>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("cc-4")}
-                      checked={selectedCharts.includes("cc-4")}
-                    />
-                  )}
-                </div>
-
-                <div className="metric-content">
-                  <h3>Registers</h3>
-                  <div className="metric-value">
-                    {data?.registersCompliance?.applicable_registers}
-                  </div>
-                  <div className="metric-progress">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${(data?.registersCompliance?.completed_registers /
-                            data?.registersCompliance?.applicable_registers) *
-                            100
-                            }%`,
-                        }}
-                      ></div>
-                    </div>
-                    <span className="progress-text">
-                      {data?.registersCompliance?.completed_registers} / {data?.registersCompliance?.applicable_registers}{" "}
-                      completed
-                    </span>
-                  </div>
-                  <div className="compliance-score">
-                    {data?.registersCompliance?.compliance_score}%
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* CC-5 - Challans */}
-            {shouldShow("cc-5") && (
-              <div
-                className={`metric-card ${cardClass("cc-5", "challans")}`}
-                onClick={canSelect ? () => handleSelect("cc-5") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="d-lg-flex d-md-flex justify-content-between">
-                  <div className="metric-icon">💰</div>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("cc-5")}
-                      checked={selectedCharts.includes("cc-5")}
-                    />
-                  )}
-                </div>
-
-                <div className="metric-content">
-                  <h3>Challans</h3>
-                  <div className="metric-value">
-                    {data?.challanCompliance?.total_challans}
-                  </div>
-                  <div className="metric-progress">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${(data?.challanCompliance?.completed_challans /
-                            data.challanCompliance?.total_challans) *
-                            100
-                            }%`,
-                        }}
-                      ></div>
-                    </div>
-                    <span className="progress-text">
-                      {data?.challanCompliance?.completed_challans} / {data.challanCompliance?.total_challans}{" "}
-                      completed
-                    </span>
-                  </div>
-                  <div className="compliance-score">
-                    {data?.challanCompliance?.compliance_score}% compliance
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="charts-section">
-          {/* CC-6 */}
-          {shouldShow("cc-6") && (
-            <div
-              className={`chart-card ${cardClass("cc-6")}`}
-              onClick={canSelect ? () => handleSelect("cc-6") : undefined}
-              style={{ cursor: canSelect ? "pointer" : "default" }}
-            >
-              {canSelect && (
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => handleSelect("cc-6")}
-                  checked={selectedCharts.includes("cc-6")}
-                />
-              )}
-
-              <Chart
-                options={overallChartOptions}
-                series={overallChartSeries}
-                type="radialBar"
-                height={350}
-              />
-            </div>
-          )}
-          {/* CC-7 */}
-          {shouldShow("cc-7") && (
-            <div
-              className={`chart-card ${cardClass("cc-7")}`}
-              onClick={canSelect ? () => handleSelect("cc-7") : undefined}
-              style={{ cursor: canSelect ? "pointer" : "default" }}
-            >
-              {canSelect && (
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => handleSelect("cc-7")}
-                  checked={selectedCharts.includes("cc-7")}
-                />
-              )}
-
-              <Chart
-                options={completionChartOptions}
-                series={completionChartSeries}
-                type="bar"
-                height={400}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* CC-8 - Performers Section */}
-        {/* -------------------- CC-8 CLIENT PERFORMANCE OVERVIEW -------------------- */}
-        {shouldShow("cc-8") && (
-          <div
-            className={`performers-section ${cardClass("cc-8")}`}
-            onClick={canSelect ? () => handleSelect("cc-8") : undefined}
-            style={{ cursor: canSelect ? "pointer" : "default" }}
-          >
-            <div className="d-lg-flex  d-md-flex justify-content-between align-items-center mb-3">
-              <h2>Client Performance Overview</h2>
-
-              {canSelect && (
-                <input
-                  type="checkbox"
-                  className="chart-select-checkbox"
-                  onChange={() => handleSelect("cc-8")}
-                  checked={selectedCharts.includes("cc-8")}
-                />
-              )}
-
-              <div className="d-lg-flex d-md-flex  justify-content-between">
-                {menuOption === "table" && (
-                  <AnimatedSearchBar
-                    placeholder="Search..."
-                    type="text"
-                    id="filter-text-box"
-                    onInput={onFilterTextBoxChanged}
-                  />
+            <div className="charts-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+                {shouldShow("cc-6") && (
+                    <OverallScoreCard loading={loading} summary={data.summary} title="Overall Compliance Score" />
                 )}
-
-                {/* SETTINGS MENU UNCHANGED */}
-                <div className="client-performance-table-sm">
-                  <Tooltip title="Account settings">
-                    <IconButton
-                      onClick={handleClick}
-                      size="small"
-                      sx={{ ml: 0 }}
-                      aria-controls={open ? "account-menu" : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={open ? "true" : undefined}
-                    >
-                      <Settings2 />
-                    </IconButton>
-                  </Tooltip>
-
-                  <Menu
-                    anchorEl={anchorEl}
-                    id="account-menu"
-                    open={open}
-                    onClose={handleClose}
-                    onClick={handleClose}
-                    slotProps={{
-                      paper: {
-                        elevation: 0,
-                        sx: {
-                          overflow: "visible",
-                          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                          mt: 1.5,
-                        },
-                      },
-                    }}
-                    transformOrigin={{ horizontal: "right", vertical: "top" }}
-                    anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        handleClose();
-                        setMenuOption("table");
-                      }}
-                    >
-                      Table View
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleClose();
-                        setMenuOption("card");
-                      }}
-                    >
-                      Card View
-                    </MenuItem>
-                  </Menu>
-                </div>
-              </div>
-            </div>
-
-            {/* TABLE VIEW */}
-            {menuOption === "table" ? (
-              <div className="client-performance-table">
-                <ClientComplianceTable data={clients} gridRef={gridRef} />
-              </div>
-            ) : (
-              /* CARD VIEW */
-              <div className="performers-grid client-performance-table-sm">
-                {currentClients.map((client, index) => {
-                  const score = Math.min(
-                    100,
-                    Number(
-                      client?.average_compliance_score ||
-                      client?.average_compliance_scor ||
-                      client?.compliance_score ||
-                      0
-                    )
-                  );
-
-                  const getClassName = (score) => {
-                    if (score >= 90) return "excellent";
-                    if (score >= 75) return "good";
-                    if (score >= 50) return "moderate";
-                    return "needs-attention";
-                  };
-
-                  return (
-                    <div
-                      key={index}
-                      className={`performer-card ${getClassName(score)}`}
-                    >
-                      <div className="performer-header">
-                        <h4>{client?.name}</h4>
-                        <span className={`performance-badge ${getClassName(score)}`}>
-                          Compliance Score
-                        </span>
-                      </div>
-
-                      <div className="performer-score">
-                        <span className="score-value">{score}%</span>
-                        <div className="score-bar">
-                          <div
-                            className="score-fill"
-                            style={{ width: `${Math.min(score, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* {currentClients.map((client, index) => {
-                  const score = client.average_compliance_score || 0;
-
-                  const getClassName = (score) => {
-                    if (score > 300) return "excellent";
-                    if (score > 100 && score < 300) return "high-performer";
-                    if (score > 80 && score <= 100) return "compliant";
-                    if (score >= 50 && score <= 80) return "good";
-                    if (score > 0 && score < 50) return "moderate";
-                    if (score === 0) return "needs-attention";
-                    return "";
-                  };
-
-                  return (
-                    <div
-                      key={index}
-                      className={`performer-card ${getClassName(score)}`}
-                    >
-                      <div className="performer-header">
-                        <h4>{client.name}</h4>
-                        <span
-                          className={`performance-badge ${getClassName(score)}`}
+                {shouldShow("cc-9") && (
+                        <DashboardCard
+                            title="Analytics Summary"
+                            subtitle="Companies by overall score"
+                            loading={loading}
+                            isEmpty={!summary.modules}
+                            minHeight={220}
                         >
-                          Compliance Score
-                        </span>
-                      </div>
-
-                      <div className="performer-score">
-                        <span className="score-value">{score}%</span>
-                        <div className="score-bar">
-                          <div
-                            className="score-fill"
-                            style={{ width: `${Math.min(score, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })} */}
-              </div>
-            )}
-
-            {/* PAGINATION */}
-            {menuOption === "card" && (
-              <div className="justify-content-end d-flex gap-2 mt-3 client-performance-table-sm">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  style={{
-                    background: currentPage === 1 ? "gray" : "black",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Prev
-                </button>
-
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  style={{
-                    background: "black",
-                    color: "white",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-        {/* CC-9 Analytics Summary */}
-        {shouldShow("cc-9") && (
-          <div
-            className={`analytics-section ${cardClass("cc-9")}`}
-            onClick={canSelect ? () => handleSelect("cc-9") : undefined}
-            style={{ cursor: canSelect ? "pointer" : "default" }}
-          >
-            <h2>Analytics Summary</h2>
-
-            {canSelect && (
-              <input
-                type="checkbox"
-                className="chart-select-checkbox"
-                onChange={() => handleSelect("cc-9")}
-                checked={selectedCharts.includes("cc-9")}
-              />
-            )}
-
-            <div className="analytics-grid">
-              {/* CC-10 */}
-              <div
-                className={`analytics-item ${cardClass("cc-10")}`}
-                onClick={canSelect ? () => handleSelect("") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="analytics-icon">🎯</div>
-                <div className="analytics-content">
-                  <h4>Average Completion Rate</h4>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("")}
-                      checked={selectedCharts.includes("")}
-                    />
-                  )}
-
-                  <div className="analytics-value">
-                    {(() => {
-                      const numerator =
-                        Number(data?.licenseCompliance?.active_license || 0) +
-                        Number(data?.returnCompliance?.completed_returns || 0) +
-                        Number(data?.challanCompliance?.completed_challans || 0);
-
-                      const denominator =
-                        Number(data?.licenseCompliance?.total_license || 0) +
-                        Number(data?.returnCompliance?.applicable_returns || 0) +
-                        Number(data?.challanCompliance?.total_challans || 0);
-
-                      return denominator === 0
-                        ? "0.0%"
-                        : ((numerator / denominator) * 100).toFixed(1) + "%";
-                    })()}
-                    {/* {(
-                      ((data.total_licenses_completed +
-                        data.total_returns_completed +
-                        data.total_challans_completed) /
-                        (data.total_licenses +
-                          data.total_returns +
-                          data.total_challans)) *
-                      100
-                    ).toFixed(1)} % */}
-
-                  </div>
-                </div>
-              </div>
-
-              {/* CC-11 */}
-              <div
-                className={`analytics-item ${cardClass("cc-11")}`}
-                onClick={canSelect ? () => handleSelect("") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="analytics-icon">⚠️</div>
-                <div className="analytics-content">
-                  <h4>Total Pending</h4>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("")}
-                      checked={selectedCharts.includes("")}
-                    />
-                  )}
-
-                  <div className="analytics-value">
-                    {(
-                      Number(data?.licenseCompliance?.inprogress_license || 0) +
-                      Number(data?.registersCompliance?.pending_registers || 0) +
-                      Number(data?.registersCompliance?.total_registers_pending || 0)
-                    )}
-
-                    {/* {data.total_licenses_pending +
-                      data.total_returns_pending +
-                      data.total_registers_pending} */}
-
-                  </div>
-                </div>
-              </div>
-
-              {/* CC-12 */}
-              <div
-                className={`analytics-item ${cardClass("cc-12")}`}
-                onClick={canSelect ? () => handleSelect("") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="analytics-icon">📈</div>
-                <div className="analytics-content">
-                  <h4>Challan Compliance Score</h4>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("")}
-                      checked={selectedCharts.includes("")}
-                    />
-                  )}
-
-                  <div className="analytics-value">
-                    {`Challans (${data?.challanCompliance?.compliance_score || 0}%)`}
-
-                    {/* Challans ({data.overall_challan_compliance_score}%) */}
-                  </div>
-                </div>
-              </div>
-
-              {/* CC-13 */}
-              <div
-                className={`analytics-item ${cardClass("cc-13")}`}
-                onClick={canSelect ? () => handleSelect("") : undefined}
-                style={{ cursor: canSelect ? "pointer" : "default" }}
-              >
-                <div className="analytics-icon">🔍</div>
-                <div className="analytics-content">
-                  <h4>Register Compliance Score</h4>
-
-                  {canSelect && (
-                    <input
-                      type="checkbox"
-                      className="chart-select-checkbox"
-                      onChange={() => handleSelect("")}
-                      checked={selectedCharts.includes("")}
-                    />
-                  )}
-
-                  <div className="analytics-value">
-                    {`Registers (${Number(data?.registersCompliance?.compliance_score || 0).toFixed(1)}%)`}
-
-                    {/* Registers ({data.overall_register_compliance_score}%) */}
-                  </div>
-                </div>
-              </div>
+                            <div className="dw-kpi-grid mb-2" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+                                {kpis.map((k) => (
+                                    <div key={k.label} className="dw-kpi">
+                                        <div className="dw-kpi-label">{k.label}</div>
+                                        <div className={`dw-kpi-value ${k.tone || ""}`}>{k.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <Chart options={distributionChart.options} series={distributionChart.series} type="bar" height={200} />
+                        </DashboardCard>
+                )}
             </div>
-          </div>
-        )}
-      </div>
-      <DashboardDrawerGrid
-        anchor={drawerAnchor}
-        open={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false);
-          setIsDetailPageDataFor("Returns");
-          setActiveDrawer(null);
-        }}
-        // this is wirking
-        data={
-          isDetailPageDataFor === "Challans"
-            ? data?.paginatedRecords?.challan?.records
-            : isDetailPageDataFor === "Licenses"
-              ? data?.paginatedRecords?.license?.records
-              : isDetailPageDataFor === "Registers"
-                ? data?.paginatedRecords?.register?.records
-                : data?.paginatedRecords?.return?.records
-        } //direct array
-        title={"Compliance Details - " + isDetailPageDataFor}
-        isDetailPage={isDetailPage}
-        setIsDetailPage={setIsDetailPage}
-        // this was pass for view detail page
-        isDetailPageData={
-          isDetailPageDataFor === "Challans"
-            ? data?.paginatedRecords?.challan?.records
-            : isDetailPageDataFor === "Licenses"
-              ? data?.paginatedRecords?.license?.records
-              : isDetailPageDataFor === "Registers"
-                ? data?.paginatedRecords?.register?.records
-                : data?.paginatedRecords?.return?.records
-        } //direct array but not working properly
-        filterColumns={filterColumns}
-        isCockpitComplianceDetailPage={true}
-        setIsDetailPageDataFor={setIsDetailPageDataFor}
-        isDetailPageDataFor={isDetailPageDataFor}
-        buttons={["Returns", "Challans", "Licenses", "Registers"]}
-        setPage={setPage}
-        setLimit={setLimit}
-        totalPage={
-          isDetailPageDataFor === "Challans"
-            ? data?.paginatedRecords?.challan?.total
-            : isDetailPageDataFor === "Licenses"
-              ? data?.paginatedRecords?.license?.total
-              : isDetailPageDataFor === "Registers"
-                ? data?.paginatedRecords?.register?.total
-                : data?.paginatedRecords?.return?.total
-        }
-        fetchPaginatedRecords={fetchPaginatedRecords}
-        isPaginatedRecords={true}
-      />
-    </div>
-  );
+
+            <div className="charts-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
+                {TILE_ORDER.filter((key) => shouldShow(MODULES[key].widgetId)).map((key) => (
+                    <ModuleTile
+                        key={key}
+                        loading={loading}
+                        module={moduleByKey[key]}
+                        onOpen={openModule}
+                    />
+                ))}
+            </div>
+
+            {shouldShow("cc-7") && (
+                <CompletionStatusCard loading={loading} modules={modules} onOpen={openModule} />
+            )}
+
+            {shouldShow("cc-1") && (
+                <GroupTableCard
+                    loading={loading}
+                    title="Multi-Client Compliance Analytics"
+                    subtitle={
+                        groupBy === "company"
+                            ? "Lowest overall score first. Click a company to open its cockpit"
+                            : "Lowest overall score first. Click a state to filter to it"
+                    }
+                    note={
+                        <div className="d-flex justify-content-between align-items-center">
+                            <span>Overall = average of the modules with data (count shown after the score); "No data" is not 0%.</span>
+                            <ToggleButtonGroup size="small" exclusive value={groupBy} onChange={(e, v) => v && setGroupBy(v)}>
+                                <ToggleButton value="company" sx={{ py: 0.25, textTransform: "none" }}>Companies</ToggleButton>
+                                <ToggleButton value="state" sx={{ py: 0.25, textTransform: "none" }}>States</ToggleButton>
+                            </ToggleButtonGroup>
+                        </div>
+                    }
+                    rows={groupBy === "company" ? data.companyWise : data.stateWise}
+                    columnDefs={groupBy === "company" ? COMPANY_COLUMNS : STATE_COLUMNS}
+                    rowId={(row) => `${groupBy}|${row.name}`}
+                    onRowClick={(row) => (groupBy === "company" ? openCompany(row.name) : updateFilters({ state: [row.name] }))}
+                    maxHeight={520}
+                />
+            )}
+
+            {shouldShow("cc-8") && (
+                <GroupTableCard
+                    loading={loading}
+                    title="Client Performance Overview"
+                    subtitle="Overall score with onboarding details from the client master. Click a company to open its cockpit"
+                    note={
+                        (data.clients || []).length === 0
+                            ? "No client master records were returned, so locations, states and subscribed modules are blank."
+                            : ""
+                    }
+                    rows={clientRows}
+                    columnDefs={CLIENT_COLUMNS}
+                    rowId={(row) => row.name}
+                    onRowClick={(row) => openCompany(row.name)}
+                    maxHeight={520}
+                />
+            )}
+        </div>
+    );
 };
 
 export default CockpitComplince;

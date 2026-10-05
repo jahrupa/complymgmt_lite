@@ -80,6 +80,7 @@ export default function DashboardDrawerGrid({
         filter: true,
         resizable: true,
         flex: 1,
+        minWidth: 150,
         headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
       }));
       setColumnDefs(cols);

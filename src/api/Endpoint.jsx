@@ -105,6 +105,7 @@ export const UPDATE_FILE='/api/v1/document_repository/update/file/';
 export const GET_DOCUMENT_DROPDOWNS_TYPES='/api/v1/document_repository/view/dropdowns/type/';
 export const GET_DOCUMENT_DROPDOWNS_STAGE='/api/v1/document_repository/view/dropdowns/stage/';
 export const DOWNLOAD_FILE='/api/v1/document_repository/view/download?document_id=';
+export const UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID='/api/v1/document_repository/update/approval_status/file/';
 
 // pages
 export const GET_ALL_PAGE='/api/v1/pages/view/all';
@@ -149,20 +150,16 @@ export const CHANGE_TEMPORARY_PASSWORD_STATUS='/api/v1/view/temporary_password_s
 
 // forget password
 export const FORGET_PASSWORD='/api/v1/password/update/email_request';
-// Cockpit Dashboard updated api
-export const LICENSE_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/license'
-export const REGISTERS_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/register'
-export const CHALLAN_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/challan'
-export const RETURN_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/overall/return'
-export const PAGINATED_RECORDS='/api/v1/dashboard/view/compliance/cockpit/records'
-export const CLIENT_DATA='/api/v1/dashboard/view/compliance/cockpit/client-data'
-export const CLIENT_COMPLIANCE='/api/v1/dashboard/view/compliance/cockpit/client-compliance'
+// Compliance Cockpit (compiles the challan, register, returns and license dashboards)
+export const GET_COCKPIT_FILTERS ='/api/v1/dashboard/view/compliance/cockpit/filters';
+export const GET_COCKPIT_SUMMARY ='/api/v1/dashboard/view/compliance/cockpit/summary';
+export const GET_COCKPIT_COMPANY_WISE ='/api/v1/dashboard/view/compliance/cockpit/company-wise';
+export const GET_COCKPIT_STATE_WISE ='/api/v1/dashboard/view/compliance/cockpit/state-wise';
+export const GET_COCKPIT_CLIENTS ='/api/v1/dashboard/view/compliance/cockpit/clients';
 
-// Cockpit Dashboard
+// General Compliance Dashboard
 export const GET_GENERAL_COMPLIANCE_PORTFOLIO='/api/v1/dashboard/view/general/compliance/portfolio'
 export const GET_GENERAL_COMPLIANCE_BY_COMPANY='/api/v1/dashboard/view/general/compliance/'
-export const GET_COMPLIANCE_COCKPIT_BY_COMPANY ='/api/v1/dashboard/view/compliance/cockpit/'
-export const GET_COCKPIT_COMPLIANCE_PORTFOLIO ='/api/v1/dashboard/view/compliance/cockpit/portfolio'
 export const GET_CLIENT_ONBOARDING_PORTFOLIO ='api/v1/dashboard/view/client/onboarding/portfolio'
 export const GET_CLIENT_ONBOARDING_BY_COMPANY ='/api/v1/dashboard/view/client/onboarding/'
 // Payroll dashboard
@@ -183,14 +180,33 @@ export const GET_CASES_PENDING_FOR_SELECTED_ISSUE_SUBTYPES ='/api/v1/dashboard/v
 export const GET_TOTAL_DELAY_FLAGS_BY_CLIENT_AND_GOVT ='/api/v1/dashboard/view/helpdesk/client/delay/flag'
 export const GET_TOTAL_DELAY_FLAGS_BY_GOVT ='/api/v1/dashboard/view/helpdesk/govt/delay/flag'
 
-// Returns and Submissions
-export const GET_RETURN_APPLICABILITY_BY_COMPANY_COMMON_NAME ='/api/v1/dashboard/view/returns/applicability/company'
-export const GET_STATE_WISE_ANALYSIS_OF_APPLICABLE_RETURNS ='/api/v1/dashboard/view/returns/state/applicable'
-export const GET_FREQUENCY_WISE_RETURNS ='/api/v1/dashboard/view/returns/frequency/distribution/returns'
-export const GET_COMPANIES_PER_RETURNS_NAMES ='/api/v1/dashboard/view/returns/company/per/returns'
-export const GET_COMPLIANCE_RISK_DITRIBUTION_BY_STATE ='/api/v1/dashboard/view/returns/compliance/risk/ditribution/state'
-export const GET_COMPLIANCE_STATUS_BASED_ON_RETURNS ='/api/v1/dashboard/view/returns/compliance/status/based/returns'
-export const GET_REMARKS_BASED_ON_COMPANY ='/api/v1/dashboard/view/returns/remarks/based/company'
+// Returns Dashboard (tracker based)
+export const GET_RETURNS_DASH_FILTERS ='/api/v1/dashboard/view/returns/filters';
+export const GET_RETURNS_DASH_SUMMARY ='/api/v1/dashboard/view/returns/summary';
+export const GET_RETURNS_DASH_COMPANY_WISE ='/api/v1/dashboard/view/returns/company-wise';
+export const GET_RETURNS_DASH_TREND ='/api/v1/dashboard/view/returns/trend';
+export const GET_RETURNS_DASH_PERIOD_WISE ='/api/v1/dashboard/view/returns/period-wise';
+export const GET_RETURNS_DASH_RETURN_WISE ='/api/v1/dashboard/view/returns/return-wise';
+export const GET_RETURNS_DASH_ACT_WISE ='/api/v1/dashboard/view/returns/act-wise';
+export const GET_RETURNS_DASH_LOCATION_WISE ='/api/v1/dashboard/view/returns/location-wise';
+export const GET_RETURNS_DASH_TURNAROUND ='/api/v1/dashboard/view/returns/turnaround';
+export const GET_RETURNS_DASH_EXCEPTIONS ='/api/v1/dashboard/view/returns/exceptions';
+export const GET_RETURNS_DASH_COVERAGE ='/api/v1/dashboard/view/returns/coverage';
+export const GET_RETURNS_DASH_RECORDS ='/api/v1/dashboard/view/returns/records';
+export const GET_RETURNS_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/returns/records/';
+
+// License Dashboard
+export const GET_LICENSE_DASH_FILTERS ='/api/v1/dashboard/view/license/filters';
+export const GET_LICENSE_DASH_SUMMARY ='/api/v1/dashboard/view/license/summary';
+export const GET_LICENSE_DASH_COMPANY_WISE ='/api/v1/dashboard/view/license/company-wise';
+export const GET_LICENSE_DASH_BREAKDOWN ='/api/v1/dashboard/view/license/breakdown';
+export const GET_LICENSE_DASH_LOCATION_WISE ='/api/v1/dashboard/view/license/location-wise';
+export const GET_LICENSE_DASH_EXPIRY_TIMELINE ='/api/v1/dashboard/view/license/expiry-timeline';
+export const GET_LICENSE_DASH_TREND ='/api/v1/dashboard/view/license/trend';
+export const GET_LICENSE_DASH_TURNAROUND ='/api/v1/dashboard/view/license/turnaround';
+export const GET_LICENSE_DASH_EXCEPTIONS ='/api/v1/dashboard/view/license/exceptions';
+export const GET_LICENSE_DASH_RECORDS ='/api/v1/dashboard/view/license/records';
+export const GET_LICENSE_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/license/records/';
 
 // Audit & Visits
 export const GET_AUDIT_BY_SERVICE_TYPE ='/api/v1/dashboard/view/audit/service/type'
@@ -218,6 +234,33 @@ export const GET_STATUS_COUNT_OF_OPEN_VS_CLOSED_CASES ='/api/v1/dashboard/view/g
 export const GET_ASSIGNED_INDIVIDUALS_LIST ='/api/v1/dashboard/view/general/helpdesk/assigned/count';
 export const GET_DOCUMENTS_PENDING_FROM ='/api/v1/dashboard/view/general/helpdesk/documents/pending/from';
 export const GET_ISSUE_CATEGORY_BY_STATUS ='/api/v1/dashboard/view/general/helpdesk/status/based/issue/category';
+
+// Challan Dashboard
+export const GET_CHALLAN_FILTERS ='/api/v1/dashboard/view/challan/filters';
+export const GET_CHALLAN_SUMMARY ='/api/v1/dashboard/view/challan/summary';
+export const GET_CHALLAN_TREND ='/api/v1/dashboard/view/challan/trend';
+export const GET_CHALLAN_COMPANY_WISE ='/api/v1/dashboard/view/challan/company-wise';
+export const GET_CHALLAN_ACT_WISE ='/api/v1/dashboard/view/challan/act-wise';
+export const GET_CHALLAN_LOCATION_WISE ='/api/v1/dashboard/view/challan/location-wise';
+export const GET_CHALLAN_TURNAROUND ='/api/v1/dashboard/view/challan/turnaround';
+export const GET_CHALLAN_EXCEPTIONS ='/api/v1/dashboard/view/challan/exceptions';
+export const GET_CHALLAN_RECORDS ='/api/v1/dashboard/view/challan/records';
+export const GET_CHALLAN_RECORD_BY_ID ='/api/v1/dashboard/view/challan/records/';
+
+// Register Dashboard
+export const GET_REGISTER_DASH_FILTERS ='/api/v1/dashboard/view/register/filters';
+export const GET_REGISTER_DASH_SUMMARY ='/api/v1/dashboard/view/register/summary';
+export const GET_REGISTER_DASH_COMPANY_WISE ='/api/v1/dashboard/view/register/company-wise';
+export const GET_REGISTER_DASH_TREND ='/api/v1/dashboard/view/register/trend';
+export const GET_REGISTER_DASH_REGISTER_WISE ='/api/v1/dashboard/view/register/register-wise';
+export const GET_REGISTER_DASH_ACT_WISE ='/api/v1/dashboard/view/register/act-wise';
+export const GET_REGISTER_DASH_LOCATION_WISE ='/api/v1/dashboard/view/register/location-wise';
+export const GET_REGISTER_DASH_TURNAROUND ='/api/v1/dashboard/view/register/turnaround';
+export const GET_REGISTER_DASH_VARIANCE ='/api/v1/dashboard/view/register/variance';
+export const GET_REGISTER_DASH_EXCEPTIONS ='/api/v1/dashboard/view/register/exceptions';
+export const GET_REGISTER_DASH_COVERAGE ='/api/v1/dashboard/view/register/coverage';
+export const GET_REGISTER_DASH_RECORDS ='/api/v1/dashboard/view/register/records';
+export const GET_REGISTER_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/register/records/';
 
 // Dashboard Widget Mappings
 export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
@@ -261,6 +304,7 @@ export const ENTITY_WISE_ACCESS='/api/v1/user_access/create/entity-wise/access';
 
 //component-wise-access
 export const CREATE_GROUPWISE_ACCESS_BY_GROUP_ID = '/api/v1/user_access/create/group-wise/access';
+export const LOCATION_WISE_ACCESS = '/api/v1/user_access/create/location-wise/access';
 
 
 

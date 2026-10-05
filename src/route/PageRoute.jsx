@@ -31,7 +31,7 @@ import ForgetPassword from '../page/ForgetPassword.jsx';
 import ChangeForgetPassword from '../page/ChangeForgetPassword.jsx';
 import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful.jsx';
 import NotificationMainPage from '../component/notification/NotificationMainPage.jsx';
-import WidgetMappings from '../dashboards/widgets/WidgetMappings.jsx';
+import WidgetAccess from '../page/widgetAccess/WidgetAccess.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
 // import RegisterProcessingV2 from '../page/RegisterProcessing.jsx';
@@ -45,7 +45,9 @@ import Entity from '../page/Entity.jsx';
 
 
 const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  // Start from the stored token so a full page load of a protected URL keeps its path and query
+  // string instead of bouncing through "/" to active_url
+  const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(localStorage.getItem('authToken')))
   const [isChangePassword, setIsChangePassword] = useState(false)
   const [unreadCountNotification, setUnreadCountNotification] = useState(0);
   const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
@@ -109,7 +111,9 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             activePage={activePage}
           />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/widget_mappings" element={<WidgetMappings />} />
+            <Route path="/widget_access" element={<WidgetAccess />} />
+            {/* The old Widget Mappings page is now part of Widget Access */}
+            <Route path="/widget_mappings" element={<Navigate to="/widget_access" replace />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
             <Route path="/add_user" element={<AddUser />} />
             <Route path="/company" element={<Company />} />

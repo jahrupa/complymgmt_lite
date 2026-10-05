@@ -4,9 +4,9 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 
-export default function RightDrawer({ pdfFile, isPdfView, toggleDrawer, drawerHeader, drawerBody, drawerFilePreviewHeader, drawerFilePreviewBody, isModalOpen }) {
+export default function RightDrawer({ pdfFile, isPdfView, toggleDrawer, drawerHeader, drawerBody, drawerFilePreviewHeader, drawerFilePreviewBody, isModalOpen, width = '500px' }) {
     const DrawerList = (
-        <Box sx={{ width: '500px' }} role="presentation">
+        <Box sx={{ width, maxWidth: '100vw' }} role="presentation">
             <div className='d-flex justify-content-between'>
                 {drawerHeader()}
                 <button onClick={toggleDrawer(false)} className='align-items-center d-flex pe-3 btn'>x</button>

@@ -181,7 +181,7 @@ const Entity = () => {
         let response;
         try {
             if (isEditing) {
-                response = await updateEntity(current.id, updateEntityPayload);
+                response = await updateEntity(current._id, updateEntityPayload);
 
             } else {
                 response = await createEntity(payload);
@@ -248,7 +248,10 @@ const Entity = () => {
             item._id === params.data._id
                 ? {
                     ...item,
-                    is_active: !item.is_active,
+                    common_attributes: {
+                        ...item.common_attributes,
+                        is_active: !item.common_attributes?.is_active,
+                    },
                 }
                 : item
         );
@@ -256,17 +259,31 @@ const Entity = () => {
         setData(updatedData);
     };
 
-    const generateDynamicColDefs = (data) => {
+   const generateDynamicColDefs = (data) => {
+  if (!Array.isArray(data) || data.length === 0 || !data[0]) {
+    return [];
+  }
 
-        if (!data || data.length === 0) return [];
+  const sample = flattenObject(data[0]);
 
-        const sample = flattenObject(data[0]);
+        // Hide internal / audit fields from the grid (same as Group Holding)
+        const hiddenKeys = [
+            "id",
+            "isdeleted",
+            "deletedby",
+            "deletedat",
+        ];
 
-        const dynamicCols = Object.keys(sample)
-            .map((key) => {
-                if (key === "_id") return null;
+        const isHiddenKey = (key) => {
+            const lastPart = key.split(".").pop().toLowerCase().replace(/_/g, "");
+            return hiddenKeys.includes(lastPart);
+        };
 
-                if (key === "common_attributes.Approval_Status") {
+        const dynamicCols = Object?.keys(sample)
+            ?.map((key) => {
+                if (isHiddenKey(key)) return null;
+
+                if (key === "common_attributes.approval_status") {
 
                     return {
                         field: key,
@@ -275,6 +292,9 @@ const Entity = () => {
                         editable: false,
                         flex: 1,
                         minWidth: 180,
+
+                        valueGetter: (params) =>
+                            params.data?.common_attributes?.approval_status,
 
                         cellRenderer: (params) => {
 
@@ -297,7 +317,7 @@ const Entity = () => {
                                             try {
 
                                                 const response = await updateApprovalStatus(
-                                                    params.data.id
+                                                    params.data._id
                                                 );
 
                                                 setIsSnackbarsOpen({
@@ -355,15 +375,16 @@ const Entity = () => {
                         },
                     };
                 }
-                if (key === "common_attributes.IsActive") {
+                if (key === "common_attributes.is_active") {
 
                     return {
+                      flex: 0,
+                      width: 140,
+                      minWidth: 140,
+                      maxWidth: 140,
                         headerName: "Status",
                         field: key,
                         pinned: "right",
-                        width: 140,
-                        minWidth: 140,
-
                         cellRenderer: (params) => (
                             <Toggle
                                 checked={params.value}
@@ -411,10 +432,13 @@ const Entity = () => {
 
         return [
             {
+              flex: 0,
+              width: 130,
+              minWidth: 130,
+              maxWidth: 130,
                 headerName: "Actions",
                 field: "actions",
                 pinned: "left",
-                width: 130,
                 filter: false,
                 editable: false,
                 cellStyle: {
@@ -440,7 +464,7 @@ const Entity = () => {
 
                                 setIsEditing(true);
                                 setIsModalOpen(true);
-                                setEntityId(params.data.id);
+                                setEntityId(params.data._id);
                             }}
                         >
                             <EditIcon
@@ -452,7 +476,7 @@ const Entity = () => {
                         <button
                             className="btn btn-sm"
                             onClick={() => {
-                                setEntityId(params.data.id);
+                                setEntityId(params.data._id);
                                 setIsDeleteModalOpen(true);
                             }}
                         >
