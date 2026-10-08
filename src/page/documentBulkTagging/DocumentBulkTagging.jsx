@@ -22,8 +22,9 @@ const RULES = [
     "doc_id and file_name must both be filled and belong to the same document.",
     "A blank cell keeps the document's current value.",
     "Each value is matched by name within its parent. If there is no match or several matches, that field is skipped and the rest of the row is still applied.",
-    "If a parent changes (e.g. company), current children that don't belong to the new parent (entity, location…) are cleared.",
+    "If a parent changes, current children that don't fit the new parent are cleared: a new company clears entity and location; a new location without a mapping for the module clears module, sub-module, service tracker, document type and stage.",
     "The module / sub-module must be mapped to the location (location to module mapping).",
+    "Rows for documents you can't update are skipped.",
 ];
 
 /**
