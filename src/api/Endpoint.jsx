@@ -308,3 +308,7 @@ export const LOCATION_WISE_ACCESS = '/api/v1/user_access/create/location-wise/ac
 
 
 
+
+// Client onboarding (bulk upload)
+export const CLIENT_ONBOARDING_TEMPLATE = '/api/v1/client_onboarding/view/template';
+export const CLIENT_ONBOARDING_UPLOAD = '/api/v1/client_onboarding/create/upload';
