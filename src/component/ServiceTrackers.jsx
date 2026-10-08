@@ -665,7 +665,8 @@ const ServiceTrackers = () => {
     minWidth: 140,
     sortable: true,
     filter: true,
-    editable: true,
+    // No inline editing: nothing saves cell edits; changes go through the Edit form
+    editable: false,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
 
@@ -751,7 +752,6 @@ const ServiceTrackers = () => {
             rowData={filteredRowData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
-            editType="fullRow"
             rowSelection="single"
             pagination={true}
           />

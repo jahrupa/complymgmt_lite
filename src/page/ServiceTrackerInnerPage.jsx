@@ -115,7 +115,8 @@ const ServiceTrackerInnerPage = () => {
       minWidth: 140,
         sortable: true,
         filter: true,
-        editable: true,
+        // No inline editing: nothing saves cell edits; changes go through the Edit form
+        editable: false,
         headerStyle: { color: '#515151', backgroundColor: '#ffffe24d' },
         flex: 1,
         filterParams: {
@@ -265,7 +266,6 @@ const ServiceTrackerInnerPage = () => {
                 return {
                     headerName: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
                     field: key,
-                    editable: key === 'file_name' || key === 'status',
                     minWidth: 150,
                 };
             });
@@ -574,9 +574,6 @@ const ServiceTrackerInnerPage = () => {
         setAddData((prev) => ({ ...prev, data: { ...prev.data, [key]: '' } }));
         setNewFieldName('');
         setAddError('');
-    };
-
-    const onRowValueChanged = (event) => {
     };
 
     const onFilterTextBoxChanged = useCallback(() => {
@@ -1137,11 +1134,9 @@ const ServiceTrackerInnerPage = () => {
                             rowData={filteredRowData || []}
                             columnDefs={columnDefs}
                             defaultColDef={defaultColDef}
-                            editType="fullRow"
                             rowSelection="single"
                             pagination={true}
                             onFilterOpened={onFilterOpened}
-                            onRowValueChanged={onRowValueChanged}
                         />
                     </div>
                 </div>

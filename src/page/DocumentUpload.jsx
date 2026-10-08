@@ -824,13 +824,13 @@ const DocumentUpload = () => {
     {
       field: "ai_data.doc_type",
       headerName: "AI Document Type",
-      editable: "false",
+      editable: false,
       valueGetter: (params) => params.data?.ai_data?.doc_type || "-",
     },
     {
       field: "ai_data.confidence",
       headerName: "AI Confidence Score",
-      editable: "false",
+      editable: false,
       valueGetter: (params) =>
         params.data?.ai_data?.confidence !== undefined
           ? `${params.data.ai_data.confidence}%`
@@ -839,7 +839,7 @@ const DocumentUpload = () => {
     {
       field: "group_holdings_id",
       headerName: "Document Status",
-      editable: "false",
+      editable: false,
       cellRenderer: (params) => (
         <span style={{ color: params.value !== "" ? "black" : "gray" }}>
           {params.value !== "" ? "Taged" : "Untaged"}
@@ -851,7 +851,7 @@ const DocumentUpload = () => {
       width: 120,
       minWidth: 120,
       maxWidth: 120,
-      editable: "false",
+      editable: false,
       field: "is_active",
       headerName: "Status",
       pinned: "left",
@@ -923,10 +923,10 @@ const DocumentUpload = () => {
     minWidth: 140,
     sortable: true,
     filter: true,
-    editable: true,
+    // No inline editing: nothing saves cell edits; changes go through the Edit form
+    editable: false,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = () => {};
   // quickFilterText doesn't work with the infinite row model, so the text is
   // sent to the API instead; debounced so every keystroke isn't a request
   const onFilterTextBoxChanged = useCallback((e) => {
@@ -1664,7 +1664,6 @@ const DocumentUpload = () => {
             pageSize={20}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
-            editType="fullRow"
             // AG Grid's header checkbox isn't supported by the infinite row
             // model, so PageSelectHeader selects the current page instead;
             // getRowId keeps the selection across page changes and refreshes.
@@ -1678,7 +1677,6 @@ const DocumentUpload = () => {
             onSelectionChanged={(e) =>
               setSelectedDocs(e.api.getSelectedRows())
             }
-            onRowValueChanged={onRowValueChanged}
           />
         </div>
       </div>
