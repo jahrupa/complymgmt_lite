@@ -26,6 +26,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Snackbars from '../Snackbars.jsx';
 import { Box, Tab, Tabs } from '@mui/material';
 import { decryptData } from '../../page/utils/encrypt.js';
+import { countUnread } from './notificationUtils';
 
 dayjs.extend(relativeTime);
 
@@ -109,7 +110,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         setError(null);
         const response = await getInAppNotification(SystemUserId || "");
         setAllNotifications(response || []);
-        setUnreadCountNotification(response?.length || 0);
+        setUnreadCountNotification(countUnread(response));
       } catch (err) {
         setError(err.message || 'Something went wrong');
       } finally {
@@ -118,6 +119,23 @@ const NotificationPage = ({setUnreadCountNotification}) => {
     };
     fetchNotifications();
   }, []);
+
+  // Badge count in the navbar; a failed refetch just leaves the old count
+  const refreshCount = async () => {
+    try {
+      const res = await getInAppNotification(SystemUserId || "");
+      setUnreadCountNotification(countUnread(res));
+    } catch {
+      // keep the old count
+    }
+  };
+
+  // 404 on an id means it's already gone (or isn't the caller's): drop it quietly
+  const dropNotification = (id) => {
+    setAllNotifications(prev => prev.filter(n => n._id !== id));
+    setOpenMenuId(null);
+    refreshCount();
+  };
 
   const handleMarkAsRead = async (id) => {
     try {
@@ -132,13 +150,17 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         prev.map(n => n._id === id ? { ...n, is_read: true } : n)
       );
 
-      getInAppNotification(SystemUserId || "");
+      refreshCount();
       setOpenMenuId(null); // close menu after action
     } catch (error) {
+      if (error?.response?.status === 404) {
+        dropNotification(id);
+        return;
+      }
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: error?.response?.data?.message,
+        message: error?.response?.data?.message || 'Something went wrong',
         severityType: 'error',
       });
     }
@@ -155,14 +177,16 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         message: response?.message,
         severityType: 'success',
       });
-      getInAppNotification(SystemUserId || "");
-      const res = await getInAppNotification(SystemUserId || "");
-      setUnreadCountNotification(res.length || 0);
+      refreshCount();
     } catch (error) {
+      if (error?.response?.status === 404) {
+        dropNotification(id);
+        return;
+      }
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: error?.response?.data?.message,
+        message: error?.response?.data?.message || 'Something went wrong',
         severityType: 'error',
       });
     }
@@ -179,12 +203,12 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         message: response?.message,
         severityType: 'success',
       });
-      getInAppNotification(SystemUserId || "");
+      refreshCount();
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: error?.response?.data?.message,
+        message: error?.response?.data?.message || 'Something went wrong',
         severityType: 'error',
       });
     }
@@ -202,12 +226,12 @@ const NotificationPage = ({setUnreadCountNotification}) => {
       setAllNotifications([]);
       setOpenMenuId(null);
       const res = await getInAppNotification(SystemUserId || "");
-      setUnreadCountNotification(res?.length || 0);
+      setUnreadCountNotification(countUnread(res));
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,
         open: true,
-        message: error?.response?.data?.message,
+        message: error?.response?.data?.message || 'Something went wrong',
         severityType: 'error',
       });
     }

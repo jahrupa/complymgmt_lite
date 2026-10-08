@@ -16,9 +16,9 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { AlignCenterVertical, FileSpreadsheet, Layers, ScanEye } from 'lucide-react';
+import { AlignCenterVertical, FileSpreadsheet, Layers, ScanEye, Tags } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
-import { usePageAccess } from '../page/utils/usePageAccess';
+import { usePageAccessResolver } from '../page/utils/usePageAccess';
 export const RegisterApplicabilityIcon = ({ active }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -77,28 +77,31 @@ export const CreateRegisterIcon = ({ active }) => (
 function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
     const [openDropdown, setOpenDropdown] = useState(null);
     const userRole = decryptData(localStorage.getItem("user_role"));
-    const clientOnboardingAccess = usePageAccess('client_onboarding');
+    const { accessFor } = usePageAccessResolver();
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
-        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
-        { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Group/Holding', link: 'group_holding' },
-        { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'company', link: 'company' },
-        { icon: (active) => <AlignCenterVertical className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Entity', link: 'entity' },
-        { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location', link: 'location' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module', link: 'module' },
-        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Subscribe Module & Sub-Module ', link: 'location_to_module' },
-        { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
-        { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents' },
-        ...(clientOnboardingAccess.canView
-            ? [{ icon: (active) => <FileSpreadsheet className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Client Onboarding', link: 'client_onboarding' }]
-            : []),
+        { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role', page: 'user' },
+        { icon: (active) => <DomainAddOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Group/Holding', link: 'group_holding', page: 'group' },
+        { icon: (active) => <ApartmentOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Company', link: 'company', page: 'company' },
+        { icon: (active) => <AlignCenterVertical className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Entity', link: 'entity', page: 'entity' },
+        { icon: (active) => <TravelExploreOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Location', link: 'location', page: 'company_location' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Module', link: 'module', page: 'module' },
+        { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Subscribe Module & Sub-Module ', link: 'location_to_module', page: 'location_to_module' },
+        { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module', page: 'submodule' },
+        { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control', page: 'user_access' },
+        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents', page: 'document_repository' },
+        { icon: (active) => <Tags className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Bulk Document Tagging', link: 'document_bulk_tagging', page: 'document_bulk_tagging' },
+        { icon: (active) => <FileSpreadsheet className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Client Onboarding', link: 'client_onboarding', page: 'client_onboarding' },
 
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 
-    ];
+    ].filter((item) => !item.page || accessFor(item.page).canView); // `page` = backend page name it needs view on
+    const canViewTrackers = accessFor('service_tracker').canView;
     const serviceTracker = useMemo(() => [
-        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers', parent: 'serviceTracker' },
+        ...(canViewTrackers
+            ? [{ icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers', parent: 'serviceTracker' }]
+            : []
+        ),
         ...(userRole === 'Admin' || userRole === 'Super-Admin'
             ? [{
                 icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
@@ -113,7 +116,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             }]
             : []
         ),
-    ], []);
+    ], [canViewTrackers, userRole]);
     // Icons.js
 
     const registerProcessing = useMemo(() => [
@@ -180,6 +183,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                         })}
 
                         {/* Document Dropdown */}
+                        {serviceTracker.length > 0 && (
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
@@ -227,6 +231,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                             )}
 
                         </div>
+                        )}
                         {/* <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"

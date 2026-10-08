@@ -15,9 +15,6 @@ import AddUser from '../page/AddUser';
 import AccessControl from '../page/AccessControl';
 import ServiceTrackers from '../component/ServiceTrackers.jsx';
 import DocumentUpload from '../page/DocumentUpload.jsx';
-import TaggedDocument from '../page/TaggedDocument.jsx';
-import UntaggedDocument from '../page/UntaggedDocument.jsx';
-import PendingDocument from '../page/PendingDocument.jsx';
 import Snackbars from '../component/Snackbars.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
@@ -33,6 +30,7 @@ import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful
 import NotificationMainPage from '../component/notification/NotificationMainPage.jsx';
 import WidgetAccess from '../page/widgetAccess/WidgetAccess.jsx';
 import ClientOnboarding from '../page/clientOnboarding/ClientOnboarding.jsx';
+import DocumentBulkTagging from '../page/documentBulkTagging/DocumentBulkTagging.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
 // import RegisterProcessingV2 from '../page/RegisterProcessing.jsx';
@@ -42,6 +40,8 @@ import RegisterApplicability from '../page/RegisterApplicability.jsx';
 import RegisterMapping from '../page/RegisterMapping.jsx';
 import RegisterProcess from '../page/RegisterProcess.jsx';
 import Entity from '../page/Entity.jsx';
+import RequirePageAccess from '../component/RequirePageAccess.jsx';
+import RequireAdmin from '../component/RequireAdmin.jsx';
 
 
 
@@ -112,27 +112,29 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             activePage={activePage}
           />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/widget_access" element={<WidgetAccess />} />
+            <Route path="/widget_access" element={<RequireAdmin><WidgetAccess /></RequireAdmin>} />
             <Route path="/client_onboarding" element={<ClientOnboarding />} />
+            <Route path="/document_bulk_tagging" element={<DocumentBulkTagging />} />
             {/* The old Widget Mappings page is now part of Widget Access */}
             <Route path="/widget_mappings" element={<Navigate to="/widget_access" replace />} />
-            <Route path="/create_user_role" element={<UserRolesPage />} />
-            <Route path="/add_user" element={<AddUser />} />
-            <Route path="/company" element={<Company />} />
-            <Route path="/entity" element={<Entity />} />
-            <Route path="/group_holding" element={<GroupCompaniesPage />} />
-            <Route path="/location" element={<Location />} />
-            <Route path="/module" element={<Module />} />
-            <Route path="/sub_module" element={<SubModule />} />
-            <Route path="/access_control" element={<AccessControl />} />
-            <Route path="/service_trackers" element={<ServiceTrackers />} />
-            <Route path="/upload_documents" element={<DocumentUpload />} />
-            <Route path="/tagged_documents" element={<TaggedDocument />} />
-            <Route path="/untagged_documents" element={<UntaggedDocument />} />
-            <Route path="/pending_documents" element={<PendingDocument />} />
+            <Route path="/create_user_role" element={<RequirePageAccess page="user"><UserRolesPage /></RequirePageAccess>} />
+            <Route path="/add_user" element={<RequirePageAccess page="user"><AddUser /></RequirePageAccess>} />
+            <Route path="/company" element={<RequirePageAccess page="company"><Company /></RequirePageAccess>} />
+            <Route path="/entity" element={<RequirePageAccess page="entity"><Entity /></RequirePageAccess>} />
+            <Route path="/group_holding" element={<RequirePageAccess page="group"><GroupCompaniesPage /></RequirePageAccess>} />
+            <Route path="/location" element={<RequirePageAccess page="company_location"><Location /></RequirePageAccess>} />
+            <Route path="/module" element={<RequirePageAccess page="module"><Module /></RequirePageAccess>} />
+            <Route path="/sub_module" element={<RequirePageAccess page="submodule"><SubModule /></RequirePageAccess>} />
+            <Route path="/access_control" element={<RequirePageAccess page="user_access"><AccessControl /></RequirePageAccess>} />
+            <Route path="/service_trackers" element={<RequirePageAccess page="service_tracker"><ServiceTrackers /></RequirePageAccess>} />
+            <Route path="/upload_documents" element={<RequirePageAccess page="document_repository"><DocumentUpload /></RequirePageAccess>} />
+            {/* Tagged / untagged / pending are views (tabs) of the Document Repository */}
+            <Route path="/tagged_documents" element={<Navigate to="/upload_documents?view=tagged" replace />} />
+            <Route path="/untagged_documents" element={<Navigate to="/upload_documents?view=untagged" replace />} />
+            <Route path="/pending_documents" element={<Navigate to="/upload_documents?view=pending" replace />} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
-            <Route path="/location_to_module" element={<LocationToModule />} />
+            <Route path="/location_to_module" element={<RequirePageAccess page="location_to_module"><LocationToModule /></RequirePageAccess>} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
             {/* <Route path="/register_processing_v2" element={<RegisterProcessingV2 />} /> */}
 
@@ -156,8 +158,8 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="process_register" element={<RegisterProcess />} />
             {/* register processing routes end */}
 
-            <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
-            <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
+            <Route path="/service/:trackerName/:id" element={<RequirePageAccess page="service_tracker"><ServiceTrackerInnerPage /></RequirePageAccess>} />
+            <Route path="/service_tracker_access" element={<RequireAdmin><ServiceTrackerAccess /></RequireAdmin>} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
             {/* Dashboard Internal Routes */}
             <Route path='/:dashboard_name/dashboard/:info' element={<DashboardInternalPage />} />

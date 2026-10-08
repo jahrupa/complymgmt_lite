@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import Snackbars from '../../component/Snackbars';
 import DashboardDrawerGrid from '../DashboardDrawer';
@@ -24,6 +24,18 @@ const fetchPaginatedRecords = async (page, limit) => {
     return { challan: pick(challan), license: pick(license), register: pick(register), return: pick(returns) };
 };
 
+// One page of one module for the drawer's paged grid: { records, total }
+const fetchModulePage = async (module, page, limit) => {
+    const fetchers = {
+        Challans: () => fetchChallanRecords(page, limit),
+        Licenses: () => fetchLicenseDashRecords({ page, limit }),
+        Registers: () => fetchRegisterDashRecords({ page, limit }),
+        Returns: () => fetchReturnsDashRecords({ page, limit }),
+    };
+    const res = await (fetchers[module] || fetchers.Returns)();
+    return { records: (res?.data || []).map((row) => row.record), total: res?.total ?? 0 };
+};
+
 const GeneralComplianceDashboard = ({ data, shouldShow, page, limit, setActiveDrawer }) => {
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
@@ -37,6 +49,11 @@ const GeneralComplianceDashboard = ({ data, shouldShow, page, limit, setActiveDr
     const [filterColumns, setFilterColumns] = useState([]);
     const [isDetailPageDataFor, setIsDetailPageDataFor] = useState("Returns");
     const [paginatedData, setPaginatedData] = useState([]);
+    // The drawer's paged grid loads the module picked in the drawer (Returns / Challans / ...)
+    const fetchSelectedModulePage = useCallback(
+        (pageNo, pageSize) => fetchModulePage(isDetailPageDataFor, pageNo, pageSize),
+        [isDetailPageDataFor]
+    );
     useEffect(() => {
         const fetchGeneralComplianceData = async () => {
             const results = await Promise.allSettled([
@@ -298,7 +315,7 @@ const GeneralComplianceDashboard = ({ data, shouldShow, page, limit, setActiveDr
                 setIsDetailPageDataFor={setIsDetailPageDataFor}
                 isDetailPageDataFor={isDetailPageDataFor}
                 buttons={['Returns', 'Challans', 'Licenses', 'Registers']}
-                fetchPaginatedRecords={fetchPaginatedRecords}
+                fetchPaginatedRecords={fetchSelectedModulePage}
                 totalPage={
                     isDetailPageDataFor === "Challans"
                         ? paginatedData?.paginatedRecords?.challan?.total

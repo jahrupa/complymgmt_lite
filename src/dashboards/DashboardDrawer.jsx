@@ -11,6 +11,7 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import DashboardDrawerGridDetailPage from "../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage";
 import MultiSelectFilter from "../page/dashboardDrawerGridDetailPage/MultiSelectFilter";
 import { useState, useMemo } from "react";
+import { blankAsDash, recordKeys } from "./common/dashboardUtils";
 // import { fetchPaginatedRecords } from '../api/service';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -65,17 +66,20 @@ export default function DashboardDrawerGrid({
       setError(""); // reset error
       if (!open) return;
 
-      if (!data || !Array.isArray(data) || data.length === 0) {
+      // Records can be missing (a mapped `row.record` that wasn't sent) or partial for external users
+      const rows = Array.isArray(data) ? data.filter((row) => row && typeof row === "object") : [];
+      if (rows.length === 0) {
         setRowData([]);
         setColumnDefs([]);
         setChartSeries([]);
         return;
       }
-      setRowData(data);
+      setRowData(rows);
 
-      const cols = Object.keys(data[0]).map((key) => ({
+      const cols = recordKeys(rows).map((key) => ({
         headerName: key.replace(/_/g, " ").toUpperCase(),
         field: key,
+        valueFormatter: blankAsDash,
         sortable: true,
         filter: true,
         resizable: true,
@@ -188,20 +192,24 @@ export default function DashboardDrawerGrid({
       // fetchData(page, pageSize);
     }
   };
-  const dataSource = {
-    getRows: async (params) => {
-      const { startRow, endRow } = params;
-
-      const page = startRow / 20 + 1; // page calculate
-      const limit = 20;
-
-      const response = await fetchPaginatedRecords(page, limit);
-      const rows = response.return?.records;
-      const totalRows = totalPage; // 👈 total count API se lao
-
-      params.successCallback(rows, totalRows);
-    },
-  };
+  // fetchPaginatedRecords(page, limit) returns { records, total } for the module on screen; a new
+  // function (another module picked) gives a new datasource, which restarts the grid from page 1
+  const dataSource = useMemo(
+    () => ({
+      getRows: async (params) => {
+        const page = params.startRow / 20 + 1;
+        try {
+          const response = await fetchPaginatedRecords(page, 20);
+          const rows = (response?.records || []).filter(Boolean);
+          params.successCallback(rows, response?.total ?? totalPage);
+        } catch {
+          params.failCallback();
+        }
+      },
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- totalPage is only a fallback count
+    [fetchPaginatedRecords],
+  );
   return (
     <Drawer
       anchor={anchor}

@@ -6,7 +6,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import FormHelperText from '@mui/material/FormHelperText';
 
-export default function SingleSelectTextField({ name, value, onChange, names = [], label, isdisable, error, helperText, isRequired }) {
+export default function SingleSelectTextField({ name, value, onChange, names = [], label, isdisable, error, helperText, isRequired, emptyLabel = 'None' }) {
   const [open, setOpen] = React.useState(false);
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
@@ -25,11 +25,11 @@ export default function SingleSelectTextField({ name, value, onChange, names = [
         variant="outlined"
       >
         <MenuItem value="">
-          <em>None</em>
+          <em>{emptyLabel}</em>
         </MenuItem>
         {names.map((item) => (
           <MenuItem key={item._id} value={item.name}>
-            {item.name}{item.optionalValue?` - (${item.optionalValue})`:null}
+            {item.label ?? item.name}{item.optionalValue?` - (${item.optionalValue})`:null}
           </MenuItem>
         ))}
       </Select>
