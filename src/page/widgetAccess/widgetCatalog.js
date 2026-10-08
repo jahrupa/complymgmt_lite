@@ -10,6 +10,7 @@ export const DASHBOARD_ORDER = [
     "compliance cockpit",
     "compliance cockpit by company",
     "general compliance",
+    "client onboarding",
     "register dashboard",
     "returns dashboard",
     "challan dashboard",

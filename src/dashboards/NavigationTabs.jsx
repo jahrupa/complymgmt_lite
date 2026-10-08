@@ -139,7 +139,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
             label: "Client Onboarding",
             slug: "client-onboarding",
             title: "Client Onboarding",
-            // no `widgets`: not gated by widget mappings, always shown
+            // Granted per user in Widget Access (CO-1); still internal users only
+            widgets: "CO",
             content:
                 selectedCompany === "" ? (
                     <ClientOnbordingDashboard
