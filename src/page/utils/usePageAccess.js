@@ -6,24 +6,41 @@ const ADMIN_ROLES = ["Admin", "Super-Admin"];
 const FULL_ACCESS = { canView: true, canCreate: true, canUpdate: true, canDelete: true };
 const NO_ACCESS = { canView: false, canCreate: false, canUpdate: false, canDelete: false };
 
-// One request per user per session, shared by every caller (sidebar + pages).
-let grantsCache = { userId: null, promise: null };
+// Admin and Super-Admin pass every backend page check.
+export const isAdminUser = () => ADMIN_ROLES.includes(decryptData(localStorage.getItem("user_role")));
 
-// Resolves to the user's grants, or null when they can't be read.
+// One request per login session, shared by every caller (sidebar + pages). Keyed on the
+// token too, so logging out and back in (no reload) picks up changed grants.
+let grantsCache = { key: null, promise: null, resolved: false, grants: null };
+
+const sessionKey = (userId) => `${userId}:${localStorage.getItem("authToken")}`;
+
+// Resolves to the user's grants, or null when they can't be read (network / 5xx).
 const loadGrants = (userId) => {
-  if (grantsCache.userId !== userId || !grantsCache.promise) {
-    grantsCache = {
-      userId,
-      promise: fetchAllUserAccessLevels({ system_user_id: userId })
-        .then((res) => (Array.isArray(res) ? res : res?.data || []))
-        .catch(() => {
-          // e.g. 403: the grants endpoint itself needs user_access view. Retry next time.
-          grantsCache = { userId: null, promise: null };
-          return null;
-        }),
-    };
+  const key = sessionKey(userId);
+  if (grantsCache.key !== key || !grantsCache.promise) {
+    const entry = { key, resolved: false, grants: null };
+    entry.promise = fetchAllUserAccessLevels({ system_user_id: userId })
+      .then((res) => {
+        entry.grants = Array.isArray(res) ? res : res?.data || [];
+        entry.resolved = true;
+        return entry.grants;
+      })
+      .catch(() => {
+        grantsCache = { key: null, promise: null, resolved: false, grants: null }; // retry next time
+        return null;
+      });
+    grantsCache = entry;
   }
   return grantsCache.promise;
+};
+
+// Grants already loaded this session, so later pages start resolved instead of "loading"
+const cachedState = () => {
+  const userId = decryptData(localStorage.getItem("user_id"));
+  return userId && grantsCache.resolved && grantsCache.key === sessionKey(userId)
+    ? { loading: false, grants: grantsCache.grants, userId }
+    : null;
 };
 
 // Mirrors the backend's page check (middleware/jwt.go CheckAccess): an active,
@@ -55,11 +72,11 @@ const accessFromGrants = (grants, pageName, userId) => {
  * Admin / Super-Admin always get full access. While loading, everything is denied.
  */
 export const usePageAccessResolver = () => {
-  const isAdmin = ADMIN_ROLES.includes(decryptData(localStorage.getItem("user_role")));
-  const [state, setState] = useState(() => ({ loading: !isAdmin, grants: [], userId: null }));
+  const isAdmin = isAdminUser();
+  const [state, setState] = useState(() => cachedState() || { loading: !isAdmin, grants: [], userId: null });
 
   useEffect(() => {
-    if (isAdmin) return;
+    if (isAdmin || !state.loading) return;
     const userId = decryptData(localStorage.getItem("user_id"));
     if (!userId) {
       setState({ loading: false, grants: [], userId: null });
@@ -72,7 +89,7 @@ export const usePageAccessResolver = () => {
     return () => {
       cancelled = true;
     };
-  }, [isAdmin]);
+  }, [isAdmin, state.loading]);
 
   const accessFor = useCallback(
     (pageName) => {

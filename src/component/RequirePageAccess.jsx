@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import { usePageAccess } from "../page/utils/usePageAccess";
 import { PAGE_ACCESS_DENIED } from "../page/utils/pageAccessEvents";
 import NoPageAccess from "./NoPageAccess";
+
+// active_url is the page the app reopens on ("/" redirects there); stored with or without "/".
+const isStoredLanding = (pathname) => {
+    const stored = localStorage.getItem("active_url");
+    return !!stored && `/${stored.replace(/^\/+/, "")}` === pathname;
+};
 
 /**
  * Renders the page only if the user can view `page` (the backend page name). Also
@@ -12,6 +19,7 @@ import NoPageAccess from "./NoPageAccess";
 const RequirePageAccess = ({ page, children }) => {
     const { loading, canView } = usePageAccess(page);
     const [denied, setDenied] = useState(false);
+    const { pathname } = useLocation();
 
     useEffect(() => {
         const onDenied = (e) => {
@@ -29,7 +37,15 @@ const RequirePageAccess = ({ page, children }) => {
         );
     }
 
-    if (!canView || denied) return <NoPageAccess />;
+    if (!canView || denied) {
+        // Reopened on a page the user has since lost access to: start them on the dashboard instead.
+        if (isStoredLanding(pathname)) {
+            localStorage.removeItem("active_url");
+            localStorage.setItem("activeItem", "Dashboard");
+            return <Navigate to="/dashboard" replace />;
+        }
+        return <NoPageAccess />;
+    }
 
     return children;
 };

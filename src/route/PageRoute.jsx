@@ -44,6 +44,7 @@ import RegisterMapping from '../page/RegisterMapping.jsx';
 import RegisterProcess from '../page/RegisterProcess.jsx';
 import Entity from '../page/Entity.jsx';
 import RequirePageAccess from '../component/RequirePageAccess.jsx';
+import RequireAdmin from '../component/RequireAdmin.jsx';
 
 
 
@@ -114,7 +115,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             activePage={activePage}
           />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/widget_access" element={<WidgetAccess />} />
+            <Route path="/widget_access" element={<RequireAdmin><WidgetAccess /></RequireAdmin>} />
             <Route path="/client_onboarding" element={<ClientOnboarding />} />
             <Route path="/document_bulk_tagging" element={<DocumentBulkTagging />} />
             {/* The old Widget Mappings page is now part of Widget Access */}
@@ -160,7 +161,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             {/* register processing routes end */}
 
             <Route path="/service/:trackerName/:id" element={<RequirePageAccess page="service_tracker"><ServiceTrackerInnerPage /></RequirePageAccess>} />
-            <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
+            <Route path="/service_tracker_access" element={<RequireAdmin><ServiceTrackerAccess /></RequireAdmin>} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
             {/* Dashboard Internal Routes */}
             <Route path='/:dashboard_name/dashboard/:info' element={<DashboardInternalPage />} />

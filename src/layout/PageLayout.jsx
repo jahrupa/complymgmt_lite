@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import SideBar from '../component/SideBar'
 import NavBar from '../component/NavBar'
 import NotificationPage from '../component/notification/NotificationPage';
@@ -15,6 +16,11 @@ const PageLayout = ({
 }) => {
      const [showNotifications, setShowNotifications] = useState(false);
      const SystemUserId = decryptData(localStorage.getItem("user_id"));
+     const { pathname } = useLocation();
+     // Keep the highlight right when we land on the dashboard by redirect (e.g. a stale active_url)
+     useEffect(() => {
+         if (pathname === '/dashboard') setActivePage('Dashboard');
+     }, [pathname, setActivePage]);
       useEffect(() => {
          const fetchNotifications = async () => {
            try {

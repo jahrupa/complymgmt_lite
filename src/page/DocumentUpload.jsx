@@ -11,6 +11,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import Toggle from "../component/Toggle";
+import { usePageAccess } from "./utils/usePageAccess";
 import {
   uploadFileGolang,
   fetchAllFiles,
@@ -53,6 +54,8 @@ import { downloadBlob } from "./utils/bulkUpload";
 const MAX_BULK_DOWNLOAD = 100;
 
 const DocumentUpload = () => {
+  // Hide or disable actions the user's document_repository grant doesn't allow
+  const { canCreate, canUpdate, canDelete } = usePageAccess("document_repository");
   // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
   const [data, setData] = useState([]);
   const gridRef = useRef();
@@ -721,6 +724,7 @@ const DocumentUpload = () => {
             >
               <VisibilityIcon fontSize="small" className="action_icon" />
             </button>
+            {canDelete && (
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -730,6 +734,8 @@ const DocumentUpload = () => {
             >
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
+            )}
+            {canUpdate && (
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -743,6 +749,7 @@ const DocumentUpload = () => {
             >
               <EditIcon fontSize="small" className="action_icon" />
             </button>
+            )}
             {/* <VisibilityIcon/> */}
           </div>
         );
@@ -824,6 +831,7 @@ const DocumentUpload = () => {
         <Toggle
           checked={!!params.value}
           onChange={(e) => handleToggleChange(e, params)}
+          disabled={!canUpdate}
         />
       ),
     },
@@ -853,9 +861,9 @@ const DocumentUpload = () => {
             <input
               type="checkbox"
               checked={status === 1}
-              disabled={status === 1}
+              disabled={status === 1 || !canUpdate}
               style={{
-                cursor: status === 1 ? "default" : "pointer",
+                cursor: status === 1 || !canUpdate ? "default" : "pointer",
                 width: 15,
                 height: 15,
                 accentColor: "orange",
@@ -1529,7 +1537,7 @@ const DocumentUpload = () => {
         </div>
         <div className="d-lg-flex d-md-flex  justify-content-end mb-3">
           <div className="pe-2 d-lg-flex d-md-flex gap-3">
-            {userType === "0" && (
+            {userType === "0" && canCreate && (
               <div>
                 <button
                   className="reject upload-wrapper upload-label"
@@ -1545,6 +1553,7 @@ const DocumentUpload = () => {
               </div>
             )}
 
+            {canUpdate && (
             <div className="btn-wrap-div">
               <button
                 className="button approve w-100 justify-content-center"
@@ -1558,6 +1567,7 @@ const DocumentUpload = () => {
                 <span className="text">Approve</span>
               </button>
             </div>
+            )}
           </div>
         </div>
       </div>

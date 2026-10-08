@@ -28,12 +28,15 @@ import MuiTextAreaField from "./MuiInputs/MuiTextAreaField";
 import { useNavigate } from "react-router-dom";
 import { AnimatedSearchBar } from "./AnimatedSearchBar";
 import { decryptData } from "../page/utils/encrypt";
+import { usePageAccess } from "../page/utils/usePageAccess";
 import MultiSelectFilter from '../page/dashboardDrawerGridDetailPage/MultiSelectFilter';
 import { flattenObject } from '../../Utils/tableColUtils';
 // Register module
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const ServiceTrackers = () => {
+  // Hide or disable actions the user's service_tracker grant doesn't allow
+  const { canCreate, canUpdate, canDelete } = usePageAccess("service_tracker");
   const [data, setData] = useState([]);
   const [errors, setErrors] = useState({});
   const [current, setCurrent] = useState({
@@ -518,13 +521,13 @@ const ServiceTrackers = () => {
                   <input
                     type="checkbox"
                     checked={status === 1}
-                    disabled={status === 1} // Approved hone ke baad disable
+                    disabled={status === 1 || !canUpdate} // Approved hone ke baad disable
                     onChange={handleChange}
                     style={{
                       width: 15,
                       height: 15,
                       accentColor: "orange",
-                      cursor: status === 1 ? "not-allowed" : "pointer",
+                      cursor: status === 1 || !canUpdate ? "not-allowed" : "pointer",
                     }}
                   />
                   <span
@@ -583,6 +586,7 @@ const ServiceTrackers = () => {
       cellRenderer: (params) => {
         return (
           <div className="d-flex justify-content-around align-items-center">
+            {canUpdate && (
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -594,6 +598,8 @@ const ServiceTrackers = () => {
             >
               <EditIcon fontSize="small" className="action_icon" />
             </button>
+            )}
+            {canDelete && (
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -603,6 +609,7 @@ const ServiceTrackers = () => {
             >
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
+            )}
           </div>
         );
       },
@@ -645,6 +652,7 @@ const ServiceTrackers = () => {
         <Toggle
           checked={!!params.value}
           onChange={(e) => handleToggleChange(e, params)}
+          disabled={!canUpdate}
         />
       ),
     },
@@ -676,12 +684,15 @@ const ServiceTrackers = () => {
           </div>
         </div>
         <div className="d-lg-flex d-md-flex gap-2 mt-2">
+          {canCreate && (
           <button className="crud_btn w-100 mb-2" onClick={openModal}>
             <span>
               <AddIcon />
             </span>{" "}
             <span className="button-style">Add Service Tracker</span>
           </button>
+          )}
+          {canUpdate && (
           <div className="btn-wrap-div">
             <button
               className="button approve w-100 justify-content-center"
@@ -695,6 +706,7 @@ const ServiceTrackers = () => {
               <span className="text">Approve </span>
             </button>
           </div>
+          )}
         </div>
       </div>
       <Snackbars
