@@ -54,6 +54,10 @@ const RecordDetailDrawer = ({ recordId, companyName, fetchRecord, title, subtitl
     }, [recordId, companyName, fetchRecord]);
 
     const computed = detail?.computed;
+    // External users only get the fields their tracker allows; a fully restricted record is just its _id
+    const sections = (detail?.sections || [])
+        .map((section) => ({ ...section, fields: (section?.fields || []).filter((f) => f && f.key !== "sheet") }))
+        .filter((section) => section.fields.length > 0);
 
     return (
         <Drawer anchor="right" open={Boolean(recordId)} onClose={onClose}>
@@ -112,14 +116,20 @@ const RecordDetailDrawer = ({ recordId, companyName, fetchRecord, title, subtitl
                             </div>
                         )}
 
-                        {(detail.sections || []).map((section) => (
+                        {sections.length === 0 && !detail.timeline?.length && (
+                            <div className="alert alert-light border text-muted small">
+                                No fields available for your access.
+                            </div>
+                        )}
+
+                        {sections.map((section) => (
                             <div key={section.title} className="mb-3">
                                 <div className="fw-600 mb-2" style={{ color: "#0f766e" }}>{section.title}</div>
                                 <table className="table table-sm mb-0 small">
                                     <tbody>
                                         {section.fields.map((field) => (
                                             <tr key={field.key}>
-                                                <td className="text-muted" style={{ width: "45%" }}>{field.label}</td>
+                                                <td className="text-muted" style={{ width: "45%" }}>{field.label || field.key}</td>
                                                 <td>{formatRawValue(field.value)}</td>
                                             </tr>
                                         ))}

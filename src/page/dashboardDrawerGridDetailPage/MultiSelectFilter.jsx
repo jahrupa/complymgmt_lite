@@ -1,15 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X, Filter } from 'lucide-react';
 import './MultiSelectFilter.css';
+import { recordKeys } from '../../dashboards/common/dashboardUtils';
 
-const MultiSelectFilter = ({ rowData, onFilterApply, filterColumns = [] }) => {
+const MultiSelectFilter = ({ rowData: rawRows, onFilterApply, filterColumns = [] }) => {
+  const rowData = Array.isArray(rawRows) ? rawRows.filter(Boolean) : [];
   const [isOpen, setIsOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState(null);
   const [filters, setFilters] = useState({});
   const dropdownRef = useRef(null);
 
+  // Only fields that came back in some row are offered (external users get a subset)
   const columns = rowData.length > 0
-    ? Object.keys(rowData[0]).filter(key => {
+    ? recordKeys(rowData).filter(key => {
       // key === 'common_attributes' is a nested object that we don't want to show as a filter option
       if (key === '_id' || key === 'common_attributes' || key === 'ai_data') return false;
       if (!filterColumns.length) return true;

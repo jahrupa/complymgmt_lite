@@ -11,6 +11,7 @@ import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import DashboardDrawerGridDetailPage from "../page/dashboardDrawerGridDetailPage/DashboardDrawerGridDetailPage";
 import MultiSelectFilter from "../page/dashboardDrawerGridDetailPage/MultiSelectFilter";
 import { useState, useMemo } from "react";
+import { blankAsDash, recordKeys } from "./common/dashboardUtils";
 // import { fetchPaginatedRecords } from '../api/service';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -65,17 +66,20 @@ export default function DashboardDrawerGrid({
       setError(""); // reset error
       if (!open) return;
 
-      if (!data || !Array.isArray(data) || data.length === 0) {
+      // Records can be missing (a mapped `row.record` that wasn't sent) or partial for external users
+      const rows = Array.isArray(data) ? data.filter((row) => row && typeof row === "object") : [];
+      if (rows.length === 0) {
         setRowData([]);
         setColumnDefs([]);
         setChartSeries([]);
         return;
       }
-      setRowData(data);
+      setRowData(rows);
 
-      const cols = Object.keys(data[0]).map((key) => ({
+      const cols = recordKeys(rows).map((key) => ({
         headerName: key.replace(/_/g, " ").toUpperCase(),
         field: key,
+        valueFormatter: blankAsDash,
         sortable: true,
         filter: true,
         resizable: true,

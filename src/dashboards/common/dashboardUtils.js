@@ -31,9 +31,25 @@ const toDisplayDate = (d, m, y) => {
 // Uploaded values are raw strings. Dates come as m/d/yyyy (challan), mm-dd-yy (register),
 // yyyy-mm-dd or d-Mon-yy (returns) and are shown as dd MMM yyyy; "-" means empty. Anything else,
 // including notes typed into date columns, is returned unchanged.
+// Column keys for record grids built from the rows themselves: the union over all rows (external
+// users may get different fields per record, or just _id), minus internal fields like "sheet".
+export const recordKeys = (rows) => {
+    const keys = new Set();
+    (Array.isArray(rows) ? rows : []).forEach((row) => {
+        if (row && typeof row === "object") Object.keys(row).forEach((key) => key !== "sheet" && keys.add(key));
+    });
+    return [...keys];
+};
+
+// Old-style grids: a missing value shows a dash instead of an empty cell
+export const blankAsDash = (p) => (p.value == null || p.value === "" ? "—" : p.value);
+
 export const formatRawValue = (val) => {
-    const str = String(val ?? "").trim();
-    if (str === "" || str === "-") return "—";
+    // Missing values (hidden from external users, or never filled) all render as a dash
+    if (val == null || (typeof val === "number" && Number.isNaN(val))) return "—";
+    if (typeof val === "object") return Array.isArray(val) ? val.map(formatRawValue).join(", ") || "—" : "—";
+    const str = String(val).trim();
+    if (str === "" || str === "-" || str === "null" || str === "undefined" || str === "NaN") return "—";
     let match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(str);
     if (match) return toDisplayDate(match[2], match[1], match[3]) || str;
     match = /^(\d{1,2})-(\d{1,2})-(\d{2})$/.exec(str);
@@ -99,7 +115,7 @@ export const YES_NO_OPTIONS = [
 
 // Locations narrowed to the selected states; locations are { state, location }
 export const locationOptionsFor = (locations = [], states = []) => [
-    ...new Set(locations.filter((l) => !states.length || states.includes(l.state)).map((l) => l.location)),
+    ...new Set(locations.filter((l) => l && (!states.length || states.includes(l.state))).map((l) => l.location)),
 ];
 
 /* ---------- filters <-> URL query string ---------- */
