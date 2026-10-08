@@ -89,15 +89,19 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <ViewModuleOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Subscribe Module & Sub-Module ', link: 'location_to_module', page: 'location_to_module' },
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module', page: 'submodule' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control', page: 'user_access' },
-        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents' },
+        { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents', page: 'document_repository' },
         { icon: (active) => <Tags className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Bulk Document Tagging', link: 'document_bulk_tagging', page: 'document_bulk_tagging' },
         { icon: (active) => <FileSpreadsheet className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Client Onboarding', link: 'client_onboarding', page: 'client_onboarding' },
 
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 
     ].filter((item) => !item.page || accessFor(item.page).canView); // `page` = backend page name it needs view on
+    const canViewTrackers = accessFor('service_tracker').canView;
     const serviceTracker = useMemo(() => [
-        { icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers', parent: 'serviceTracker' },
+        ...(canViewTrackers
+            ? [{ icon: (active) => <CheckBoxIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Trackers', link: 'service_trackers', parent: 'serviceTracker' }]
+            : []
+        ),
         ...(userRole === 'Admin' || userRole === 'Super-Admin'
             ? [{
                 icon: (active) => <ScanEye className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />,
@@ -112,7 +116,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
             }]
             : []
         ),
-    ], []);
+    ], [canViewTrackers, userRole]);
     // Icons.js
 
     const registerProcessing = useMemo(() => [
@@ -179,6 +183,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                         })}
 
                         {/* Document Dropdown */}
+                        {serviceTracker.length > 0 && (
                         <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"
@@ -226,6 +231,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
                             )}
 
                         </div>
+                        )}
                         {/* <div className={`${sidebarOpen ? 'ms-2 mb-2 d-flex flex-column open-sidebar-wrap' : 'ms-2 mb-2 d-flex flex-column'}`}>
                             <div
                                 className="d-flex align-items-center cursor-pointer mb-4"

@@ -128,11 +128,11 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/module" element={<RequirePageAccess page="module"><Module /></RequirePageAccess>} />
             <Route path="/sub_module" element={<RequirePageAccess page="submodule"><SubModule /></RequirePageAccess>} />
             <Route path="/access_control" element={<RequirePageAccess page="user_access"><AccessControl /></RequirePageAccess>} />
-            <Route path="/service_trackers" element={<ServiceTrackers />} />
-            <Route path="/upload_documents" element={<DocumentUpload />} />
-            <Route path="/tagged_documents" element={<TaggedDocument />} />
-            <Route path="/untagged_documents" element={<UntaggedDocument />} />
-            <Route path="/pending_documents" element={<PendingDocument />} />
+            <Route path="/service_trackers" element={<RequirePageAccess page="service_tracker"><ServiceTrackers /></RequirePageAccess>} />
+            <Route path="/upload_documents" element={<RequirePageAccess page="document_repository"><DocumentUpload /></RequirePageAccess>} />
+            <Route path="/tagged_documents" element={<RequirePageAccess page="document_repository"><TaggedDocument /></RequirePageAccess>} />
+            <Route path="/untagged_documents" element={<RequirePageAccess page="document_repository"><UntaggedDocument /></RequirePageAccess>} />
+            <Route path="/pending_documents" element={<RequirePageAccess page="document_repository"><PendingDocument /></RequirePageAccess>} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<RequirePageAccess page="location_to_module"><LocationToModule /></RequirePageAccess>} />
@@ -159,7 +159,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="process_register" element={<RegisterProcess />} />
             {/* register processing routes end */}
 
-            <Route path="/service/:trackerName/:id" element={<ServiceTrackerInnerPage />} />
+            <Route path="/service/:trackerName/:id" element={<RequirePageAccess page="service_tracker"><ServiceTrackerInnerPage /></RequirePageAccess>} />
             <Route path="/service_tracker_access" element={<ServiceTrackerAccess />} />
             <Route path="/password_setting" element={<ChangePassword setIsChangePassword={setIsChangePassword} />} />
             {/* Dashboard Internal Routes */}

@@ -263,10 +263,10 @@ export const GET_REGISTER_DASH_RECORDS ='/api/v1/dashboard/view/register/records
 export const GET_REGISTER_DASH_RECORD_BY_ID ='/api/v1/dashboard/view/register/records/';
 
 // Dashboard Widget Mappings
-export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget-mapping/get/multiple';
-export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget-mapping/create';
-export const DELETE_WIDGET_MAPPING_BY_ID ='/api/v1/widget-mapping/delete?user_id=';
-export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget-mapping/get?user_id=';
+export const GET_ALL_WIDGET_MAPPINGS ='/api/v1/widget_mapping/view/multiple';
+export const CREATE_OR_UPDATE_WIDGET_MAPPING ='/api/v1/widget_mapping/create';
+export const DELETE_WIDGET_MAPPING_BY_ID ='/api/v1/widget_mapping/delete?user_id=';
+export const GET_WIDGETS_BY_USER_ID ='/api/v1/widget_mapping/view?user_id=';
 
 // Register Processing
 export const GET_ALL_REGISTER_NAMES='/api/v1/register_processing/view/register/names/multiple';
