@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../style/statsCards.css";
 import "../style/dashboard.css";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Tabs, Tab, Box, CircularProgress } from "@mui/material";
 import GeneralComplianceDashboard from "../dashboards/GeneralComplianceDashboard/GeneralComplianceDashboard";
 import {
     fetchClientOnboardingByCompany,
@@ -25,6 +25,7 @@ import ChallanDashboard from "./challanDashboard/ChallanDashboard";
 import RegisterDashboard from "./registerDashboard/RegisterDashboard";
 import LicenseDashboard from "./licenseDashboard/LicenseDashboard";
 import { decryptData } from "../page/utils/encrypt";
+import { widgetPrefix } from "../page/widgetAccess/widgetCatalog";
 
 // Query params shared by every dashboard tab
 const SHARED_PARAMS = ["tab", "company_name"];
@@ -96,6 +97,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
             label: "Compliance Cockpit",
             slug: "compliance-cockpit",
             title: "Compliance Cockpit",
+            // The by-company cockpit renders CCBC-* widgets, the portfolio one CC-*
+            widgets: selectedCompany !== "" ? "CCBC" : "CC",
             content:
                 selectedCompany !== "" ? (
                     <CockpitComplinceByCompany
@@ -118,6 +121,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
             label: "General Compliance",
             slug: "general-compliance",
             title: "General Compliance",
+            widgets: "GC",
             content: (
                 <GeneralComplianceDashboard data={generalDashboardData}
                     shouldShow={shouldShow}
@@ -135,7 +139,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
             label: "Client Onboarding",
             slug: "client-onboarding",
             title: "Client Onboarding",
-            withoutWidgets: true, // not gated by widget mappings
+            // no `widgets`: not gated by widget mappings, always shown
             content:
                 selectedCompany === "" ? (
                     <ClientOnbordingDashboard
@@ -157,6 +161,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
     tabsList.push(
         {
             label: "Registers",
+            widgets: "RG",
             slug: "register",
             title: "Register Dashboard",
             content: (
@@ -170,6 +175,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Returns & Submissions",
+            widgets: "RT",
             slug: "returns-submissions",
             title: "Payroll - Returns & Submissions",
             content: (
@@ -183,6 +189,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Challan",
+            widgets: "CH",
             slug: "challan",
             title: "Challan Dashboard",
             content: (
@@ -196,6 +203,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Licenses",
+            widgets: "LC",
             slug: "license",
             title: "License Dashboard",
             content: (
@@ -209,6 +217,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Payroll Services",
+            widgets: "PS",
             slug: "payroll-services",
             title: "Payroll",
             content: (
@@ -222,6 +231,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Helpdesk & Escalations",
+            widgets: "HE",
             slug: "helpdesk-escalations",
             title: "Payroll - Helpdesk & Escalations",
             content: (
@@ -236,6 +246,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "General Helpdesk",
+            widgets: "GH",
             slug: "general-helpdesk",
             title: "Payroll - General Helpdesk",
             content: (
@@ -249,6 +260,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Audit & Visits",
+            widgets: "AV",
             slug: "audit-visits",
             title: "Audit & Visits",
             content: (
@@ -262,6 +274,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         },
         {
             label: "Notices & Inspections",
+            widgets: "NI",
             slug: "notices-inspections",
             title: "Notices & Inspections",
             content: (
@@ -276,14 +289,31 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         }
     );
 
-    const activeIndex = Math.max(0, tabsList.findIndex((t) => t.slug === activeSlug));
+    // A dashboard tab is only shown if the user has at least one of its widgets (`widgets` is the
+    // widget id prefix, e.g. "RG" for RG-1..RG-11); tabs without `widgets` are always shown.
+    const widgetPrefixes = new Set(widgetsList.flat().map((item) => widgetPrefix(item?.widget_id)));
+    const visibleTabs = tabsList.filter((t) => !t.widgets || widgetPrefixes.has(t.widgets));
+    const activeIndex = Math.max(0, visibleTabs.findIndex((t) => t.slug === (activeSlug || "compliance-cockpit")));
+    const activeTab = visibleTabs[activeIndex];
+
+    // The tab in the URL (or the default cockpit) isn't available: open the first one that is, so its
+    // dashboard loads (each dashboard only fetches while its slug is the active one)
+    useEffect(() => {
+        if (widgetsLoaded && activeTab && activeTab.slug !== (activeSlug || "compliance-cockpit")) {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.set("tab", activeTab.slug);
+                return next;
+            }, { replace: true });
+        }
+    }, [widgetsLoaded, activeTab, activeSlug, setSearchParams]);
 
     useEffect(() => {
-        setActiveTitle(tabsList[activeIndex]?.title || "");
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- tabsList is rebuilt every render
-    }, [activeIndex, userType]);
+        setActiveTitle(activeTab?.title || "");
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- setActiveTitle is a state setter
+    }, [activeTab?.title]);
 
-    const handleTabChange = (event, newValue) => switchTab(tabsList[newValue].slug);
+    const handleTabChange = (event, newValue) => switchTab(visibleTabs[newValue].slug);
 
     useEffect(() => {
         const fetchGeneralDashboardData = async () => {
@@ -313,8 +343,6 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         fetchClientOnboardingPortfolioData();
     }, [selectedCompany]);
 
-    const noWidgets = widgetsLoaded && !widgetsList.flat().length;
-
     useEffect(() => {
         const fetchWidgetsListData = async () => {
             const [a] = await Promise.allSettled([
@@ -329,6 +357,23 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         };
         fetchWidgetsListData();
     }, [selectedCompany]);
+    // Which tabs exist depends on the widget list, so wait for it rather than flash tabs in and out
+    if (!widgetsLoaded) {
+        return (
+            <div className="d-flex justify-content-center p-5">
+                <CircularProgress size={26} />
+            </div>
+        );
+    }
+
+    if (visibleTabs.length === 0) {
+        return (
+            <div className="alert alert-light border text-center text-muted mt-3 py-4">
+                No widgets assigned. Contact your admin.
+            </div>
+        );
+    }
+
     return (
         <Box sx={{ width: "100%" }}>
             <Tabs
@@ -337,22 +382,15 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
                 variant="scrollable"
                 scrollButtons="auto"
             >
-                {tabsList.map((t, i) => (
-                    <Tab key={i} label={t.label} />
+                {visibleTabs.map((t) => (
+                    <Tab key={t.slug} label={t.label} />
                 ))}
             </Tabs>
 
             <Box sx={{ marginTop: 2 }}>
-                {tabsList.map((tab, index) => (
-                    <TabPanel key={index} value={activeIndex} index={index} keepMounted>
-                        {/* Widgets are gated by shouldShow, so with none (or a failed load) the panel would be blank */}
-                        {noWidgets && !tab.withoutWidgets ? (
-                            <div className="alert alert-light border text-center text-muted py-4">
-                                No widgets assigned. Contact your admin.
-                            </div>
-                        ) : (
-                            tab.content
-                        )}
+                {visibleTabs.map((tab, index) => (
+                    <TabPanel key={tab.slug} value={activeIndex} index={index} keepMounted>
+                        {tab.content}
                     </TabPanel>
                 ))}
             </Box>
