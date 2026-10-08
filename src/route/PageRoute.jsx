@@ -32,6 +32,7 @@ import ChangeForgetPassword from '../page/ChangeForgetPassword.jsx';
 import ResetForgetPasswordSuccessful from '../page/ResetForgetPasswordSuccessful.jsx';
 import NotificationMainPage from '../component/notification/NotificationMainPage.jsx';
 import WidgetAccess from '../page/widgetAccess/WidgetAccess.jsx';
+import ClientOnboarding from '../page/clientOnboarding/ClientOnboarding.jsx';
 import DashboardInternalPage from '../dashboards/dashboardInternalPage/DashboardInternalPage.jsx';
 import RegisterProcessing from '../page/registerProcessing/RegisterProcessing.jsx';
 // import RegisterProcessingV2 from '../page/RegisterProcessing.jsx';
@@ -112,6 +113,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
           />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/widget_access" element={<WidgetAccess />} />
+            <Route path="/client_onboarding" element={<ClientOnboarding />} />
             {/* The old Widget Mappings page is now part of Widget Access */}
             <Route path="/widget_mappings" element={<Navigate to="/widget_access" replace />} />
             <Route path="/create_user_role" element={<UserRolesPage />} />
