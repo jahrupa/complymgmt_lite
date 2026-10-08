@@ -15,9 +15,6 @@ import AddUser from '../page/AddUser';
 import AccessControl from '../page/AccessControl';
 import ServiceTrackers from '../component/ServiceTrackers.jsx';
 import DocumentUpload from '../page/DocumentUpload.jsx';
-import TaggedDocument from '../page/TaggedDocument.jsx';
-import UntaggedDocument from '../page/UntaggedDocument.jsx';
-import PendingDocument from '../page/PendingDocument.jsx';
 import Snackbars from '../component/Snackbars.jsx';
 import ProfileForm from '../page/ProfileForm.jsx';
 import LocationToModule from '../page/LocationToModule.jsx';
@@ -131,9 +128,10 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/access_control" element={<RequirePageAccess page="user_access"><AccessControl /></RequirePageAccess>} />
             <Route path="/service_trackers" element={<RequirePageAccess page="service_tracker"><ServiceTrackers /></RequirePageAccess>} />
             <Route path="/upload_documents" element={<RequirePageAccess page="document_repository"><DocumentUpload /></RequirePageAccess>} />
-            <Route path="/tagged_documents" element={<RequirePageAccess page="document_repository"><TaggedDocument /></RequirePageAccess>} />
-            <Route path="/untagged_documents" element={<RequirePageAccess page="document_repository"><UntaggedDocument /></RequirePageAccess>} />
-            <Route path="/pending_documents" element={<RequirePageAccess page="document_repository"><PendingDocument /></RequirePageAccess>} />
+            {/* Tagged / untagged / pending will be filtered views of the Document Repository */}
+            <Route path="/tagged_documents" element={<Navigate to="/upload_documents" replace />} />
+            <Route path="/untagged_documents" element={<Navigate to="/upload_documents" replace />} />
+            <Route path="/pending_documents" element={<Navigate to="/upload_documents" replace />} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<RequirePageAccess page="location_to_module"><LocationToModule /></RequirePageAccess>} />
