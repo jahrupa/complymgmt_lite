@@ -192,20 +192,24 @@ export default function DashboardDrawerGrid({
       // fetchData(page, pageSize);
     }
   };
-  const dataSource = {
-    getRows: async (params) => {
-      const { startRow, endRow } = params;
-
-      const page = startRow / 20 + 1; // page calculate
-      const limit = 20;
-
-      const response = await fetchPaginatedRecords(page, limit);
-      const rows = response.return?.records;
-      const totalRows = totalPage; // 👈 total count API se lao
-
-      params.successCallback(rows, totalRows);
-    },
-  };
+  // fetchPaginatedRecords(page, limit) returns { records, total } for the module on screen; a new
+  // function (another module picked) gives a new datasource, which restarts the grid from page 1
+  const dataSource = useMemo(
+    () => ({
+      getRows: async (params) => {
+        const page = params.startRow / 20 + 1;
+        try {
+          const response = await fetchPaginatedRecords(page, 20);
+          const rows = (response?.records || []).filter(Boolean);
+          params.successCallback(rows, response?.total ?? totalPage);
+        } catch {
+          params.failCallback();
+        }
+      },
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- totalPage is only a fallback count
+    [fetchPaginatedRecords],
+  );
   return (
     <Drawer
       anchor={anchor}
