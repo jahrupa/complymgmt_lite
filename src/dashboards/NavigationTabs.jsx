@@ -53,6 +53,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
     const [ClientOnBoardingByCompanyData, setClientOnBoardingByCompanyData] = useState([]);
     const [activeDrawer, setActiveDrawer] = useState(null);
     const [widgetsList, setWidgetsList] = useState([]);
+    const [widgetsLoaded, setWidgetsLoaded] = useState(false);
     const [page] = useState(1);
     const [limit] = useState(20);
 
@@ -134,6 +135,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
             label: "Client Onboarding",
             slug: "client-onboarding",
             title: "Client Onboarding",
+            withoutWidgets: true, // not gated by widget mappings
             content:
                 selectedCompany === "" ? (
                     <ClientOnbordingDashboard
@@ -311,6 +313,8 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
         fetchClientOnboardingPortfolioData();
     }, [selectedCompany]);
 
+    const noWidgets = widgetsLoaded && !widgetsList.flat().length;
+
     useEffect(() => {
         const fetchWidgetsListData = async () => {
             const [a] = await Promise.allSettled([
@@ -321,6 +325,7 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
                     ? a.value?.widgets || []
                     : []
             );
+            setWidgetsLoaded(true);
         };
         fetchWidgetsListData();
     }, [selectedCompany]);
@@ -340,7 +345,14 @@ const NavigationTabs = ({ selectedCompany, setSelectedCompany, setActiveTitle })
             <Box sx={{ marginTop: 2 }}>
                 {tabsList.map((tab, index) => (
                     <TabPanel key={index} value={activeIndex} index={index} keepMounted>
-                        {tab.content}
+                        {/* Widgets are gated by shouldShow, so with none (or a failed load) the panel would be blank */}
+                        {noWidgets && !tab.withoutWidgets ? (
+                            <div className="alert alert-light border text-center text-muted py-4">
+                                No widgets assigned. Contact your admin.
+                            </div>
+                        ) : (
+                            tab.content
+                        )}
                     </TabPanel>
                 ))}
             </Box>

@@ -19,6 +19,12 @@ import { decryptData } from "../utils/encrypt";
 import WidgetPreview from "./WidgetPreview";
 import { COMPANY_SCOPED_PREFIXES, groupCatalog, normalizeId, titleCase, widgetPrefix } from "./widgetCatalog";
 
+// Listing, creating and deleting mappings and reading another user's widgets are admin-only on the backend.
+const widgetError = (error, fallback) =>
+    error?.response?.status === 403 || error?.response?.status === 401
+        ? "Access denied. Only admins can manage widget access."
+        : error?.response?.data?.message || fallback;
+
 /**
  * Widget Access: choose which dashboard widgets each user sees. Pick a user, tick widgets (grouped
  * by dashboard) and save; the preview panel shows a live snapshot of the focused widget.
@@ -71,10 +77,11 @@ const WidgetAccess = () => {
         try {
             const data = await fetchAllWidgetMappings(adminId);
             setMappings(Array.isArray(data) ? data : []);
-        } catch {
+        } catch (error) {
             setMappings([]);
+            notify(widgetError(error, "Could not load current widget access"), "error");
         }
-    }, [adminId]);
+    }, [adminId, notify]);
 
     useEffect(() => {
         const load = async () => {
@@ -89,7 +96,8 @@ const WidgetAccess = () => {
             const companyList = companiesRes.status === "fulfilled" && Array.isArray(companiesRes.value) ? companiesRes.value : [];
             setCompanies(companyList.map((c) => c.company_name).filter(Boolean));
             setPreviewCompany((prev) => prev || companyList[0]?.company_name || "");
-            if (catalogRes.status === "rejected") notify("Could not load the widget list", "error");
+            if (catalogRes.status === "rejected") notify(widgetError(catalogRes.reason, "Could not load the widget list"), "error");
+            else if (usersRes.status === "rejected") notify(widgetError(usersRes.reason, "Could not load users"), "error");
             await loadMappings();
             setLoadingPage(false);
         };
@@ -123,9 +131,12 @@ const WidgetAccess = () => {
             const ids = new Set((res?.widgets || []).map((w) => normalizeId(w.widget_id)).filter((wid) => catalogIds.has(wid)));
             setInitial(ids);
             setSelected(new Set(ids));
-        } catch {
+        } catch (error) {
+            // Don't show the user as having no widgets: saving that would wipe their real access
+            setTargetId("");
             setInitial(new Set());
             setSelected(new Set());
+            notify(widgetError(error, "Could not load this user's widgets"), "error");
         } finally {
             setLoadingUser(false);
         }
@@ -164,7 +175,7 @@ const WidgetAccess = () => {
             setInitial(new Set(selected));
             await loadMappings();
         } catch (error) {
-            notify(error?.response?.data?.message || "Could not save widget access", "error");
+            notify(widgetError(error, "Could not save widget access"), "error");
         } finally {
             setSaving(false);
         }
@@ -180,7 +191,7 @@ const WidgetAccess = () => {
             setSelected(new Set());
             await loadMappings();
         } catch (error) {
-            notify(error?.response?.data?.message || "Could not remove widget access", "error");
+            notify(widgetError(error, "Could not remove widget access"), "error");
         } finally {
             setSaving(false);
         }
