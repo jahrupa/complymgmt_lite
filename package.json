@@ -30,6 +30,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "docx-preview": "^0.4.0",
+    "jszip": "^3.10.2",
     "lucide": "^0.525.0",
     "lucide-react": "^0.525.0",
     "react": "^19.0.0",
