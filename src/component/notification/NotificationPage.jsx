@@ -26,6 +26,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Snackbars from '../Snackbars.jsx';
 import { Box, Tab, Tabs } from '@mui/material';
 import { decryptData } from '../../page/utils/encrypt.js';
+import { countUnread } from './notificationUtils';
 
 dayjs.extend(relativeTime);
 
@@ -109,7 +110,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
         setError(null);
         const response = await getInAppNotification(SystemUserId || "");
         setAllNotifications(response || []);
-        setUnreadCountNotification(response?.length || 0);
+        setUnreadCountNotification(countUnread(response));
       } catch (err) {
         setError(err.message || 'Something went wrong');
       } finally {
@@ -123,7 +124,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
   const refreshCount = async () => {
     try {
       const res = await getInAppNotification(SystemUserId || "");
-      setUnreadCountNotification(res?.length || 0);
+      setUnreadCountNotification(countUnread(res));
     } catch {
       // keep the old count
     }
@@ -225,7 +226,7 @@ const NotificationPage = ({setUnreadCountNotification}) => {
       setAllNotifications([]);
       setOpenMenuId(null);
       const res = await getInAppNotification(SystemUserId || "");
-      setUnreadCountNotification(res?.length || 0);
+      setUnreadCountNotification(countUnread(res));
     } catch (error) {
       setIsSnackbarsOpen({
         ...issnackbarsOpen,

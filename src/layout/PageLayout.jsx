@@ -5,6 +5,7 @@ import NavBar from '../component/NavBar'
 import NotificationPage from '../component/notification/NotificationPage';
 import { getInAppNotification } from '../api/service';
 import { decryptData } from '../page/utils/encrypt';
+import { countUnread } from '../component/notification/notificationUtils';
 
 const PageLayout = ({
   sidebarOpen,
@@ -25,7 +26,7 @@ const PageLayout = ({
          const fetchNotifications = async () => {
            try {
              const response = await getInAppNotification(SystemUserId || "");
-             setUnreadCountNotification(response?.length || 0);
+             setUnreadCountNotification(countUnread(response));
            } catch {
              // handle error silently
            }
