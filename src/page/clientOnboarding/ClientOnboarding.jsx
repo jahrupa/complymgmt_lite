@@ -1,29 +1,18 @@
 import React, { useCallback, useRef, useState } from "react";
 import { CircularProgress } from "@mui/material";
-import { Download, FileSpreadsheet, UploadCloud, X } from "lucide-react";
+import { Download } from "lucide-react";
 import "../../style/clientOnboardingUpload.css";
 import { downloadClientOnboardingTemplate, uploadClientOnboardingFile } from "../../api/service";
 import Snackbars from "../../component/Snackbars";
 import DeleteModal from "../../component/DeleteModal";
+import FileDropzone from "../../component/FileDropzone";
 import { usePageAccess } from "../utils/usePageAccess";
 import OnboardingResults from "./OnboardingResults";
-import { ACCEPTED_EXT, downloadBlob, formatFileSize, isAcceptedFile, totalCreated } from "./onboardingUtils";
+import { apiErrorMessage, downloadBlob } from "../utils/bulkUpload";
+import { ACCEPTED_EXT, totalCreated } from "./onboardingUtils";
 
-// Pulls the server's message out of an axios error; blob requests return their error body as a Blob.
-const errorMessage = async (error, fallback) => {
-    const status = error?.response?.status;
-    if (status === 403) return "Access denied — you don't have permission for client onboarding.";
-    if (status === 401) return "Your session has expired. Please log in again.";
-    let data = error?.response?.data;
-    if (data instanceof Blob) {
-        try {
-            data = JSON.parse(await data.text());
-        } catch {
-            data = null;
-        }
-    }
-    return data?.message || fallback;
-};
+const errorMessage = (error, fallback) =>
+    apiErrorMessage(error, fallback, "Access denied — you don't have permission for client onboarding.");
 
 /**
  * Client Onboarding: bulk-create groups, companies, entities, locations, modules and
@@ -33,10 +22,8 @@ const ClientOnboarding = () => {
     const { loading: accessLoading, canView, canCreate } = usePageAccess("client_onboarding");
 
     const [file, setFile] = useState(null);
-    const [dragOver, setDragOver] = useState(false);
     const [busy, setBusy] = useState(null); // "template" | "preview" | "import" | null
     const busyRef = useRef(false);
-    const inputRef = useRef(null);
 
     const [result, setResult] = useState(null);
     const [mode, setMode] = useState(null); // "preview" | "import"
@@ -70,11 +57,7 @@ const ClientOnboarding = () => {
     };
 
     const selectFile = (picked) => {
-        if (busyRef.current || !picked) return;
-        if (!isAcceptedFile(picked)) {
-            notify(`Unsupported file type. Please upload a ${ACCEPTED_EXT.join(", ")} file.`, "error");
-            return;
-        }
+        if (busyRef.current) return;
         setFile(picked);
         setResult(null);
         setMode(null);
@@ -89,22 +72,6 @@ const ClientOnboarding = () => {
         setMode(null);
         setPreviewedFile(null);
         setRequestError("");
-    };
-
-    const handleInputChange = (e) => {
-        selectFile(e.target.files?.[0]);
-        e.target.value = ""; // allow picking the same file again after removing it
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setDragOver(false);
-        if (!canCreate) return;
-        if (e.dataTransfer.files.length > 1) {
-            notify("Please upload one file at a time.", "error");
-            return;
-        }
-        selectFile(e.dataTransfer.files[0]);
     };
 
     const handleDownloadTemplate = () =>
@@ -221,54 +188,14 @@ const ClientOnboarding = () => {
 
                     {canCreate ? (
                         <>
-                            <div
-                                className={`client-onboarding-dropzone ${dragOver ? "drag-over" : ""} ${busy ? "disabled" : ""}`}
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => !busy && inputRef.current?.click()}
-                                onKeyDown={(e) => {
-                                    if ((e.key === "Enter" || e.key === " ") && !busy) inputRef.current?.click();
-                                }}
-                                onDragOver={(e) => {
-                                    e.preventDefault();
-                                    setDragOver(true);
-                                }}
-                                onDragLeave={() => setDragOver(false)}
-                                onDrop={handleDrop}
-                            >
-                                <UploadCloud size={32} className="mb-2" />
-                                <div>
-                                    <strong>Click to choose a file</strong> or drag and drop it here
-                                </div>
-                                <div className="text-muted small">{ACCEPTED_EXT.join(", ")} — one file at a time</div>
-                                <input
-                                    ref={inputRef}
-                                    type="file"
-                                    accept={ACCEPTED_EXT.join(",")}
-                                    hidden
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-
-                            {file && (
-                                <div className="client-onboarding-file">
-                                    <FileSpreadsheet size={20} />
-                                    <div className="client-onboarding-file-name" title={file.name}>
-                                        {file.name}
-                                        <span className="text-muted small ms-2">{formatFileSize(file.size)}</span>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="btn btn-sm btn-link text-danger p-0"
-                                        onClick={removeFile}
-                                        disabled={!!busy}
-                                        aria-label="Remove file"
-                                        title="Remove file"
-                                    >
-                                        <X size={18} />
-                                    </button>
-                                </div>
-                            )}
+                            <FileDropzone
+                                file={file}
+                                accept={ACCEPTED_EXT}
+                                disabled={!!busy}
+                                onSelect={selectFile}
+                                onRemove={removeFile}
+                                onError={(message) => notify(message, "error")}
+                            />
 
                             <div className="d-flex flex-wrap gap-2 mt-3">
                                 <button

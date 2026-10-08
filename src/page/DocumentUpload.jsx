@@ -47,7 +47,7 @@ import { flattenObject } from "../../Utils/tableColUtils";
 import MonthYearCalander from "../component/MonthYearCalander";
 import { decryptData } from "./utils/encrypt";
 import { zipDocuments } from "./utils/bulkDownload";
-import { downloadBlob } from "./clientOnboarding/onboardingUtils";
+import { downloadBlob } from "./utils/bulkUpload";
 
 // Every file is held in memory while the zip is built, so keep a ceiling
 const MAX_BULK_DOWNLOAD = 100;

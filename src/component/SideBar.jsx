@@ -16,7 +16,7 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { AlignCenterVertical, FileSpreadsheet, Layers, ScanEye } from 'lucide-react';
+import { AlignCenterVertical, FileSpreadsheet, Layers, ScanEye, Tags } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
 import { usePageAccess } from '../page/utils/usePageAccess';
 export const RegisterApplicabilityIcon = ({ active }) => (
@@ -78,6 +78,7 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
     const [openDropdown, setOpenDropdown] = useState(null);
     const userRole = decryptData(localStorage.getItem("user_role"));
     const clientOnboardingAccess = usePageAccess('client_onboarding');
+    const bulkTaggingAccess = usePageAccess('document_bulk_tagging');
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
         { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
@@ -90,6 +91,9 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents' },
+        ...(bulkTaggingAccess.canView
+            ? [{ icon: (active) => <Tags className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Bulk Document Tagging', link: 'document_bulk_tagging' }]
+            : []),
         ...(clientOnboardingAccess.canView
             ? [{ icon: (active) => <FileSpreadsheet className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Client Onboarding', link: 'client_onboarding' }]
             : []),

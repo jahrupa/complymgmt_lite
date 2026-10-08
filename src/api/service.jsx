@@ -242,6 +242,8 @@ import {
   UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID,
   CLIENT_ONBOARDING_TEMPLATE,
   CLIENT_ONBOARDING_UPLOAD,
+  DOCUMENT_BULK_TAGGING_TEMPLATE,
+  DOCUMENT_BULK_TAGGING_UPLOAD,
 
 
 } from "./Endpoint";
@@ -2851,6 +2853,31 @@ export const uploadClientOnboardingFile = async (file, dryRun) => {
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// DOCUMENT BULK TAGGING
+export const downloadDocumentBulkTaggingTemplate = async () => {
+  try {
+    const response = await API.get(DOCUMENT_BULK_TAGGING_TEMPLATE, { responseType: "blob" });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// dryRun=true reports what would change without writing; dryRun=false applies it and emails a report.
+export const uploadDocumentBulkTaggingFile = async (file, dryRun) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await API.post(DOCUMENT_BULK_TAGGING_UPLOAD, formData, {
+      params: { dry_run: dryRun ? "true" : "false" },
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
   } catch (error) {
     throw error;
