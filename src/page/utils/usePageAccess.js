@@ -67,8 +67,24 @@ const accessFromGrants = (grants, pageName, userId) => {
   };
 };
 
+// Mirrors common.CheckAccess on the backend for a single record (e.g. one service tracker): any
+// active, non-deleted grant for this user on that entity id with the permission flag set.
+const entityAccessFromGrants = (grants, entityId, userId) => {
+  if (!grants) return FULL_ACCESS; // grants unknown: don't hide, the server still answers 403
+  const matching = grants.filter(
+    (g) => g.EntityId === entityId && (!g.UserId || g.UserId === userId) && g.IsActive && !g.IsDeleted
+  );
+  return {
+    canView: matching.some((g) => g.view),
+    canCreate: matching.some((g) => g.create),
+    canUpdate: matching.some((g) => g.update),
+    canDelete: matching.some((g) => g.delete),
+  };
+};
+
 /**
- * Loads the logged-in user's page grants once and returns `accessFor(pageName)`.
+ * Loads the logged-in user's page grants once and returns `accessFor(pageName)` and
+ * `entityAccessFor(entityId)`.
  * Admin / Super-Admin always get full access. While loading, everything is denied.
  */
 export const usePageAccessResolver = () => {
@@ -100,7 +116,16 @@ export const usePageAccessResolver = () => {
     [isAdmin, state]
   );
 
-  return { loading: state.loading, accessFor };
+  const entityAccessFor = useCallback(
+    (entityId) => {
+      if (isAdmin) return FULL_ACCESS;
+      if (state.loading || !entityId) return NO_ACCESS;
+      return entityAccessFromGrants(state.grants, entityId, state.userId);
+    },
+    [isAdmin, state]
+  );
+
+  return { loading: state.loading, accessFor, entityAccessFor };
 };
 
 /**
@@ -110,4 +135,13 @@ export const usePageAccessResolver = () => {
 export const usePageAccess = (pageName) => {
   const { loading, accessFor } = usePageAccessResolver();
   return { loading, ...accessFor(pageName) };
+};
+
+/**
+ * Permissions on one record, e.g. useEntityAccess("service_tracker", trackerId). The backend
+ * matches tracker grants by entity id only (ids are unique), so entityType just documents intent.
+ */
+export const useEntityAccess = (entityType, entityId) => {
+  const { loading, entityAccessFor } = usePageAccessResolver();
+  return { loading, ...entityAccessFor(entityId) };
 };

@@ -22,6 +22,8 @@ export const CREATE_COMPANY ='/api/v1/company/create';
 export const UPDATE_COMPANY_BY_ID ='/api/v1/company/update/';
 export const UPDATE_COMPANY_STATUS_BY_ID='/api/v1/company/update/status/';
 export const GET_ALL_COMPANY ='/api/v1/company/view/multiple';
+// The user's companies for the dashboard filter; no company page grant needed
+export const GET_DASHBOARD_COMPANIES = '/api/v1/dashboard/view/companies';
 export const DELETE_COMPANY_BY_ID ='/api/v1/company/delete/';
 export const GET_ALL_COMPANY_NAME ='/api/v1/company/view/names/multiple';
 export const GET_COMPANY_NAME_BY_GROUP_ID ='/api/v1/company/view/group/multiple/';
@@ -86,7 +88,9 @@ export const GET_ALL_SERVICE_TRACKER_SHEET_DATA ='/api/v1/service_tracker/view';
 export const UPDATE_SERVICE_TRACKER_APPROVAL_STATUS_BY_ID = '/api/v1/service_tracker/update/approval_status/';
 export const GET_SERVICE_TRACKER_BY_SUBMODULE_ID = '/api/v1/service_tracker/view/sub_module_id/multiple/';
 export const GET_SERVICE_TRACKER_BY_MODULE_ID = '/api/v1/service_tracker/view/tracker_by_module/';
-export const APPEND_TRACKER='api/v1/client_master/append/tracker?tracker_name=';
+// Tracker data: `${UPLOAD_TRACKER_DATA}/<tracker>/upload?mode=append|replace` and `${CREATE_TRACKER_RECORD}/<tracker>/data`
+export const UPLOAD_TRACKER_DATA = '/api/v1/service_tracker/create';
+export const CREATE_TRACKER_RECORD = '/api/v1/service_tracker/create';
 // Location To Module
 export const GET_ALL_LOCATION_TO_MODULE='/api/v1/location_to_module/view/multiple';
 export const CREATE_LOCATION_TO_MODULE='/api/v1/location_to_module/create';
@@ -98,7 +102,6 @@ export const UPDATE_LOCATION_TO_MODULES_APPROVAL_STATUS_BY_ID='/api/v1/location_
 // File Upload
 export const AUTO_FILE_UPLOAD_PYTHON='/classify-files';
 export const AUTO_FILE_UPLOAD_GOLANG='/api/v1/document_repository/create/file';
-export const UPLOAD_EXCEL='/api/v1/tracker/upload_tracker/excel';
 export const GET_ALL_FILES='/api/v1/document_repository/view/files';
 export const DELETE_FILE_ID='/api/v1/document_repository/delete/file/';
 export const UPDATE_FILE='/api/v1/document_repository/update/file/';

@@ -61,7 +61,6 @@ import {
   CREATE_USER_ACCESS_LEVEL,
   UPDATE_USER_ACCESS_LEVEL,
   DELETE_USER_ACCESS_LEVEL,
-  UPLOAD_EXCEL,
   GET_ALL_INNER_PAGE_SERVICE_TRACKER,
   GET_ALL_SERVICE_TRACKER_NAME,
   GET_ALL_SERVICE_TRACKER_FIELDS,
@@ -206,7 +205,9 @@ import {
   CREATE_OR_UPDATE_WIDGET_MAPPING,
   DELETE_WIDGET_MAPPING_BY_ID,
   GET_WIDGETS_BY_USER_ID,
-  APPEND_TRACKER,
+  UPLOAD_TRACKER_DATA,
+  CREATE_TRACKER_RECORD,
+  GET_DASHBOARD_COMPANIES,
   COMPANY_WISE_ACCESS,
   GET_ALL_REGISTER_NAMES,
   GET_REGISTER_MAPPING,
@@ -260,6 +261,16 @@ export const loginApi = async (loginPayload) => {
 }
 
 // Company Api
+// Companies for the dashboard filter, limited to the user's own (no company page grant needed)
+export const fetchDashboardCompanies = async () => {
+  try {
+    const response = await API.get(GET_DASHBOARD_COMPANIES);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const fetchAllCompanies = async () => {
   try {
     const response = await API.get(GET_ALL_COMPANY);
@@ -807,13 +818,32 @@ export const fetchAllInnerPageServiceTracker = async (trackerName, sheetName) =>
   }
 };
 
-export const appendServiceTrackerInnerPageDAta = async (trackerName) => {
+// mode "append" adds the file's rows; "replace" archives and replaces only the rows of the
+// sheets in the file (other sheets are kept). The uploader comes from the token.
+export const uploadTrackerFile = async (trackerName, file, mode) => {
   try {
-    const url = `${APPEND_TRACKER}${encodeURIComponent(trackerName)}}`;
-    const response = await API.post(url);
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await API.post(
+      `${UPLOAD_TRACKER_DATA}/${encodeURIComponent(trackerName)}/upload`,
+      formData,
+      { params: { mode }, headers: { "Content-Type": "multipart/form-data" } }
+    );
     return response.data;
   } catch (error) {
-    // console.error("Error fetching inner page service tracker:", error);
+    throw error;
+  }
+};
+
+// One new row: sheetName is required (stored lower-cased, may be new); data maps column -> value
+export const createTrackerRecord = async (trackerName, sheetName, data) => {
+  try {
+    const response = await API.post(
+      `${CREATE_TRACKER_RECORD}/${encodeURIComponent(trackerName)}/data`,
+      { sheet_name: sheetName, data }
+    );
+    return response.data;
+  } catch (error) {
     throw error;
   }
 };
@@ -1070,56 +1100,6 @@ export const uploadFileGolang = async (filesArray, isAutoUpload) => {
 //   }
 // };
 
-export const uploadExcelFile = async (filesArray, metadata = {}) => {
-  try {
-    const formData = new FormData();
-
-    filesArray.forEach((file) => {
-      formData.append("file", file);
-    });
-
-    // Append other fields
-    Object.entries(metadata).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
-    const response = await API.post(UPLOAD_EXCEL, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    // console.error("Upload failed:", error.response?.data || error);
-    throw error;
-  }
-};
-export const appendExcelFile = async (filesArray, metadata = {}) => {
-  try {
-    const formData = new FormData();
-
-    filesArray.forEach((file) => {
-      formData.append("file", file);
-    });
-
-    // Append other fields
-    Object.entries(metadata).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
-    const response = await API.post(`${APPEND_TRACKER}${encodeURIComponent(metadata.tracker_name)}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    // console.error("Upload failed:", error.response?.data || error);
-    throw error;
-  }
-};
 export const deleteFileById = async (id) => {
   try {
     const response = await API.delete(`${DELETE_FILE_ID}${id}`);
