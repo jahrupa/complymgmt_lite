@@ -128,10 +128,10 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/access_control" element={<RequirePageAccess page="user_access"><AccessControl /></RequirePageAccess>} />
             <Route path="/service_trackers" element={<RequirePageAccess page="service_tracker"><ServiceTrackers /></RequirePageAccess>} />
             <Route path="/upload_documents" element={<RequirePageAccess page="document_repository"><DocumentUpload /></RequirePageAccess>} />
-            {/* Tagged / untagged / pending will be filtered views of the Document Repository */}
-            <Route path="/tagged_documents" element={<Navigate to="/upload_documents" replace />} />
-            <Route path="/untagged_documents" element={<Navigate to="/upload_documents" replace />} />
-            <Route path="/pending_documents" element={<Navigate to="/upload_documents" replace />} />
+            {/* Tagged / untagged / pending are views (tabs) of the Document Repository */}
+            <Route path="/tagged_documents" element={<Navigate to="/upload_documents?view=tagged" replace />} />
+            <Route path="/untagged_documents" element={<Navigate to="/upload_documents?view=untagged" replace />} />
+            <Route path="/pending_documents" element={<Navigate to="/upload_documents?view=pending" replace />} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
             <Route path="/location_to_module" element={<RequirePageAccess page="location_to_module"><LocationToModule /></RequirePageAccess>} />

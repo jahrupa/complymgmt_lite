@@ -1129,11 +1129,12 @@ export const deleteFileById = async (id) => {
     throw error;
   }
 };
-export const fetchAllFiles = async (page, limit, search) => {
+// filters: extra query params, e.g. { tagged: "false" } or { approval_status: 0 }
+export const fetchAllFiles = async (page, limit, search, filters = {}) => {
   try {
     const response = await API.get(GET_ALL_FILES, {
       // axios leaves out params that are undefined
-      params: { page, limit, search: search?.trim() || undefined },
+      params: { page, limit, search: search?.trim() || undefined, ...filters },
     });
     // The record count comes back in the X-Total-Count header, not in the body
     const total = Number(response.headers?.["x-total-count"]);

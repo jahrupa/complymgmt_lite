@@ -10,6 +10,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
+import { useSearchParams } from "react-router-dom";
+import { Tab, Tabs } from "@mui/material";
 import Toggle from "../component/Toggle";
 import { usePageAccess } from "./utils/usePageAccess";
 import {
@@ -53,7 +55,34 @@ import { downloadBlob } from "./utils/bulkUpload";
 // Every file is held in memory while the zip is built, so keep a ceiling
 const MAX_BULK_DOWNLOAD = 100;
 
+// Views of the repository, kept in the URL (?view=) so /tagged_documents etc. can link to them.
+// "Tagged" means company, entity, location, module, document type and stage are all filled (backend rule).
+const VIEWS = [
+  { key: "all", label: "All", params: {} },
+  { key: "tagged", label: "Tagged", params: { tagged: "true" } },
+  { key: "untagged", label: "Untagged", params: { tagged: "false" } },
+  { key: "pending", label: "Pending approval", params: { approval_status: 0 } },
+];
+
 const DocumentUpload = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view = VIEWS.find((v) => v.key === searchParams.get("view")) || VIEWS[0];
+  const fetchViewPage = useCallback(
+    (page, limit, search) => fetchAllFiles(page, limit, search, view.params),
+    [view],
+  );
+  const changeView = (key) => {
+    setSelectedDocs([]); // the grid remounts for the new view, dropping its selection
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (key === "all") next.delete("view");
+        else next.set("view", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
   // Hide or disable actions the user's document_repository grant doesn't allow
   const { canCreate, canUpdate, canDelete } = usePageAccess("document_repository");
   // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
@@ -1592,6 +1621,17 @@ const DocumentUpload = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
+        <Tabs
+          value={view.key}
+          onChange={(_, key) => changeView(key)}
+          variant="scrollable"
+          scrollButtons="auto"
+          className="mb-2"
+        >
+          {VIEWS.map((v) => (
+            <Tab key={v.key} value={v.key} label={v.label} />
+          ))}
+        </Tabs>
         <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
@@ -1615,8 +1655,9 @@ const DocumentUpload = () => {
 
         <div style={{ marginTop: "1rem" }}>
           <PaginatedGrid
+            key={view.key} // a new view is a new result set: start again from page 1
             ref={gridRef}
-            fetchPage={fetchAllFiles}
+            fetchPage={fetchViewPage}
             search={search}
             rowFilter={rowFilter}
             onPageLoaded={setData}
