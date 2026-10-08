@@ -31,7 +31,7 @@ import {
   downloadFile,
   fetchEntityById,
   getAllCompanyLocationByEntityId,
-  // updateDocumentApprovalStatusById,
+  updateDocumentApprovalStatusById,
 } from "../api/service";
 import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
@@ -375,12 +375,12 @@ const DocumentUpload = () => {
       });
     }
   };
+  // With an id (a row's Mongo _id) approves that document only; without one, every pending document
   const handleApproveAll = async (id) => {
     try {
-      const response = await bulkApproveAllPageData("document_repository");
-      // const response = id
-      //   ? await updateDocumentApprovalStatusById(id, 1)
-      //   : await bulkApproveAllPageData("document_repository");
+      const response = id
+        ? await updateDocumentApprovalStatusById(id, 1)
+        : await bulkApproveAllPageData("document_repository");
       const message = response?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
@@ -897,7 +897,7 @@ const DocumentUpload = () => {
                 height: 15,
                 accentColor: "orange",
               }}
-              onChange={() => handleApproveAll(params.data.document_id)}
+              onChange={() => handleApproveAll(params.data._id)}
             />
             <span
               style={{
