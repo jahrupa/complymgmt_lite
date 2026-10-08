@@ -35,6 +35,7 @@ import Snackbars from "../component/Snackbars";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import PaginatedGrid from "../component/PaginatedGrid";
+import PageSelectHeader from "../component/PageSelectHeader";
 import MultiFileUpload from "../component/MultiFileUpload";
 import RightDrawer from "../component/RightDrawer";
 import { ReactPDFViewer } from "../component/ReactPDFViewer";
@@ -45,6 +46,11 @@ import MultiSelectFilter from "./dashboardDrawerGridDetailPage/MultiSelectFilter
 import { flattenObject } from "../../Utils/tableColUtils";
 import MonthYearCalander from "../component/MonthYearCalander";
 import { decryptData } from "./utils/encrypt";
+import { zipDocuments } from "./utils/bulkDownload";
+import { downloadBlob } from "./clientOnboarding/onboardingUtils";
+
+// Every file is held in memory while the zip is built, so keep a ceiling
+const MAX_BULK_DOWNLOAD = 100;
 
 const DocumentUpload = () => {
   // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
@@ -129,7 +135,10 @@ const DocumentUpload = () => {
   const [documentDropdownTypes, setDocumentDropdownTypes] = useState([]);
   const [documentDropdownStages, setDocumentDropdownStages] = useState([]);
   const searchTimerRef = useRef(null);
-  
+  const [selectedDocs, setSelectedDocs] = useState([]);
+  // { done, total } while a bulk download is running, otherwise null
+  const [bulkProgress, setBulkProgress] = useState(null);
+
   const validate = () => {
     let tempErrors = {};
     if (!current?.group_name)
@@ -516,6 +525,63 @@ const DocumentUpload = () => {
       getDocumentDropdownStages(current?.service_tracker_name);
     }
   }, [current?.service_tracker_name]);
+
+  const handleBulkDownload = async () => {
+    if (!selectedDocs.length || bulkProgress) return;
+    if (selectedDocs.length > MAX_BULK_DOWNLOAD) {
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: `You can download at most ${MAX_BULK_DOWNLOAD} files at a time.`,
+        severityType: "warning",
+      });
+      return;
+    }
+
+    const docs = selectedDocs.map(({ document_id, file_name }) => ({
+      document_id,
+      file_name,
+    }));
+    setBulkProgress({ done: 0, total: docs.length });
+    try {
+      // A single file doesn't need a zip around it
+      if (docs.length === 1) {
+        const blob = await downloadFile(docs[0].document_id);
+        downloadBlob(blob, docs[0].file_name || "document");
+        return;
+      }
+
+      const { zip, failed } = await zipDocuments(docs, (done, total) =>
+        setBulkProgress({ done, total }),
+      );
+      if (zip) {
+        const date = new Date().toISOString().slice(0, 10);
+        downloadBlob(zip, `documents_${date}.zip`);
+      }
+
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: !failed.length
+          ? `Downloaded ${docs.length} files`
+          : zip
+            ? `Downloaded ${docs.length - failed.length} of ${docs.length} files. Failed: ${failed
+                .map((d) => d.file_name || d.document_id)
+                .join(", ")}`
+            : "Download failed. Please try again.",
+        severityType: !failed.length ? "success" : zip ? "warning" : "error",
+      });
+    } catch (error) {
+      setIsSnackbarsOpen({
+        ...issnackbarsOpen,
+        open: true,
+        message: error?.response?.data?.message || "Download failed. Please try again.",
+        severityType: "error",
+      });
+    } finally {
+      setBulkProgress(null);
+    }
+  };
 
   const getRoleColorForFileStatus = (status) => {
     switch (status) {
@@ -1524,6 +1590,17 @@ const DocumentUpload = () => {
             onInput={onFilterTextBoxChanged}
           />
           <MultiSelectFilter rowData={data} onFilterApply={handleFilterApply} />
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 ms-auto"
+            onClick={handleBulkDownload}
+            disabled={!selectedDocs.length || !!bulkProgress}
+          >
+            <Download size={16} />
+            {bulkProgress
+              ? `Downloading ${bulkProgress.done}/${bulkProgress.total}...`
+              : `Download selected${selectedDocs.length ? ` (${selectedDocs.length})` : ""}`}
+          </button>
         </div>
 
         <div style={{ marginTop: "1rem" }}>
@@ -1537,7 +1614,19 @@ const DocumentUpload = () => {
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
             editType="fullRow"
-            rowSelection="single"
+            // AG Grid's header checkbox isn't supported by the infinite row
+            // model, so PageSelectHeader selects the current page instead;
+            // getRowId keeps the selection across page changes and refreshes.
+            rowSelection={{
+              mode: "multiRow",
+              headerCheckbox: false,
+              enableClickSelection: false,
+            }}
+            selectionColumnDef={{ headerComponent: PageSelectHeader }}
+            getRowId={(params) => String(params.data.document_id)}
+            onSelectionChanged={(e) =>
+              setSelectedDocs(e.api.getSelectedRows())
+            }
             onRowValueChanged={onRowValueChanged}
           />
         </div>
