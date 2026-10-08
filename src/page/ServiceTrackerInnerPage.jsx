@@ -18,12 +18,24 @@ import DeleteModal from '../component/DeleteModal';
 import Modal from '../component/Modal';
 import SingleSelectTextField from '../component/MuiInputs/SingleSelectTextField';
 import { decryptData } from './utils/encrypt';
+import { usePageAccess } from './utils/usePageAccess';
 import MultiSelectFilter from './dashboardDrawerGridDetailPage/MultiSelectFilter';
 
 // Register modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+// Internal fields set by the backend on every record; not data the user should see or edit
+const HIDDEN_TRACKER_FIELDS = ['sheet'];
+
+const titleCaseSheet = (name) => String(name ?? '').replace(/\b\w/g, (c) => c.toUpperCase());
+
 const ServiceTrackerInnerPage = () => {
+    // Record edits, deletes (soft, via is_deleted), toggles and approvals are all PUTs, so the server
+    // checks service_tracker "update" for them; uploads add records ("create").
+    const { canCreate, canUpdate } = usePageAccess('service_tracker');
+    // Grid cell renderers are built inside async fetches, so they read the latest value from a ref
+    const canUpdateRef = useRef(canUpdate);
+    canUpdateRef.current = canUpdate;
     const { trackerName, id } = useParams();
     const [rowData, setRowData] = useState([]);
     const [columnDefs, setColumnDefs] = useState([]);
@@ -101,7 +113,7 @@ const ServiceTrackerInnerPage = () => {
             };
             const response = await updateServiceTrackerData(userId, formattedTrackerName, deletePayload);
             const message = response?.message || "Deleted successfully";
-            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name);
             setRowData(updatedData);
             setIsDeleteModalOpen(false);
             setIsSnackbarsOpen({
@@ -134,7 +146,7 @@ const ServiceTrackerInnerPage = () => {
             };
             const response = await updateServiceTrackerData(userId, formattedTrackerName, updatedPayload);
             const message = response?.message || "Status updated";
-            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name);
             setRowData(updatedData);
             setIsSnackbarsOpen({
                 open: true,
@@ -172,7 +184,7 @@ const ServiceTrackerInnerPage = () => {
             const response = await fetchAllInnerPageServiceTracker(trackerName, sheetName);
             setRowData(response || []);
             const dataSample = response?.[0] || {};
-            const dynamicCols = Object.keys(dataSample).map((key) => {
+            const dynamicCols = Object.keys(dataSample).filter((key) => !HIDDEN_TRACKER_FIELDS.includes(key)).map((key) => {
                 if (key === 'approval_status' && dataSample.approval_status !== undefined) {
                     return {
                         field: 'approval_status',
@@ -223,6 +235,7 @@ const ServiceTrackerInnerPage = () => {
                             <Toggle
                                 checked={!!params.value}
                                 onChange={(e) => handleToggleChange(e, params.data._id)}
+                                disabled={!canUpdateRef.current}
                             />
                         )
                     };
@@ -245,7 +258,7 @@ const ServiceTrackerInnerPage = () => {
                 cellStyle: { 'background-color': 'rgb(252 229 205 / 64%)' },
                 filter: false,
                 editable: false,
-                cellRenderer: (params) => (
+                cellRenderer: (params) => !canUpdateRef.current ? null : (
                     <div className="d-flex gap-2">
                         <button className="btn btn-sm" onClick={() => {
                             setEditData(params.data);
@@ -340,6 +353,7 @@ const ServiceTrackerInnerPage = () => {
             Object.keys(rowData[0]).forEach((key) => {
                 emptyObj[key] = '';
             });
+            if ('sheet' in emptyObj) emptyObj.sheet = current?.sheet_name || '';
             setAddData(emptyObj);
         }
 
@@ -410,9 +424,9 @@ const ServiceTrackerInnerPage = () => {
                 message,
                 severityType: 'success',
             });
-            const responseData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            const responseData = await fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name);
             setRowData(responseData || []);
-            await fetchAndSetTrackerData(formattedTrackerName);
+            await fetchAndSetTrackerData(formattedTrackerName, current?.sheet_name);
         } catch (error) {
             setIsSnackbarsOpen({
                 ...issnackbarsOpen,
@@ -428,7 +442,7 @@ const ServiceTrackerInnerPage = () => {
         try {
             const response = await updateServiceTrackerData(trackerId, formattedTrackerName, editData);
             const message = response?.message || "Tracker updated successfully";
-            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name);
             setRowData(updatedData);
             setIsSnackbarsOpen({
                 open: true,
@@ -460,7 +474,7 @@ const ServiceTrackerInnerPage = () => {
 
             const message = response?.message || 'Record added successfully';
 
-            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName);
+            const updatedData = await fetchAllInnerPageServiceTracker(formattedTrackerName, current?.sheet_name);
             setRowData(updatedData);
 
             setIsSnackbarsOpen({
@@ -577,6 +591,7 @@ const ServiceTrackerInnerPage = () => {
                                 'deleted_by',
                                 'is_deleted',
                                 'is_active',
+                                ...HIDDEN_TRACKER_FIELDS,
                             ].includes(key)
                         ) {
                             return null;
@@ -667,6 +682,7 @@ const ServiceTrackerInnerPage = () => {
                                 'deleted_by',
                                 'is_deleted',
                                 'is_active',
+                                ...HIDDEN_TRACKER_FIELDS,
                             ].includes(key)
                         ) {
                             return null;
@@ -775,7 +791,8 @@ const ServiceTrackerInnerPage = () => {
 
             // Set sheet data
             if (serviceTrackerSheetResult.status === 'fulfilled') {
-                const sheets = serviceTrackerSheetResult.value;
+                // The API returns sheets in random order; sort so the default sheet is stable
+                const sheets = [...(serviceTrackerSheetResult.value || [])].sort((a, b) => String(a?.name).localeCompare(String(b?.name)));
                 setServiceTrackerSheet(sheets);
 
                 // If no sheet is selected yet, default to the first one
@@ -946,6 +963,7 @@ const ServiceTrackerInnerPage = () => {
                     </div>
                 </div>
                 <div className='d-lg-flex d-md-flex gap-2 mt-2'>
+                    {canCreate && (
                     <div style={{ width: '250px' }}>
                         <SingleSelectTextField
                             name="sheet_upload_type"
@@ -973,6 +991,7 @@ const ServiceTrackerInnerPage = () => {
                         />
 
                     </div>
+                    )}
                     {/* <button
                         className="w-100 mb-2 justify-content-center reject upload-wrapper upload-label mt-lg-2 mt-md-2"
                         onClick={() => {
@@ -997,6 +1016,7 @@ const ServiceTrackerInnerPage = () => {
                         <Upload size={20} />
                         <span className="text">Upload</span>
                     </button> */}
+                    {canUpdate && (
                     <div className='btn-wrap-div mt-lg-2 mt-md-2'>
                         <button className="button approve w-100 justify-content-center" onClick={handleApproveAll}>
                             <span className="icon">
@@ -1007,6 +1027,7 @@ const ServiceTrackerInnerPage = () => {
                             <span className="text">Approve</span>
                         </button>
                     </div>
+                    )}
                 </div>
             </div>
             <div className="client-onboarding-2">
@@ -1017,13 +1038,15 @@ const ServiceTrackerInnerPage = () => {
                             <div className='ps-3 mt-1'>
                                 <MultiSelectFilter
                                     rowData={rowData}
-                                    filterColumns={rowData.length > 0 ? Object.keys(rowData[0]) : []}
+                                    filterColumns={rowData.length > 0 ? Object.keys(rowData[0]).filter((key) => !HIDDEN_TRACKER_FIELDS.includes(key)) : []}
                                     onFilterApply={handleFilterApply}
                                 />
                             </div>
 
                         </div>
 
+                        {/* With one sheet there is nothing to pick, but that sheet is still passed when fetching */}
+                        {serviceTrackerSheet?.length > 1 && (
                         <div style={{ width: '250px' }}>
                             <SingleSelectTextField
                                 name="sheet_name"
@@ -1047,11 +1070,13 @@ const ServiceTrackerInnerPage = () => {
                                 names={
                                     serviceTrackerSheet?.map((data) => ({
                                         _id: data?.name,
-                                        name: data?.name
+                                        name: data?.name,
+                                        label: titleCaseSheet(data?.name), // names come back lower-cased
                                     })) || []
                                 }
                             />
                         </div>
+                        )}
 
                     </div>
                     <div className="ag-theme-quartz" style={{ height: '600px', width: '100%', marginTop: '1rem' }}>

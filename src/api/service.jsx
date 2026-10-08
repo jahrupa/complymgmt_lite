@@ -797,8 +797,9 @@ export const fetchAllServiceTrackerFields = async (tracker_name) => {
 };
 export const fetchAllInnerPageServiceTracker = async (trackerName, sheetName) => {
   try {
-    const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data?sheet=${encodeURIComponent(sheetName)}`;
-    const response = await API.get(url);
+    // No sheet (old single-sheet data, or "all sheets") means no param at all, not ?sheet=null
+    const url = `${GET_ALL_INNER_PAGE_SERVICE_TRACKER}/${encodeURIComponent(trackerName)}/data`;
+    const response = await API.get(url, { params: { sheet: sheetName || undefined } });
     return response.data;
   } catch (error) {
     // console.error("Error fetching inner page service tracker:", error);
