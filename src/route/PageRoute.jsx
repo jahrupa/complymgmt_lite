@@ -43,6 +43,7 @@ import RegisterApplicability from '../page/RegisterApplicability.jsx';
 import RegisterMapping from '../page/RegisterMapping.jsx';
 import RegisterProcess from '../page/RegisterProcess.jsx';
 import Entity from '../page/Entity.jsx';
+import RequirePageAccess from '../component/RequirePageAccess.jsx';
 
 
 
@@ -118,15 +119,15 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/document_bulk_tagging" element={<DocumentBulkTagging />} />
             {/* The old Widget Mappings page is now part of Widget Access */}
             <Route path="/widget_mappings" element={<Navigate to="/widget_access" replace />} />
-            <Route path="/create_user_role" element={<UserRolesPage />} />
-            <Route path="/add_user" element={<AddUser />} />
-            <Route path="/company" element={<Company />} />
-            <Route path="/entity" element={<Entity />} />
-            <Route path="/group_holding" element={<GroupCompaniesPage />} />
-            <Route path="/location" element={<Location />} />
-            <Route path="/module" element={<Module />} />
-            <Route path="/sub_module" element={<SubModule />} />
-            <Route path="/access_control" element={<AccessControl />} />
+            <Route path="/create_user_role" element={<RequirePageAccess page="user"><UserRolesPage /></RequirePageAccess>} />
+            <Route path="/add_user" element={<RequirePageAccess page="user"><AddUser /></RequirePageAccess>} />
+            <Route path="/company" element={<RequirePageAccess page="company"><Company /></RequirePageAccess>} />
+            <Route path="/entity" element={<RequirePageAccess page="entity"><Entity /></RequirePageAccess>} />
+            <Route path="/group_holding" element={<RequirePageAccess page="group"><GroupCompaniesPage /></RequirePageAccess>} />
+            <Route path="/location" element={<RequirePageAccess page="company_location"><Location /></RequirePageAccess>} />
+            <Route path="/module" element={<RequirePageAccess page="module"><Module /></RequirePageAccess>} />
+            <Route path="/sub_module" element={<RequirePageAccess page="submodule"><SubModule /></RequirePageAccess>} />
+            <Route path="/access_control" element={<RequirePageAccess page="user_access"><AccessControl /></RequirePageAccess>} />
             <Route path="/service_trackers" element={<ServiceTrackers />} />
             <Route path="/upload_documents" element={<DocumentUpload />} />
             <Route path="/tagged_documents" element={<TaggedDocument />} />
@@ -134,7 +135,7 @@ const PageRoute = ({ sidebarOpen, setSidebarOpen }) => {
             <Route path="/pending_documents" element={<PendingDocument />} />
             {/* <Route path="/user_profile/1" element={<UserProfilePage />} /> */}
             <Route path="/user_profile/1" element={<ProfileForm />} />
-            <Route path="/location_to_module" element={<LocationToModule />} />
+            <Route path="/location_to_module" element={<RequirePageAccess page="location_to_module"><LocationToModule /></RequirePageAccess>} />
             <Route path="/register_processing" element={<RegisterProcessing />} />
             {/* <Route path="/register_processing_v2" element={<RegisterProcessingV2 />} /> */}
 

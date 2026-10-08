@@ -6,6 +6,7 @@ import { downloadClientOnboardingTemplate, uploadClientOnboardingFile } from "..
 import Snackbars from "../../component/Snackbars";
 import DeleteModal from "../../component/DeleteModal";
 import FileDropzone from "../../component/FileDropzone";
+import NoPageAccess from "../../component/NoPageAccess";
 import { usePageAccess } from "../utils/usePageAccess";
 import OnboardingResults from "./OnboardingResults";
 import { apiErrorMessage, downloadBlob } from "../utils/bulkUpload";
@@ -142,13 +143,7 @@ const ClientOnboarding = () => {
         );
     }
 
-    if (!canView) {
-        return (
-            <div className="client-onboarding-page">
-                <div className="alert alert-warning mt-3">You don't have access to this page.</div>
-            </div>
-        );
-    }
+    if (!canView) return <NoPageAccess />;
 
     return (
         <div className="client-onboarding-page">

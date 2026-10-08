@@ -7,6 +7,7 @@ import { downloadDocumentBulkTaggingTemplate, uploadDocumentBulkTaggingFile } fr
 import Snackbars from "../../component/Snackbars";
 import DeleteModal from "../../component/DeleteModal";
 import FileDropzone from "../../component/FileDropzone";
+import NoPageAccess from "../../component/NoPageAccess";
 import { usePageAccess } from "../utils/usePageAccess";
 import { apiErrorMessage, downloadBlob } from "../utils/bulkUpload";
 import TaggingResults from "./TaggingResults";
@@ -24,12 +25,6 @@ const RULES = [
     "If a parent changes (e.g. company), current children that don't belong to the new parent (entity, location…) are cleared.",
     "The module / sub-module must be mapped to the location (location to module mapping).",
 ];
-
-const NoAccess = () => (
-    <div className="client-onboarding-page">
-        <div className="alert alert-warning mt-3">You don't have access to this page.</div>
-    </div>
-);
 
 /**
  * Document Bulk Tagging: retag many Document Repository files from a spreadsheet keyed by
@@ -176,7 +171,7 @@ const DocumentBulkTagging = () => {
         );
     }
 
-    if (!canView || denied) return <NoAccess />;
+    if (!canView || denied) return <NoPageAccess />;
 
     return (
         <div className="client-onboarding-page">

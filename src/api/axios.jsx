@@ -3,6 +3,7 @@
 
 import axios from "axios";
 import { decryptData } from "../page/utils/encrypt";
+import { PAGE_ACCESS_DENIED, pageNameFromUrl } from "../page/utils/pageAccessEvents";
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 const API = axios.create({
   baseURL,
@@ -53,6 +54,12 @@ API.interceptors.response.use(
     ) {
       localStorage.removeItem("authToken");
       window.location.href = "/"; // redirect to login
+    }
+
+    // A refused read means the user can't view that page; RequirePageAccess listens for this
+    if (response?.status === 403 && error.config?.method === "get") {
+      const page = pageNameFromUrl(error.config.url);
+      if (page) window.dispatchEvent(new CustomEvent(PAGE_ACCESS_DENIED, { detail: page }));
     }
 
     return Promise.reject(error);
