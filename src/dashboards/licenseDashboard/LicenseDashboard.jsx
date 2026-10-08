@@ -132,7 +132,7 @@ const LicenseDashboard = ({
 
     // The raw "Days to Expire" column is never shown; computed.days_to_expire replaces it
     const recordColumns = useMemo(
-        () => (filterOptions?.columns || []).filter((col) => !HIDDEN_RECORD_COLUMNS.includes(col.key)),
+        () => (Array.isArray(filterOptions?.columns) ? filterOptions.columns : []).filter((col) => !HIDDEN_RECORD_COLUMNS.includes(col?.key)),
         [filterOptions]
     );
 

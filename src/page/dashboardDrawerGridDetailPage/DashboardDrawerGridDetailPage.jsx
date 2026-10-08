@@ -4,10 +4,13 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import MultiSelectFilter from "./MultiSelectFilter";
+import { blankAsDash, recordKeys } from "../../dashboards/common/dashboardUtils";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-function DashboardDrawerGridDetailPage({ rowData,filters }) {
+function DashboardDrawerGridDetailPage({ rowData: rawRows, filters = {} }) {
   const gridRef = useRef();
+  // The records key may be missing from the response, and rows may be partial for external users
+  const rowData = useMemo(() => (Array.isArray(rawRows) ? rawRows.filter(Boolean) : []), [rawRows]);
   const filteredRowData = useMemo(() => {
     if (Object.keys(filters).length === 0) return rowData;
 
@@ -21,11 +24,12 @@ function DashboardDrawerGridDetailPage({ rowData,filters }) {
   const columnDefs = useMemo(() => {
     if (!rowData.length) return [];
 
-    return Object.keys(rowData[0])
+    return recordKeys(rowData)
       .filter((key) => key !== "_id")
       .map((key) => ({
         headerName: key.replace(/_/g, " ").toUpperCase(),
         field: key,
+        valueFormatter: blankAsDash,
         sortable: true,
         filter: true,
         resizable: true,

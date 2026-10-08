@@ -10,7 +10,7 @@ import NavigationTabs from "../dashboards/NavigationTabs";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { fetchAllCompanies } from "../api/service";
+import { fetchDashboardCompanies } from "../api/service";
 
 const DashboardPage = () => {
   const [companyName, setCompanyName] = useState([]);
@@ -42,10 +42,11 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const companies = await fetchAllCompanies();
+        // Only the user's companies; doesn't need the company page grant
+        const companies = await fetchDashboardCompanies();
         setCompanyName(Array.isArray(companies) ? companies : []);
       } catch {
-        setCompanyName([]);
+        setCompanyName([]); // just "All companies"; the widgets cover all of the user's companies
       }
     };
 
@@ -73,6 +74,7 @@ const DashboardPage = () => {
               onChange={(e) => {
                 setSelectedCompany(e.target.value);
               }}
+              emptyLabel="All companies"
               names={companyName?.map((data) => ({
                 _id: data?._id,
                 name: data?.company_name,

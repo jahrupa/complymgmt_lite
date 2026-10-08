@@ -10,7 +10,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SingleSelectTextField from "../component/MuiInputs/SingleSelectTextField";
+import { useSearchParams } from "react-router-dom";
+import { Tab, Tabs } from "@mui/material";
 import Toggle from "../component/Toggle";
+import { usePageAccess } from "./utils/usePageAccess";
 import {
   uploadFileGolang,
   fetchAllFiles,
@@ -28,7 +31,7 @@ import {
   downloadFile,
   fetchEntityById,
   getAllCompanyLocationByEntityId,
-  // updateDocumentApprovalStatusById,
+  updateDocumentApprovalStatusById,
 } from "../api/service";
 import DeleteModal from "../component/DeleteModal";
 import Snackbars from "../component/Snackbars";
@@ -47,12 +50,41 @@ import { flattenObject } from "../../Utils/tableColUtils";
 import MonthYearCalander from "../component/MonthYearCalander";
 import { decryptData } from "./utils/encrypt";
 import { zipDocuments } from "./utils/bulkDownload";
-import { downloadBlob } from "./clientOnboarding/onboardingUtils";
+import { downloadBlob } from "./utils/bulkUpload";
 
 // Every file is held in memory while the zip is built, so keep a ceiling
 const MAX_BULK_DOWNLOAD = 100;
 
+// Views of the repository, kept in the URL (?view=) so /tagged_documents etc. can link to them.
+// "Tagged" means company, entity, location, module, document type and stage are all filled (backend rule).
+const VIEWS = [
+  { key: "all", label: "All", params: {} },
+  { key: "tagged", label: "Tagged", params: { tagged: "true" } },
+  { key: "untagged", label: "Untagged", params: { tagged: "false" } },
+  { key: "pending", label: "Pending approval", params: { approval_status: 0 } },
+];
+
 const DocumentUpload = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view = VIEWS.find((v) => v.key === searchParams.get("view")) || VIEWS[0];
+  const fetchViewPage = useCallback(
+    (page, limit, search) => fetchAllFiles(page, limit, search, view.params),
+    [view],
+  );
+  const changeView = (key) => {
+    setSelectedDocs([]); // the grid remounts for the new view, dropping its selection
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (key === "all") next.delete("view");
+        else next.set("view", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
+  // Hide or disable actions the user's document_repository grant doesn't allow
+  const { canCreate, canUpdate, canDelete } = usePageAccess("document_repository");
   // Rows of the page currently shown; used for dynamic columns and MultiSelectFilter
   const [data, setData] = useState([]);
   const gridRef = useRef();
@@ -343,12 +375,12 @@ const DocumentUpload = () => {
       });
     }
   };
+  // With an id (a row's Mongo _id) approves that document only; without one, every pending document
   const handleApproveAll = async (id) => {
     try {
-      const response = await bulkApproveAllPageData("document_repository");
-      // const response = id
-      //   ? await updateDocumentApprovalStatusById(id, 1)
-      //   : await bulkApproveAllPageData("document_repository");
+      const response = id
+        ? await updateDocumentApprovalStatusById(id, 1)
+        : await bulkApproveAllPageData("document_repository");
       const message = response?.message || "Status update successfully";
       // Show success snackbar
       setIsSnackbarsOpen({
@@ -721,6 +753,7 @@ const DocumentUpload = () => {
             >
               <VisibilityIcon fontSize="small" className="action_icon" />
             </button>
+            {canDelete && (
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -730,6 +763,8 @@ const DocumentUpload = () => {
             >
               <DeleteIcon fontSize="small" className="action_icon" />
             </button>
+            )}
+            {canUpdate && (
             <button
               className="btn btn-sm"
               onClick={() => {
@@ -743,6 +778,7 @@ const DocumentUpload = () => {
             >
               <EditIcon fontSize="small" className="action_icon" />
             </button>
+            )}
             {/* <VisibilityIcon/> */}
           </div>
         );
@@ -788,13 +824,13 @@ const DocumentUpload = () => {
     {
       field: "ai_data.doc_type",
       headerName: "AI Document Type",
-      editable: "false",
+      editable: false,
       valueGetter: (params) => params.data?.ai_data?.doc_type || "-",
     },
     {
       field: "ai_data.confidence",
       headerName: "AI Confidence Score",
-      editable: "false",
+      editable: false,
       valueGetter: (params) =>
         params.data?.ai_data?.confidence !== undefined
           ? `${params.data.ai_data.confidence}%`
@@ -803,7 +839,7 @@ const DocumentUpload = () => {
     {
       field: "group_holdings_id",
       headerName: "Document Status",
-      editable: "false",
+      editable: false,
       cellRenderer: (params) => (
         <span style={{ color: params.value !== "" ? "black" : "gray" }}>
           {params.value !== "" ? "Taged" : "Untaged"}
@@ -815,7 +851,7 @@ const DocumentUpload = () => {
       width: 120,
       minWidth: 120,
       maxWidth: 120,
-      editable: "false",
+      editable: false,
       field: "is_active",
       headerName: "Status",
       pinned: "left",
@@ -824,6 +860,7 @@ const DocumentUpload = () => {
         <Toggle
           checked={!!params.value}
           onChange={(e) => handleToggleChange(e, params)}
+          disabled={!canUpdate}
         />
       ),
     },
@@ -853,14 +890,14 @@ const DocumentUpload = () => {
             <input
               type="checkbox"
               checked={status === 1}
-              disabled={status === 1}
+              disabled={status === 1 || !canUpdate}
               style={{
-                cursor: status === 1 ? "default" : "pointer",
+                cursor: status === 1 || !canUpdate ? "default" : "pointer",
                 width: 15,
                 height: 15,
                 accentColor: "orange",
               }}
-              onChange={() => handleApproveAll(params.data.document_id)}
+              onChange={() => handleApproveAll(params.data._id)}
             />
             <span
               style={{
@@ -886,10 +923,10 @@ const DocumentUpload = () => {
     minWidth: 140,
     sortable: true,
     filter: true,
-    editable: true,
+    // No inline editing: nothing saves cell edits; changes go through the Edit form
+    editable: false,
     headerStyle: { color: "#515151", backgroundColor: "#ffffe24d" },
   };
-  const onRowValueChanged = () => {};
   // quickFilterText doesn't work with the infinite row model, so the text is
   // sent to the API instead; debounced so every keystroke isn't a request
   const onFilterTextBoxChanged = useCallback((e) => {
@@ -1529,7 +1566,7 @@ const DocumentUpload = () => {
         </div>
         <div className="d-lg-flex d-md-flex  justify-content-end mb-3">
           <div className="pe-2 d-lg-flex d-md-flex gap-3">
-            {userType === "0" && (
+            {userType === "0" && canCreate && (
               <div>
                 <button
                   className="reject upload-wrapper upload-label"
@@ -1545,6 +1582,7 @@ const DocumentUpload = () => {
               </div>
             )}
 
+            {canUpdate && (
             <div className="btn-wrap-div">
               <button
                 className="button approve w-100 justify-content-center"
@@ -1558,6 +1596,7 @@ const DocumentUpload = () => {
                 <span className="text">Approve</span>
               </button>
             </div>
+            )}
           </div>
         </div>
       </div>
@@ -1582,6 +1621,17 @@ const DocumentUpload = () => {
         closeModal={closeModal}
       />
       <div className="table_div p-3">
+        <Tabs
+          value={view.key}
+          onChange={(_, key) => changeView(key)}
+          variant="scrollable"
+          scrollButtons="auto"
+          className="mb-2"
+        >
+          {VIEWS.map((v) => (
+            <Tab key={v.key} value={v.key} label={v.label} />
+          ))}
+        </Tabs>
         <div className="d-flex align-items-center gap-2">
           <AnimatedSearchBar
             placeholder="Search..."
@@ -1605,15 +1655,15 @@ const DocumentUpload = () => {
 
         <div style={{ marginTop: "1rem" }}>
           <PaginatedGrid
+            key={view.key} // a new view is a new result set: start again from page 1
             ref={gridRef}
-            fetchPage={fetchAllFiles}
+            fetchPage={fetchViewPage}
             search={search}
             rowFilter={rowFilter}
             onPageLoaded={setData}
             pageSize={20}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
-            editType="fullRow"
             // AG Grid's header checkbox isn't supported by the infinite row
             // model, so PageSelectHeader selects the current page instead;
             // getRowId keeps the selection across page changes and refreshes.
@@ -1627,7 +1677,6 @@ const DocumentUpload = () => {
             onSelectionChanged={(e) =>
               setSelectedDocs(e.api.getSelectedRows())
             }
-            onRowValueChanged={onRowValueChanged}
           />
         </div>
       </div>

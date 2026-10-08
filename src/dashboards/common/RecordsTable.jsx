@@ -5,6 +5,11 @@ import PaginatedGrid from "../../component/PaginatedGrid";
 import DashboardCard from "./DashboardCard";
 import { formatRawValue } from "./dashboardUtils";
 
+// Internal fields never shown as a column, even if the API lists them
+const HIDDEN_KEYS = ["sheet"];
+
+const humanize = (key) => String(key).replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 const loadVisibleColumns = (storageKey, defaults) => {
     try {
         const saved = JSON.parse(localStorage.getItem(storageKey));
@@ -51,14 +56,19 @@ const RecordsTable = forwardRef(function RecordsTable(
     },
     ref
 ) {
-    const [visible, setVisible] = useState(() => loadVisibleColumns(storageKey, defaultColumns));
+    const [savedVisible, setVisible] = useState(() => loadVisibleColumns(storageKey, defaultColumns));
     const [pickerAnchor, setPickerAnchor] = useState(null);
 
     // Computed columns go after the column named in `after`, or at the end
     const allColumns = useMemo(() => {
-        const result = (columns || []).map((col) =>
-            labelOverrides?.[col.key] ? { ...col, label: labelOverrides[col.key] } : col
-        );
+        // Only columns the API sent exist: fields hidden from external users are simply missing
+        const result = (Array.isArray(columns) ? columns : [])
+            .filter((col) => col?.key && !HIDDEN_KEYS.includes(col.key))
+            .map((col) => ({
+                ...col,
+                label: labelOverrides?.[col.key] || col.label || humanize(col.key),
+                section: col.section || "Other",
+            }));
         computedColumns.forEach((col) => {
             const index = col.after ? result.findIndex((c) => c.key === col.after) : -1;
             if (index === -1) result.push(col);
@@ -68,8 +78,17 @@ const RecordsTable = forwardRef(function RecordsTable(
     }, [columns, computedColumns, labelOverrides]);
     const computedKeys = useMemo(() => new Set(computedColumns.map((c) => c.key)), [computedColumns]);
 
+    // If none of the saved / default columns came back (e.g. all hidden for an external user),
+    // show the first few that did instead of an empty grid
+    const visible = useMemo(() => {
+        const available = new Set(allColumns.map((c) => c.key));
+        if (savedVisible.some((key) => available.has(key))) return savedVisible;
+        return allColumns.slice(0, 6).map((c) => c.key);
+    }, [savedVisible, allColumns]);
+
     const toggleColumn = (key) => {
-        setVisible((prev) => {
+        setVisible(() => {
+            const prev = visible;
             const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
             try {
                 localStorage.setItem(storageKey, JSON.stringify(next));
@@ -179,7 +198,7 @@ const RecordsTable = forwardRef(function RecordsTable(
                         key={gridKey}
                         fetchPage={gridFetch}
                         getRows={(res) =>
-                            (res?.data || []).map((row) => ({ ...row.record, _id: row._id, _computed: row.computed }))
+                            (res?.data || []).map((row) => ({ ...row.record, _id: row._id ?? row.record?._id, _computed: row.computed }))
                         }
                         pageSize={20}
                         columnDefs={columnDefs}

@@ -15,6 +15,7 @@ export default function ServiceTrackerAccess() {
     const [trackerKeys, setTrackerKeys] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [trackersError, setTrackersError] = useState('')
     const [issnackbarsOpen, setIsSnackbarsOpen] = useState({
         open: false,
         vertical: "top",
@@ -34,7 +35,7 @@ export default function ServiceTrackerAccess() {
                 const data = await fetchAllServiceTrackerName()
                 setTrackers(data || []) 
             } catch (err) {
-                console.error(err)
+                setTrackersError(err?.response?.data?.message || 'Failed to load trackers')
             }
         }
         getTrackers()
@@ -52,7 +53,7 @@ export default function ServiceTrackerAccess() {
             const data = await fetchAllServiceTrackerFields(formattedName)
             setTrackerKeys(data?.tracker_keys || {})
         } catch (err) {
-            setError(err.message || 'Failed to fetch tracker keys')
+            setError(err?.response?.data?.message || err.message || 'Failed to fetch tracker keys')
         } finally {
             setLoading(false)
         }
@@ -180,6 +181,7 @@ export default function ServiceTrackerAccess() {
                     {/* Step 1 */}
                     <div className="card-section">
                         <div className="section-label">Step 1 — Select Tracker</div>
+                        {trackersError && <div className="error-message">{trackersError}</div>}
 
                         <div className="radio-group">
                             {trackers.map((tracker) => (

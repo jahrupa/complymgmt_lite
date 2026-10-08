@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, Download } from "lucide-react";
-import { LEVELS, downloadBlob, errorsToCsv, totalCreated } from "./onboardingUtils";
+import { downloadBlob } from "../utils/bulkUpload";
+import { LEVELS, errorsToCsv, totalCreated } from "./onboardingUtils";
 
 /**
  * Result of a preview (dry run) or a real import: per-level counts, the names of new

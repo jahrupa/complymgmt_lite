@@ -11,9 +11,9 @@ import {
     TextField,
 } from "@mui/material";
 
-// Options are plain strings or { value, label }
-const optionValue = (opt) => (typeof opt === "string" ? opt : opt.value);
-const optionLabel = (opt) => (typeof opt === "string" ? opt : opt.label);
+// Options are plain strings or { value, label }; a null entry from the API must not crash the menu
+const optionValue = (opt) => (opt && typeof opt === "object" ? opt.value : opt ?? "");
+const optionLabel = (opt) => (opt && typeof opt === "object" ? opt.label ?? opt.value : opt ?? "");
 
 // Multi select with checkboxes
 export const MultiFilter = ({ label, value, options = [], onChange, width = 190 }) => (
