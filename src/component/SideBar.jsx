@@ -16,8 +16,9 @@ import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { AlignCenterVertical, Layers, ScanEye } from 'lucide-react';
+import { AlignCenterVertical, FileSpreadsheet, Layers, ScanEye } from 'lucide-react';
 import { decryptData } from '../page/utils/encrypt';
+import { usePageAccess } from '../page/utils/usePageAccess';
 export const RegisterApplicabilityIcon = ({ active }) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -76,6 +77,7 @@ export const CreateRegisterIcon = ({ active }) => (
 function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
     const [openDropdown, setOpenDropdown] = useState(null);
     const userRole = decryptData(localStorage.getItem("user_role"));
+    const clientOnboardingAccess = usePageAccess('client_onboarding');
     const menuItems = [
         { icon: (active) => <DashboardCustomizeOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Dashboard', link: 'dashboard' },
         { icon: (active) => <AssignmentIndOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Create User', link: 'create_user_role' },
@@ -88,6 +90,9 @@ function SideBar({ sidebarOpen, setSidebarOpen, setActivePage, activePage }) {
         { icon: (active) => <ExtensionOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'SubModule', link: 'sub_module' },
         { icon: (active) => <DesktopAccessDisabledOutlinedIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Access Control', link: 'access_control' },
         { icon: (active) => <EditDocumentIcon className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Document Repository', link: 'upload_documents' },
+        ...(clientOnboardingAccess.canView
+            ? [{ icon: (active) => <FileSpreadsheet className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Client Onboarding', link: 'client_onboarding' }]
+            : []),
 
         // { icon: (active) => <PanelsRightBottom className={`${active ? 'side-bar-icon-active' : 'side-bar-icon'}`} />, label: 'Register Processing', link: 'register_processing' },
 

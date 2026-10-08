@@ -240,6 +240,8 @@ import {
   ENTITY_WISE_ACCESS,
   LOCATION_WISE_ACCESS,
   UPDATE_DOCUMENT_APPROVAL_STATUS_BY_ID,
+  CLIENT_ONBOARDING_TEMPLATE,
+  CLIENT_ONBOARDING_UPLOAD,
 
 
 } from "./Endpoint";
@@ -2828,3 +2830,29 @@ export const createLocationWiseAccess = async (data) => {
 
 
 
+
+// CLIENT ONBOARDING
+export const downloadClientOnboardingTemplate = async () => {
+  try {
+    const response = await API.get(CLIENT_ONBOARDING_TEMPLATE, { responseType: "blob" });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// dryRun=true validates the file and reports what would be created without writing anything.
+export const uploadClientOnboardingFile = async (file, dryRun) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await API.post(
+      `${CLIENT_ONBOARDING_UPLOAD}${dryRun ? "?dry_run=true" : ""}`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
