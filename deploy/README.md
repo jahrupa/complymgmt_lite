@@ -35,7 +35,7 @@ going live or rolling back is an atomic symlink switch, so neither needs a web s
 | `deploy/remote.sh` | Runs on the server: `activate`, `rollback`, `list`, `current`. Uploaded on every run. |
 | `deploy/healthcheck.sh` | Runs on the runner: waits for `/version.json` to report the new release, then checks it stays healthy. |
 | `deploy/nginx/complymgmt_lite.conf` | Example nginx site (SPA fallback, caching, old-chunk fallback). |
-| `deploy/nginx/staging.conf` | The staging site: `http://complymgmt.local`, HTTPS block ready for an internal certificate. |
+| `deploy/nginx/staging.conf` | The staging site: `http://complymgmt.stage`, HTTPS block ready for an internal certificate. |
 
 ### Server layout (`DEPLOY_PATH`, e.g. `/var/www/complymgmt_lite`)
 
@@ -105,18 +105,16 @@ ssh-keyscan -p 22 <host>
 
 Server needs: `bash`, `tar`, `flock` (util-linux), and GNU `mv` (`-T`). No Node.js.
 
-## Staging server (on-prem): `http://complymgmt.local`
+## Staging server (on-prem): `http://complymgmt.stage`
 
 Staging (`stage-server`, 192.168.1.218, Rocky Linux 10, SELinux enforcing) gets the same model as
 production: nginx serving the built files, no Node process, no supervisord. It is on a private
 network, so GitHub can't reach it; a self-hosted runner on the server itself picks up the deploy job
 (it only connects out to GitHub), downloads the build and puts it in place.
 
-**1. DNS.** Point `complymgmt.local` at 192.168.1.218 in the internal DNS. The server must resolve the
-name too (the health check runs there): check with `getent hosts complymgmt.local`, or add
-`127.0.0.1 complymgmt.local` to `/etc/hosts`. Note that `.local` is also the multicast-DNS suffix: some
-macOS/Linux clients try mDNS first and resolve it slowly or not at all. If that bites, a name like
-`complymgmt.internal` avoids it.
+**1. DNS.** Point `complymgmt.stage` at 192.168.1.218 in the internal DNS. The server must resolve the
+name too (the health check runs there): check with `getent hosts complymgmt.stage`, or add
+`127.0.0.1 complymgmt.stage` to `/etc/hosts`.
 
 **2. Retire the Vite dev server** (staging is down from here until the first deploy lands):
 
@@ -174,7 +172,7 @@ cd /home/webdeploy/actions-runner-frontend && sudo ./svc.sh install webdeploy &&
 If the service won't start under SELinux, apply whatever was done for the backend runner.
 
 **6. Backend CORS.** The staging backend only accepts browser calls from origins listed in its
-`CORS_ALLOWED_ORIGINS` env var; add `http://complymgmt.local` (and `https://complymgmt.local` once
+`CORS_ALLOWED_ORIGINS` env var; add `http://complymgmt.stage` (and `https://complymgmt.stage` once
 TLS is on) and restart it.
 
 **7. GitHub values** (see *GitHub setup* below for where they go):
@@ -187,14 +185,14 @@ TLS is on) and restart it.
 | `DEPLOY_USER` | `webdeploy` |
 | `DEPLOY_SSH_KEY` / `DEPLOY_KNOWN_HOSTS` | From step 4 |
 | `DEPLOY_PATH` | `/var/www/complymgmt_lite` |
-| `APP_URL` | `http://complymgmt.local` |
+| `APP_URL` | `http://complymgmt.stage` |
 
 **8. First deploy.** *Actions → Deploy → Run workflow* on `develop` (or merge into `develop`). When it
-is green, `curl http://complymgmt.local/version.json` shows the release, and the old
+is green, `curl http://complymgmt.stage/version.json` shows the release, and the old
 `/var/www/complymgmt_lite.vite-old` folder can go.
 
-HTTPS: `.local` names can't get public certificates; with a certificate from an internal CA, enable
-the 443 block in `deploy/nginx/staging.conf` and set `APP_URL` to `https://complymgmt.local`.
+HTTPS: an internal-only name can't get a public certificate; with one from an internal CA, enable
+the 443 block in `deploy/nginx/staging.conf` and set `APP_URL` to `https://complymgmt.stage`.
 
 ## GitHub setup
 
