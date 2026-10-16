@@ -35,6 +35,7 @@ going live or rolling back is an atomic symlink switch, so neither needs a web s
 | `deploy/remote.sh` | Runs on the server: `activate`, `rollback`, `list`, `current`. Uploaded on every run. |
 | `deploy/healthcheck.sh` | Runs on the runner: waits for `/version.json` to report the new release, then checks it stays healthy. |
 | `deploy/nginx/complymgmt_lite.conf` | Example nginx site (SPA fallback, caching, old-chunk fallback). |
+| `deploy/nginx/staging.conf` | The staging site: `http://complymgmt.local`, HTTPS block ready for an internal certificate. |
 
 ### Server layout (`DEPLOY_PATH`, e.g. `/var/www/complymgmt_lite`)
 
@@ -104,19 +105,96 @@ ssh-keyscan -p 22 <host>
 
 Server needs: `bash`, `tar`, `flock` (util-linux), and GNU `mv` (`-T`). No Node.js.
 
-### Moving staging off the Vite dev server
+## Staging server (on-prem): `http://complymgmt.local`
 
-Today staging runs `vite --mode stage` (a dev server) under supervisord from a copy of the source.
-After the first successful staging deploy has populated `/var/www/complymgmt_lite/current`:
+Staging (`stage-server`, 192.168.1.218, Rocky Linux 10, SELinux enforcing) gets the same model as
+production: nginx serving the built files, no Node process, no supervisord. It is on a private
+network, so GitHub can't reach it; a self-hosted runner on the server itself picks up the deploy job
+(it only connects out to GitHub), downloads the build and puts it in place.
 
-1. Point the staging host at the static files with the nginx site above. If nginx currently proxies
-   to the Vite port, replace that `location`/`proxy_pass` with the `root` + `try_files` setup.
-2. `sudo supervisorctl stop complymgmt_lite`, then remove `/etc/supervisord.d/complymgmt_lite.ini`
-   and `sudo supervisorctl update`.
-3. Copy the old `.env.stage` contents into the `STAGING_ENV_FILE` secret, then delete the old source
-   files (`src/`, `node_modules/`, …) from the folder, keeping `releases/`, `current`, `previous`,
-   `incoming/` and `deploy.log`. Using a fresh `DEPLOY_PATH` (e.g. `/var/www/complymgmt_lite_web`)
-   avoids mixing the two during the switch.
+**1. DNS.** Point `complymgmt.local` at 192.168.1.218 in the internal DNS. The server must resolve the
+name too (the health check runs there): check with `getent hosts complymgmt.local`, or add
+`127.0.0.1 complymgmt.local` to `/etc/hosts`. Note that `.local` is also the multicast-DNS suffix: some
+macOS/Linux clients try mDNS first and resolve it slowly or not at all. If that bites, a name like
+`complymgmt.internal` avoids it.
+
+**2. Retire the Vite dev server** (staging is down from here until the first deploy lands):
+
+```bash
+sudo supervisorctl stop complymgmt_lite
+sudo rm /etc/supervisord.d/complymgmt_lite.ini && sudo supervisorctl update
+sudo mv /var/www/complymgmt_lite /var/www/complymgmt_lite.vite-old   # keep until .env.stage is in GitHub
+```
+
+**3. nginx and a deploy user** (a dedicated user: the existing `deploy` user is in the `docker` group,
+which is root-equivalent, and the frontend only needs to write files):
+
+```bash
+sudo dnf install -y nginx
+sudo systemctl enable --now nginx
+sudo firewall-cmd --permanent --add-service=http --add-service=https && sudo firewall-cmd --reload
+
+sudo useradd --create-home --shell /bin/bash webdeploy
+sudo mkdir -p /var/www/complymgmt_lite
+sudo chown webdeploy:webdeploy /var/www/complymgmt_lite && sudo chmod 755 /var/www/complymgmt_lite
+sudo restorecon -Rv /var/www/complymgmt_lite       # SELinux label nginx may read
+
+# deploy/nginx/staging.conf from this repo, copied over first (scp deploy/nginx/staging.conf stage-server:)
+sudo cp ~/staging.conf /etc/nginx/conf.d/complymgmt_lite.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+**4. SSH key for the runner** (runner and server are the same machine, so the key only works from localhost):
+
+```bash
+sudo -iu webdeploy
+ssh-keygen -t ed25519 -N '' -f ~/.ssh/ci_deploy -C "github-actions complymgmt_lite staging"
+echo "from=\"127.0.0.1\" $(cat ~/.ssh/ci_deploy.pub)" >> ~/.ssh/authorized_keys
+chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+ssh-keyscan 127.0.0.1    # -> DEPLOY_KNOWN_HOSTS
+cat ~/.ssh/ci_deploy     # -> DEPLOY_SSH_KEY, then: rm ~/.ssh/ci_deploy ~/.ssh/ci_deploy.pub
+exit
+```
+
+**5. Runner for this repo.** The runner already on the server (`deploy` user) belongs to the backend
+repo and can't take this repo's jobs. A repo admin opens *Settings → Actions → Runners → New
+self-hosted runner → Linux x64*, which shows the download commands and a token; run them as
+`webdeploy` with this name and label:
+
+```bash
+sudo -iu webdeploy
+mkdir actions-runner-frontend && cd actions-runner-frontend
+# curl + tar lines from the GitHub page, then:
+./config.sh --url https://github.com/jahrupa/complymgmt_lite --token <TOKEN> \
+  --name complymgmt-frontend-staging --labels complymgmt-frontend-staging --unattended
+exit
+cd /home/webdeploy/actions-runner-frontend && sudo ./svc.sh install webdeploy && sudo ./svc.sh start
+```
+
+If the service won't start under SELinux, apply whatever was done for the backend runner.
+
+**6. Backend CORS.** The staging backend only accepts browser calls from origins listed in its
+`CORS_ALLOWED_ORIGINS` env var; add `http://complymgmt.local` (and `https://complymgmt.local` once
+TLS is on) and restart it.
+
+**7. GitHub values** (see *GitHub setup* below for where they go):
+
+| Name | Value |
+|------|-------|
+| `STAGING_ENV_FILE` (repo secret) | Contents of `/var/www/complymgmt_lite.vite-old/.env.stage` |
+| `STAGING_RUNNER` (repo variable) | `self-hosted,complymgmt-frontend-staging` |
+| `DEPLOY_HOST` | `127.0.0.1` |
+| `DEPLOY_USER` | `webdeploy` |
+| `DEPLOY_SSH_KEY` / `DEPLOY_KNOWN_HOSTS` | From step 4 |
+| `DEPLOY_PATH` | `/var/www/complymgmt_lite` |
+| `APP_URL` | `http://complymgmt.local` |
+
+**8. First deploy.** *Actions → Deploy → Run workflow* on `develop` (or merge into `develop`). When it
+is green, `curl http://complymgmt.local/version.json` shows the release, and the old
+`/var/www/complymgmt_lite.vite-old` folder can go.
+
+HTTPS: `.local` names can't get public certificates; with a certificate from an internal CA, enable
+the 443 block in `deploy/nginx/staging.conf` and set `APP_URL` to `https://complymgmt.local`.
 
 ## GitHub setup
 
