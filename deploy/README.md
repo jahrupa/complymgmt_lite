@@ -29,6 +29,8 @@ going live or rolling back is an atomic symlink switch, so neither needs a web s
 | `.github/workflows/ci.yml` | Pull requests into `develop`/`main`: install, lint gate, build. |
 | `.github/workflows/deploy.yml` | Push to `develop`/`main` (or *Run workflow* on them): build, deploy, health check, automated rollback. |
 | `.github/workflows/rollback.yml` | Manual rollback (or just list releases) for either environment. |
+| `.github/workflows/push-alert.yml` | Loud notice for every push to `develop`/`main` (direct and force pushes flagged). |
+| `.github/scripts/notify.sh` | Sends a message to Slack, Teams and/or email, whichever is configured. |
 | `.github/actions/ssh-setup` | Writes the deploy key and pinned host key under the runner's temp dir. |
 | `.github/scripts/lint-ratchet.sh` | Fails a PR only if it adds ESLint errors (the codebase still has ~330 old ones). |
 | `.github/scripts/runner-json.sh` | Turns `STAGING_RUNNER`/`PRODUCTION_RUNNER` into a `runs-on` value. |
@@ -226,10 +228,43 @@ On **production** also set:
   roll back alone in an emergency.
 - *Deployment branches and tags*: selected branches → `main`. Staging: `develop`.
 
-**Branch protection** (Settings → Rules) on `develop` and `main`: require a pull request and the
-*CI / Lint and build* check; block force pushes.
+**Fork pull requests** (Settings → Actions → General → *Fork pull request workflows from outside
+collaborators*): choose **Require approval for all outside collaborators**. The repo is public, and a
+fork's PR runs its own copy of the workflows, which could otherwise target the self-hosted runner on
+the staging server.
 
-### Cloud or on-prem: where the deploy job runs
+## Notifications (instead of branch protection)
+
+The repo doesn't use branch protection, so pushes are made loud instead:
+
+| Event | Message |
+|-------|---------|
+| PR merged into `develop`/`main` | ℹ️ who merged it, the commits |
+| Direct push (no PR) | 🚨 who pushed, the commits, "skipped review and CI" |
+| Force push / branch deleted | 🔥 alert with the compare link |
+| Deploy finished | ✅ deployed / ❌ build failed / ❌ failed and automatically rolled back |
+| Manual rollback | 🚨 from → to, who, and the reason given |
+
+`push-alert.yml` sends the push messages; `deploy.yml` and `rollback.yml` send their results. All of them
+use `.github/scripts/notify.sh` on GitHub-hosted runners (free for public repos), which sends to every
+channel that has secrets set. Set any combination as **repository secrets**:
+
+| Channel | Secrets |
+|---------|---------|
+| Slack | `SLACK_WEBHOOK_URL`: an [incoming webhook](https://api.slack.com/messaging/webhooks) for the channel |
+| Microsoft Teams | `TEAMS_WEBHOOK_URL`: in the channel, *Workflows → "Post to a channel when a webhook request is received"*, and copy its URL |
+| Email | `SMTP_URL`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `NOTIFY_EMAIL_TO` (comma-separated), optional `NOTIFY_EMAIL_FROM` |
+
+Email examples: Microsoft 365 `smtp://smtp.office365.com:587` (the mailbox needs *Authenticated SMTP*
+enabled), Google Workspace/Gmail `smtps://smtp.gmail.com:465` with an
+[app password](https://support.google.com/accounts/answer/185833). Use a dedicated mailbox such as
+`alerts@…`. If no channel is set, the messages only appear in the run log. If a configured channel
+fails, the run turns red, so GitHub's own failure email reaches whoever triggered it.
+
+GitHub's built-in emails still apply on top: whoever triggers a failed run gets an email (default
+setting), and anyone can *Watch → Custom → Pull requests* to hear about PRs.
+
+## Cloud or on-prem: where the deploy job runs
 
 Repository variables `STAGING_RUNNER` and `PRODUCTION_RUNNER` (Settings → Variables) choose it:
 

@@ -115,6 +115,10 @@ jobs:
     concurrency:
       group: deploy-${{ needs.plan.outputs.environment }}
       cancel-in-progress: false
+    outputs:
+      previous: ${{ steps.before.outputs.release }}
+      rolled_back_to: ${{ steps.rollback.outputs.to }}
+      app_url: ${{ vars.APP_URL }}
     env:
       RELEASE: ${{ needs.plan.outputs.release }}
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
@@ -213,3 +217,54 @@ jobs:
       - name: Remove SSH key
         if: always()
         run: rm -rf "${DEPLOY_SSH_DIR:-/nonexistent}"
+
+  # Runs on a GitHub-hosted runner, so the staging server needs nothing extra for notifications
+  notify:
+    name: Notify
+    needs: [plan, build, deploy]
+    if: always() && needs.plan.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Send
+        env:
+          ENVIRONMENT: ${{ needs.plan.outputs.environment }}
+          RELEASE: ${{ needs.plan.outputs.release }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          PREVIOUS: ${{ needs.deploy.outputs.previous }}
+          ROLLED_BACK_TO: ${{ needs.deploy.outputs.rolled_back_to }}
+          APP_URL: ${{ needs.deploy.outputs.app_url }}
+          HEAD_MESSAGE: ${{ github.event.head_commit.message }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          SMTP_URL: ${{ secrets.SMTP_URL }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          NOTIFY_EMAIL_FROM: ${{ secrets.NOTIFY_EMAIL_FROM }}
+          NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+        run: |
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          details="Release: $RELEASE"$'\n'"Commit: ${GITHUB_SHA::7} ${HEAD_MESSAGE%%$'\n'*}"$'\n'"Triggered by: $GITHUB_ACTOR"
+          if [ "$BUILD_RESULT" != success ]; then
+            status=failure; title="$ENVIRONMENT build failed; nothing was deployed"
+            body="$details"
+          elif [ "$DEPLOY_RESULT" = success ]; then
+            status=success; title="Deployed to $ENVIRONMENT"
+            body="$details"$'\n'"Live at: ${APP_URL:-?}"$'\n'"Was: ${PREVIOUS:-none}"
+          elif [ -n "$ROLLED_BACK_TO" ]; then
+            status=failure; title="$ENVIRONMENT deploy failed; automatically rolled back"
+            body="$details"$'\n'"The health check failed, so the server went back to $ROLLED_BACK_TO."
+          elif [ "$DEPLOY_RESULT" = cancelled ]; then
+            status=warning; title="$ENVIRONMENT deploy was cancelled"
+            body="$details"$'\n'"Check the run: if the new release had gone live, it was switched back."
+          else
+            status=failure; title="$ENVIRONMENT deploy failed"
+            body="$details"$'\n'"Result: $DEPLOY_RESULT. See the run for the failing step and the releases on the server."
+          fi
+          NOTIFY_STATUS="$status" NOTIFY_TITLE="$title" NOTIFY_BODY="$body" NOTIFY_URL="$run_url" \
+            .github/scripts/notify.sh
