@@ -13,6 +13,7 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  issues: write # GitHub-email fallback (comments on the alerts issue)
 
 jobs:
   alert:
@@ -80,4 +81,7 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           NOTIFY_EMAIL_FROM: ${{ secrets.NOTIFY_EMAIL_FROM }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          # Fallback when none of the above is set: GitHub emails via the alerts issue
+          GH_TOKEN: ${{ github.token }}
+          NOTIFY_GITHUB_MENTIONS: ${{ vars.NOTIFY_GITHUB_MENTIONS }}
         run: .github/scripts/notify.sh

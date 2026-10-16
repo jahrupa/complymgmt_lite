@@ -222,6 +222,9 @@ jobs:
   notify:
     name: Notify
     needs: [plan, build, deploy]
+    permissions:
+      contents: read
+      issues: write # GitHub-email fallback (comments on the alerts issue)
     if: always() && needs.plan.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -247,6 +250,9 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           NOTIFY_EMAIL_FROM: ${{ secrets.NOTIFY_EMAIL_FROM }}
           NOTIFY_EMAIL_TO: ${{ secrets.NOTIFY_EMAIL_TO }}
+          # Fallback when none of the above is set: GitHub emails via the alerts issue
+          GH_TOKEN: ${{ github.token }}
+          NOTIFY_GITHUB_MENTIONS: ${{ vars.NOTIFY_GITHUB_MENTIONS }}
         run: |
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           details="Release: $RELEASE"$'\n'"Commit: ${GITHUB_SHA::7} ${HEAD_MESSAGE%%$'\n'*}"$'\n'"Triggered by: $GITHUB_ACTOR"

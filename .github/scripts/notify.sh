@@ -17,6 +17,11 @@
 #   SMTP_USERNAME / SMTP_PASSWORD
 #   NOTIFY_EMAIL_FROM   sender address (defaults to SMTP_USERNAME)
 #   NOTIFY_EMAIL_TO     comma-separated recipients
+#
+# Fallback when none of those is set: GitHub's own email. The message is posted as a comment on one
+# open issue labelled `alerts` (created on first use), @mentioning NOTIFY_GITHUB_MENTIONS (repository
+# variable, e.g. "@alice @bob"; defaults to the repo owner). GitHub emails the people mentioned and
+# everyone subscribed to that issue. Needs GH_TOKEN with `issues: write`.
 set -uo pipefail
 
 status="${NOTIFY_STATUS:-info}"
@@ -89,9 +94,33 @@ if [ -n "${SMTP_URL:-}" ] && [ -n "${NOTIFY_EMAIL_TO:-}" ]; then
   fi
 fi
 
+notify_github() {
+  [ -n "${GH_TOKEN:-}" ] || { echo "::error::notify: no channel set and no GH_TOKEN for the GitHub fallback"; return 1; }
+  local label=alerts issue mentions safe_title file="$RUNNER_TEMP/notify-comment.md"
+  issue="$(gh issue list --repo "$repo" --label "$label" --state open --limit 1 --json number --jq '.[0].number // empty')" || return 1
+  if [ -z "$issue" ]; then
+    gh label create "$label" --repo "$repo" --color D93F0B --description "Push and deploy alerts" >/dev/null 2>&1 || true
+    issue="$(gh issue create --repo "$repo" --label "$label" --title "🔔 Push and deploy alerts" --body \
+      "Every push to develop/main, deploy result and rollback is posted here by GitHub Actions. **Subscribe to this issue** to get them all by email. People in the NOTIFY_GITHUB_MENTIONS repository variable are @mentioned on each one.")" || return 1
+    issue="${issue##*/}"
+  fi
+  mentions="${NOTIFY_GITHUB_MENTIONS:-@${GITHUB_REPOSITORY_OWNER:-}}"
+  # An "@name" inside a commit or PR title must not ping anyone: the body goes in a code block and
+  # the title gets a zero-width space after each @
+  safe_title="${title//@/@$'\u200b'}"
+  {
+    printf '### %s\n\n' "$safe_title"
+    printf '````\n%s\n````\n\n' "$body"
+    [ -n "$url" ] && printf '[Open in GitHub](%s)\n\n' "$url"
+    printf 'cc %s\n' "$mentions"
+  } > "$file"
+  gh issue comment "$issue" --repo "$repo" --body-file "$file" >/dev/null || return 1
+  echo "notify: posted to GitHub issue #$issue (mentions: $mentions); GitHub emails them and the issue's subscribers"
+}
+
 if [ $((sent + failed)) -eq 0 ]; then
-  echo "::notice::No notification channel is configured (SLACK_WEBHOOK_URL, TEAMS_WEBHOOK_URL or SMTP_URL + NOTIFY_EMAIL_TO)."
-  echo "Would have sent: $title"; echo "$body"
-  exit 0
+  echo "No Slack/Teams/email channel is configured; using GitHub's email via the alerts issue."
+  notify_github
+  exit
 fi
 [ "$failed" -eq 0 ]

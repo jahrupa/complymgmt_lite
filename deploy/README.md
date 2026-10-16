@@ -258,8 +258,16 @@ channel that has secrets set. Set any combination as **repository secrets**:
 Email examples: Microsoft 365 `smtp://smtp.office365.com:587` (the mailbox needs *Authenticated SMTP*
 enabled), Google Workspace/Gmail `smtps://smtp.gmail.com:465` with an
 [app password](https://support.google.com/accounts/answer/185833). Use a dedicated mailbox such as
-`alerts@…`. If no channel is set, the messages only appear in the run log. If a configured channel
-fails, the run turns red, so GitHub's own failure email reaches whoever triggered it.
+`alerts@…`. If a configured channel fails, the run turns red, so GitHub's own failure email reaches
+whoever triggered it.
+
+**Nothing set? GitHub sends the email.** With none of the secrets above, each message is posted as a
+comment on one open issue labelled `alerts` ("🔔 Push and deploy alerts", created on first use) that
+@mentions the people in the repository variable `NOTIFY_GITHUB_MENTIONS` (e.g. `@jahrupa @alice`;
+defaults to the repo owner). GitHub emails everyone mentioned (their *Participating, @mentions* email
+setting, on by default) and everyone who subscribed to the issue, so teammates can just click
+*Subscribe* on it. The repo is public, so these comments are public too; they only hold what is
+already visible (commits, pusher, release ids, deploy results).
 
 GitHub's built-in emails still apply on top: whoever triggers a failed run gets an email (default
 setting), and anyone can *Watch → Custom → Pull requests* to hear about PRs.
